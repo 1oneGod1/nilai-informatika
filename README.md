@@ -11,7 +11,7 @@ Aplikasi ini memungkinkan guru mengelola nilai siswa dan siswa melihat nilai mer
 
 Aplikasi dapat diakses di:
 
-👉 **[https://nilai-informatika.web.app](https://nilai-informatika.web.app)**
+ **[https://nilai-informatika.web.app](https://nilai-informatika.web.app)**
 
 ---
 
@@ -118,19 +118,27 @@ Guru dapat melakukan **CRUD** data nilai siswa setelah login:
 ##  Screenshot Aplikasi
 
 ### Halaman Pencarian Nilai (Mode Siswa)
-![Halaman Pencarian](screenshots/search.png)
+<img width="1906" height="1073" alt="Screenshot 2026-03-10 103527" src="https://github.com/user-attachments/assets/560948b2-cb3f-49d5-ac49-714959f9f680" />
 
 ### Tampilan Nilai Siswa
-![Tampilan Nilai](screenshots/nilai.png)
+
+<img width="604" height="609" alt="Screenshot 2026-03-10 103707" src="https://github.com/user-attachments/assets/95c61678-6652-42a3-95ce-7e95e92a987e" />
+<img width="587" height="668" alt="Screenshot 2026-03-10 103719" src="https://github.com/user-attachments/assets/6405ab0a-e5a7-4040-b2e2-3e778b51a156" />
+<img width="780" height="667" alt="Screenshot 2026-03-10 103654" src="https://github.com/user-attachments/assets/e02c9100-9f23-474f-bac0-8026ace09a09" />
+
+
 
 ### Login Guru
-![Login Guru](screenshots/login.png)
+<img width="881" height="556" alt="Screenshot 2026-03-10 103609" src="https://github.com/user-attachments/assets/334f9d12-88da-4c8c-9c69-352571fb7d55" />
+
 
 ### Dashboard Guru
-![Dashboard Guru](screenshots/dashboard.png)
+<img width="1904" height="914" alt="Screenshot 2026-03-10 103622" src="https://github.com/user-attachments/assets/e3df4300-bd3f-4890-9fc0-cb72475ce65a" />
+<img width="1788" height="770" alt="Screenshot 2026-03-10 103634" src="https://github.com/user-attachments/assets/08298901-23be-43ce-9801-e6c4dec232d6" />
+
 
 ### Firebase Realtime Database
-![Firebase Database](screenshots/firebase_database.png)
+<img width="1864" height="1254" alt="Screenshot 2026-03-10 104102" src="https://github.com/user-attachments/assets/50439333-fd6a-4b0d-9627-73cddf6ff59c" />
 
 ---
 
