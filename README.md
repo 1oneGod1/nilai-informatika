@@ -187,12 +187,7 @@ nilai-informatika/
 ├── firebase.json       # Konfigurasi Firebase Hosting & Cache
 ├── .firebaserc         # Firebase project alias
 ├── README.md           # Dokumentasi project
-└── screenshots/        # Screenshot untuk README
-    ├── search.png
-    ├── nilai.png
-    ├── login.png
-    ├── dashboard.png
-    └── firebase_database.png
+
 ```
 
 ---
@@ -215,9 +210,3 @@ Project ini dibuat untuk:
 - [Bootstrap 5 Docs](https://getbootstrap.com/docs/5.0)
 
 ---
-
-##  Author
-
-| | |
-|---|---|
-| **Course** | Backend as a Service (BaaS) |
