@@ -1,4 +1,4 @@
-# 📊 Nilai Informatika – Firebase BaaS Project
+#  Nilai Informatika – Firebase BaaS Project
 
 Aplikasi web **Buku Nilai Informatika** yang dibangun menggunakan **Firebase Realtime Database** sebagai Backend as a Service (BaaS).  
 Aplikasi ini memungkinkan guru mengelola nilai siswa dan siswa melihat nilai mereka secara real-time melalui website.
@@ -7,7 +7,7 @@ Aplikasi ini memungkinkan guru mengelola nilai siswa dan siswa melihat nilai mer
 
 ---
 
-## 🌐 Live Demo
+##  Live Demo
 
 Aplikasi dapat diakses di:
 
@@ -15,7 +15,7 @@ Aplikasi dapat diakses di:
 
 ---
 
-## 🚀 Teknologi yang Digunakan
+##  Teknologi yang Digunakan
 
 ### Frontend
 | Teknologi | Keterangan |
@@ -34,7 +34,7 @@ Aplikasi dapat diakses di:
 
 ---
 
-## 🗂 Arsitektur Sistem
+##  Arsitektur Sistem
 
 ```
 User (Browser)
@@ -49,13 +49,13 @@ Firebase Realtime Database (Google Cloud)
 ```
 
 Firebase digunakan sebagai **Backend as a Service** yang menangani:
-- ✅ Penyimpanan data siswa
-- ✅ Sinkronisasi data real-time
-- ✅ Hosting aplikasi
+-  Penyimpanan data siswa
+-  Sinkronisasi data real-time
+-  Hosting aplikasi
 
 ---
 
-## 📋 Struktur Data Database
+##  Struktur Data Database
 
 Data disimpan pada Firebase Realtime Database dengan struktur berikut:
 
@@ -87,35 +87,35 @@ Setiap siswa memiliki **6 field data**:
 
 ---
 
-## ✨ Fitur Aplikasi
+##  Fitur Aplikasi
 
-### 👨‍🎓 Mode Siswa
+###  Mode Siswa
 Siswa **tidak perlu login** untuk melihat nilai. Cukup:
-- 🔍 Cari nama mereka di kolom pencarian
-- 📊 Lihat nilai formatif dan sumatif
-- 🏆 Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
+-  Cari nama mereka di kolom pencarian
+-  Lihat nilai formatif dan sumatif
+-  Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
 
-### 👨‍🏫 Mode Guru
+###  Mode Guru
 Guru dapat melakukan **CRUD** data nilai siswa setelah login:
 
 | Fungsi | Keterangan |
 |---|---|
-| ➕ **Create** | Tambah siswa baru via form input |
-| 👁️ **Read** | Lihat seluruh data siswa real-time |
-| ✏️ **Update** | Edit nilai langsung dari tabel |
-| 🗑️ **Delete** | Hapus data siswa dari database |
+|  **Create** | Tambah siswa baru via form input |
+|  **Read** | Lihat seluruh data siswa real-time |
+|  **Update** | Edit nilai langsung dari tabel |
+|  **Delete** | Hapus data siswa dari database |
 
-### 📊 Fitur Tambahan
-- 🔍 Pencarian nama siswa (live search)
-- 📥 Import data massal dari Excel
-- 📤 Export seluruh data ke Excel
-- 📈 Indikator otomatis: **Tuntas** / **Remedial** / **Susulan**
-- 📱 UI Responsif (mobile-friendly)
-- 🔐 Dashboard guru dilindungi password
+###  Fitur Tambahan
+-  Pencarian nama siswa (live search)
+-  Import data massal dari Excel
+-  Export seluruh data ke Excel
+-  Indikator otomatis: **Tuntas** / **Remedial** / **Susulan**
+-  UI Responsif (mobile-friendly)
+-  Dashboard guru dilindungi password
 
 ---
 
-## 📸 Screenshot Aplikasi
+##  Screenshot Aplikasi
 
 ### Halaman Pencarian Nilai (Mode Siswa)
 ![Halaman Pencarian](screenshots/search.png)
@@ -134,7 +134,7 @@ Guru dapat melakukan **CRUD** data nilai siswa setelah login:
 
 ---
 
-## ⚙️ Instalasi Lokal
+##  Instalasi Lokal
 
 1. Clone repository:
 ```bash
@@ -150,7 +150,7 @@ cd nilai-informatika
 
 ---
 
-## ☁️ Deployment
+##  Deployment
 
 Project di-deploy menggunakan **Firebase Hosting**.
 
@@ -169,7 +169,7 @@ firebase deploy --only hosting
 
 ---
 
-## 📁 Struktur File
+##  Struktur File
 
 ```
 nilai-informatika/
@@ -189,17 +189,17 @@ nilai-informatika/
 
 ---
 
-## 🎯 Tujuan Project
+##  Tujuan Project
 
 Project ini dibuat untuk:
-- 📌 Memahami konsep **Backend as a Service (BaaS)**
-- 📌 Mengimplementasikan **Firebase Realtime Database**
-- 📌 Membangun aplikasi **CRUD berbasis web**
-- 📌 Mengintegrasikan frontend dengan **cloud backend**
+-  Memahami konsep **Backend as a Service (BaaS)**
+-  Mengimplementasikan **Firebase Realtime Database**
+-  Membangun aplikasi **CRUD berbasis web**
+-  Mengintegrasikan frontend dengan **cloud backend**
 
 ---
 
-## 📚 Referensi
+##  Referensi
 
 - [Firebase Documentation](https://firebase.google.com/docs)
 - [Firebase Realtime Database Guide](https://firebase.google.com/docs/database)
@@ -208,7 +208,7 @@ Project ini dibuat untuk:
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 | | |
 |---|---|
