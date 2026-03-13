@@ -13,6 +13,24 @@ Aplikasi dapat diakses di:
 
 **[https://nilai-informatika.web.app](https://nilai-informatika.web.app)**
 
+
+## Teknologi yang Digunakan
+=======
+##  Live Demo
+
+Aplikasi dapat diakses di:
+
+ **[https://nilai-informatika.web.app](https://nilai-informatika.web.app)**
+
+
+##  Teknologi yang Digunakan
+>>>>>>> 3a90986e08a877dd4e436fb0cbd2b9b60a3c1686
+## Live Demo
+
+Aplikasi dapat diakses di:
+
+**[https://nilai-informatika.web.app](https://nilai-informatika.web.app)**
+
 ---
 
 ## Teknologi yang Digunakan
@@ -38,6 +56,10 @@ Aplikasi dapat diakses di:
 ---
 
 ## Arsitektur Sistem
+=======
+##  Arsitektur Sistem
+>>>>>>> 3a90986e08a877dd4e436fb0cbd2b9b60a3c1686
+## Arsitektur Sistem
 
 ```
 User (Browser)
@@ -52,6 +74,15 @@ Firebase Realtime Database (Google Cloud)
 ```
 
 Firebase digunakan sebagai **Backend as a Service** yang menangani:
+
+
+
+## Struktur Data Database
+=======
+
+
+##  Struktur Data Database
+>>>>>>> 3a90986e08a877dd4e436fb0cbd2b9b60a3c1686
 
 - Penyimpanan data siswa
 - Sinkronisasi data real-time
@@ -97,6 +128,100 @@ Setiap siswa memiliki **6 field data**:
 
 Siswa **tidak perlu login** untuk melihat nilai. Cukup:
 
+
+### Mode Guru
+
+Guru melakukan **register/login** menggunakan Firebase Authentication (Email/Password), lalu dapat melakukan CRUD data nilai siswa:
+
+| Fungsi     | Keterangan                         |
+| ---------- | ---------------------------------- |
+| **Create** | Tambah siswa baru via form input   |
+| **Read**   | Lihat seluruh data siswa real-time |
+| **Update** | Edit nilai langsung dari tabel     |
+| **Delete** | Hapus data siswa dari database     |
+
+### Fitur Tambahan
+
+
+
+## Screenshot Aplikasi
+
+### Halaman Pencarian Nilai (Mode Siswa)
+
+### Tampilan Nilai Siswa
+
+<img width="1754" height="1053" alt="image" src="https://github.com/user-attachments/assets/adda0834-9136-4edf-9a61-9a811d4b6ebd" />
+
+### Login Guru
+
+<img width="922" height="816" alt="image" src="https://github.com/user-attachments/assets/15a60fb7-0697-40a8-975f-80348b99a9ba" />
+
+### Dashboard Guru
+
+<img width="2090" height="1309" alt="image" src="https://github.com/user-attachments/assets/aca36eb9-46ce-453f-b761-062ce762f06e" />
+
+### Firebase Realtime Database
+
+<img width="1952" height="1091" alt="image" src="https://github.com/user-attachments/assets/0ccd252d-1957-466f-8ae5-0934eaa05911" />
+
+### Firebase Authentication
+
+<img width="1727" height="648" alt="image" src="https://github.com/user-attachments/assets/4af02c1c-7e80-4aa1-a5fd-609797ee81a1" />
+
+
+## Instalasi Lokal
+=======
+##  Fitur Aplikasi
+
+###  Mode Siswa
+Siswa **tidak perlu login** untuk melihat nilai. Cukup:
+
+###  Mode Guru
+Guru melakukan **register/login** menggunakan Firebase Authentication (Email/Password), lalu dapat melakukan CRUD data nilai siswa:
+
+| Fungsi | Keterangan |
+|---|---|
+|  **Create** | Tambah siswa baru via form input |
+|  **Read** | Lihat seluruh data siswa real-time |
+|  **Update** | Edit nilai langsung dari tabel |
+|  **Delete** | Hapus data siswa dari database |
+
+###  Fitur Tambahan
+
+
+##  Screenshot Aplikasi
+
+### Halaman Pencarian Nilai (Mode Siswa)
+
+
+### Tampilan Nilai Siswa
+<img width="1754" height="1053" alt="image" src="https://github.com/user-attachments/assets/adda0834-9136-4edf-9a61-9a811d4b6ebd" />
+
+
+### Login Guru
+<img width="922" height="816" alt="image" src="https://github.com/user-attachments/assets/15a60fb7-0697-40a8-975f-80348b99a9ba" />
+
+
+### Dashboard Guru
+<img width="2090" height="1309" alt="image" src="https://github.com/user-attachments/assets/aca36eb9-46ce-453f-b761-062ce762f06e" />
+
+
+### Firebase Realtime Database
+<img width="1952" height="1091" alt="image" src="https://github.com/user-attachments/assets/0ccd252d-1957-466f-8ae5-0934eaa05911" />
+
+### Firebase Authentication
+<img width="1727" height="648" alt="image" src="https://github.com/user-attachments/assets/4af02c1c-7e80-4aa1-a5fd-609797ee81a1" />
+
+
+
+
+##  Instalasi Lokal
+>>>>>>> 3a90986e08a877dd4e436fb0cbd2b9b60a3c1686
+## Fitur Aplikasi
+
+### Mode Siswa
+
+Siswa **tidak perlu login** untuk melihat nilai. Cukup:
 - Cari nama mereka di kolom pencarian
 - Lihat nilai formatif dan sumatif
 - Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
@@ -113,11 +238,10 @@ Guru melakukan **register/login** menggunakan Firebase Authentication (Email/Pas
 | **Delete** | Hapus data siswa dari database     |
 
 ### Fitur Tambahan
-
 - Pencarian nama siswa (live search)
 - Import data massal dari Excel
 - Export seluruh data ke Excel
-- Indikator otomatis: **Tuntas** / **Remedial** / **Susulan**
+- Indikator otomatis: **Tuntas** / **Remedial** / **Sususan**
 - UI Responsif (mobile-friendly)
 - Dashboard guru dilindungi password
 - Register/Login guru via Firebase Authentication
@@ -169,6 +293,10 @@ cd nilai-informatika
 ---
 
 ## Deployment
+=======
+##  Deployment
+>>>>>>> 3a90986e08a877dd4e436fb0cbd2b9b60a3c1686
+## Deployment
 
 Project di-deploy menggunakan **Firebase Hosting**.
 
@@ -187,6 +315,10 @@ firebase deploy --only hosting
 
 ---
 
+## Struktur File
+=======
+##  Struktur File
+>>>>>>> 3a90986e08a877dd4e436fb0cbd2b9b60a3c1686
 ## Struktur File
 
 ```
@@ -211,6 +343,20 @@ nilai-informatika/
 
 Project ini dibuat untuk:
 
+
+
+## Referensi
+=======
+##  Tujuan Project
+
+Project ini dibuat untuk:
+
+
+##  Referensi
+>>>>>>> 3a90986e08a877dd4e436fb0cbd2b9b60a3c1686
+## Tujuan Project
+
+Project ini dibuat untuk:
 - Memahami konsep **Backend as a Service (BaaS)**
 - Mengimplementasikan **Firebase Realtime Database**
 - Membangun aplikasi **CRUD berbasis web**
@@ -226,3 +372,8 @@ Project ini dibuat untuk:
 - [Bootstrap 5 Docs](https://getbootstrap.com/docs/5.0)
 
 ---
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 3a90986e08a877dd4e436fb0cbd2b9b60a3c1686
