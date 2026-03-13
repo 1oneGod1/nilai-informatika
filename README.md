@@ -52,6 +52,7 @@ Firebase Realtime Database (Google Cloud)
 ```
 
 Firebase digunakan sebagai **Backend as a Service** yang menangani:
+
 - Penyimpanan data siswa
 - Sinkronisasi data real-time
 - Hosting aplikasi
@@ -95,6 +96,7 @@ Setiap siswa memiliki **6 field data**:
 ### Mode Siswa
 
 Siswa **tidak perlu login** untuk melihat nilai. Cukup:
+
 - Cari nama mereka di kolom pencarian
 - Lihat nilai formatif dan sumatif
 - Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
@@ -111,6 +113,7 @@ Guru melakukan **register/login** menggunakan Firebase Authentication (Email/Pas
 | **Delete** | Hapus data siswa dari database     |
 
 ### Fitur Tambahan
+
 - Pencarian nama siswa (live search)
 - Import data massal dari Excel
 - Export seluruh data ke Excel
@@ -207,6 +210,7 @@ nilai-informatika/
 ## Tujuan Project
 
 Project ini dibuat untuk:
+
 - Memahami konsep **Backend as a Service (BaaS)**
 - Mengimplementasikan **Firebase Realtime Database**
 - Membangun aplikasi **CRUD berbasis web**
@@ -309,7 +313,3 @@ Pull request dan issue dipersilakan untuk pengembangan fitur atau perbaikan bug.
 - [Bootstrap 5 Docs](https://getbootstrap.com/docs/5.0)
 
 ---
-
-## Lisensi
-
-MIT License. Bebas digunakan dan dimodifikasi untuk keperluan pembelajaran.

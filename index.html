@@ -1,13 +1,22 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nilai Informatika</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="style.css?v=20260310b" rel="stylesheet" />
     <script>
@@ -18,32 +27,53 @@
             fontFamily: {
               sans: ["Inter", "sans-serif"],
               poppins: ["Poppins", "sans-serif"],
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      };
     </script>
     <style>
-      body { font-family: "Inter", sans-serif; background-color: #f8fafc; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 24px 24px; }
-      .tile-ok   { color: #059669; }
-      .tile-bad  { color: #DC2626; }
-      .tile-empty{ color: #94a3b8; }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8fafc;
+        background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+        background-size: 24px 24px;
+      }
+      .tile-ok {
+        color: #059669;
+      }
+      .tile-bad {
+        color: #dc2626;
+      }
+      .tile-empty {
+        color: #94a3b8;
+      }
     </style>
   </head>
   <body class="min-h-screen flex flex-col">
-
     <!-- NAVBAR Student -->
-    <nav id="navbarStudent" class="bg-gradient-to-r from-indigo-600 to-blue-500 shadow-md">
+    <nav
+      id="navbarStudent"
+      class="bg-gradient-to-r from-indigo-600 to-blue-500 shadow-md"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
-          <div class="flex items-center gap-3 text-white cursor-pointer" onclick="showStudentView()">
+          <div
+            class="flex items-center gap-3 text-white cursor-pointer"
+            onclick="showStudentView()"
+          >
             <div class="bg-white/20 p-2 rounded-lg">
               <i data-lucide="book-open" class="w-5 h-5 text-white"></i>
             </div>
-            <span class="font-poppins font-semibold text-lg tracking-wide">Nilai Informatika</span>
+            <span class="font-poppins font-semibold text-lg tracking-wide"
+              >Nilai Informatika</span
+            >
           </div>
-          <button id="btnLoginGuru" onclick="openLoginModal()"
-            class="bg-white/10 hover:bg-white text-white hover:text-indigo-600 transition-colors duration-200 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 border border-white/20">
+          <button
+            id="btnLoginGuru"
+            onclick="openLoginModal()"
+            class="bg-white/10 hover:bg-white text-white hover:text-indigo-600 transition-colors duration-200 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 border border-white/20"
+          >
             <i data-lucide="log-in" class="w-4 h-4"></i>
             <span>Login Guru</span>
           </button>
@@ -52,23 +82,43 @@
     </nav>
 
     <!-- NAVBAR Teacher -->
-    <nav id="navbarTeacher" style="display:none" class="bg-gradient-to-r from-indigo-600 to-blue-600 shadow-md sticky top-0 z-50">
+    <nav
+      id="navbarTeacher"
+      style="display: none"
+      class="bg-gradient-to-r from-indigo-600 to-blue-600 shadow-md sticky top-0 z-50"
+    >
       <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center gap-3 text-white">
             <div class="bg-white/20 p-2 rounded-lg">
               <i data-lucide="monitor-stop" class="w-5 h-5 text-white"></i>
             </div>
-            <span class="font-poppins font-semibold text-lg tracking-wide hidden sm:block">Input Nilai Informatika</span>
-            <span class="font-poppins font-semibold text-lg tracking-wide sm:hidden">Informatika</span>
-            <span class="bg-emerald-500/20 text-emerald-100 border border-emerald-400/30 text-xs px-2.5 py-1 rounded-full font-medium ml-1">Mode Guru</span>
+            <span
+              class="font-poppins font-semibold text-lg tracking-wide hidden sm:block"
+              >Input Nilai Informatika</span
+            >
+            <span
+              class="font-poppins font-semibold text-lg tracking-wide sm:hidden"
+              >Informatika</span
+            >
+            <span
+              class="bg-emerald-500/20 text-emerald-100 border border-emerald-400/30 text-xs px-2.5 py-1 rounded-full font-medium ml-1"
+              >Mode Guru</span
+            >
           </div>
           <div class="flex items-center gap-3">
-            <button onclick="showStudentView()" class="bg-white/10 hover:bg-white text-white hover:text-indigo-600 transition-colors duration-200 px-3 py-2 rounded-lg font-medium text-sm hidden sm:flex items-center gap-2 border border-white/20">
+            <button
+              onclick="showStudentView()"
+              class="bg-white/10 hover:bg-white text-white hover:text-indigo-600 transition-colors duration-200 px-3 py-2 rounded-lg font-medium text-sm hidden sm:flex items-center gap-2 border border-white/20"
+            >
               <i data-lucide="home" class="w-4 h-4"></i> Homepage
             </button>
-            <button onclick="logoutGuru()" class="bg-rose-500 hover:bg-rose-600 text-white transition-colors duration-200 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm">
-              <i data-lucide="log-out" class="w-4 h-4"></i> <span class="hidden sm:inline">Keluar</span>
+            <button
+              onclick="logoutGuru()"
+              class="bg-rose-500 hover:bg-rose-600 text-white transition-colors duration-200 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm"
+            >
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Keluar</span>
             </button>
           </div>
         </div>
@@ -81,41 +131,63 @@
     <!-- VIEW 1: STUDENT -->
     <div id="studentView">
       <main class="flex items-center justify-center px-4 py-10 sm:py-16">
-        <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.07)] border border-slate-100 w-full max-w-xl overflow-hidden">
-
+        <div
+          class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.07)] border border-slate-100 w-full max-w-xl overflow-hidden"
+        >
           <div class="p-8 sm:p-10">
             <div class="flex justify-center mb-6">
               <div class="bg-indigo-50 text-indigo-600 p-4 rounded-2xl">
                 <i data-lucide="search" class="w-9 h-9"></i>
               </div>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-bold font-poppins text-center mb-7 text-slate-800">Cari Nilai Siswa</h1>
+            <h1
+              class="text-2xl sm:text-3xl font-bold font-poppins text-center mb-7 text-slate-800"
+            >
+              Cari Nilai Siswa
+            </h1>
 
             <div class="flex flex-col sm:flex-row gap-3">
               <div class="relative flex-grow">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <div
+                  class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+                >
                   <i data-lucide="user" class="w-5 h-5 text-slate-400"></i>
                 </div>
-                <input type="text" id="studentSearchInput"
+                <input
+                  type="text"
+                  id="studentSearchInput"
                   placeholder="Masukkan nama lengkap siswa..."
                   class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 focus:bg-white transition-all text-slate-700 font-medium"
-                  onkeydown="if(event.key==='Enter') searchStudent()" />
+                  onkeydown="if (event.key === 'Enter') searchStudent();"
+                />
               </div>
-              <button onclick="searchStudent()"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-xl font-semibold transition-colors duration-200 shadow-sm flex justify-center items-center">
+              <button
+                onclick="searchStudent()"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-xl font-semibold transition-colors duration-200 shadow-sm flex justify-center items-center"
+              >
                 Cari
               </button>
             </div>
           </div>
 
-          <div id="studentResultArea" class="border-t border-slate-100 bg-slate-50/50 p-5 sm:p-8 md:p-10">
-            <div id="searchResults" style="display:none"></div>
-            <div id="studentDetail" style="display:none"></div>
+          <div
+            id="studentResultArea"
+            class="border-t border-slate-100 bg-slate-50/50 p-5 sm:p-8 md:p-10"
+          >
+            <div id="searchResults" style="display: none"></div>
+            <div id="studentDetail" style="display: none"></div>
             <div id="searchPlaceholder">
               <div class="text-center py-4">
-                <i data-lucide="info" class="w-8 h-8 mx-auto mb-3 text-slate-300"></i>
-                <p class="font-semibold text-slate-500 mb-2">Cara Mencari Nilai</p>
-                <ul class="text-sm text-slate-400 space-y-1 text-left inline-block">
+                <i
+                  data-lucide="info"
+                  class="w-8 h-8 mx-auto mb-3 text-slate-300"
+                ></i>
+                <p class="font-semibold text-slate-500 mb-2">
+                  Cara Mencari Nilai
+                </p>
+                <ul
+                  class="text-sm text-slate-400 space-y-1 text-left inline-block"
+                >
                   <li>&#10003; Masukkan <strong>nama lengkap</strong> Anda</li>
                   <li>&#10003; Pastikan ejaan nama sudah benar</li>
                   <li>&#10003; Klik tombol <strong>Cari</strong></li>
@@ -124,33 +196,52 @@
               </div>
             </div>
           </div>
-
         </div>
       </main>
     </div>
 
     <!-- VIEW 2: TEACHER -->
-    <div id="teacherView" style="display:none">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10 space-y-5 sm:space-y-6">
-
+    <div id="teacherView" style="display: none">
+      <div
+        class="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10 space-y-5 sm:space-y-6"
+      >
         <!-- Settings Accordion -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <button class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden')">
-            <span class="flex items-center gap-2.5 font-semibold text-slate-700 text-sm">
+        <div
+          class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
+        >
+          <button
+            class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors"
+            onclick="this.nextElementSibling.classList.toggle('hidden')"
+          >
+            <span
+              class="flex items-center gap-2.5 font-semibold text-slate-700 text-sm"
+            >
               <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i>
               Pengaturan Kolom Formatif
             </span>
             <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
           </button>
-          <div class="hidden border-t border-slate-100 bg-slate-50/60 px-6 py-5">
+          <div
+            class="hidden border-t border-slate-100 bg-slate-50/60 px-6 py-5"
+          >
             <div class="flex items-end gap-4 flex-wrap">
               <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1.5">Jumlah Formatif</label>
-                <input type="number" id="numFormatif" value="2" min="1" max="10"
-                  class="w-24 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors" />
+                <label class="block text-xs font-semibold text-slate-600 mb-1.5"
+                  >Jumlah Formatif</label
+                >
+                <input
+                  type="number"
+                  id="numFormatif"
+                  value="2"
+                  min="1"
+                  max="10"
+                  class="w-24 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                />
               </div>
-              <button onclick="applySettings()"
-                class="flex items-center gap-2 bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <button
+                onclick="applySettings()"
+                class="flex items-center gap-2 bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
+              >
                 <i data-lucide="check-circle" class="w-4 h-4"></i> Terapkan
               </button>
             </div>
@@ -158,50 +249,96 @@
         </div>
 
         <!-- Import / Export -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"
+        >
           <div class="flex items-stretch">
             <div class="w-1 flex-shrink-0 bg-indigo-500 rounded-l-2xl"></div>
             <div class="flex-1 px-6 py-5 sm:px-7 sm:py-6">
               <div class="flex items-center gap-2.5 mb-5">
-                <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-500"></i>
-                <h2 class="font-semibold text-slate-800 text-base">Import / Export Data Siswa</h2>
+                <i
+                  data-lucide="file-spreadsheet"
+                  class="w-5 h-5 text-indigo-500"
+                ></i>
+                <h2 class="font-semibold text-slate-800 text-base">
+                  Import / Export Data Siswa
+                </h2>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <!-- Export -->
-                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5 flex flex-col gap-3">
+                <div
+                  class="bg-emerald-50 border border-emerald-200 rounded-xl p-5 flex flex-col gap-3"
+                >
                   <div>
-                    <p class="font-semibold text-emerald-800 text-sm">Export ke Excel</p>
-                    <p class="text-xs text-emerald-600 mt-0.5">Download semua data siswa dan nilai</p>
+                    <p class="font-semibold text-emerald-800 text-sm">
+                      Export ke Excel
+                    </p>
+                    <p class="text-xs text-emerald-600 mt-0.5">
+                      Download semua data siswa dan nilai
+                    </p>
                   </div>
-                  <button onclick="exportExcel()"
-                    class="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-medium transition-colors shadow-sm w-full mt-auto">
-                    <i data-lucide="download" class="w-4 h-4"></i> Download Excel
+                  <button
+                    onclick="exportExcel()"
+                    class="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-medium transition-colors shadow-sm w-full mt-auto"
+                  >
+                    <i data-lucide="download" class="w-4 h-4"></i> Download
+                    Excel
                   </button>
                 </div>
                 <!-- Template -->
-                <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 flex flex-col gap-3">
+                <div
+                  class="bg-blue-50 border border-blue-200 rounded-xl p-5 flex flex-col gap-3"
+                >
                   <div>
-                    <p class="font-semibold text-blue-800 text-sm">Template Import</p>
-                    <p class="text-xs text-blue-600 mt-0.5">Download template Excel dengan kolom lengkap</p>
+                    <p class="font-semibold text-blue-800 text-sm">
+                      Template Import
+                    </p>
+                    <p class="text-xs text-blue-600 mt-0.5">
+                      Download template Excel dengan kolom lengkap
+                    </p>
                   </div>
-                  <button onclick="downloadTemplate()"
-                    class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors shadow-sm w-full mt-auto">
-                    <i data-lucide="file-down" class="w-4 h-4"></i> Download Template
+                  <button
+                    onclick="downloadTemplate()"
+                    class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition-colors shadow-sm w-full mt-auto"
+                  >
+                    <i data-lucide="file-down" class="w-4 h-4"></i> Download
+                    Template
                   </button>
                 </div>
                 <!-- Import -->
-                <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-5 flex flex-col gap-3">
+                <div
+                  class="bg-indigo-50 border border-indigo-200 rounded-xl p-5 flex flex-col gap-3"
+                >
                   <div>
-                    <p class="font-semibold text-indigo-800 text-sm">Import dari Excel</p>
-                    <p class="text-xs text-indigo-600 mt-0.5">Upload file Excel untuk mengimpor data</p>
+                    <p class="font-semibold text-indigo-800 text-sm">
+                      Import dari Excel
+                    </p>
+                    <p class="text-xs text-indigo-600 mt-0.5">
+                      Upload file Excel untuk mengimpor data
+                    </p>
                   </div>
-                  <label class="flex items-center justify-center gap-2 bg-white border-2 border-dashed border-indigo-300 hover:border-indigo-500 text-indigo-600 hover:text-indigo-700 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer">
+                  <label
+                    class="flex items-center justify-center gap-2 bg-white border-2 border-dashed border-indigo-300 hover:border-indigo-500 text-indigo-600 hover:text-indigo-700 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                  >
                     <i data-lucide="upload" class="w-4 h-4"></i> Pilih File
-                    <input type="file" id="importFile" accept=".xlsx,.xls,.csv" class="hidden" onchange="this.closest('label').querySelector('span').textContent = this.files[0]?.name || 'Pilih File'" />
+                    <input
+                      type="file"
+                      id="importFile"
+                      accept=".xlsx,.xls,.csv"
+                      class="hidden"
+                      onchange="
+                        this.closest('label').querySelector(
+                          'span',
+                        ).textContent = this.files[0]?.name || 'Pilih File'
+                      "
+                    />
                   </label>
-                  <button onclick="importExcel()"
-                    class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg text-sm font-medium transition-colors shadow-sm w-full">
-                    <i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload &amp; Import
+                  <button
+                    onclick="importExcel()"
+                    class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg text-sm font-medium transition-colors shadow-sm w-full"
+                  >
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload
+                    &amp; Import
                   </button>
                 </div>
               </div>
@@ -210,34 +347,67 @@
         </div>
 
         <!-- Tambah Siswa -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"
+        >
           <div class="flex items-stretch">
             <div class="w-1 flex-shrink-0 bg-emerald-500 rounded-l-2xl"></div>
             <div class="flex-1 px-6 py-5 sm:px-7 sm:py-6">
               <div class="flex items-center gap-2.5 mb-5">
                 <i data-lucide="user-plus" class="w-5 h-5 text-emerald-600"></i>
-                <h2 class="font-semibold text-slate-800 text-base">Tambah Siswa Baru</h2>
+                <h2 class="font-semibold text-slate-800 text-base">
+                  Tambah Siswa Baru
+                </h2>
               </div>
               <form id="addForm" onsubmit="addSiswa(event)">
-                <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-end gap-3">
+                <div
+                  class="grid grid-cols-2 sm:flex sm:flex-wrap items-end gap-3"
+                >
                   <div class="col-span-2 flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-slate-600">Nama Siswa</label>
-                    <input type="text" id="nama" placeholder="Nama lengkap" required
-                      class="w-full sm:w-48 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" />
+                    <label class="text-xs font-semibold text-slate-600"
+                      >Nama Siswa</label
+                    >
+                    <input
+                      type="text"
+                      id="nama"
+                      placeholder="Nama lengkap"
+                      required
+                      class="w-full sm:w-48 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                    />
                   </div>
                   <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-slate-600">Kelas</label>
-                    <input type="text" id="kelas" placeholder="10 RPL 1" required
-                      class="w-full sm:w-32 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" />
+                    <label class="text-xs font-semibold text-slate-600"
+                      >Kelas</label
+                    >
+                    <input
+                      type="text"
+                      id="kelas"
+                      placeholder="10 RPL 1"
+                      required
+                      class="w-full sm:w-32 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                    />
                   </div>
-                  <div id="formatifGroupAdd" class="flex gap-2 flex-wrap items-end col-span-2 sm:col-span-1"></div>
+                  <div
+                    id="formatifGroupAdd"
+                    class="flex gap-2 flex-wrap items-end col-span-2 sm:col-span-1"
+                  ></div>
                   <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-slate-600">Sumatif</label>
-                    <input type="number" id="sumatif" placeholder="0-100" min="0" max="100"
-                      class="w-full sm:w-24 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" />
+                    <label class="text-xs font-semibold text-slate-600"
+                      >Sumatif</label
+                    >
+                    <input
+                      type="number"
+                      id="sumatif"
+                      placeholder="0-100"
+                      min="0"
+                      max="100"
+                      class="w-full sm:w-24 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                    />
                   </div>
-                  <button type="submit"
-                    class="col-span-2 sm:col-span-1 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto">
+                  <button
+                    type="submit"
+                    class="col-span-2 sm:col-span-1 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto"
+                  >
                     <i data-lucide="plus" class="w-4 h-4"></i> Tambah Siswa
                   </button>
                 </div>
@@ -247,37 +417,73 @@
         </div>
 
         <!-- Tabel Nilai -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"
+        >
           <!-- Toolbar -->
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-5 sm:px-7 py-4 sm:py-5 border-b border-slate-100">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-5 sm:px-7 py-4 sm:py-5 border-b border-slate-100"
+          >
             <div>
-              <h2 class="font-semibold text-slate-800 text-base">Input &amp; Edit Nilai Siswa</h2>
-              <p class="text-xs text-slate-400 mt-0.5">Menampilkan <span id="shownCount" class="font-semibold text-slate-600">0</span> dari <strong id="totalCount" class="text-slate-600">0</strong> siswa</p>
+              <h2 class="font-semibold text-slate-800 text-base">
+                Input &amp; Edit Nilai Siswa
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Menampilkan
+                <span id="shownCount" class="font-semibold text-slate-600"
+                  >0</span
+                >
+                dari
+                <strong id="totalCount" class="text-slate-600">0</strong> siswa
+              </p>
             </div>
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <div
+              class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5"
+            >
               <div class="relative">
-                <i data-lucide="filter" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                <select id="filterKelas" onchange="filterTable()"
-                  class="w-full sm:w-auto pl-8 pr-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors bg-white appearance-none" style="min-width:160px">
+                <i
+                  data-lucide="filter"
+                  class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                ></i>
+                <select
+                  id="filterKelas"
+                  onchange="filterTable()"
+                  class="w-full sm:w-auto pl-8 pr-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors bg-white appearance-none"
+                  style="min-width: 160px"
+                >
                   <option value="">Semua Kelas</option>
                 </select>
               </div>
               <div class="relative">
-                <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama..." oninput="filterTable()"
-                  class="w-full sm:w-56 pl-8 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors" />
+                <i
+                  data-lucide="search"
+                  class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                ></i>
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="Cari nama..."
+                  oninput="filterTable()"
+                  class="w-full sm:w-56 pl-8 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                />
               </div>
             </div>
           </div>
           <!-- Table -->
           <div class="overflow-x-auto">
             <table class="w-full text-sm" id="siswaTable">
-              <thead id="tableHead" class="bg-slate-50 border-b border-slate-200"></thead>
+              <thead
+                id="tableHead"
+                class="bg-slate-50 border-b border-slate-200"
+              ></thead>
               <tbody id="tableBody">
                 <tr>
                   <td colspan="20" class="text-center py-10 text-slate-400">
                     <div class="flex flex-col items-center gap-2">
-                      <i data-lucide="loader-circle" class="w-6 h-6 text-indigo-400 animate-spin"></i>
+                      <i
+                        data-lucide="loader-circle"
+                        class="w-6 h-6 text-indigo-400 animate-spin"
+                      ></i>
                       <span class="text-sm">Memuat data...</span>
                     </div>
                   </td>
@@ -286,51 +492,98 @@
             </table>
           </div>
         </div>
-
       </div>
     </div>
 
     <!-- MODAL Login/Register -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" style="max-width:380px">
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 380px">
         <div class="modal-content border-0 rounded-3 overflow-hidden shadow-lg">
-          <div class="modal-header border-0 pb-0 position-relative" style="background:linear-gradient(135deg,#4f46e5,#3b82f6);padding:24px 24px 16px">
+          <div
+            class="modal-header border-0 pb-0 position-relative"
+            style="
+              background: linear-gradient(135deg, #4f46e5, #3b82f6);
+              padding: 24px 24px 16px;
+            "
+          >
             <div class="text-white w-100 text-center">
               <div class="d-flex justify-content-center mb-2">
-                <div style="background:rgba(255,255,255,0.2);border-radius:12px;padding:10px">
+                <div
+                  style="
+                    background: rgba(255, 255, 255, 0.2);
+                    border-radius: 12px;
+                    padding: 10px;
+                  "
+                >
                   <i class="bi bi-shield-lock-fill fs-4 text-white"></i>
                 </div>
               </div>
               <h5 class="modal-title fw-bold mb-1">Login Guru</h5>
               <p class="small opacity-75 mb-0">Akses dashboard input nilai</p>
             </div>
-            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+            <button
+              type="button"
+              class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body p-4">
             <form onsubmit="submitLogin(event)">
               <div class="mb-3">
                 <label class="form-label fw-semibold small">Email Guru</label>
-                <input type="email" class="form-control" id="emailInput" placeholder="contoh@email.com" required />
+                <input
+                  type="email"
+                  class="form-control"
+                  id="emailInput"
+                  placeholder="contoh@email.com"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label fw-semibold small">Kata Sandi</label>
                 <div class="input-group">
-                  <input type="password" class="form-control" id="passwordInput" placeholder="Minimal 6 karakter" required minlength="6" />
-                  <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="passwordInput"
+                    placeholder="Minimal 6 karakter"
+                    required
+                    minlength="6"
+                  />
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    onclick="togglePassword()"
+                  >
                     <i class="bi bi-eye" id="eyeIcon"></i>
                   </button>
                 </div>
-                <div class="text-danger small mt-1" id="loginError" style="display:none">
-                  <i class="bi bi-x-circle me-1"></i><span id="loginErrorText">Login gagal.</span>
+                <div
+                  class="text-danger small mt-1"
+                  id="loginError"
+                  style="display: none"
+                >
+                  <i class="bi bi-x-circle me-1"></i
+                  ><span id="loginErrorText">Login gagal.</span>
                 </div>
               </div>
-              <button type="submit" class="btn w-100 fw-semibold py-2 text-white" style="background:linear-gradient(135deg,#4f46e5,#3b82f6)">
+              <button
+                type="submit"
+                class="btn w-100 fw-semibold py-2 text-white"
+                style="background: linear-gradient(135deg, #4f46e5, #3b82f6)"
+              >
                 <i class="bi bi-unlock-fill me-2"></i>Masuk ke Dashboard
               </button>
-              <button type="button" onclick="submitRegister()" class="btn btn-outline-primary w-100 fw-semibold py-2 mt-2">
+              <button
+                type="button"
+                onclick="submitRegister()"
+                class="btn btn-outline-primary w-100 fw-semibold py-2 mt-2"
+              >
                 <i class="bi bi-person-plus-fill me-2"></i>Register Akun Guru
               </button>
-              <p class="text-muted small mt-3 mb-0 text-center">Register sekali saja, lalu login menggunakan akun yang sama.</p>
+              <p class="text-muted small mt-3 mb-0 text-center">
+                Register sekali saja, lalu login menggunakan akun yang sama.
+              </p>
             </form>
           </div>
         </div>
@@ -343,6 +596,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="app.js?v=20260313a"></script>
-    <script>lucide.createIcons();</script>
+    <script>
+      lucide.createIcons();
+    </script>
   </body>
 </html>

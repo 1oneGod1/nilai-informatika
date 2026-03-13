@@ -3,14 +3,15 @@
    Firebase Realtime Database  CRUD Implementation
    ===================================================== */
 
-// 
+//
 // 1. FIREBASE CONFIGURATION
 //    Ganti dengan config Firebase Anda
-// 
+//
 const firebaseConfig = {
   apiKey: "AIzaSyCvzB1z9VCja-DEAzkSbE7m0d_lZMJ7KhE",
   authDomain: "nilai-informatika.firebaseapp.com",
-  databaseURL: "https://nilai-informatika-default-rtdb.asia-southeast1.firebasedatabase.app",
+  databaseURL:
+    "https://nilai-informatika-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "nilai-informatika",
   storageBucket: "nilai-informatika.firebasestorage.app",
   messagingSenderId: "4250294265",
@@ -23,20 +24,20 @@ const db = firebase.database();
 const auth = firebase.auth();
 const siswaRef = db.ref("siswa");
 
-// 
+//
 // 2. GLOBAL STATE
-// 
+//
 let numFormatif = 2;
-let allSiswa    = [];
+let allSiswa = [];
 let isTeacherLoggedIn = false;
 
 // KKM per kelas (numeric key)
-const KKM_MAP = { 7:67, 8:68, 9:69, 10:75, 11:76, 12:77 };
+const KKM_MAP = { 7: 67, 8: 68, 9: 69, 10: 75, 11: 76, 12: 77 };
 
-// 
+//
 // Utility: extract numeric grade from kelas string
 // "10 RPL 1"  10,  "7A"  7,  "12"  12
-// 
+//
 function getKKM(kelasStr) {
   const match = String(kelasStr).match(/\d+/);
   if (!match) return 0;
@@ -44,9 +45,9 @@ function getKKM(kelasStr) {
   return KKM_MAP[grade] || 0;
 }
 
-// 
+//
 // 3. PAGE LOAD
-// 
+//
 document.addEventListener("DOMContentLoaded", () => {
   renderFormFormatifInputs();
   renderTableHead();
@@ -54,28 +55,28 @@ document.addEventListener("DOMContentLoaded", () => {
   bindAuthState();
 });
 
-// 
+//
 // VIEW SWITCHING
-// 
+//
 function showStudentView() {
-  document.getElementById("studentView").style.display   = "";
-  document.getElementById("teacherView").style.display   = "none";
+  document.getElementById("studentView").style.display = "";
+  document.getElementById("teacherView").style.display = "none";
   document.getElementById("navbarStudent").style.display = "";
   document.getElementById("navbarTeacher").style.display = "none";
   setTimeout(() => lucide.createIcons(), 50);
 }
 
 function showTeacherView() {
-  document.getElementById("studentView").style.display   = "none";
-  document.getElementById("teacherView").style.display   = "";
+  document.getElementById("studentView").style.display = "none";
+  document.getElementById("teacherView").style.display = "";
   document.getElementById("navbarStudent").style.display = "none";
   document.getElementById("navbarTeacher").style.display = "";
   setTimeout(() => lucide.createIcons(), 50);
 }
 
-// 
+//
 // LOGIN GURU
-// 
+//
 function openLoginModal() {
   document.getElementById("emailInput").value = "";
   document.getElementById("passwordInput").value = "";
@@ -88,32 +89,38 @@ function submitLogin(event) {
   const email = document.getElementById("emailInput").value.trim();
   const pwd = document.getElementById("passwordInput").value;
 
-  auth.signInWithEmailAndPassword(email, pwd)
+  auth
+    .signInWithEmailAndPassword(email, pwd)
     .then(() => {
       hideLoginError();
-      const modal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
+      const modal = bootstrap.Modal.getInstance(
+        document.getElementById("loginModal"),
+      );
       if (modal) modal.hide();
       showAlert("Login berhasil. Selamat datang di dashboard guru.", "success");
     })
-    .catch(err => showLoginError(err.message));
+    .catch((err) => showLoginError(err.message));
 }
 
 function submitRegister() {
   const email = document.getElementById("emailInput").value.trim();
   const pwd = document.getElementById("passwordInput").value;
 
-  auth.createUserWithEmailAndPassword(email, pwd)
+  auth
+    .createUserWithEmailAndPassword(email, pwd)
     .then(() => {
       hideLoginError();
-      const modal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
+      const modal = bootstrap.Modal.getInstance(
+        document.getElementById("loginModal"),
+      );
       if (modal) modal.hide();
       showAlert("Register berhasil. Akun guru siap digunakan.", "success");
     })
-    .catch(err => showLoginError(err.message));
+    .catch((err) => showLoginError(err.message));
 }
 
 function togglePassword() {
-  const inp  = document.getElementById("passwordInput");
+  const inp = document.getElementById("passwordInput");
   const icon = document.getElementById("eyeIcon");
   if (inp.type === "password") {
     inp.type = "text";
@@ -125,13 +132,14 @@ function togglePassword() {
 }
 
 function logoutGuru() {
-  auth.signOut()
+  auth
+    .signOut()
     .then(() => showAlert("Anda telah keluar dari mode guru.", "info"))
-    .catch(err => showAlert("Gagal logout: " + err.message, "danger"));
+    .catch((err) => showAlert("Gagal logout: " + err.message, "danger"));
 }
 
 function bindAuthState() {
-  auth.onAuthStateChanged(user => {
+  auth.onAuthStateChanged((user) => {
     isTeacherLoggedIn = !!user;
     if (isTeacherLoggedIn) {
       showTeacherView();
@@ -149,10 +157,11 @@ function showLoginError(message) {
     "auth/wrong-password": "Email atau kata sandi salah.",
     "auth/user-not-found": "Akun belum terdaftar. Silakan register dulu.",
     "auth/email-already-in-use": "Email sudah terdaftar. Silakan login.",
-    "auth/weak-password": "Password terlalu lemah (minimal 6 karakter)."
+    "auth/weak-password": "Password terlalu lemah (minimal 6 karakter).",
   };
   const code = String(message || "").match(/auth\/[a-z-]+/)?.[0];
-  const text = map[code] || "Autentikasi gagal. Periksa email dan kata sandi Anda.";
+  const text =
+    map[code] || "Autentikasi gagal. Periksa email dan kata sandi Anda.";
   const errWrap = document.getElementById("loginError");
   const errText = document.getElementById("loginErrorText");
   if (errText) errText.textContent = text;
@@ -164,9 +173,9 @@ function hideLoginError() {
   if (errWrap) errWrap.style.display = "none";
 }
 
-// 
+//
 // 4. SETTINGS  formatif columns
-// 
+//
 function applySettings() {
   const val = parseInt(document.getElementById("numFormatif").value, 10);
   if (isNaN(val) || val < 1 || val > 10) {
@@ -177,12 +186,15 @@ function applySettings() {
   renderFormFormatifInputs();
   renderTableHead();
   renderTableBody(allSiswa);
-  showAlert("Pengaturan diterapkan: " + numFormatif + " kolom Formatif.", "success");
+  showAlert(
+    "Pengaturan diterapkan: " + numFormatif + " kolom Formatif.",
+    "success",
+  );
 }
 
-// 
+//
 // 5. RENDER ADD-FORM FORMATIF INPUTS
-// 
+//
 function renderFormFormatifInputs() {
   const grp = document.getElementById("formatifGroupAdd");
   if (!grp) return;
@@ -198,11 +210,13 @@ function renderFormFormatifInputs() {
   }
 }
 
-// 
+//
 // 6. RENDER TABLE HEAD
-// 
-const TH = 'px-4 py-3 font-semibold text-center text-slate-500 text-xs uppercase tracking-wider whitespace-nowrap';
-const TH_LEFT = 'px-4 py-3 font-semibold text-left text-slate-500 text-xs uppercase tracking-wider whitespace-nowrap';
+//
+const TH =
+  "px-4 py-3 font-semibold text-center text-slate-500 text-xs uppercase tracking-wider whitespace-nowrap";
+const TH_LEFT =
+  "px-4 py-3 font-semibold text-left text-slate-500 text-xs uppercase tracking-wider whitespace-nowrap";
 function renderTableHead() {
   let fCols = "";
   for (let i = 1; i <= numFormatif; i++) {
@@ -222,15 +236,18 @@ function renderTableHead() {
     </tr>`;
 }
 
-// 
+//
 // 7. STATUS CALC
-// 
+//
 function calcStatus(kelasStr, formatifArr, sumatif) {
   const kkm = getKKM(kelasStr);
-  const hasEmpty = formatifArr.some(v => v === "" || v === null || v === undefined);
+  const hasEmpty = formatifArr.some(
+    (v) => v === "" || v === null || v === undefined,
+  );
   if (hasEmpty) return "Susulan";
-  if (formatifArr.some(v => Number(v) < kkm)) return "Remedial";
-  if (sumatif === "" || sumatif === null || sumatif === undefined) return "Susulan";
+  if (formatifArr.some((v) => Number(v) < kkm)) return "Remedial";
+  if (sumatif === "" || sumatif === null || sumatif === undefined)
+    return "Susulan";
   if (Number(sumatif) < kkm) return "Remedial";
   return "Tuntas";
 }
@@ -243,9 +260,9 @@ function buildFormatifArray(s) {
   return arr;
 }
 
-// 
+//
 // 8. RENDER TABLE BODY (inline editing)
-// 
+//
 function renderTableBody(data) {
   const tbody = document.getElementById("tableBody");
   if (!tbody) return;
@@ -268,11 +285,13 @@ function renderTableBody(data) {
     return;
   }
 
-  const searchVal   = (document.getElementById("searchInput")?.value || "").toLowerCase();
+  const searchVal = (
+    document.getElementById("searchInput")?.value || ""
+  ).toLowerCase();
   const filterKelas = document.getElementById("filterKelas")?.value || "";
 
-  let filtered = data.filter(s => {
-    const matchName  = s.nama.toLowerCase().includes(searchVal);
+  let filtered = data.filter((s) => {
+    const matchName = s.nama.toLowerCase().includes(searchVal);
     const matchKelas = filterKelas ? s.kelas === filterKelas : true;
     return matchName && matchKelas;
   });
@@ -291,28 +310,33 @@ function renderTableBody(data) {
     return;
   }
 
-  tbody.innerHTML = filtered.map((s, idx) => {
-    const kkm = getKKM(s.kelas);
-    const formatifArr = buildFormatifArray(s);
-    const status = calcStatus(s.kelas, formatifArr, s.sumatif);
+  tbody.innerHTML = filtered
+    .map((s, idx) => {
+      const kkm = getKKM(s.kelas);
+      const formatifArr = buildFormatifArray(s);
+      const status = calcStatus(s.kelas, formatifArr, s.sumatif);
 
-    let fInputs = "";
-    for (let i = 0; i < numFormatif; i++) {
-      const val = formatifArr[i];
-      const num = (val !== "" && val !== null && val !== undefined) ? Number(val) : "";
-      const cls = (num !== "" && num < kkm) ? SCORE_BAD : SCORE_OK;
-      fInputs += `
+      let fInputs = "";
+      for (let i = 0; i < numFormatif; i++) {
+        const val = formatifArr[i];
+        const num =
+          val !== "" && val !== null && val !== undefined ? Number(val) : "";
+        const cls = num !== "" && num < kkm ? SCORE_BAD : SCORE_OK;
+        fInputs += `
         <td class="px-3 py-2 text-center">
           <input type="number" min="0" max="100"
-            class="${cls}" id="r-f${i+1}-${s.id}"
+            class="${cls}" id="r-f${i + 1}-${s.id}"
             value="${num}" placeholder="-"
             oninput="highlightScore(this,${kkm})" />
         </td>`;
-    }
+      }
 
-    const sumatifVal = (s.sumatif !== "" && s.sumatif !== null && s.sumatif !== undefined) ? Number(s.sumatif) : "";
-    const sCls = (sumatifVal !== "" && sumatifVal < kkm) ? SCORE_BAD : SCORE_OK;
-    const sumatifInput = `
+      const sumatifVal =
+        s.sumatif !== "" && s.sumatif !== null && s.sumatif !== undefined
+          ? Number(s.sumatif)
+          : "";
+      const sCls = sumatifVal !== "" && sumatifVal < kkm ? SCORE_BAD : SCORE_OK;
+      const sumatifInput = `
       <td class="px-3 py-2 text-center">
         <input type="number" min="0" max="100"
           class="${sCls}" id="r-s-${s.id}"
@@ -320,23 +344,29 @@ function renderTableBody(data) {
           oninput="highlightScore(this,${kkm})" />
       </td>`;
 
-    let dotColor, chipCls, chipLabel;
-    if (status === "Tuntas") {
-      dotColor = 'bg-emerald-500'; chipLabel = 'Tuntas';
-      chipCls = 'inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-medium';
-    } else if (status === "Remedial") {
-      dotColor = 'bg-rose-500'; chipLabel = 'Remedial';
-      chipCls = 'inline-flex items-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-full text-xs font-medium';
-    } else {
-      dotColor = 'bg-amber-500'; chipLabel = 'Susulan';
-      chipCls = 'inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full text-xs font-medium';
-    }
-    const statusChip = `<span class="${chipCls}"><span class="w-1.5 h-1.5 rounded-full ${dotColor} flex-shrink-0"></span>${chipLabel}</span>`;
+      let dotColor, chipCls, chipLabel;
+      if (status === "Tuntas") {
+        dotColor = "bg-emerald-500";
+        chipLabel = "Tuntas";
+        chipCls =
+          "inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-medium";
+      } else if (status === "Remedial") {
+        dotColor = "bg-rose-500";
+        chipLabel = "Remedial";
+        chipCls =
+          "inline-flex items-center gap-1.5 bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-full text-xs font-medium";
+      } else {
+        dotColor = "bg-amber-500";
+        chipLabel = "Susulan";
+        chipCls =
+          "inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full text-xs font-medium";
+      }
+      const statusChip = `<span class="${chipCls}"><span class="w-1.5 h-1.5 rounded-full ${dotColor} flex-shrink-0"></span>${chipLabel}</span>`;
 
-    const saveSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
-    const delSvg  = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"/></svg>`;
+      const saveSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+      const delSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"/></svg>`;
 
-    return `
+      return `
       <tr id="row-${s.id}" class="border-t border-slate-100 hover:bg-slate-50/80 transition-colors">
         <td class="px-4 py-3 text-center text-slate-400 text-sm font-medium">${idx + 1}</td>
         <td class="px-4 py-3 font-medium text-slate-800 whitespace-nowrap">${escHtml(s.nama)}</td>
@@ -359,60 +389,85 @@ function renderTableBody(data) {
           </div>
         </td>
       </tr>`;
-  }).join("");
+    })
+    .join("");
 }
 
 // Score input Tailwind classes (shared by renderTableBody and highlightScore)
-const SCORE_BASE = 'w-16 text-center text-sm py-1.5 border rounded-md focus:outline-none focus:ring-1 transition-colors';
-const SCORE_OK   = SCORE_BASE + ' border-slate-200 focus:border-indigo-500 focus:ring-indigo-500';
-const SCORE_BAD  = SCORE_BASE + ' border-rose-300 bg-rose-50 text-rose-700 font-semibold focus:border-rose-500 focus:ring-rose-500';
+const SCORE_BASE =
+  "w-16 text-center text-sm py-1.5 border rounded-md focus:outline-none focus:ring-1 transition-colors";
+const SCORE_OK =
+  SCORE_BASE +
+  " border-slate-200 focus:border-indigo-500 focus:ring-indigo-500";
+const SCORE_BAD =
+  SCORE_BASE +
+  " border-rose-300 bg-rose-50 text-rose-700 font-semibold focus:border-rose-500 focus:ring-rose-500";
 function highlightScore(el, kkm) {
   const v = el.value.trim();
-  el.className = (v !== "" && Number(v) < kkm) ? SCORE_BAD : SCORE_OK;
+  el.className = v !== "" && Number(v) < kkm ? SCORE_BAD : SCORE_OK;
 }
 
-// 
+//
 // 9. POPULATE KELAS FILTER
-// 
+//
 function populateFilterKelas(data) {
   const sel = document.getElementById("filterKelas");
   if (!sel) return;
   const current = sel.value;
-  const kelasList = [...new Set((data || []).map(s => s.kelas))].sort((a,b) => {
-    const na = parseInt(a.match(/\d+/)?.[0] || 0);
-    const nb = parseInt(b.match(/\d+/)?.[0] || 0);
-    return na !== nb ? na - nb : a.localeCompare(b);
-  });
-  sel.innerHTML = `<option value=""> Semua Kelas</option>` +
-    kelasList.map(k => `<option value="${escHtml(k)}"${k===current?" selected":""}>${escHtml(k)}</option>`).join("");
+  const kelasList = [...new Set((data || []).map((s) => s.kelas))].sort(
+    (a, b) => {
+      const na = parseInt(a.match(/\d+/)?.[0] || 0);
+      const nb = parseInt(b.match(/\d+/)?.[0] || 0);
+      return na !== nb ? na - nb : a.localeCompare(b);
+    },
+  );
+  sel.innerHTML =
+    `<option value=""> Semua Kelas</option>` +
+    kelasList
+      .map(
+        (k) =>
+          `<option value="${escHtml(k)}"${k === current ? " selected" : ""}>${escHtml(k)}</option>`,
+      )
+      .join("");
 }
 
-// 
+//
 // 10. FIREBASE: REAL-TIME LISTENER
-// 
+//
 function listenToData() {
-  siswaRef.on("value", snap => {
-    allSiswa = [];
-    const data = snap.val();
-    if (data) {
-      Object.entries(data).forEach(([id, val]) => allSiswa.push({ id, ...val }));
-      allSiswa.sort((a,b) => a.nama.localeCompare(b.nama, "id"));
-    }
-    renderTableBody(allSiswa);
-  }, err => {
-    showAlert("Gagal memuat data Firebase. Periksa konfigurasi. Error: " + err.message, "danger");
-    const tbody = document.getElementById("tableBody");
-    if (tbody) tbody.innerHTML = `<tr><td colspan="20" class="text-center text-danger py-4">
+  siswaRef.on(
+    "value",
+    (snap) => {
+      allSiswa = [];
+      const data = snap.val();
+      if (data) {
+        Object.entries(data).forEach(([id, val]) =>
+          allSiswa.push({ id, ...val }),
+        );
+        allSiswa.sort((a, b) => a.nama.localeCompare(b.nama, "id"));
+      }
+      renderTableBody(allSiswa);
+    },
+    (err) => {
+      showAlert(
+        "Gagal memuat data Firebase. Periksa konfigurasi. Error: " +
+          err.message,
+        "danger",
+      );
+      const tbody = document.getElementById("tableBody");
+      if (tbody)
+        tbody.innerHTML = `<tr><td colspan="20" class="text-center text-danger py-4">
       Gagal terhubung ke Firebase.</td></tr>`;
-  });
+    },
+  );
 }
 
-// 
+//
 // 11. CREATE  Add student
-// 
+//
 function addSiswa(event) {
   event.preventDefault();
-  const nama  = document.getElementById("nama").value.trim();
+  const nama = document.getElementById("nama").value.trim();
   const kelas = document.getElementById("kelas").value.trim();
   const sumatif = document.getElementById("sumatif").value.trim();
 
@@ -421,31 +476,40 @@ function addSiswa(event) {
     return;
   }
 
-  const record = { nama, kelas, sumatif: sumatif !== "" ? Number(sumatif) : "", createdAt: Date.now() };
+  const record = {
+    nama,
+    kelas,
+    sumatif: sumatif !== "" ? Number(sumatif) : "",
+    createdAt: Date.now(),
+  };
   for (let i = 1; i <= numFormatif; i++) {
     const el = document.getElementById("formatif" + i);
     const v = el ? el.value.trim() : "";
     record["formatif" + i] = v !== "" ? Number(v) : "";
   }
 
-  siswaRef.push(record)
+  siswaRef
+    .push(record)
     .then(() => {
-      showAlert("Siswa <strong>" + escHtml(nama) + "</strong> berhasil ditambahkan.", "success");
+      showAlert(
+        "Siswa <strong>" + escHtml(nama) + "</strong> berhasil ditambahkan.",
+        "success",
+      );
       document.getElementById("addForm").reset();
     })
-    .catch(err => showAlert("Gagal menyimpan: " + err.message, "danger"));
+    .catch((err) => showAlert("Gagal menyimpan: " + err.message, "danger"));
 }
 
-// 
+//
 // 12. UPDATE  Save inline row
-// 
+//
 function saveSiswaRow(id) {
-  const siswa = allSiswa.find(s => s.id === id);
+  const siswa = allSiswa.find((s) => s.id === id);
   if (!siswa) return;
 
   const updated = {
-    nama:   siswa.nama,
-    kelas:  siswa.kelas,
+    nama: siswa.nama,
+    kelas: siswa.kelas,
     sumatif: "",
     updatedAt: Date.now(),
     createdAt: siswa.createdAt || Date.now(),
@@ -463,36 +527,57 @@ function saveSiswaRow(id) {
     updated["formatif" + i] = v !== "" ? Number(v) : "";
   }
 
-  siswaRef.child(id).set(updated)
-    .then(() => showAlert("Nilai <strong>" + escHtml(siswa.nama) + "</strong> berhasil disimpan.", "success"))
-    .catch(err => showAlert("Gagal menyimpan: " + err.message, "danger"));
+  siswaRef
+    .child(id)
+    .set(updated)
+    .then(() =>
+      showAlert(
+        "Nilai <strong>" + escHtml(siswa.nama) + "</strong> berhasil disimpan.",
+        "success",
+      ),
+    )
+    .catch((err) => showAlert("Gagal menyimpan: " + err.message, "danger"));
 }
 
-// 
+//
 // 13. DELETE  Remove student
-// 
+//
 function deleteSiswa(id, nama) {
-  if (!confirm("Hapus data siswa \"" + nama + "\"? Tindakan ini tidak dapat dibatalkan.")) return;
-  siswaRef.child(id).remove()
-    .then(() => showAlert("Data <strong>" + escHtml(nama) + "</strong> berhasil dihapus.", "success"))
-    .catch(err => showAlert("Gagal menghapus: " + err.message, "danger"));
+  if (
+    !confirm(
+      'Hapus data siswa "' + nama + '"? Tindakan ini tidak dapat dibatalkan.',
+    )
+  )
+    return;
+  siswaRef
+    .child(id)
+    .remove()
+    .then(() =>
+      showAlert(
+        "Data <strong>" + escHtml(nama) + "</strong> berhasil dihapus.",
+        "success",
+      ),
+    )
+    .catch((err) => showAlert("Gagal menghapus: " + err.message, "danger"));
 }
 
-// 
+//
 // 14. FILTER TABLE
-// 
+//
 function filterTable() {
   renderTableBody(allSiswa);
 }
 
-// 
+//
 // 15. STUDENT SEARCH (siswa view)
-// 
+//
 function searchStudent() {
-  const query = (document.getElementById("studentSearchInput")?.value || "").trim().toLowerCase();
+  const query = (document.getElementById("studentSearchInput")?.value || "")
+    .trim()
+    .toLowerCase();
   const placeholder = document.getElementById("searchPlaceholder");
-  const results     = document.getElementById("searchResults");
-  const detail      = document.getElementById("studentDetail");
+  const results = document.getElementById("searchResults");
+  const detail = document.getElementById("studentDetail");
 
   detail.style.display = "none";
   detail.innerHTML = "";
@@ -503,7 +588,7 @@ function searchStudent() {
     return;
   }
 
-  const found = allSiswa.filter(s => s.nama.toLowerCase().includes(query));
+  const found = allSiswa.filter((s) => s.nama.toLowerCase().includes(query));
   placeholder.style.display = "none";
   results.style.display = "";
 
@@ -517,9 +602,10 @@ function searchStudent() {
     return;
   }
 
-  results.innerHTML = found.map(s => {
-    const initial = s.nama.charAt(0).toUpperCase();
-    return `
+  results.innerHTML = found
+    .map((s) => {
+      const initial = s.nama.charAt(0).toUpperCase();
+      return `
       <div class="search-result-item" onclick="showStudentDetail('${s.id}')">
         <div class="result-avatar">${initial}</div>
         <div>
@@ -528,11 +614,12 @@ function searchStudent() {
         </div>
         <i class="bi bi-chevron-right ms-auto text-muted"></i>
       </div>`;
-  }).join("");
+    })
+    .join("");
 }
 
 function showStudentDetail(id) {
-  const s = allSiswa.find(x => x.id === id);
+  const s = allSiswa.find((x) => x.id === id);
   if (!s) return;
   const kkm = getKKM(s.kelas);
   const formatifArr = buildFormatifArray(s);
@@ -542,26 +629,29 @@ function showStudentDetail(id) {
   let tiles = "";
   const totalTiles = numFormatif + 1;
   // Always use grid-cols-3 for ≤3 tiles so they stay on one row; for more use 2+auto
-  const gridCols = totalTiles <= 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4";
+  const gridCols =
+    totalTiles <= 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4";
   for (let i = 0; i < numFormatif; i++) {
     const val = formatifArr[i];
     let colorClass, displayVal;
     if (val === "" || val === null || val === undefined) {
-      colorClass = "tile-empty"; displayVal = "-";
+      colorClass = "tile-empty";
+      displayVal = "-";
     } else {
       const num = Number(val);
       colorClass = num < kkm ? "tile-bad" : "tile-ok";
       displayVal = num;
     }
     tiles += `<div class="bg-white py-3 px-2 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center gap-1">
-      <span class="text-[9px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wide text-center leading-tight">Formatif ${i+1}</span>
+      <span class="text-[9px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wide text-center leading-tight">Formatif ${i + 1}</span>
       <span class="text-2xl sm:text-3xl font-bold ${colorClass}">${displayVal}</span>
     </div>`;
   }
   // Sumatif tile
   let sColorClass, sDisplayVal;
   if (s.sumatif === "" || s.sumatif === null || s.sumatif === undefined) {
-    sColorClass = "tile-empty"; sDisplayVal = "-";
+    sColorClass = "tile-empty";
+    sDisplayVal = "-";
   } else {
     const num = Number(s.sumatif);
     sColorClass = num < kkm ? "tile-bad" : "tile-ok";
@@ -579,9 +669,9 @@ function showStudentDetail(id) {
     for (let i = 0; i < numFormatif; i++) {
       const val = formatifArr[i];
       if (val === "" || val === null || val === undefined) {
-        needItems.push(`Formatif ${i+1} (belum dilakukan)`);
+        needItems.push(`Formatif ${i + 1} (belum dilakukan)`);
       } else if (Number(val) < kkm) {
-        needItems.push(`Formatif ${i+1} (${Number(val)})`);
+        needItems.push(`Formatif ${i + 1} (${Number(val)})`);
       }
     }
     if (s.sumatif === "" || s.sumatif === null || s.sumatif === undefined) {
@@ -591,10 +681,10 @@ function showStudentDetail(id) {
     }
 
     const actions = [];
-    const hasEmpty = needItems.some(x => x.includes("belum dilakukan"));
-    const hasBelowKKM = needItems.some(x => !x.includes("belum dilakukan"));
-    if (hasEmpty)     actions.push("Mengikuti evaluasi yang belum dilakukan");
-    if (hasBelowKKM)  actions.push("Perbaikan nilai yang di bawah KKM");
+    const hasEmpty = needItems.some((x) => x.includes("belum dilakukan"));
+    const hasBelowKKM = needItems.some((x) => !x.includes("belum dilakukan"));
+    if (hasEmpty) actions.push("Mengikuti evaluasi yang belum dilakukan");
+    if (hasBelowKKM) actions.push("Perbaikan nilai yang di bawah KKM");
 
     notifHtml = `
       <div class="mt-3 rounded-xl sm:rounded-2xl border border-red-200 bg-red-50 p-3 sm:p-4">
@@ -608,12 +698,12 @@ function showStudentDetail(id) {
         <div class="bg-white rounded-lg sm:rounded-xl border border-red-100 p-2.5 sm:p-3 mb-2.5">
           <div class="font-semibold text-red-800 mb-1.5 text-xs sm:text-sm">Evaluasi yang perlu ditindaklanjuti:</div>
           <ul class="list-disc list-inside space-y-1">
-            ${needItems.map(x => `<li class="text-xs sm:text-sm text-red-700">${x}</li>`).join("")}
+            ${needItems.map((x) => `<li class="text-xs sm:text-sm text-red-700">${x}</li>`).join("")}
           </ul>
         </div>
         <div class="bg-red-100 rounded-lg sm:rounded-xl p-2.5 sm:p-3">
           <div class="font-semibold text-red-800 text-xs sm:text-sm mb-1">📢 Silakan temui guru mata pelajaran Informatika untuk:</div>
-          ${actions.map(a => `<div class="text-xs sm:text-sm text-red-700">&bull; ${a}</div>`).join("")}
+          ${actions.map((a) => `<div class="text-xs sm:text-sm text-red-700">&bull; ${a}</div>`).join("")}
         </div>
       </div>`;
   } else {
@@ -659,9 +749,9 @@ function closeStudentDetail() {
   document.getElementById("searchResults").style.display = "";
 }
 
-// 
+//
 // 16. EXPORT TO EXCEL
-// 
+//
 function exportExcel() {
   if (allSiswa.length === 0) {
     showAlert("Tidak ada data untuk diekspor.", "warning");
@@ -678,9 +768,9 @@ function exportExcel() {
     const row = [idx + 1, s.nama, s.kelas];
     for (let i = 0; i < numFormatif; i++) {
       const v = formatifArr[i];
-      row.push((v !== "" && v !== null && v !== undefined) ? Number(v) : "");
+      row.push(v !== "" && v !== null && v !== undefined ? Number(v) : "");
     }
-    row.push((s.sumatif !== "" && s.sumatif !== null) ? Number(s.sumatif) : "");
+    row.push(s.sumatif !== "" && s.sumatif !== null ? Number(s.sumatif) : "");
     row.push(status);
     row.push(getKKM(s.kelas));
     return row;
@@ -689,19 +779,26 @@ function exportExcel() {
   const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
   // Column widths
   ws["!cols"] = [
-    {wch:5},{wch:28},{wch:14},
-    ...Array(numFormatif).fill({wch:12}),
-    {wch:10},{wch:12},{wch:6}
+    { wch: 5 },
+    { wch: 28 },
+    { wch: 14 },
+    ...Array(numFormatif).fill({ wch: 12 }),
+    { wch: 10 },
+    { wch: 12 },
+    { wch: 6 },
   ];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Data Nilai Siswa");
-  XLSX.writeFile(wb, "NilaiSiswa_" + new Date().toISOString().slice(0,10) + ".xlsx");
+  XLSX.writeFile(
+    wb,
+    "NilaiSiswa_" + new Date().toISOString().slice(0, 10) + ".xlsx",
+  );
   showAlert("Export Excel berhasil diunduh.", "success");
 }
 
-// 
+//
 // 17. DOWNLOAD TEMPLATE
-// 
+//
 function downloadTemplate() {
   const headers = ["Nama Siswa", "Kelas"];
   for (let i = 1; i <= numFormatif; i++) headers.push("Formatif " + i);
@@ -713,9 +810,10 @@ function downloadTemplate() {
 
   const ws = XLSX.utils.aoa_to_sheet([headers, example]);
   ws["!cols"] = [
-    {wch:28},{wch:14},
-    ...Array(numFormatif).fill({wch:12}),
-    {wch:10}
+    { wch: 28 },
+    { wch: 14 },
+    ...Array(numFormatif).fill({ wch: 12 }),
+    { wch: 10 },
   ];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Template");
@@ -723,9 +821,9 @@ function downloadTemplate() {
   showAlert("Template Excel berhasil diunduh.", "success");
 }
 
-// 
+//
 // 18. IMPORT FROM EXCEL
-// 
+//
 function importExcel() {
   const fileInput = document.getElementById("importFile");
   const file = fileInput?.files?.[0];
@@ -735,40 +833,48 @@ function importExcel() {
   }
 
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = function (e) {
     try {
-      const data  = new Uint8Array(e.target.result);
-      const wb    = XLSX.read(data, { type: "array" });
-      const ws    = wb.Sheets[wb.SheetNames[0]];
-      const rows  = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
 
       if (rows.length < 2) {
         showAlert("File kosong atau tidak ada data.", "warning");
         return;
       }
 
-      const header = rows[0].map(h => String(h).trim().toLowerCase());
+      const header = rows[0].map((h) => String(h).trim().toLowerCase());
       // Detect column indices
-      const iNama  = header.findIndex(h => h.includes("nama"));
-      const iKelas = header.findIndex(h => h.includes("kelas"));
-      const iSumat = header.findIndex(h => h.includes("sumatif"));
-      const iFmt   = [];
+      const iNama = header.findIndex((h) => h.includes("nama"));
+      const iKelas = header.findIndex((h) => h.includes("kelas"));
+      const iSumat = header.findIndex((h) => h.includes("sumatif"));
+      const iFmt = [];
       for (let i = 1; i <= 10; i++) {
-        const idx = header.findIndex(h => h.includes("formatif " + i) || h.includes("formatif" + i) || h === "f" + i);
+        const idx = header.findIndex(
+          (h) =>
+            h.includes("formatif " + i) ||
+            h.includes("formatif" + i) ||
+            h === "f" + i,
+        );
         iFmt.push(idx);
       }
 
       if (iNama === -1 || iKelas === -1) {
-        showAlert("Header file tidak sesuai. Pastikan ada kolom Nama Siswa dan Kelas.", "danger");
+        showAlert(
+          "Header file tidak sesuai. Pastikan ada kolom Nama Siswa dan Kelas.",
+          "danger",
+        );
         return;
       }
 
       let count = 0;
-      const dataRows = rows.slice(1).filter(r => r.some(c => c !== ""));
+      const dataRows = rows.slice(1).filter((r) => r.some((c) => c !== ""));
       const batch = {};
 
-      dataRows.forEach(r => {
-        const nama  = String(r[iNama] || "").trim();
+      dataRows.forEach((r) => {
+        const nama = String(r[iNama] || "").trim();
         const kelas = String(r[iKelas] || "").trim();
         if (!nama || !kelas) return;
 
@@ -781,7 +887,8 @@ function importExcel() {
         };
         iFmt.forEach((colIdx, arrIdx) => {
           const v = colIdx >= 0 ? r[colIdx] : "";
-          record["formatif" + (arrIdx + 1)] = (v !== "" && v !== null && v !== undefined) ? Number(v) : "";
+          record["formatif" + (arrIdx + 1)] =
+            v !== "" && v !== null && v !== undefined ? Number(v) : "";
         });
         batch[key] = record;
         count++;
@@ -792,45 +899,56 @@ function importExcel() {
         return;
       }
 
-      db.ref("siswa").update(batch)
+      db.ref("siswa")
+        .update(batch)
         .then(() => {
-          showAlert(`Import berhasil! ${count} data siswa ditambahkan.`, "success");
+          showAlert(
+            `Import berhasil! ${count} data siswa ditambahkan.`,
+            "success",
+          );
           fileInput.value = "";
         })
-        .catch(err => showAlert("Gagal import: " + err.message, "danger"));
-
-    } catch(err) {
+        .catch((err) => showAlert("Gagal import: " + err.message, "danger"));
+    } catch (err) {
       showAlert("Gagal membaca file: " + err.message, "danger");
     }
   };
   reader.readAsArrayBuffer(file);
 }
 
-// 
+//
 // 19. ALERT UTILITY
-// 
+//
 function showAlert(message, type = "success") {
   const area = document.getElementById("alertArea");
   if (!area) return;
   const id = "alert_" + Date.now();
-  const icons = { success:"bi-check-circle-fill", danger:"bi-x-octagon-fill", warning:"bi-exclamation-triangle-fill", info:"bi-info-circle-fill" };
+  const icons = {
+    success: "bi-check-circle-fill",
+    danger: "bi-x-octagon-fill",
+    warning: "bi-exclamation-triangle-fill",
+    info: "bi-info-circle-fill",
+  };
   area.innerHTML = `
     <div id="${id}" class="alert alert-${type} alert-dismissible d-flex align-items-center gap-2" role="alert">
-      <i class="bi ${icons[type]||"bi-info-circle-fill"}"></i>
+      <i class="bi ${icons[type] || "bi-info-circle-fill"}"></i>
       <div>${message}</div>
       <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
     </div>`;
-  setTimeout(() => { const el = document.getElementById(id); if (el) el.remove(); }, 5000);
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }, 5000);
 }
 
-// 
+//
 // 20. HTML ESCAPE
-// 
+//
 function escHtml(str) {
   return String(str)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#39;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
