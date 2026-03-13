@@ -1,4 +1,4 @@
-# 📊 Nilai Informatika – Firebase BaaS Project
+# Nilai Informatika – Firebase BaaS Project
 
 Aplikasi web **Buku Nilai Informatika** yang dibangun menggunakan **Firebase Realtime Database** sebagai Backend as a Service (BaaS).  
 Aplikasi ini memungkinkan guru mengelola nilai siswa dan siswa melihat nilai mereka secara real-time melalui website.
@@ -7,15 +7,15 @@ Aplikasi ini memungkinkan guru mengelola nilai siswa dan siswa melihat nilai mer
 
 ---
 
-## 🌐 Live Demo
+##  Live Demo
 
 Aplikasi dapat diakses di:
 
-👉 **[https://nilai-informatika.web.app](https://nilai-informatika.web.app)**
+ **[https://nilai-informatika.web.app](https://nilai-informatika.web.app)**
 
 ---
 
-## 🚀 Teknologi yang Digunakan
+##  Teknologi yang Digunakan
 
 ### Frontend
 | Teknologi | Keterangan |
@@ -35,7 +35,7 @@ Aplikasi dapat diakses di:
 
 ---
 
-## 🗂 Arsitektur Sistem
+##  Arsitektur Sistem
 
 ```
 User (Browser)
@@ -50,13 +50,13 @@ Firebase Realtime Database (Google Cloud)
 ```
 
 Firebase digunakan sebagai **Backend as a Service** yang menangani:
-- ✅ Penyimpanan data siswa
-- ✅ Sinkronisasi data real-time
-- ✅ Hosting aplikasi
+-  Penyimpanan data siswa
+-  Sinkronisasi data real-time
+-  Hosting aplikasi
 
 ---
 
-## 📋 Struktur Data Database
+##  Struktur Data Database
 
 Data disimpan pada Firebase Realtime Database dengan struktur berikut:
 
@@ -88,45 +88,47 @@ Setiap siswa memiliki **6 field data**:
 
 ---
 
-## ✨ Fitur Aplikasi
+##  Fitur Aplikasi
 
-### 👨‍🎓 Mode Siswa
+###  Mode Siswa
 Siswa **tidak perlu login** untuk melihat nilai. Cukup:
-- 🔍 Cari nama mereka di kolom pencarian
-- 📊 Lihat nilai formatif dan sumatif
-- 🏆 Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
+-  Cari nama mereka di kolom pencarian
+-  Lihat nilai formatif dan sumatif
+-  Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
 
-### 👨‍🏫 Mode Guru
+###  Mode Guru
 Guru melakukan **register/login** menggunakan Firebase Authentication (Email/Password), lalu dapat melakukan CRUD data nilai siswa:
 
 | Fungsi | Keterangan |
 |---|---|
-| ➕ **Create** | Tambah siswa baru via form input |
-| 👁️ **Read** | Lihat seluruh data siswa real-time |
-| ✏️ **Update** | Edit nilai langsung dari tabel |
-| 🗑️ **Delete** | Hapus data siswa dari database |
+|  **Create** | Tambah siswa baru via form input |
+|  **Read** | Lihat seluruh data siswa real-time |
+|  **Update** | Edit nilai langsung dari tabel |
+|  **Delete** | Hapus data siswa dari database |
 
-### 📊 Fitur Tambahan
-- 🔍 Pencarian nama siswa (live search)
-- 📥 Import data massal dari Excel
-- 📤 Export seluruh data ke Excel
-- 📈 Indikator otomatis: **Tuntas** / **Remedial** / **Susulan**
-- 📱 UI Responsif (mobile-friendly)
-- 🔐 Dashboard guru dilindungi password
-- 🔐 Register/Login guru via Firebase Authentication
+###  Fitur Tambahan
+-  Pencarian nama siswa (live search)
+-  Import data massal dari Excel
+-  Export seluruh data ke Excel
+-  Indikator otomatis: **Tuntas** / **Remedial** / **Susulan**
+-  UI Responsif (mobile-friendly)
+-  Dashboard guru dilindungi password
+-  Register/Login guru via Firebase Authentication
 
 ---
 
-## 📸 Screenshot Aplikasi
+##  Screenshot Aplikasi
 
 ### Halaman Pencarian Nilai (Mode Siswa)
-![Halaman Pencarian](screenshots/search.png)
+
 
 ### Tampilan Nilai Siswa
-![Tampilan Nilai](screenshots/nilai.png)
+<img width="1754" height="1053" alt="image" src="https://github.com/user-attachments/assets/adda0834-9136-4edf-9a61-9a811d4b6ebd" />
+
 
 ### Login Guru
-![Login Guru](screenshots/login.png)
+<img width="922" height="816" alt="image" src="https://github.com/user-attachments/assets/15a60fb7-0697-40a8-975f-80348b99a9ba" />
+
 
 ### Dashboard Guru
 ![Dashboard Guru](screenshots/dashboard.png)
@@ -136,7 +138,7 @@ Guru melakukan **register/login** menggunakan Firebase Authentication (Email/Pas
 
 ---
 
-## ⚙️ Instalasi Lokal
+##  Instalasi Lokal
 
 1. Clone repository:
 ```bash
@@ -152,7 +154,7 @@ cd nilai-informatika
 
 ---
 
-## ☁️ Deployment
+##  Deployment
 
 Project di-deploy menggunakan **Firebase Hosting**.
 
@@ -171,7 +173,7 @@ firebase deploy --only hosting
 
 ---
 
-## 📁 Struktur File
+##  Struktur File
 
 ```
 nilai-informatika/
@@ -191,17 +193,17 @@ nilai-informatika/
 
 ---
 
-## 🎯 Tujuan Project
+##  Tujuan Project
 
 Project ini dibuat untuk:
-- 📌 Memahami konsep **Backend as a Service (BaaS)**
-- 📌 Mengimplementasikan **Firebase Realtime Database**
-- 📌 Membangun aplikasi **CRUD berbasis web**
-- 📌 Mengintegrasikan frontend dengan **cloud backend**
+-  Memahami konsep **Backend as a Service (BaaS)**
+-  Mengimplementasikan **Firebase Realtime Database**
+-  Membangun aplikasi **CRUD berbasis web**
+-  Mengintegrasikan frontend dengan **cloud backend**
 
 ---
 
-## 📚 Referensi
+##  Referensi
 
 - [Firebase Documentation](https://firebase.google.com/docs)
 - [Firebase Realtime Database Guide](https://firebase.google.com/docs/database)
@@ -210,8 +212,4 @@ Project ini dibuat untuk:
 
 ---
 
-## 👨‍💻 Author
 
-| | |
-|---|---|
-| **Course** | Backend as a Service (BaaS) |
