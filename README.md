@@ -131,10 +131,16 @@ Guru melakukan **register/login** menggunakan Firebase Authentication (Email/Pas
 
 
 ### Dashboard Guru
-![Dashboard Guru](screenshots/dashboard.png)
+<img width="2090" height="1309" alt="image" src="https://github.com/user-attachments/assets/aca36eb9-46ce-453f-b761-062ce762f06e" />
+
 
 ### Firebase Realtime Database
-![Firebase Database](screenshots/firebase_database.png)
+<img width="1952" height="1091" alt="image" src="https://github.com/user-attachments/assets/0ccd252d-1957-466f-8ae5-0934eaa05911" />
+
+### Firebase Realtime Database
+<img width="1727" height="648" alt="image" src="https://github.com/user-attachments/assets/4af02c1c-7e80-4aa1-a5fd-609797ee81a1" />
+
+
 
 ---
 
