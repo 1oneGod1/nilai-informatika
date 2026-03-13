@@ -30,6 +30,7 @@ Aplikasi dapat diakses di:
 | Layanan | Fungsi |
 |---|---|
 | Firebase Realtime Database | Penyimpanan & sinkronisasi data real-time |
+| Firebase Authentication | Register & login akun guru (Email/Password) |
 | Firebase Hosting | Deploy & hosting aplikasi |
 
 ---
@@ -96,7 +97,7 @@ Siswa **tidak perlu login** untuk melihat nilai. Cukup:
 - 🏆 Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
 
 ### 👨‍🏫 Mode Guru
-Guru dapat melakukan **CRUD** data nilai siswa setelah login:
+Guru melakukan **register/login** menggunakan Firebase Authentication (Email/Password), lalu dapat melakukan CRUD data nilai siswa:
 
 | Fungsi | Keterangan |
 |---|---|
@@ -112,6 +113,7 @@ Guru dapat melakukan **CRUD** data nilai siswa setelah login:
 - 📈 Indikator otomatis: **Tuntas** / **Remedial** / **Susulan**
 - 📱 UI Responsif (mobile-friendly)
 - 🔐 Dashboard guru dilindungi password
+- 🔐 Register/Login guru via Firebase Authentication
 
 ---
 

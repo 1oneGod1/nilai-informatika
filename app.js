@@ -20,6 +20,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const auth = firebase.auth();
 const siswaRef = db.ref("siswa");
 
 // 
@@ -28,8 +29,6 @@ const siswaRef = db.ref("siswa");
 let numFormatif = 2;
 let allSiswa    = [];
 let isTeacherLoggedIn = false;
-
-const TEACHER_PASSWORD = "guru123";
 
 // KKM per kelas (numeric key)
 const KKM_MAP = { 7:67, 8:68, 9:69, 10:75, 11:76, 12:77 };
@@ -52,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderFormFormatifInputs();
   renderTableHead();
   listenToData();
-  showStudentView();
+  bindAuthState();
 });
 
 // 
@@ -78,24 +77,39 @@ function showTeacherView() {
 // LOGIN GURU
 // 
 function openLoginModal() {
+  document.getElementById("emailInput").value = "";
   document.getElementById("passwordInput").value = "";
-  document.getElementById("loginError").style.display = "none";
+  hideLoginError();
   new bootstrap.Modal(document.getElementById("loginModal")).show();
 }
 
 function submitLogin(event) {
   event.preventDefault();
+  const email = document.getElementById("emailInput").value.trim();
   const pwd = document.getElementById("passwordInput").value;
-  if (pwd === TEACHER_PASSWORD) {
-    isTeacherLoggedIn = true;
-    bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
-    showTeacherView();
-    showAlert("Selamat datang! Anda berhasil masuk ke dashboard guru.", "success");
-  } else {
-    document.getElementById("loginError").style.display = "block";
-    document.getElementById("passwordInput").value = "";
-    document.getElementById("passwordInput").focus();
-  }
+
+  auth.signInWithEmailAndPassword(email, pwd)
+    .then(() => {
+      hideLoginError();
+      const modal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
+      if (modal) modal.hide();
+      showAlert("Login berhasil. Selamat datang di dashboard guru.", "success");
+    })
+    .catch(err => showLoginError(err.message));
+}
+
+function submitRegister() {
+  const email = document.getElementById("emailInput").value.trim();
+  const pwd = document.getElementById("passwordInput").value;
+
+  auth.createUserWithEmailAndPassword(email, pwd)
+    .then(() => {
+      hideLoginError();
+      const modal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
+      if (modal) modal.hide();
+      showAlert("Register berhasil. Akun guru siap digunakan.", "success");
+    })
+    .catch(err => showLoginError(err.message));
 }
 
 function togglePassword() {
@@ -111,9 +125,43 @@ function togglePassword() {
 }
 
 function logoutGuru() {
-  isTeacherLoggedIn = false;
-  showStudentView();
-  showAlert("Anda telah keluar dari mode guru.", "info");
+  auth.signOut()
+    .then(() => showAlert("Anda telah keluar dari mode guru.", "info"))
+    .catch(err => showAlert("Gagal logout: " + err.message, "danger"));
+}
+
+function bindAuthState() {
+  auth.onAuthStateChanged(user => {
+    isTeacherLoggedIn = !!user;
+    if (isTeacherLoggedIn) {
+      showTeacherView();
+    } else {
+      showStudentView();
+    }
+  });
+}
+
+function showLoginError(message) {
+  const map = {
+    "auth/invalid-email": "Format email tidak valid.",
+    "auth/missing-password": "Kata sandi wajib diisi.",
+    "auth/invalid-credential": "Email atau kata sandi salah.",
+    "auth/wrong-password": "Email atau kata sandi salah.",
+    "auth/user-not-found": "Akun belum terdaftar. Silakan register dulu.",
+    "auth/email-already-in-use": "Email sudah terdaftar. Silakan login.",
+    "auth/weak-password": "Password terlalu lemah (minimal 6 karakter)."
+  };
+  const code = String(message || "").match(/auth\/[a-z-]+/)?.[0];
+  const text = map[code] || "Autentikasi gagal. Periksa email dan kata sandi Anda.";
+  const errWrap = document.getElementById("loginError");
+  const errText = document.getElementById("loginErrorText");
+  if (errText) errText.textContent = text;
+  if (errWrap) errWrap.style.display = "block";
+}
+
+function hideLoginError() {
+  const errWrap = document.getElementById("loginError");
+  if (errWrap) errWrap.style.display = "none";
 }
 
 // 
