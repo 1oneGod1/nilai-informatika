@@ -27,7 +27,15 @@ function submitLogin(event) {
   auth
     .signInWithEmailAndPassword(email, pwd)
     .then((result) => {
-      const uid = result.user.uid;
+      const user = result.user;
+      
+      // Syarat login: harus sudah diverifikasi emailnya (kecuali mungkin developer testing, tapi wajarnya semua)
+      if (!user.emailVerified) {
+        auth.signOut();
+        throw new Error("Email belum diverifikasi. Silakan klik link verifikasi yang telah dikirim ke email Anda.");
+      }
+
+      const uid = user.uid;
       return guruRef.child(uid).once("value").then((snap) => {
         const guruData = snap.val();
 
@@ -82,24 +90,31 @@ function submitRegister() {
       const uid     = result.user.uid;
       const isAdmin = email === ADMIN_UTAMA_EMAIL;
 
-      return guruRef.child(uid).set({
-        email,
-        uid,
-        isVerified: isAdmin,
-        createdAt: Date.now(),
-        verifiedAt: isAdmin ? Date.now() : null,
-        verifiedBy: isAdmin ? "auto" : null,
+      // Setup URL kembalian setelah verifikasi email (halaman ini & buka modal)
+      const actionCodeSettings = {
+        url: window.location.origin + window.location.pathname + "?loginModal=true"
+      };
+
+      return result.user.sendEmailVerification(actionCodeSettings).then(() => {
+        return guruRef.child(uid).set({
+          email,
+          uid,
+          isVerified: isAdmin,
+          createdAt: Date.now(),
+          verifiedAt: isAdmin ? Date.now() : null,
+          verifiedBy: isAdmin ? "auto" : null,
+        });
       }).then(() => {
         hideLoginError();
         const modal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
         if (modal) modal.hide();
 
         if (isAdmin) {
-          showAlert("Register berhasil! Anda adalah Admin Utama.", "success");
-          setTimeout(() => { window.location.href = "dashboard.html"; }, 1000);
+          showAlert("Register berhasil! Anda adalah Admin Utama. Link verifikasi telah dikirim.", "success");
+          setTimeout(() => { window.location.href = "dashboard.html"; }, 1500);
         } else {
           showAlert(
-            "Register berhasil! Akun Anda menunggu verifikasi admin utama.",
+            "Register berhasil! Link verifikasi telah dikirim ke email Anda. Silakan verifikasi untuk dapat login.",
             "info"
           );
           auth.signOut();
@@ -146,20 +161,31 @@ function togglePassword() {
 const AUTH_ERROR_MAP = {
   "auth/invalid-email":       "Format email tidak valid.",
   "auth/missing-password":    "Kata sandi wajib diisi.",
-  "auth/invalid-credential":  "Email atau kata sandi salah.",
-  "auth/wrong-password":      "Email atau kata sandi salah.",
-  "auth/user-not-found":      "Akun belum terdaftar. Silakan register dulu.",
+  "auth/invalid-credential":  "Akun tidak ditemukan atau Password salah.",
+  "auth/wrong-password":      "Password salah.",
+  "auth/user-not-found":      "Akun tidak ditemukan.",
   "auth/email-already-in-use":"Email sudah terdaftar. Silakan login.",
   "auth/weak-password":       "Password terlalu lemah (minimal 6 karakter).",
 };
 
-function showLoginError(message) {
+function showLoginError(message, isSuccess = false) {
   const code = String(message || "").match(/auth\/[a-z-]+/)?.[0];
   const text = AUTH_ERROR_MAP[code] || message || "Autentikasi gagal.";
   const errWrap = document.getElementById("loginError");
   const errText = document.getElementById("loginErrorText");
-  if (errText) errText.textContent = text;
-  if (errWrap) errWrap.style.display = "block";
+  if (errText) {
+    errText.textContent = text;
+    errText.className = isSuccess ? "text-emerald-700 ml-2" : "text-rose-700 ml-2";
+  }
+  if (errWrap) {
+    errWrap.className = isSuccess 
+      ? "alert alert-success p-2 text-sm items-start" 
+      : "alert alert-danger p-2 text-sm items-start";
+    errWrap.querySelector("i").className = isSuccess 
+      ? "fas fa-check-circle text-emerald-500 mt-0.5" 
+      : "fas fa-exclamation-circle text-rose-500 mt-0.5";
+    errWrap.style.display = "block";
+  }
 }
 
 function hideLoginError() {

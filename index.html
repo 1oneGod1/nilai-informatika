@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -338,6 +338,22 @@
     <script src="js/auth.js"></script>
     <script src="js/student.js"></script>
     <script>
+        // Cek jika dari redirect email verifikasi
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get("loginModal") === "true") {
+                // Hapus param dari URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                // Langsung buka form login dan tampilkan sukses
+                setTimeout(() => {
+                    openLoginModal();
+                    if (typeof showLoginError === "function") {
+                        showLoginError("Email Anda berhasil diverifikasi. Silakan login.", true);
+                    }
+                }, 500);
+            }
+        });
+
         // Simulasi interaksi loading saat klik EXECUTE/Submit form
         function handleSearchSubmit(event) {
             event.preventDefault();
