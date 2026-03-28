@@ -36,9 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Cek status isVerified di Realtime Database
     guruRef.child(user.uid).once("value").then((snap) => {
       const data = snap.val();
-      if (!data || !data.isVerified) {
+      if (!data || !data.isVerified || !data.emailVerified) {
         auth.signOut().then(() => {
-          alert("Akun belum diverifikasi admin. Anda tidak bisa mengakses dashboard.");
+          alert("Akun belum memenuhi syarat verifikasi email/admin. Anda tidak bisa mengakses dashboard.");
           window.location.href = "index.html";
         });
         return;

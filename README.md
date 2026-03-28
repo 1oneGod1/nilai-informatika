@@ -258,6 +258,50 @@ Project ini dibuat untuk:
    ```bash
    npm install -g firebase-tools
    ```
+
+---
+
+## Setup EmailJS Custom Verification
+
+Untuk fitur verifikasi email custom (EmailJS), lakukan langkah berikut:
+
+1. Buat service dan template di EmailJS.
+2. Gunakan template siap pakai di file `EMAILJS_TEMPLATE.md`.
+3. Ambil `publicKey`, `serviceId`, dan `templateId` dari dashboard EmailJS.
+4. Isi konfigurasi pada file `js/firebase-init.js` di object `EMAILJS_CONFIG`.
+
+Contoh konfigurasi:
+
+```js
+const EMAILJS_CONFIG = {
+   publicKey: "YOUR_EMAILJS_PUBLIC_KEY",
+   serviceId: "YOUR_EMAILJS_SERVICE_ID",
+   templateId: "YOUR_EMAILJS_TEMPLATE_ID",
+};
+```
+
+---
+
+## Realtime Database Rules (Minimum)
+
+Project ini sekarang menyediakan file rules minimum di `database.rules.json` untuk:
+
+- Public read data siswa (`siswa`)
+- Write data siswa hanya user login
+- Data guru hanya terbaca user login
+- Field approval admin (`isVerified`, `verifiedBy`, `verifiedAt`) hanya bisa ditulis Admin Utama
+
+Deploy rules:
+
+```bash
+firebase deploy --only database
+```
+
+Deploy hosting + rules sekaligus:
+
+```bash
+firebase deploy --only hosting,database
+```
 3. Login ke Firebase:
    ```bash
    firebase login
