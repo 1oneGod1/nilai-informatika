@@ -7,9 +7,12 @@
 
 let pendingEmailForResend = "";
 
-// ─── HELPERS ──────────────────────────────────────────────
 function getLoginEmailInputValue() {
   return (document.getElementById("emailInput")?.value || "").trim();
+}
+
+function getLoginPasswordInputValue() {
+  return document.getElementById("passwordInput")?.value || "";
 }
 
 function normalizeAuthErrorMessage(message) {
@@ -21,74 +24,6 @@ function setResendVisibility(show) {
   if (resendWrap) resendWrap.style.display = show ? "block" : "none";
 }
 
-async function findGuruByEmail(email) {
-  const snap = await guruRef
-    .orderByChild("email")
-    .equalTo(email)
-    .limitToFirst(1)
-    .once("value");
-
-  if (!snap.exists()) return null;
-
-  let foundUid = null;
-  let foundData = null;
-  snap.forEach((child) => {
-    foundUid = child.key;
-    foundData = child.val();
-  });
-  if (!foundUid || !foundData) return null;
-  return { uid: foundUid, data: foundData };
-}
-
-async function sendCustomVerificationEmail({ email, uid, token }) {
-  if (!window.emailjs) {
-    throw new Error(
-      "EmailJS SDK belum dimuat. Tambahkan script EmailJS di halaman index.",
-    );
-  }
-
-  if (!isEmailJsConfigured()) {
-    throw new Error(
-      "EmailJS belum dikonfigurasi. Isi publicKey, serviceId, dan templateId di js/firebase-init.js.",
-    );
-  }
-
-  const cfg = getEmailJsConfig();
-  const verifyUrl = buildVerifyUrl(uid, token);
-  const expiresMinutes = Math.floor(VERIFY_TOKEN_TTL_MS / 60000);
-
-  await window.emailjs.send(
-    cfg.serviceId,
-    cfg.templateId,
-    {
-      to_email: email,
-      user_email: email,
-      verify_link: verifyUrl,
-      verification_link: verifyUrl,
-      app_name: "Nilai Informatika",
-      support_email: ADMIN_UTAMA_EMAIL,
-      expires_minutes: expiresMinutes,
-    },
-    { publicKey: cfg.publicKey },
-  );
-}
-
-async function issueVerificationToken(uid, email) {
-  const token = generateVerificationToken();
-  const tokenHash = await sha256Hex(token);
-  const now = nowTs();
-
-  await guruRef.child(uid).update({
-    email,
-    verifyTokenHash: tokenHash,
-    verifyTokenExpiresAt: now + VERIFY_TOKEN_TTL_MS,
-    verifyRequestedAt: now,
-  });
-
-  return token;
-}
-
-// ─── MODAL OPEN ───────────────────────────────────────────
 function openLoginModal() {
   document.getElementById("emailInput").value = "";
   document.getElementById("passwordInput").value = "";
@@ -101,85 +36,106 @@ function openLoginModal() {
 function submitLogin(event) {
   event.preventDefault();
   const email = getLoginEmailInputValue();
-  const pwd   = document.getElementById("passwordInput").value;
+  const pwd   = getLoginPasswordInputValue();
 
   if (!email || !pwd) {
     showLoginError("Email dan password harus diisi.");
     return;
   }
 
+  // Disable button sementara proses
+  const btn = document.querySelector("#loginForm button[type=submit]");
+  const originalBtnText = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Memproses...';
+  }
+
   auth
     .signInWithEmailAndPassword(email, pwd)
     .then(async (result) => {
       const user = result.user;
-      const uid = user.uid;
+      const uid  = user.uid;
+
+      // ── Cek verifikasi email Firebase ──────────────────
+      if (!user.emailVerified && email !== ADMIN_UTAMA_EMAIL) {
+        pendingEmailForResend = email;
+        setResendVisibility(true);
+        await auth.signOut();
+        showLoginError(
+          "Email Anda belum diverifikasi. Silakan cek inbox/spam dan klik link verifikasi yang dikirim saat register."
+        );
+        if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
+        return;
+      }
+
+      // ── Ambil / buat profil guru di Realtime DB ─────────
       const snap = await guruRef.child(uid).once("value");
       let guruData = snap.val();
 
-      // Akun lama tanpa profile node → bootstrap profile
       if (!guruData) {
         const isAdmin = email === ADMIN_UTAMA_EMAIL;
         guruData = {
-          email,
-          uid,
+          email, uid,
           isVerified: isAdmin,
-          emailVerified: isAdmin,
+          emailVerified: user.emailVerified || isAdmin,
           createdAt: nowTs(),
           verifiedAt: isAdmin ? nowTs() : null,
           verifiedBy: isAdmin ? "auto" : null,
           emailVerifiedAt: isAdmin ? nowTs() : null,
-          verifyTokenHash: null,
-          verifyTokenExpiresAt: null,
-          verifyRequestedAt: null,
         };
         await guruRef.child(uid).set(guruData);
       }
 
-      // Sinkronisasi dengan status Firebase Auth untuk kompatibilitas akun lama
+      // ── Sync emailVerified jika baru saja diverifikasi ─
       if (user.emailVerified && !guruData.emailVerified) {
         await guruRef.child(uid).update({
           emailVerified: true,
           emailVerifiedAt: nowTs(),
-          verifyTokenHash: null,
-          verifyTokenExpiresAt: null,
         });
         guruData.emailVerified = true;
       }
 
-      if (!guruData.emailVerified) {
-        pendingEmailForResend = email;
-        setResendVisibility(true);
-        await auth.signOut();
-        throw new Error(
-          "Email Anda belum diverifikasi. Gunakan tombol kirim ulang verifikasi.",
-        );
-      }
-
+      // ── Cek persetujuan Admin Utama ─────────────────────
       if (!guruData.isVerified) {
         setResendVisibility(false);
         await auth.signOut();
-        throw new Error(
-          "Akun Anda belum diverifikasi oleh admin utama. Silakan hubungi admin.",
+        showLoginError(
+          "Akun Anda belum diverifikasi oleh admin utama. Silakan hubungi admin."
         );
+        if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
+        return;
       }
 
+      // ── Login sukses → redirect dashboard ──────────────
       setResendVisibility(false);
+      hideLoginError();
       const modalEl = document.getElementById("loginModal");
       const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
       modal.hide();
       setTimeout(() => { window.location.href = "dashboard.html"; }, 300);
     })
-    .catch((err) => showLoginError(normalizeAuthErrorMessage(err.message)));
+    .catch((err) => {
+      if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
+      showLoginError(normalizeAuthErrorMessage(err.message));
+    });
 }
 
-// ─── REGISTER ────────────────────────────────────────────
+// ─── REGISTER ─────────────────────────────────────────────
 function submitRegister() {
   const email = getLoginEmailInputValue();
-  const pwd   = document.getElementById("passwordInput").value;
+  const pwd   = getLoginPasswordInputValue();
 
   if (!email || !pwd) {
     showLoginError("Email dan password harus diisi.");
     return;
+  }
+
+  const btn = document.querySelector("#loginForm button[type=submit]");
+  const originalBtnText = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mendaftarkan...';
   }
 
   auth
@@ -188,118 +144,133 @@ function submitRegister() {
       const uid     = result.user.uid;
       const isAdmin = email === ADMIN_UTAMA_EMAIL;
 
+      // ── Simpan profil guru ke Realtime DB ───────────────
       const baseProfile = {
-        email,
-        uid,
+        email, uid,
         isVerified: isAdmin,
         emailVerified: isAdmin,
         createdAt: nowTs(),
         verifiedAt: isAdmin ? nowTs() : null,
         verifiedBy: isAdmin ? "auto" : null,
         emailVerifiedAt: isAdmin ? nowTs() : null,
-        verifyTokenHash: null,
-        verifyTokenExpiresAt: null,
-        verifyRequestedAt: null,
       };
-
       await guruRef.child(uid).set(baseProfile);
 
-      if (!isAdmin) {
-        const token = await issueVerificationToken(uid, email);
-        await sendCustomVerificationEmail({ email, uid, token });
-      }
-
+      // ── Sembunyikan modal ───────────────────────────────
       hideLoginError();
       setResendVisibility(false);
       const modal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
       if (modal) modal.hide();
 
+      if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
+
+      // ── Admin Utama: langsung redirect ──────────────────
       if (isAdmin) {
         showAlert(
           "Register berhasil! Anda adalah Admin Utama dan langsung bisa mengakses dashboard.",
-          "success",
+          "success"
         );
         setTimeout(() => { window.location.href = "dashboard.html"; }, 1200);
         return;
       }
 
-      showAlert(
-        "Register berhasil. Link verifikasi custom telah dikirim via EmailJS. Silakan verifikasi email Anda sebelum login.",
-        "info",
-      );
+      // ── Kirim email verifikasi Firebase ─────────────────
+      // URL setelah klik link di email → verify.html (halaman khusus verifikasi)
+      // Firebase akan redirect ke URL ini SETELAH kode OOB diproses otomatis
+      // atau verify.html kita yang meng-handle applyActionCode.
+      const verifyPageUrl =
+        window.location.origin +
+        window.location.pathname.replace(/[^/]*$/, "") +
+        "verify.html";
+
+      await result.user.sendEmailVerification({
+        url: verifyPageUrl,
+        handleCodeInApp: false,
+      });
+
       await auth.signOut();
+
+      showAlert(
+        `<strong>Register berhasil!</strong> Link verifikasi telah dikirim ke <strong>${escHtml(email)}</strong>.<br>
+         Silakan cek <strong>inbox</strong> atau folder <strong>spam</strong> Anda, lalu klik link verifikasi sebelum login.`,
+        "info"
+      );
     })
-    .catch((err) => showLoginError(normalizeAuthErrorMessage(err.message)));
+    .catch((err) => {
+      if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
+      showLoginError(normalizeAuthErrorMessage(err.message));
+    });
 }
 
-// ─── RESEND VERIFICATION ────────────────────────────────
+// ─── KIRIM ULANG VERIFIKASI ───────────────────────────────
 async function resendVerificationFromLogin() {
   try {
     const email = pendingEmailForResend || getLoginEmailInputValue();
-    if (!email) {
-      showLoginError("Masukkan email terlebih dahulu sebelum kirim ulang verifikasi.");
+    const pwd   = getLoginPasswordInputValue();
+
+    if (!email || !pwd) {
+      showLoginError("Masukkan email dan password terlebih dahulu sebelum kirim ulang verifikasi.");
       return;
     }
 
-    const found = await findGuruByEmail(email);
-    if (!found) {
-      showLoginError("Email tidak ditemukan di daftar guru.");
-      return;
-    }
+    const result = await auth.signInWithEmailAndPassword(email, pwd);
+    const user   = result.user;
 
-    const { uid, data } = found;
-    if (data.emailVerified) {
+    if (user.emailVerified) {
       setResendVisibility(false);
+      await auth.signOut();
       showLoginError("Email ini sudah terverifikasi. Silakan login.", true);
       return;
     }
 
-    const now = nowTs();
-    const lastRequest = Number(data.verifyRequestedAt || 0);
-    if (lastRequest && now - lastRequest < RESEND_VERIFICATION_COOLDOWN_MS) {
-      const waitSec = Math.ceil(
-        (RESEND_VERIFICATION_COOLDOWN_MS - (now - lastRequest)) / 1000,
-      );
-      showLoginError(
-        `Tunggu ${waitSec} detik sebelum kirim ulang verifikasi.`,
-      );
-      return;
-    }
+    const verifyPageUrl =
+      window.location.origin +
+      window.location.pathname.replace(/[^/]*$/, "") +
+      "verify.html";
 
-    const token = await issueVerificationToken(uid, email);
-    await sendCustomVerificationEmail({ email, uid, token });
+    await user.sendEmailVerification({
+      url: verifyPageUrl,
+      handleCodeInApp: false,
+    });
+    await auth.signOut();
+
     showLoginError(
-      "Email verifikasi berhasil dikirim ulang. Silakan cek inbox/spam.",
-      true,
+      "Email verifikasi berhasil dikirim ulang ke " + escHtml(email) + ". Silakan cek inbox/spam.",
+      true
     );
   } catch (err) {
     showLoginError(normalizeAuthErrorMessage(err.message));
   }
 }
 
-// ─── TOGGLE REGISTER FORM ────────────────────────────────
+// ─── TOGGLE FORM LOGIN ↔ REGISTER ────────────────────────
 function showRegisterForm() {
   const loginForm     = document.getElementById("loginForm");
   const registerLabel = document.getElementById("registerToggleBtn");
+  const submitBtn     = document.querySelector("#loginForm button[type=submit]");
+  const modalTitle    = document.querySelector("#loginModal .modal-title");
 
   if (loginForm.getAttribute("data-mode") === "register") {
-    // Kembali ke mode login
+    // Kembali ke mode Login
     loginForm.setAttribute("data-mode", "login");
     loginForm.onsubmit = submitLogin;
-    document.querySelector("#loginForm button[type=submit]").textContent = "Masuk";
-    if (registerLabel) registerLabel.textContent = "Belum punya akun? Register";
+    if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-unlock-fill me-2"></i>Masuk';
+    if (registerLabel) registerLabel.textContent = "Belum punya akun? Register di sini";
+    if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> LOGIN GURU';
     setResendVisibility(false);
   } else {
-    // Ganti ke mode register
+    // Beralih ke mode Register
     loginForm.setAttribute("data-mode", "register");
     loginForm.onsubmit = (e) => { e.preventDefault(); submitRegister(); };
-    document.querySelector("#loginForm button[type=submit]").textContent = "Daftar Akun";
+    if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Daftar Akun';
     if (registerLabel) registerLabel.textContent = "Sudah punya akun? Login";
+    if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-user-plus me-2"></i> REGISTER GURU';
     setResendVisibility(false);
   }
+  hideLoginError();
 }
 
-// ─── TOGGLE PASSWORD VISIBILITY ──────────────────────────
+// ─── TOGGLE SHOW/HIDE PASSWORD ────────────────────────────
 function togglePassword() {
   const inp  = document.getElementById("passwordInput");
   const icon = document.getElementById("eyeIcon");
@@ -312,34 +283,44 @@ function togglePassword() {
   }
 }
 
-// ─── ERROR DISPLAY ────────────────────────────────────────
+// ─── ERROR MAP ────────────────────────────────────────────
 const AUTH_ERROR_MAP = {
-  "auth/invalid-email":       "Format email tidak valid.",
-  "auth/missing-password":    "Kata sandi wajib diisi.",
-  "auth/invalid-credential":  "Akun tidak ditemukan atau Password salah.",
-  "auth/wrong-password":      "Password salah.",
-  "auth/user-not-found":      "Akun tidak ditemukan.",
-  "auth/email-already-in-use":"Email sudah terdaftar. Silakan login.",
-  "auth/weak-password":       "Password terlalu lemah (minimal 6 karakter).",
+  "auth/invalid-email":        "Format email tidak valid.",
+  "auth/missing-password":     "Kata sandi wajib diisi.",
+  "auth/invalid-credential":   "Email atau password salah. Periksa kembali.",
+  "auth/wrong-password":       "Password salah. Coba lagi.",
+  "auth/user-not-found":       "Akun dengan email ini tidak ditemukan. Silakan register terlebih dahulu.",
+  "auth/email-already-in-use": "Email sudah terdaftar. Silakan login.",
+  "auth/weak-password":        "Password terlalu lemah (minimal 6 karakter).",
+  "auth/too-many-requests":    "Terlalu banyak percobaan login. Coba beberapa saat lagi.",
+  "auth/network-request-failed": "Koneksi gagal. Periksa internet Anda.",
+  "auth/user-disabled":        "Akun ini telah dinonaktifkan. Hubungi admin.",
 };
 
+// ─── SHOW / HIDE LOGIN ERROR ──────────────────────────────
 function showLoginError(message, isSuccess = false) {
-  const code = String(message || "").match(/auth\/[a-z-]+/)?.[0];
+  // Coba ekstrak kode error Firebase (auth/...)
+  const code = String(message || "").match(/\(auth\/[a-z-]+\)/)?.[0]
+    ?.replace(/[()]/g, "")
+    || String(message || "").match(/auth\/[a-z-]+/)?.[0];
+
   const text = AUTH_ERROR_MAP[code] || message || "Autentikasi gagal.";
+
   const errWrap = document.getElementById("loginError");
+  const errIcon = errWrap ? errWrap.querySelector("i") : null;
   const errText = document.getElementById("loginErrorText");
-  if (errText) {
-    errText.textContent = text;
-    errText.className = isSuccess ? "text-emerald-700 ml-2" : "text-rose-700 ml-2";
-  }
+
+  if (errText) errText.textContent = text;
+
   if (errWrap) {
-    errWrap.className = isSuccess 
-      ? "alert alert-success p-2 text-sm items-start" 
-      : "alert alert-danger p-2 text-sm items-start";
-    errWrap.querySelector("i").className = isSuccess 
-      ? "fas fa-check-circle text-emerald-500 mt-0.5" 
-      : "fas fa-exclamation-circle text-rose-500 mt-0.5";
-    errWrap.style.display = "block";
+    if (isSuccess) {
+      errWrap.className = "alert alert-success d-flex align-items-center gap-2";
+      if (errIcon) errIcon.className = "fas fa-check-circle me-2 text-success";
+    } else {
+      errWrap.className = "alert alert-danger d-flex align-items-center gap-2";
+      if (errIcon) errIcon.className = "fas fa-exclamation-circle me-2";
+    }
+    errWrap.style.display = "flex";
   }
 }
 
@@ -348,22 +329,46 @@ function hideLoginError() {
   if (el) el.style.display = "none";
 }
 
-// ─── CHECK AUTH ON PAGE LOAD (index.html) ────────────────
-// Jika guru sudah login dan terverifikasi, langsung redirect ke dashboard
+// ─── LOGOUT ───────────────────────────────────────────────
+function logoutGuru() {
+  auth
+    .signOut()
+    .then(() => {
+      showAlert("Anda telah keluar dari mode guru.", "info");
+    })
+    .catch((err) => showAlert("Gagal logout: " + err.message, "danger"));
+}
+
+// ─── CEK AUTH DI HALAMAN SISWA (index.html) ───────────────
 function checkAuthOnStudentPage() {
+  // Cek apakah baru selesai verifikasi email (dari verify.html)
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("verified") === "1") {
+    // Bersihkan URL tanpa reload
+    window.history.replaceState({}, document.title, window.location.pathname);
+    // Tunggu DOM siap lalu buka modal login dengan pesan sukses
+    setTimeout(() => {
+      openLoginModal();
+      showLoginError(
+        "Email Anda berhasil diverifikasi! Silakan login untuk melanjutkan.",
+        true
+      );
+    }, 400);
+  }
+
+  // Pantau status auth
   auth.onAuthStateChanged(async (user) => {
-    if (!user) return; // Tidak login → tetap di student view
+    if (!user) return;
     try {
       const snap = await guruRef.child(user.uid).once("value");
       const data = snap.val();
-      if (data && data.isVerified && data.emailVerified) {
-        // Guru terverifikasi → tampilkan tombol "Masuk ke Dashboard"
+      if (data && data.isVerified && user.emailVerified) {
         const dashBtn = document.getElementById("dashboardBtn");
         if (dashBtn) {
           dashBtn.style.display = "";
           dashBtn.onclick = () => { window.location.href = "dashboard.html"; };
         }
       }
-    } catch (_) { /* ignore */ }
+    } catch (_) { /* abaikan */ }
   });
 }

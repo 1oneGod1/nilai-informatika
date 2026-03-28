@@ -49,61 +49,31 @@
       `;
     }
 
+    function redirectToLogin(delay = 2500) {
+      window.setTimeout(() => {
+        // Redirect ke login dengan flag ?verified=1 agar modal login
+        // terbuka otomatis dengan pesan "email berhasil diverifikasi"
+        window.location.href = "index.html?verified=1";
+      }, delay);
+    }
+
     async function verifyEmailToken() {
       try {
-        setStatus("loading", "Memverifikasi...", "Sedang mengecek token verifikasi Anda.");
+        setStatus("loading", "Memverifikasi...", "Sedang memproses verifikasi email dari Firebase.");
 
         const params = new URLSearchParams(window.location.search);
-        const uid = (params.get("uid") || "").trim();
-        const token = (params.get("token") || "").trim();
+        const mode = (params.get("mode") || "").trim();
+        const oobCode = (params.get("oobCode") || "").trim();
 
-        if (!uid || !token) {
-          setStatus("error", "Link Tidak Valid", "Parameter verifikasi tidak lengkap.");
+        if (mode !== "verifyEmail" || !oobCode) {
+          setStatus("error", "Link Tidak Valid", "Parameter verifikasi Firebase tidak lengkap atau mode tidak didukung.");
           retryBtn.classList.remove("hidden");
           return;
         }
 
-        const snap = await guruRef.child(uid).once("value");
-        const guruData = snap.val();
-
-        if (!guruData) {
-          setStatus("error", "Akun Tidak Ditemukan", "Data guru untuk link ini tidak ditemukan.");
-          return;
-        }
-
-        if (guruData.emailVerified) {
-          setStatus("success", "Sudah Terverifikasi", "Email Anda sudah pernah diverifikasi sebelumnya.");
-          return;
-        }
-
-        const expiresAt = Number(guruData.verifyTokenExpiresAt || 0);
-        const savedHash = String(guruData.verifyTokenHash || "");
-
-        if (!savedHash || !expiresAt) {
-          setStatus("error", "Token Tidak Tersedia", "Token verifikasi tidak tersedia. Silakan kirim ulang dari halaman login.");
-          return;
-        }
-
-        if (nowTs() > expiresAt) {
-          setStatus("warn", "Token Kadaluarsa", "Token verifikasi sudah kadaluarsa. Silakan kirim ulang verifikasi dari halaman login.");
-          return;
-        }
-
-        const incomingHash = await sha256Hex(token);
-        if (incomingHash !== savedHash) {
-          setStatus("error", "Token Tidak Cocok", "Token verifikasi tidak valid. Silakan kirim ulang verifikasi.");
-          return;
-        }
-
-        await guruRef.child(uid).update({
-          emailVerified: true,
-          emailVerifiedAt: nowTs(),
-          verifyTokenHash: null,
-          verifyTokenExpiresAt: null,
-          verifyRequestedAt: null,
-        });
-
-        setStatus("success", "Verifikasi Berhasil", "Email Anda berhasil diverifikasi. Silakan kembali ke halaman login.");
+        await auth.applyActionCode(oobCode);
+        setStatus("success", "Verifikasi Berhasil", "Email Anda berhasil diverifikasi. Anda akan diarahkan ke halaman login.");
+        redirectToLogin();
       } catch (err) {
         setStatus("error", "Gagal Memverifikasi", String(err.message || err));
         retryBtn.classList.remove("hidden");

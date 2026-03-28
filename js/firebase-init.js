@@ -23,30 +23,16 @@ const auth    = firebase.auth();
 const siswaRef = db.ref("siswa");
 const guruRef  = db.ref("guru");
 
-// EmailJS config (isi dengan data dari dashboard EmailJS)
-const EMAILJS_CONFIG = {
-  publicKey: "YJQoP43cSX51foN43",
-  serviceId: "service_xwae3kj",
-  templateId: "template_knsm16l",
-};
-
-const VERIFY_TOKEN_TTL_MS = 30 * 60 * 1000;
-const RESEND_VERIFICATION_COOLDOWN_MS = 60 * 1000;
-
-// Admin utama
 const ADMIN_UTAMA_EMAIL = "andi.purba@sdh.or.id";
 
-// KKM per angkatan
 const KKM_MAP = { 7: 67, 8: 68, 9: 69, 10: 75, 11: 76, 12: 77 };
 
-// Ekstrak angka kelas → KKM
 function getKKM(kelasStr) {
   const match = String(kelasStr || "").match(/\d+/);
   if (!match) return 0;
   return KKM_MAP[parseInt(match[0], 10)] || 0;
 }
 
-// Escape HTML (XSS-safe)
 function escHtml(str) {
   return String(str)
     .replace(/&/g, "&amp;")
@@ -56,7 +42,6 @@ function escHtml(str) {
     .replace(/'/g, "&#39;");
 }
 
-// Alert Bootstrap (dipakai di kedua halaman)
 function showAlert(message, type = "success") {
   const area = document.getElementById("alertArea");
   if (!area) return;
@@ -81,36 +66,4 @@ function showAlert(message, type = "success") {
 
 function nowTs() {
   return Date.now();
-}
-
-function isEmailJsConfigured() {
-  return Boolean(
-    EMAILJS_CONFIG.publicKey &&
-      EMAILJS_CONFIG.serviceId &&
-      EMAILJS_CONFIG.templateId,
-  );
-}
-
-function getEmailJsConfig() {
-  return { ...EMAILJS_CONFIG };
-}
-
-function generateVerificationToken() {
-  const bytes = new Uint8Array(32);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-async function sha256Hex(text) {
-  const encoded = new TextEncoder().encode(String(text));
-  const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-function buildVerifyUrl(uid, token) {
-  const url = new URL("verify.html", window.location.href);
-  url.searchParams.set("uid", uid);
-  url.searchParams.set("token", token);
-  return url.toString();
 }

@@ -1,664 +1,597 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sistem Nilai Informatika</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Chart.js -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Bootstrap untuk modal login guru -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="style.css?v=20260315" rel="stylesheet" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        
-        /* Student View Dark Mode */
-        #studentView {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0f172a;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
+      @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
-        .font-mono-tech {
-            font-family: 'JetBrains Mono', monospace;
-        }
+      html,
+      body {
+        background-color: #0a0f1e;
+      }
 
-        .fade-in {
-            animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .spin { animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        }
+      #studentView {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: #0a0f1e;
+        background-image: radial-gradient(
+          rgba(255, 255, 255, 0.05) 1px,
+          transparent 1px
+        );
+        background-size: 24px 24px;
+      }
 
-        .progress-bar-fill {
-            transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+      .font-mono-tech {
+        font-family: "JetBrains Mono", monospace;
+      }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+      .fade-in {
+        animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
 
-        /* Teacher View */
-        #teacherView {
-            background-color: #f8fafc;
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-        #navbarStudent {
-            background: linear-gradient(to right, #4f46e5, #3b82f6);
-        }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      }
 
-        #navbarTeacher {
-            background: linear-gradient(to right, #4f46e5, #3b82f6);
-        }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+      }
 
-        .glass-panel-teacher {
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-        }
+      #navbarStudent {
+        background: transparent;
+      }
+
+      .student-modal .modal-content {
+        background: rgba(15, 23, 42, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #e2e8f0;
+      }
+
+      .student-modal .modal-header,
+      .student-modal .modal-footer {
+        border-color: rgba(255, 255, 255, 0.08);
+      }
+
+      .student-modal .form-control {
+        background: rgba(51, 65, 85, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      .student-modal .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+      }
     </style>
-</head>
-<body class="min-h-screen flex flex-col">
-
-    <!-- NAVBAR Student (Dark Cyber) -->
+  </head>
+  <body class="min-h-screen flex flex-col" style="background-color: #0a0f1e">
     <nav id="navbarStudent" class="sticky top-0 z-20">
-        <div class="bg-gradient-to-r from-transparent to-transparent border-b border-cyan-500/20 backdrop-blur-md">
-            <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="bg-cyan-500/10 text-cyan-400 p-2 rounded-lg border border-cyan-500/20">
-                        <i class="fas fa-terminal text-sm"></i>
-                    </div>
-                    <h1 class="text-lg font-bold text-white tracking-wide font-mono-tech">CS<span class="text-cyan-400">.</span>Report</h1>
-                </div>
-                <button onclick="openLoginModal()" class="flex items-center gap-2 text-sm font-bold text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/10 px-4 py-2 rounded-lg transition-colors font-mono-tech">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span class="hidden sm:inline">LOGIN GURU</span>
-                </button>
+      <div
+        class="bg-gradient-to-r from-transparent to-transparent border-b border-cyan-500/20 backdrop-blur-md"
+      >
+        <div
+          class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-3"
+        >
+          <div class="flex items-center gap-3 min-w-0">
+            <div
+              class="bg-cyan-500/10 text-cyan-400 p-2 rounded-lg border border-cyan-500/20"
+            >
+              <i class="fas fa-terminal text-sm"></i>
             </div>
+            <h1
+              class="text-lg font-bold text-white tracking-wide font-mono-tech truncate"
+            >
+              CS<span class="text-cyan-400">.</span>Report
+            </h1>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              id="dashboardBtn"
+              style="display: none"
+              class="flex items-center gap-2 text-sm font-bold text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/10 px-4 py-2 rounded-lg transition-colors font-mono-tech"
+            >
+              <i class="fas fa-gauge-high"></i>
+              <span class="hidden sm:inline">DASHBOARD</span>
+            </button>
+            <button
+              onclick="openLoginModal()"
+              class="flex items-center gap-2 text-sm font-bold text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/10 px-4 py-2 rounded-lg transition-colors font-mono-tech"
+            >
+              <i class="fas fa-sign-in-alt"></i>
+              <span class="hidden sm:inline">LOGIN GURU</span>
+            </button>
+          </div>
         </div>
+      </div>
     </nav>
 
-    <!-- NAVBAR Teacher -->
-    <nav id="navbarTeacher" style="display:none" class="sticky top-0 z-20 shadow-md">
-        <div class="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3 text-white">
-                <div class="bg-white/20 p-2 rounded-lg">
-                    <i class="bi bi-collection" style="width:20px;height:20px;"></i>
-                </div>
-                <span class="font-semibold text-lg tracking-wide hidden sm:block">Input Nilai Informatika</span>
-                <span class="font-semibold text-lg tracking-wide sm:hidden">Informatika</span>
-                <span class="bg-emerald-500/20 text-emerald-100 border border-emerald-400/30 text-xs px-2.5 py-1 rounded-full font-medium">Mode Guru</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <button onclick="showStudentView()" class="bg-white/10 hover:bg-white text-white hover:text-indigo-600 transition-colors duration-200 px-3 py-2 rounded-lg font-medium text-sm hidden sm:flex items-center gap-2 border border-white/20">
-                    <i class="bi bi-house"></i> Homepage
-                </button>
-                <button onclick="logoutGuru()" class="bg-rose-500 hover:bg-rose-600 text-white transition-colors duration-200 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm">
-                    <i class="bi bi-box-arrow-right"></i>
-                    <span class="hidden sm:inline">Keluar</span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- ALERT AREA -->
     <div class="container mt-3" id="alertArea"></div>
 
-    <!-- VIEW 1: STUDENT (Dark Cyber Design) -->
     <div id="studentView" class="flex-1 text-slate-300">
-        <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-12 flex flex-col items-center">
-            <!-- Area Pencarian -->
-            <div class="glass-panel rounded-[2rem] p-8 md:p-12 w-full max-w-2xl mb-10 relative overflow-hidden">
-                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-cyan-500/5 blur-[80px] pointer-events-none"></div>
-                <div class="relative z-10">
-                    <div class="w-16 h-16 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(34,211,238,0.2)]">
-                        <i class="fas fa-search text-2xl text-cyan-400"></i>
-                    </div>
-                    <h2 class="text-3xl font-extrabold text-white text-center mb-8 tracking-tight">Terminal Pencarian<span class="text-cyan-400 animate-pulse">_</span></h2>
+      <main
+        class="w-full max-w-6xl mx-auto px-4 py-12 flex flex-col items-center gap-8"
+      >
+        <section
+          class="glass-panel rounded-[2rem] p-8 md:p-12 w-full max-w-3xl relative overflow-hidden"
+        >
+          <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-cyan-500/5 blur-[80px] pointer-events-none"
+          ></div>
+          <div class="relative z-10">
+            <div
+              class="w-16 h-16 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+            >
+              <i class="fas fa-search text-2xl text-cyan-400"></i>
+            </div>
+            <h2
+              class="text-3xl font-extrabold text-white text-center mb-3 tracking-tight"
+            >
+              Terminal Pencarian<span class="text-cyan-400 animate-pulse"
+                >_</span
+              >
+            </h2>
+            <p class="text-center text-slate-400 max-w-xl mx-auto mb-8">
+              Cari siswa berdasarkan NIS atau nama. Hasil akan diambil langsung
+              dari database Firebase yang sama dengan versi hosting.
+            </p>
 
-                    <div class="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
-                        <div class="relative flex-1 group">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <i class="fas fa-id-badge text-slate-500 group-focus-within:text-cyan-400 transition-colors"></i>
-                            </div>
-                            <input type="text" id="searchInput" class="w-full pl-11 pr-4 py-3.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all text-white placeholder-slate-500 text-sm font-mono-tech shadow-inner" placeholder="Query: [NIS] or [Name]...">
-                        </div>
-                        <button id="searchBtn" onclick="handleSearch()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(8,145,178,0.3)] flex items-center justify-center gap-2 min-w-[120px] font-mono-tech">
-                            <span id="btnText">EXECUTE</span>
-                            <i id="btnSpinner" class="fas fa-circle-notch spin hidden"></i>
-                        </button>
-                    </div>
-
-                    <div id="errorMessage" class="hidden mt-4 text-rose-400 bg-rose-500/10 border border-rose-500/20 text-sm py-2 px-4 rounded-xl inline-flex items-center gap-2 font-medium w-full max-w-xl mx-auto justify-center">
-                        <i class="fas fa-triangle-exclamation"></i>
-                        <span id="errorText">Error 404: Data not found.</span>
-                    </div>
-
-                    <div class="mt-12 pt-8 border-t border-slate-700/50">
-                        <div class="text-center mb-3">
-                            <i class="fas fa-circle-info text-2xl text-slate-600"></i>
-                        </div>
-                        <h3 class="text-sm font-bold text-slate-400 text-center mb-5 font-mono-tech uppercase tracking-widest">>> Protokol Akses</h3>
-                        <ul class="text-sm text-slate-400 space-y-3 max-w-[320px] mx-auto text-left font-mono-tech">
-                            <li class="flex items-start gap-3">
-                                <i class="fas fa-check text-cyan-500 mt-0.5"></i>
-                                <span>Input <strong>NIS / Nama</strong> siswa</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <i class="fas fa-check text-cyan-500 mt-0.5"></i>
-                                <span>Referensikan ID pada kartu pelajar</span>
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <i class="fas fa-check text-cyan-500 mt-0.5"></i>
-                                <span>Klik tombol <strong>EXECUTE</strong></span>
-                            </li>
-                            <li class="flex items-start gap-3 opacity-50">
-                                <i class="fas fa-lock text-slate-500 mt-0.5"></i>
-                                <span>Otentikasi password (Upcoming feature)</span>
-                            </li>
-                        </ul>
-                    </div>
+            <div class="max-w-xl mx-auto">
+              <div class="relative group">
+                <div
+                  class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+                >
+                  <i
+                    class="fas fa-id-badge text-slate-500 group-focus-within:text-cyan-400 transition-colors"
+                  ></i>
                 </div>
+                <input
+                  type="text"
+                  id="studentSearchInput"
+                  oninput="searchStudent()"
+                  class="w-full pl-11 pr-4 py-3.5 bg-slate-900/80 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all text-white placeholder-slate-500 text-sm font-mono-tech shadow-inner"
+                  placeholder="Query: [NIS] or [Name]..."
+                />
+              </div>
             </div>
 
-            <!-- Area Hasil Pencarian -->
-            <div id="resultSection" class="hidden fade-in w-full space-y-6 max-w-5xl">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- Kartu Profil -->
-                    <div class="glass-panel rounded-3xl p-8 lg:col-span-4 flex flex-col items-center text-center relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl"></div>
-                        <div class="relative mb-6 group">
-                            <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full opacity-50 blur transition duration-500"></div>
-                            <img id="studentAvatar" src="" class="relative w-28 h-28 rounded-full border-2 border-slate-800 object-cover bg-slate-800 z-10">
-                            <div id="competencyBadge" class="absolute -bottom-3 -right-3 z-20 bg-slate-800 text-cyan-400 border border-cyan-500/30 text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg font-mono-tech uppercase">EXPERT</div>
-                        </div>
-                        <div class="w-full">
-                            <h3 id="studentName" class="text-2xl font-extrabold text-white mb-1">Nama Siswa</h3>
-                            <p class="text-cyan-400 font-mono-tech text-sm mb-6"><i class="fas fa-hashtag text-xs opacity-70"></i> <span id="studentNis"></span></p>
-                            <div class="grid grid-cols-2 gap-3 w-full text-left">
-                                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50">
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-1 flex items-center gap-2"><i class="fas fa-layer-group"></i> Kelas</p>
-                                    <p id="studentClass" class="font-bold text-slate-200 text-sm truncate"></p>
-                                </div>
-                                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50">
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-1 flex items-center gap-2"><i class="fas fa-clock"></i> T.A.</p>
-                                    <p class="font-bold text-slate-200 text-sm">23/24</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Kartu Radar Chart -->
-                    <div class="glass-panel rounded-3xl p-6 lg:p-8 lg:col-span-8 flex flex-col">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                            <div>
-                                <h4 class="text-xl font-bold text-white flex items-center gap-3"><i class="fas fa-radar text-indigo-400"></i> Competency Radar Map</h4>
-                                <p class="text-sm text-slate-400 mt-1">Analisis visual penguasaan modul Informatika</p>
-                            </div>
-                            <div class="text-right bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-700/50">
-                                <p class="text-[10px] text-slate-500 font-bold uppercase">Index Skor Total</p>
-                                <p id="totalGpa" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">0.00</p>
-                            </div>
-                        </div>
-                        <div class="w-full flex-1 min-h-[300px] relative flex justify-center items-center">
-                            <canvas id="skillRadarChart" style="max-height: 320px;"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabel Nilai -->
-                <div class="glass-panel rounded-3xl overflow-hidden">
-                    <div class="p-6 md:px-8 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/30">
-                        <h4 class="text-lg font-bold text-white flex items-center gap-3">
-                            <i class="fas fa-database text-cyan-500"></i> Rincian Nilai per Modul Topik
-                        </h4>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left whitespace-nowrap">
-                            <thead class="bg-slate-900/80 text-slate-400 text-[11px] uppercase tracking-widest font-bold">
-                                <tr>
-                                    <th class="px-8 py-5 rounded-tl-lg">Modul Pembelajaran</th>
-                                    <th class="px-5 py-5 text-center">Praktikum<br><span class="text-cyan-500/70 font-mono-tech">40%</span></th>
-                                    <th class="px-5 py-5 text-center">Teori<br><span class="text-cyan-500/70 font-mono-tech">30%</span></th>
-                                    <th class="px-5 py-5 text-center">Proyek<br><span class="text-cyan-500/70 font-mono-tech">30%</span></th>
-                                    <th class="px-6 py-5">Skor Akhir & Indikator</th>
-                                    <th class="px-6 py-5 text-center rounded-tr-lg">Grade</th>
-                                </tr>
-                            </thead>
-                            <tbody id="gradesBody" class="divide-y divide-slate-700/50 text-slate-200 text-sm"></tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="mt-12 pt-8 border-t border-slate-700/50">
+              <div class="text-center mb-3">
+                <i class="fas fa-circle-info text-2xl text-slate-600"></i>
+              </div>
+              <h3
+                class="text-sm font-bold text-slate-400 text-center mb-5 font-mono-tech uppercase tracking-widest"
+              >
+                >> Protokol Akses
+              </h3>
+              <ul
+                class="text-sm text-slate-400 space-y-3 max-w-[360px] mx-auto text-left font-mono-tech"
+              >
+                <li class="flex items-start gap-3">
+                  <i class="fas fa-check text-cyan-500 mt-0.5"></i>
+                  <span>Input <strong>NIS / Nama</strong> siswa</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="fas fa-check text-cyan-500 mt-0.5"></i>
+                  <span>Pilih siswa dari hasil pencarian</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="fas fa-check text-cyan-500 mt-0.5"></i>
+                  <span>Masukkan password untuk melihat nilai</span>
+                </li>
+              </ul>
             </div>
-        </main>
+          </div>
+        </section>
+
+        <section
+          id="searchPlaceholder"
+          class="glass-panel rounded-3xl p-10 w-full max-w-5xl text-center fade-in"
+        >
+          <div
+            class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-900/70 border border-slate-700 flex items-center justify-center"
+          >
+            <i class="fas fa-database text-cyan-400 text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">
+            Siap menampilkan data siswa
+          </h3>
+          <p class="text-slate-400 max-w-2xl mx-auto">
+            Mulai ketik nama atau NIS di atas. Daftar hasil pencarian akan
+            muncul di sini, lalu Anda bisa membuka detail nilai setelah
+            verifikasi password.
+          </p>
+        </section>
+
+        <section
+          id="searchResults"
+          class="w-full max-w-5xl hidden fade-in"
+        ></section>
+        <section
+          id="studentDetail"
+          class="w-full max-w-5xl hidden fade-in"
+        ></section>
+      </main>
     </div>
 
-    <!-- VIEW 2: TEACHER -->
-    <div id="teacherView" style="display:none" class="flex-1">
-        <div class="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10 space-y-5 sm:space-y-6">
-            <!-- ADMIN PANEL -->
-            <div id="adminPanel" class="bg-gradient-to-br from-rose-50 to-orange-50 rounded-2xl shadow-sm border border-rose-200 overflow-hidden" style="display:none">
-                <div class="flex items-stretch">
-                    <div class="w-1 flex-shrink-0 bg-rose-500 rounded-l-2xl"></div>
-                    <div class="flex-1 px-6 py-5 sm:px-7 sm:py-6">
-                        <div class="flex items-center gap-2.5 mb-4">
-                            <i class="bi bi-shield-check" style="width:20px;height:20px;color:#dc2626;"></i>
-                            <h2 class="font-semibold text-slate-800 text-base">Panel Verifikasi Guru (Admin Utama)</h2>
-                        </div>
-                        <div id="adminPanelContent"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Accordion -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <button class="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden')">
-                    <span class="flex items-center gap-2.5 font-semibold text-slate-700 text-sm">
-                        <i class="bi bi-gear" style="width:16px;height:16px;"></i>
-                        Pengaturan Kolom Formatif
-                    </span>
-                    <i class="bi bi-chevron-down" style="width:16px;height:16px;"></i>
-                </button>
-                <div class="hidden border-t border-slate-100 bg-slate-50/60 px-6 py-5">
-                    <div class="flex items-end gap-4 flex-wrap">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1.5">Jumlah Formatif</label>
-                            <input type="number" id="numFormatif" value="2" min="1" max="10" class="w-24 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors">
-                        </div>
-                        <button onclick="applySettings()" class="flex items-center gap-2 bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
-                            <i class="bi bi-check-circle" style="width:16px;height:16px;"></i> Terapkan
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tambah Siswa -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="flex items-stretch">
-                    <div class="w-1 flex-shrink-0 bg-emerald-500 rounded-l-2xl"></div>
-                    <div class="flex-1 px-6 py-5 sm:px-7 sm:py-6">
-                        <div class="flex items-center gap-2.5 mb-5">
-                            <i class="bi bi-person-plus-fill" style="width:20px;height:20px;color:#059669;"></i>
-                            <h2 class="font-semibold text-slate-800 text-base">Tambah Siswa Baru</h2>
-                        </div>
-                        <form id="addForm" onsubmit="addSiswa(event)">
-                            <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-end gap-3">
-                                <div class="col-span-2 flex flex-col gap-1">
-                                    <label class="text-xs font-semibold text-slate-600">NIS (Nomor Induk Siswa)</label>
-                                    <input type="text" id="nis" placeholder="0123456789" required class="w-full sm:w-48 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors">
-                                </div>
-                                <div class="col-span-2 flex flex-col gap-1">
-                                    <label class="text-xs font-semibold text-slate-600">Nama Siswa</label>
-                                    <input type="text" id="nama" placeholder="Nama lengkap" required class="w-full sm:w-48 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors">
-                                </div>
-                                <div class="flex flex-col gap-1">
-                                    <label class="text-xs font-semibold text-slate-600">Kelas</label>
-                                    <input type="text" id="kelas" placeholder="10 RPL 1" required class="w-full sm:w-32 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors">
-                                </div>
-                                <div class="flex flex-col gap-1">
-                                    <label class="text-xs font-semibold text-slate-600">Password</label>
-                                    <input type="text" id="siswaPassword" placeholder="Password akses nilai" required class="w-full sm:w-32 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors">
-                                </div>
-                                <div id="formatifGroupAdd" class="flex gap-2 flex-wrap items-end col-span-2 sm:col-span-1"></div>
-                                <div class="flex flex-col gap-1">
-                                    <label class="text-xs font-semibold text-slate-600">Sumatif</label>
-                                    <input type="number" id="sumatif" placeholder="0-100" min="0" max="100" class="w-full sm:w-24 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors">
-                                </div>
-                                <button type="submit" class="col-span-2 sm:col-span-1 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm w-full sm:w-auto">
-                                    <i class="bi bi-plus" style="width:16px;height:16px;"></i> Tambah Siswa
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabel Nilai -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-5 sm:px-7 py-4 sm:py-5 border-b border-slate-100">
-                    <div>
-                        <h2 class="font-semibold text-slate-800 text-base">Input & Edit Nilai Siswa</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Menampilkan <span id="shownCount" class="font-semibold text-slate-600">0</span> dari <strong id="totalCount" class="text-slate-600">0</strong> siswa</p>
-                    </div>
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-                        <div class="relative">
-                            <i class="bi bi-filter" style="width:14px;height:14px;" class="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                            <select id="filterKelas" onchange="filterTable()" class="w-full sm:w-auto pl-8 pr-3 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors bg-white appearance-none" style="min-width: 160px">
-                                <option value="">Semua Kelas</option>
-                            </select>
-                        </div>
-                        <div class="relative">
-                            <i class="bi bi-search" style="width:14px;height:14px;" class="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                            <input type="text" id="searchInput" placeholder="Cari nama..." oninput="filterTable()" class="w-full sm:w-56 pl-8 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors">
-                        </div>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm" id="siswaTable">
-                        <thead id="tableHead" class="bg-slate-50 border-b border-slate-200"></thead>
-                        <tbody id="tableBody">
-                            <tr>
-                                <td colspan="20" class="text-center py-10 text-slate-400">
-                                    <div class="flex flex-col items-center gap-2">
-                                        <i class="bi bi-arrow-repeat" style="width:24px;height:24px;" class="text-indigo-400 animate-spin"></i>
-                                        <span class="text-sm">Memuat data...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL Login Guru -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 420px">
-            <div class="modal-content" style="background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(255, 255, 255, 0.05);">
-                <div class="modal-header border-slate-700/50" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                    <h5 class="modal-title text-white font-mono-tech" style="font-family: 'JetBrains Mono', monospace;">
-                        <i class="fas fa-sign-in-alt me-2"></i> LOGIN GURU
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" style="background: rgba(15, 23, 42, 0.8);">
-                    <div id="loginError" style="display: none;" class="alert alert-danger" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <span id="loginErrorText"></span>
-                    </div>
-                    <form id="loginForm" onsubmit="submitLogin(event)">
-                        <div class="mb-3">
-                            <label for="emailInput" class="form-label text-slate-200" style="font-size: 0.875rem;">Email Guru</label>
-                            <input type="email" class="form-control" id="emailInput" placeholder="guru@sekolah.id" required style="background: rgba(51, 65, 85, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); color: white;">
-                            <style>.form-control::placeholder { color: rgba(255, 255, 255, 0.5); }</style>
-                        </div>
-                        <div class="mb-3">
-                            <label for="passwordInput" class="form-label text-slate-200" style="font-size: 0.875rem;">Password</label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" id="passwordInput" placeholder="••••••••" required style="background: rgba(51, 65, 85, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); color: white;">
-                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()" style="border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5);">
-                                    <i class="bi bi-eye" id="eyeIcon"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn w-100" style="background: #06b6d4; border: none; color: white; font-weight: 600;">
-                            <i class="bi bi-unlock-fill me-2"></i>Masuk
-                        </button>
-                    </form>
-                    <div class="text-center mt-3">
-                        <button type="button" id="registerToggleBtn" onclick="showRegisterForm()" class="btn btn-link text-cyan-400" style="text-decoration: none; font-size: 0.875rem;">
-                            Belum punya akun? Register di sini
-                        </button>
-                    </div>
-                    <div id="resendVerificationWrap" class="text-center mt-2" style="display:none;">
-                        <button type="button" onclick="resendVerificationFromLogin()" class="btn btn-sm btn-outline-info">
-                            <i class="bi bi-envelope-check me-1"></i>Kirim Ulang Verifikasi
-                        </button>
-                    </div>
-                </div>
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 420px">
+        <div
+          class="modal-content"
+          style="
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+          "
+        >
+          <div
+            class="modal-header border-slate-700/50"
+            style="border-bottom: 1px solid rgba(255, 255, 255, 0.05)"
+          >
+            <h5
+              class="modal-title text-white font-mono-tech"
+              style="font-family: &quot;JetBrains Mono&quot;, monospace"
+            >
+              <i class="fas fa-sign-in-alt me-2"></i> LOGIN GURU
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body" style="background: rgba(15, 23, 42, 0.8)">
+            <div
+              id="loginError"
+              style="display: none"
+              class="alert alert-danger d-flex align-items-center gap-2"
+              role="alert"
+            >
+              <i class="fas fa-exclamation-circle me-2"></i>
+              <span id="loginErrorText"></span>
             </div>
+            <form id="loginForm" onsubmit="submitLogin(event)">
+              <div class="mb-3">
+                <label
+                  for="emailInput"
+                  class="form-label text-slate-200"
+                  style="font-size: 0.875rem"
+                  >Email Guru</label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="emailInput"
+                  placeholder="guru@sekolah.id"
+                  required
+                  style="
+                    background: rgba(51, 65, 85, 0.5);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    color: white;
+                  "
+                />
+                <style>
+                  .form-control::placeholder {
+                    color: rgba(255, 255, 255, 0.5);
+                  }
+                </style>
+              </div>
+              <div class="mb-3">
+                <label
+                  for="passwordInput"
+                  class="form-label text-slate-200"
+                  style="font-size: 0.875rem"
+                  >Password</label
+                >
+                <div class="input-group">
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="passwordInput"
+                    placeholder="••••••••"
+                    required
+                    style="
+                      background: rgba(51, 65, 85, 0.5);
+                      border: 1px solid rgba(255, 255, 255, 0.1);
+                      color: white;
+                    "
+                  />
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    onclick="togglePassword()"
+                    style="
+                      border: 1px solid rgba(255, 255, 255, 0.1);
+                      color: rgba(255, 255, 255, 0.5);
+                    "
+                  >
+                    <i class="bi bi-eye" id="eyeIcon"></i>
+                  </button>
+                </div>
+              </div>
+              <button
+                type="submit"
+                class="btn w-100"
+                style="
+                  background: #06b6d4;
+                  border: none;
+                  color: white;
+                  font-weight: 600;
+                "
+              >
+                <i class="bi bi-unlock-fill me-2"></i>Masuk
+              </button>
+            </form>
+            <div class="text-center mt-3">
+              <button
+                type="button"
+                id="registerToggleBtn"
+                onclick="showRegisterForm()"
+                class="btn btn-link text-cyan-400"
+                style="text-decoration: none; font-size: 0.875rem"
+              >
+                Belum punya akun? Register di sini
+              </button>
+            </div>
+            <div
+              id="resendVerificationWrap"
+              class="text-center mt-2"
+              style="display: none"
+            >
+              <button
+                type="button"
+                onclick="resendVerificationFromLogin()"
+                class="btn btn-sm btn-outline-info"
+              >
+                <i class="bi bi-envelope-check me-1"></i>Kirim Ulang Verifikasi
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
-    <!-- EmailJS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <!-- Firebase SDK Compat -->
+    <div
+      class="modal fade student-modal"
+      id="studentPasswordModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 420px">
+        <div class="modal-content rounded-4 overflow-hidden">
+          <div class="modal-header">
+            <h5 class="modal-title font-mono-tech text-white">
+              <i class="fas fa-lock me-2 text-cyan-400"></i>VERIFIKASI SISWA
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div
+              id="passwordError"
+              class="alert alert-danger items-start"
+              style="display: none"
+            >
+              <i class="fas fa-exclamation-circle me-2 mt-1"></i>
+              <span id="passwordErrorText"></span>
+            </div>
+
+            <div id="studentPasswordFormBody">
+              <p class="text-sm text-slate-300 mb-3">
+                Masukkan password siswa untuk membuka detail nilai.
+              </p>
+              <form onsubmit="verifyStudentPassword(event)">
+                <div class="mb-3">
+                  <label
+                    for="studentPasswordInput"
+                    class="form-label text-slate-200 text-sm"
+                    >Password</label
+                  >
+                  <div class="input-group">
+                    <input
+                      type="password"
+                      id="studentPasswordInput"
+                      class="form-control"
+                      placeholder="••••••••"
+                      required
+                    />
+                    <button
+                      class="btn btn-outline-secondary"
+                      type="button"
+                      onclick="toggleStudentPassword()"
+                      style="
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        color: rgba(255, 255, 255, 0.7);
+                      "
+                    >
+                      <i
+                        id="studentEyeIcon"
+                        class="fas fa-eye text-indigo-500"
+                      ></i>
+                    </button>
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  class="btn w-100"
+                  style="
+                    background: #06b6d4;
+                    border: none;
+                    color: white;
+                    font-weight: 600;
+                  "
+                >
+                  Lihat Nilai
+                </button>
+              </form>
+              <div class="text-center mt-3">
+                <button
+                  type="button"
+                  class="btn btn-link text-cyan-400 text-decoration-none p-0"
+                  onclick="toggleForgotPasswordView()"
+                >
+                  Lupa password?
+                </button>
+              </div>
+            </div>
+
+            <div id="studentForgotFormBody" style="display: none">
+              <p class="text-sm text-slate-300 mb-3">
+                Ajukan password baru. Permintaan ini harus disetujui guru di
+                dashboard.
+              </p>
+              <form onsubmit="submitForgotPasswordRequest(event)">
+                <div class="mb-3">
+                  <label
+                    for="newPasswordRequest"
+                    class="form-label text-slate-200 text-sm"
+                    >Password baru</label
+                  >
+                  <input
+                    type="text"
+                    id="newPasswordRequest"
+                    class="form-control"
+                    placeholder="Minimal 6 karakter"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="btn w-100"
+                  style="
+                    background: #10b981;
+                    border: none;
+                    color: white;
+                    font-weight: 600;
+                  "
+                >
+                  Kirim Pengajuan
+                </button>
+              </form>
+              <div class="text-center mt-3">
+                <button
+                  type="button"
+                  class="btn btn-link text-cyan-400 text-decoration-none p-0"
+                  onclick="toggleForgotPasswordView()"
+                >
+                  Kembali ke form password
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade student-modal"
+      id="studentChangePasswordModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 420px">
+        <div class="modal-content rounded-4 overflow-hidden">
+          <div class="modal-header">
+            <h5 class="modal-title font-mono-tech text-white">
+              <i class="fas fa-key me-2 text-emerald-400"></i>UBAH PASSWORD
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div
+              id="changePasswordError"
+              class="alert alert-danger items-start"
+              style="display: none"
+            >
+              <i class="fas fa-exclamation-circle me-2 mt-1"></i>
+              <span id="changePasswordErrorText"></span>
+            </div>
+            <form onsubmit="submitChangePassword(event)">
+              <div class="mb-3">
+                <label
+                  for="newActivePasswordInput"
+                  class="form-label text-slate-200 text-sm"
+                  >Password baru aktif</label
+                >
+                <input
+                  type="text"
+                  id="newActivePasswordInput"
+                  class="form-control"
+                  placeholder="Minimal 6 karakter"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                class="btn w-100"
+                style="
+                  background: #10b981;
+                  border: none;
+                  color: white;
+                  font-weight: 600;
+                "
+              >
+                Simpan Password
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Firebase/Auth Scripts -->
     <script src="js/firebase-init.js"></script>
     <script src="js/auth.js"></script>
-
-    <script>
-        let radarChartInstance = null;
-
-        const databaseInformatika = [
-            {
-                nis: "10111",
-                nama: "Andi Susanto",
-                kelas: "X Rekayasa Perangkat Lunak",
-                nilai: [
-                    { mapel: "Algoritma & Pemrograman", praktikum: 95, teori: 85, proyek: 92 },
-                    { mapel: "Sistem Komputer", praktikum: 80, teori: 88, proyek: 85 },
-                    { mapel: "Jaringan & Internet", praktikum: 85, teori: 82, proyek: 88 },
-                    { mapel: "Analisis Data (SQL)", praktikum: 90, teori: 85, proyek: 95 },
-                    { mapel: "Berpikir Komputasional", praktikum: 88, teori: 90, proyek: 85 },
-                    { mapel: "Dampak Sosial IT", praktikum: 85, teori: 95, proyek: 88 }
-                ]
-            },
-            {
-                nis: "10112",
-                nama: "Budi Pratama",
-                kelas: "X Teknik Komputer Jaringan",
-                nilai: [
-                    { mapel: "Algoritma & Pemrograman", praktikum: 75, teori: 80, proyek: 78 },
-                    { mapel: "Sistem Komputer", praktikum: 90, teori: 85, proyek: 92 },
-                    { mapel: "Jaringan & Internet", praktikum: 95, teori: 90, proyek: 95 },
-                    { mapel: "Analisis Data (SQL)", praktikum: 70, teori: 75, proyek: 72 },
-                    { mapel: "Berpikir Komputasional", praktikum: 80, teori: 85, proyek: 82 },
-                    { mapel: "Dampak Sosial IT", praktikum: 85, teori: 80, proyek: 88 }
-                ]
-            },
-            {
-                nis: "10113",
-                nama: "Citra Lestari",
-                kelas: "X Desain Komunikasi Visual",
-                nilai: [
-                    { mapel: "Algoritma & Pemrograman", praktikum: 85, teori: 88, proyek: 90 },
-                    { mapel: "Sistem Komputer", praktikum: 80, teori: 85, proyek: 82 },
-                    { mapel: "Jaringan & Internet", praktikum: 75, teori: 80, proyek: 78 },
-                    { mapel: "Analisis Data (SQL)", praktikum: 88, teori: 90, proyek: 85 },
-                    { mapel: "Berpikir Komputasional", praktikum: 92, teori: 95, proyek: 90 },
-                    { mapel: "Dampak Sosial IT", praktikum: 95, teori: 92, proyek: 98 }
-                ]
-            }
-        ];
-
-        document.getElementById("searchInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                handleSearch();
-            }
-        });
-
-        function getPredikat(nilaiAkhir) {
-            if (nilaiAkhir >= 90) return { huruf: 'A', class: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30' };
-            if (nilaiAkhir >= 80) return { huruf: 'B', class: 'text-cyan-400 bg-cyan-400/10 border-cyan-400/30' };
-            if (nilaiAkhir >= 70) return { huruf: 'C', class: 'text-amber-400 bg-amber-400/10 border-amber-400/30' };
-            return { huruf: 'D', class: 'text-rose-400 bg-rose-400/10 border-rose-400/30' };
-        }
-
-        function getCompetencyLevel(rataRata) {
-            if (rataRata >= 90) return "EXPERT";
-            if (rataRata >= 80) return "ADVANCED";
-            if (rataRata >= 70) return "INTERMEDIATE";
-            return "NOVICE";
-        }
-
-        function handleSearch() {
-            const input = document.getElementById("searchInput").value.trim().toLowerCase();
-            const errorMsg = document.getElementById("errorMessage");
-            const resultSection = document.getElementById("resultSection");
-            const btnText = document.getElementById("btnText");
-            const btnSpinner = document.getElementById("btnSpinner");
-            
-            errorMsg.classList.add("hidden");
-
-            if (input === "") {
-                document.getElementById("errorText").textContent = "Input required: NIS or Name.";
-                errorMsg.classList.remove("hidden");
-                return;
-            }
-
-            btnText.textContent = "PROCESSING...";
-            btnSpinner.classList.remove("hidden");
-            resultSection.classList.add("hidden");
-
-            setTimeout(() => {
-                btnText.textContent = "EXECUTE";
-                btnSpinner.classList.add("hidden");
-
-                const siswa = databaseInformatika.find(s => 
-                    s.nis.toLowerCase() === input || 
-                    s.nama.toLowerCase().includes(input)
-                );
-
-                if (siswa) {
-                    tampilkanData(siswa);
-                } else {
-                    document.getElementById("errorText").textContent = `Record for "${document.getElementById("searchInput").value}" not found in DB.`;
-                    errorMsg.classList.remove("hidden");
-                }
-            }, 600);
-        }
-
-        function renderRadarChart(siswa) {
-            const ctx = document.getElementById('skillRadarChart').getContext('2d');
-            const labels = siswa.nilai.map(n => n.mapel);
-            const dataNilai = siswa.nilai.map(n => Math.round((n.praktikum * 0.4) + (n.teori * 0.3) + (n.proyek * 0.3)));
-
-            if (radarChartInstance) { radarChartInstance.destroy(); }
-
-            Chart.defaults.color = '#94a3b8';
-            Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-
-            radarChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Skill Proficiency',
-                        data: dataNilai,
-                        backgroundColor: 'rgba(34, 211, 238, 0.2)',
-                        borderColor: '#22d3ee',
-                        pointBackgroundColor: '#6366f1',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#22d3ee',
-                        borderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)', circular: true },
-                            pointLabels: { font: { size: 11, weight: '600' }, color: '#cbd5e1' },
-                            ticks: { display: false, min: 0, max: 100, stepSize: 20 }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                            titleColor: '#22d3ee',
-                            padding: 12,
-                            borderColor: 'rgba(34, 211, 238, 0.3)',
-                            borderWidth: 1,
-                            callbacks: { label: function(context) { return ` Score: ${context.parsed.r} / 100`; } }
-                        }
-                    }
-                }
-            });
-        }
-
-        function tampilkanData(siswa) {
-            document.getElementById("studentName").textContent = siswa.nama;
-            document.getElementById("studentNis").textContent = siswa.nis;
-            document.getElementById("studentClass").textContent = siswa.kelas;
-            
-            const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(siswa.nama)}&background=1e293b&color=22d3ee&size=200&bold=true&rounded=true&format=svg`;
-            document.getElementById("studentAvatar").src = avatarUrl;
-
-            const tableBody = document.getElementById("gradesBody");
-            tableBody.innerHTML = "";
-            
-            let totalNilai = 0;
-
-            siswa.nilai.forEach((item, index) => {
-                const nilaiAkhir = Math.round((item.praktikum * 0.4) + (item.teori * 0.3) + (item.proyek * 0.3));
-                totalNilai += nilaiAkhir;
-                const predikat = getPredikat(nilaiAkhir);
-
-                let barColor = 'bg-cyan-500';
-                if(nilaiAkhir < 70) barColor = 'bg-rose-500';
-                else if(nilaiAkhir < 80) barColor = 'bg-amber-500';
-                else if(nilaiAkhir >= 90) barColor = 'bg-emerald-500';
-
-                const row = document.createElement("tr");
-                row.className = "hover:bg-slate-800/50 transition-colors group";
-                
-                row.innerHTML = `
-                    <td class="px-8 py-5">
-                        <p class="font-bold text-slate-200 group-hover:text-cyan-400 transition-colors">${item.mapel}</p>
-                        <p class="text-[10px] text-slate-500 font-mono-tech mt-0.5">MOD-${100 + index}</p>
-                    </td>
-                    <td class="px-5 py-5 text-center font-mono-tech text-slate-300">${item.praktikum}</td>
-                    <td class="px-5 py-5 text-center font-mono-tech text-slate-300">${item.teori}</td>
-                    <td class="px-5 py-5 text-center font-mono-tech text-slate-300">${item.proyek}</td>
-                    <td class="px-6 py-5">
-                        <div class="flex items-center gap-3">
-                            <span class="font-extrabold text-white w-8 text-right font-mono-tech">${nilaiAkhir}</span>
-                            <div class="w-full bg-slate-900 rounded-full h-1.5 border border-slate-700">
-                                <div class="${barColor} h-1.5 rounded-full progress-bar-fill" style="width: 0%" data-width="${nilaiAkhir}%"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-5 text-center">
-                        <span class="px-3 py-1 rounded-md text-xs font-bold border ${predikat.class} inline-block min-w-[32px]">
-                            ${predikat.huruf}
-                        </span>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            const rataRata = Math.round(totalNilai / siswa.nilai.length);
-            document.getElementById("totalGpa").textContent = rataRata.toFixed(2);
-            
-            document.getElementById("competencyBadge").textContent = getCompetencyLevel(rataRata);
-
-            renderRadarChart(siswa);
-
-            const resultSection = document.getElementById("resultSection");
-            resultSection.classList.remove("hidden");
-            
-            setTimeout(() => {
-                const bars = document.querySelectorAll('.progress-bar-fill');
-                bars.forEach(bar => {
-                    bar.style.width = bar.getAttribute('data-width');
-                });
-            }, 100);
-        }
-
-    </script>
-</body>
+    <script src="js/student.js"></script>
+  </body>
 </html>
