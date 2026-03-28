@@ -9,15 +9,15 @@
     "guru": {
       "$uid": {
         ".read": "auth != null",
-        ".write": "auth != null && (auth.uid === $uid || auth.token.email === 'andi.purba@sdh.or.id')",
+        ".write": "auth != null && (auth.uid === $uid || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
         "isVerified": {
-          ".write": "auth != null && auth.token.email === 'andi.purba@sdh.or.id'"
+          ".write": "auth != null && (auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')"
         },
         "verifiedBy": {
-          ".write": "auth != null && auth.token.email === 'andi.purba@sdh.or.id'"
+          ".write": "auth != null && (auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')"
         },
         "verifiedAt": {
-          ".write": "auth != null && auth.token.email === 'andi.purba@sdh.or.id'"
+          ".write": "auth != null && (auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')"
         }
       }
     }

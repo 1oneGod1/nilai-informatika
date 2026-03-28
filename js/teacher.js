@@ -8,6 +8,15 @@ let allSiswa = [];
 let activeQuarter = 3; // Default ke Q3 karena migrasi data kesana
 let numFormatif = { 1: 2, 2: 2, 3: 2, 4: 2 }; // Default fields per quarter
 
+function isAdminEmailSafe(email) {
+  if (typeof isAdminEmail === "function") return isAdminEmail(email);
+  const normalized = String(email || "").trim().toLowerCase();
+  return (
+    normalized === "andi.purba@sdh.or.id" ||
+    normalized === "pandapotanandi@gmail.com"
+  );
+}
+
 function setQuarter(q) {
   activeQuarter = q;
   // Update Tabs UI
@@ -19,37 +28,56 @@ function setQuarter(q) {
   // Sync input value
   const inputNum = document.getElementById("numFormatif");
   if (inputNum) inputNum.value = numFormatif[activeQuarter];
-
+  
   renderFormFormatifInputs();
   renderTableHead();
   renderTableBody(allSiswa);
 }
 
-// ─── AUTHENTICATION CHECK ─────────────────────────────────
+// G��G��G�� AUTHENTICATION CHECK G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
 document.addEventListener("DOMContentLoaded", () => {
   auth.onAuthStateChanged((user) => {
     if (!user) {
-      window.location.href = "index.html"; // Belum login → usir
+      window.location.href = "index.html"; // Belum login G�� usir
       return;
     }
-
+    
     // Cek status isVerified di Realtime Database
-    guruRef.child(user.uid).once("value").then((snap) => {
-      const data = snap.val();
-      if (!data || !data.isVerified || !user.emailVerified) {
+    guruRef.child(user.uid).once("value").then(async (snap) => {
+      const data = snap.val() || {};
+      const isAdminUtama = isAdminEmailSafe(user.email) || isAdminEmailSafe(data.email);
+
+      if (isAdminUtama && (!data.isVerified || !data.emailVerified)) {
+        await guruRef.child(user.uid).update({
+          email: data.email || user.email || "",
+          uid: user.uid,
+          isVerified: true,
+          emailVerified: true,
+          verifiedAt: data.verifiedAt || Date.now(),
+          verifiedBy: data.verifiedBy || "auto",
+          emailVerifiedAt: data.emailVerifiedAt || Date.now(),
+        });
+        data.isVerified = true;
+        data.emailVerified = true;
+      }
+
+      const hasAccess = (data.isVerified || isAdminUtama)
+        && (data.emailVerified || user.emailVerified || isAdminUtama);
+
+      if (!hasAccess) {
         auth.signOut().then(() => {
           alert("Akun belum memenuhi syarat verifikasi email/admin. Anda tidak bisa mengakses dashboard.");
           window.location.href = "index.html";
         });
         return;
       }
-
+      
       // Lulus verifikasi
-      const isAdminUtama = data.email === ADMIN_UTAMA_EMAIL;
-
+      const displayEmail = data.email || user.email || "";
+      
       // Update UI Header
       const userNameEl = document.getElementById("userNameDisplay");
-      if (userNameEl) userNameEl.textContent = data.email;
+      if (userNameEl) userNameEl.textContent = displayEmail;
       const roleBadge = document.getElementById("roleBadge");
       if (roleBadge) {
         if (isAdminUtama) {
@@ -62,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Tampilkan Admin Panel jika Admin Utama
       if (isAdminUtama) {
-        try { loadAdminPanel(data.email); } catch (e) { console.warn(e); }
+        try { loadAdminPanel(displayEmail); } catch (e) { console.warn(e); }
       }
 
       // Mulai fitur Dashboard
@@ -73,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ─── SETTINGS FORMATIF ────────────────────────────────────
+// G��G��G�� SETTINGS FORMATIF G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
 function applySettings() {
   const val = parseInt(document.getElementById("numFormatif").value, 10);
   if (isNaN(val) || val < 1 || val > 10) {
@@ -101,7 +129,7 @@ function renderFormFormatifInputs() {
   }
 }
 
-// ─── REALTIME LISTENER SISWA ──────────────────────────────
+// G��G��G�� REALTIME LISTENER SISWA G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
 function listenToSiswaData() {
   siswaRef.on("value", (snap) => {
     allSiswa = [];
@@ -132,7 +160,7 @@ function listenToSiswaData() {
             allSiswa.push({ id, ...val }); // Hanya simpan ke array local kalau gak sedang dimigrasi
         }
       });
-
+      
       if (madeChanges) {
           siswaRef.update(updates).then(() => {
               console.log("Auto-migrasi data lama ke Quarter 3 berhasil.");
@@ -147,7 +175,7 @@ function listenToSiswaData() {
   });
 }
 
-// ─── ADD SISWA ────────────────────────────────────────────
+// G��G��G�� ADD SISWA G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
 function addSiswa(event) {
   event.preventDefault();
   const nis = document.getElementById("nis").value.trim();
@@ -182,7 +210,7 @@ function addSiswa(event) {
     .catch((err) => showAlert("Gagal menyimpan: " + err.message, "danger"));
 }
 
-// ─── EDIT & DELETE SISWA ──────────────────────────────────
+// G��G��G�� EDIT & DELETE SISWA G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
 function saveSiswaRow(id) {
   const siswa = allSiswa.find((s) => s.id === id);
   if (!siswa) return;
@@ -190,7 +218,7 @@ function saveSiswaRow(id) {
   const rowNisEl = document.getElementById("r-nis-" + id);
   const rowPwdEl = document.getElementById("r-pwd-" + id);
   const sumatifEl = document.getElementById("r-s-" + id);
-
+  
   const updated = {
     nama: siswa.nama,
     kelas: siswa.kelas,
@@ -219,7 +247,7 @@ function deleteSiswa(id, nama) {
     .catch((err) => showAlert("Gagal menghapus: " + err.message, "danger"));
 }
 
-// ─── RENDER TABLE BODY (CRUD) ─────────────────────────────
+// G��G��G�� RENDER TABLE BODY (CRUD) G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
 const TH_CYAN = "px-4 py-4 text-center text-cyan-500/80 text-[10px] uppercase tracking-widest font-bold whitespace-nowrap";
 const TH_INDIGO = "px-4 py-4 text-center text-indigo-400/80 text-[10px] uppercase tracking-widest font-bold whitespace-nowrap";
 const TH = "px-4 py-4 text-center text-slate-400 text-[10px] uppercase tracking-widest font-bold whitespace-nowrap";
@@ -228,7 +256,7 @@ const TH_LEFT = "px-4 py-4 text-left text-slate-400 text-[10px] uppercase tracki
 function renderTableHead() {
   let fCols = "";
   for (let i = 1; i <= numFormatif[activeQuarter]; i++) fCols += `<th class="${TH_CYAN}">Q${activeQuarter} - F${i}</th>`;
-
+  
   const thead = document.getElementById("tableHead");
   if (!thead) return;
   thead.innerHTML = `
@@ -258,3 +286,394 @@ function renderTableBody(data) {
 
   // Filter Kelas Dropdown
   const selFilter = document.getElementById("filterKelas");
+  const currentKelas = selFilter?.value || "";
+  if (selFilter) {
+    const listKelas = [...new Set((data || []).map((s) => s.kelas))].sort((a,b) => {
+      const na = parseInt(a.match(/\d+/)?.[0]||0);
+      const nb = parseInt(b.match(/\d+/)?.[0]||0);
+      return na !== nb ? na - nb : a.localeCompare(b);
+    });
+    selFilter.innerHTML = `<option value="">Semua Kelas</option>` + 
+      listKelas.map(k => `<option value="${escHtml(k)}"${k===currentKelas?' selected':''}>${escHtml(k)}</option>`).join("");
+  }
+
+  // Search Text
+  const searchVal = (document.getElementById("teacherSearch")?.value || "").toLowerCase();
+  
+  const filtered = data.filter(s => {
+    const matchName = s.nama.toLowerCase().includes(searchVal);
+    const matchKelas = currentKelas ? s.kelas === currentKelas : true;
+    return matchName && matchKelas;
+  });
+
+  const shownEl = document.getElementById("shownCount");
+  const totalEl = document.getElementById("totalCount");
+  if (shownEl) shownEl.textContent = filtered.length;
+  if (totalEl) totalEl.textContent = allSiswa.length;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="20" class="text-center py-12">
+      <div class="flex flex-col items-center gap-3 text-slate-500">
+        <i class="fas fa-search text-3xl text-slate-600"></i>
+        <span class="text-sm font-mono-tech">Tidak ada data yang sesuai filter.</span>
+      </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((s, idx) => {
+    const kkm = getKKM(s.kelas);
+    const fArr = [];
+    for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
+        fArr.push(s[`q${activeQuarter}_f${i}`] !== undefined ? s[`q${activeQuarter}_f${i}`] : "");
+    }
+    
+    // Status Logic
+    const avgF = fArr.some(v => v!=="") ? fArr.reduce((a,b)=>a+Number(b||0),0) / fArr.filter(v=>v!=="").length : 0;
+    const sumatifValue = s[`q${activeQuarter}_sumatif`];
+    const finalScore = (avgF * 0.4) + (Number(sumatifValue||0) * 0.6);
+    let status = finalScore >= kkm ? "Tuntas" : "Remedial";
+    if (fArr.every(v => v==="") && (sumatifValue==="" || sumatifValue===undefined)) status = "Susulan";
+
+    // Build Inputs
+    let fInputs = "";
+    for (let i = 0; i < numFormatif[activeQuarter]; i++) {
+      const val = fArr[i];
+      const num = val !== "" && val !== null && val !== undefined ? Number(val) : "";
+      const cls = num !== "" && num < kkm ? "table-input input-remedial" : "table-input";
+      fInputs += `
+        <td class="px-2 py-3">
+          <input type="number" min="0" max="100" class="${cls}" id="r-f${i+1}-${s.id}" value="${num}" placeholder="-" oninput="highlightScore(this,${kkm})" />
+        </td>`;
+    }
+
+    const sumatifVal = sumatifValue !== "" && sumatifValue !== null && sumatifValue !== undefined ? Number(sumatifValue) : "";
+    const sCls = sumatifVal !== "" && sumatifVal < kkm ? "table-input input-remedial" : "table-input";
+    
+    // NIS Editable
+    const nisEditable = `<input type="text" class="table-input" style="width:100%; text-align:left;" id="r-nis-${s.id}" value="${escHtml(s.nis || '')}" placeholder="NIS" />`;
+
+    // Password Editable & Pending Password Request
+    let passwordHTML = `<div class="flex items-center gap-2 w-full max-w-[150px]"><input type="text" class="table-input" style="text-align:left;" id="r-pwd-${s.id}" value="${escHtml(s.password || 'Sph12345!')}" placeholder="Password" /></div>`;
+    
+    if (s.pendingPassword) {
+      passwordHTML += `
+        <div class="mt-2 bg-indigo-500/10 border border-indigo-500/30 rounded p-1.5 flex flex-col gap-1.5 text-[10px] w-full max-w-[150px]">
+          <span class="text-indigo-300 font-bold whitespace-nowrap"><i class="fas fa-bell text-xs animate-pulse text-indigo-400 mr-1"></i> Pengajuan Reset: <br><span class="text-white font-mono-tech mt-1 inline-block">${escHtml(s.pendingPassword)}</span></span>
+          <div class="flex items-center gap-1 mt-0.5">
+            <button onclick="approveStudentPassword('${s.id}')" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/50 rounded py-0.5 transition-colors font-bold text-[9px] uppercase"><i class="fas fa-check"></i></button>
+            <button onclick="rejectStudentPassword('${s.id}')" class="flex-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/50 rounded py-0.5 transition-colors font-bold text-[9px] uppercase"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Status Chip
+    let dotCls, chipCls, chipLabel, animateDot;
+    if (status === "Tuntas") {
+      dotCls = "bg-emerald-500"; chipLabel = "Tuntas"; animateDot = "";
+      chipCls = "inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider";
+    } else if (status === "Remedial") {
+      dotCls = "bg-rose-500"; chipLabel = "Remedial"; animateDot = "animate-pulse";
+      chipCls = "inline-flex items-center gap-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider";
+    } else {
+      dotCls = "bg-amber-500"; chipLabel = "Susulan"; animateDot = "animate-pulse";
+      chipCls = "inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider";
+    }
+    const statusChip = `<span class="${chipCls}"><span class="w-1.5 h-1.5 rounded-full ${dotCls} flex-shrink-0 ${animateDot}"></span>${chipLabel}</span>`;
+
+    return `
+      <tr id="row-${s.id}" class="hover:bg-slate-800/50 transition-colors group">
+        <td class="px-3 py-3 text-center text-slate-500 font-mono-tech text-sm">${idx + 1}</td>
+        <td class="px-3 py-3 font-mono-tech text-sm w-[120px]">${nisEditable}</td>
+        <td class="px-3 py-3 font-bold text-slate-200 whitespace-nowrap">${escHtml(s.nama)}</td>
+        <td class="px-3 py-3 text-center">
+          <span class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs font-mono-tech text-slate-300">${escHtml(s.kelas)}</span>
+        </td>
+        <td class="px-3 py-3">${passwordHTML}</td>
+        ${fInputs}
+        <td class="px-2 py-3">
+          <input type="number" min="0" max="100" class="${sCls}" id="r-s-${s.id}" value="${sumatifVal}" placeholder="-" oninput="highlightScore(this,${kkm})" />
+        </td>
+        <td class="px-3 py-3 text-center">${statusChip}</td>
+        <td class="px-4 py-3">
+          <div class="flex items-center justify-center gap-2">
+            <button title="Simpan NIS, Password & Nilai" onclick="saveSiswaRow('${s.id}')"
+              class="w-8 h-8 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-colors flex items-center justify-center">
+              <i class="fas fa-check text-xs"></i>
+            </button>
+            <button title="Hapus Siswa" onclick="deleteSiswa('${s.id}','${escHtml(s.nama)}')"
+              class="w-8 h-8 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 hover:border-rose-500/50 transition-colors flex items-center justify-center">
+              <i class="fas fa-trash-alt text-xs"></i>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+  }).join("");
+}
+
+function approveStudentPassword(id) {
+  const siswa = allSiswa.find(s => s.id === id);
+  if (!siswa || !siswa.pendingPassword) return;
+  
+  if (!confirm(`Setujui pengajuan password baru untuk ${siswa.nama}?`)) return;
+  
+  siswaRef.child(id).update({
+    password: siswa.pendingPassword,
+    pendingPassword: null,
+    pendingPasswordAt: null
+  }).then(() => {
+    showAlert("Password baru berhasil disetujui", "success");
+  }).catch(err => {
+    showAlert("Gagal menyetujui password: " + err.message, "danger");
+  });
+}
+
+function rejectStudentPassword(id) {
+  const siswa = allSiswa.find(s => s.id === id);
+  if (!siswa || !siswa.pendingPassword) return;
+  
+  if (!confirm(`Tolak pengajuan password dari ${siswa.nama}?`)) return;
+  
+  siswaRef.child(id).update({
+    pendingPassword: null,
+    pendingPasswordAt: null
+  }).then(() => {
+    showAlert("Pengajuan password ditolak", "info");
+  }).catch(err => {
+    showAlert("Gagal menolak pengajuan: " + err.message, "danger");
+  });
+}
+
+// G��G��G�� ADMIN PANEL (SUPER ADMIN ONLY) G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+let activeAdminEmail = "";
+
+function loadAdminPanel(adminEmail) {
+  activeAdminEmail = adminEmail;
+  const adminPanelBtn = document.getElementById("adminPanelBtn");
+  if (adminPanelBtn) adminPanelBtn.style.display = ""; // Munculkan accordion admin
+  
+  guruRef.on("value", (snap) => {
+    const allGuru = snap.val() || {};
+    const pendingGuru = Object.entries(allGuru)
+      .filter(([uid, data]) => data && !data.isVerified && !isAdminEmailSafe(data.email))
+      .map(([uid, data]) => ({ uid, ...data }));
+    
+    renderAdminPanel(pendingGuru);
+  }, err => console.error("AdminPanel Listen Error:", err));
+}
+
+function renderAdminPanel(pendingGuru) {
+  const container = document.getElementById("adminPanelContent");
+  if (!container) return;
+
+  if (pendingGuru.length === 0) {
+    document.getElementById("adminBadgeCount").style.display = "none";
+    container.innerHTML = `
+      <div class="flex items-center gap-2 text-emerald-400 text-sm font-mono-tech p-4">
+        <i class="fas fa-check-circle"></i> System Secure. Tidak ada antrean registrasi guru.
+      </div>`;
+    return;
+  }
+
+  // Tampilkan badge jumlah antrean
+  const badge = document.getElementById("adminBadgeCount");
+  if (badge) {
+    badge.textContent = pendingGuru.length;
+    badge.style.display = "inline-flex";
+  }
+
+  container.innerHTML = pendingGuru.map(guru => `
+    <div class="flex items-center justify-between gap-3 p-4 bg-slate-900/60 border-b border-slate-700/50 hover:bg-slate-800/60 transition-colors">
+      <div class="flex-1 min-w-0">
+        <p class="font-bold text-sm text-slate-200">${escHtml(guru.email)}</p>
+        <p class="text-xs text-slate-500 font-mono-tech mt-1">
+          <i class="fas fa-clock mr-1"></i> Register: ${new Date(guru.createdAt).toLocaleString('id-ID')}
+        </p>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button onclick="verifyGuruAccount('${escHtml(guru.uid)}')"\n          class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-colors shadow-lg shadow-emerald-900/20">\n          <i class="fas fa-check mr-1"></i>Approve\n        </button>
+        <button onclick="rejectGuruAccount('${escHtml(guru.uid)}')"\n          class="px-4 py-2 bg-slate-800 hover:bg-rose-900/50 text-rose-400 border border-slate-700 hover:border-rose-500/50 text-xs font-bold rounded-lg transition-colors">\n          <i class="fas fa-times mr-1"></i>Reject\n        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function verifyGuruAccount(uid) {
+  if (!confirm("Approve akun guru ini?")) return;
+  guruRef.child(uid).update({ 
+    isVerified: true, verifiedAt: Date.now(), verifiedBy: activeAdminEmail 
+  }).then(() => showAlert("Akun guru berhasil di-approve!", "success"))
+    .catch(err => showAlert("Gagal: " + err.message, "danger"));
+}
+
+function rejectGuruAccount(uid) {
+  if (!confirm("Tolak (Hapus) akun guru ini permanen?")) return;
+  guruRef.child(uid).remove()
+    .then(() => showAlert("Akun guru ditolak dan dihapus permanen.", "info"))
+    .catch(err => showAlert("Gagal: " + err.message, "danger"));
+}
+
+// G��G��G�� LOGOUT GURU G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+function logoutGuru() {
+  auth.signOut().then(() => {
+    window.location.href = "index.html";
+  }).catch((err) => alert("Gagal logout: " + err.message));
+}
+
+// G��G��G�� EXCEL FEATURES (EXPORT, IMPORT, TEMPLATE) G��G��G��G��G��G��G��G��G��G��G��G��
+function exportExcel() {
+  const selFilter = document.getElementById("filterKelas");
+  const currentKelas = selFilter?.value || "";
+  const searchVal = (document.getElementById("teacherSearch")?.value || "").toLowerCase();
+  
+  const filteredSiswa = allSiswa.filter(s => {
+    const matchName = s.nama.toLowerCase().includes(searchVal);
+    const matchKelas = currentKelas ? s.kelas === currentKelas : true;
+    return matchName && matchKelas;
+  });
+
+  if (filteredSiswa.length === 0) return showAlert("Tidak ada data untuk diekspor sesuai filter saat ini.", "warning");
+  
+  const headers = ["No", "NIS", "Nama Siswa", "Kelas", "Password"];
+  for (let i = 1; i <= numFormatif[activeQuarter]; i++) headers.push(`Formatif ${i}`);
+  headers.push("Sumatif", "Status", "KKM");
+
+  const rows = filteredSiswa.map((s, idx) => {
+    const row = [idx + 1, s.nis || "", s.nama, s.kelas, s.password || ""];
+    const kkm = getKKM(s.kelas);
+    
+    let fCount = 0;
+    let fSum = 0;
+    let allEmpty = true;
+    for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
+        const v = s[`q${activeQuarter}_f${i}`];
+        if (v !== "" && v !== null && v !== undefined) {
+            row.push(Number(v));
+            fSum += Number(v);
+            fCount++;
+            allEmpty = false;
+        } else {
+            row.push("");
+        }
+    }
+    const sVal = s[`q${activeQuarter}_sumatif`];
+    if (sVal !== "" && sVal !== null && sVal !== undefined) {
+         row.push(Number(sVal));
+         allEmpty = false;
+    } else {
+         row.push("");
+    }
+    
+    let status = "Susulan";
+    if (!allEmpty) {
+        const avgF = fCount > 0 ? fSum / fCount : 0;
+        const finalScore = (avgF * 0.4) + (Number(sVal||0) * 0.6);
+        status = finalScore >= kkm ? "Tuntas" : "Remedial";
+    }
+    row.push(status);
+    row.push(kkm);
+    return row;
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  ws["!cols"] = [{wch:5}, {wch:12}, {wch:28}, {wch:12}, {wch:15}, ...Array(numFormatif[activeQuarter]).fill({wch:10}), {wch:10}, {wch:10}, {wch:6}];
+  const wb = XLSX.utils.book_new();
+  const sheetName = currentKelas ? `Data Q${activeQuarter} ${currentKelas}` : `Data Nilai Q${activeQuarter}`;
+  XLSX.utils.book_append_sheet(wb, ws, sheetName.substring(0, 31)); // excel sheet names max 31 chars
+  
+  const fileNameClass = currentKelas ? `_${currentKelas}` : "";
+  XLSX.writeFile(wb, `Database_Nilai_Q${activeQuarter}${fileNameClass}_` + new Date().toISOString().slice(0, 10) + ".xlsx");
+  showAlert(`Export Excel Quarter ${activeQuarter} berhasil diunduh.`, "success");
+}
+
+function downloadTemplate() {
+  const headers = ["NIS", "Nama Siswa", "Kelas", "Password"];
+  for (let i = 1; i <= numFormatif[activeQuarter]; i++) headers.push(`Formatif ${i}`);
+  headers.push("Sumatif");
+
+  const example = ["12345678", "Contoh Nama", "10 RPL 1", "SandiKuat123!"];
+  for (let i = 0; i < numFormatif[activeQuarter]; i++) example.push(75);
+  example.push(85);
+
+  const ws = XLSX.utils.aoa_to_sheet([headers, example]);
+  ws["!cols"] = [{wch:15}, {wch:25}, {wch:12}, {wch:20}, ...Array(numFormatif[activeQuarter]).fill({wch:10}), {wch:10}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Template Import");
+  XLSX.writeFile(wb, `Template_Import_Nilai_Q${activeQuarter}.xlsx`);
+  showAlert(`Template Excel Quarter ${activeQuarter} berhasil diunduh.`, "success");
+}
+
+function triggerImport() {
+  document.getElementById("importFileExcel").click();
+}
+
+function importExcel(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {type: "array"});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ""});
+
+      if (rows.length < 2) return showAlert("File Excel kosong.", "warning");
+
+      const head = rows[0].map(h => String(h).trim().toLowerCase());
+      const iNis = head.findIndex(h => h.includes("nis"));
+      const iNama = head.findIndex(h => h.includes("nama"));
+      const iKelas = head.findIndex(h => h.includes("kelas"));
+      const iPwd = head.findIndex(h => h.includes("password"));
+      const iSumat = head.findIndex(h => h.includes("sumatif"));
+      
+      const qCols = [];
+      for(let i=1; i<=10; i++) {
+          qCols.push(head.findIndex(h => h.includes(`formatif ${i}`) || h.includes(`f${i}`)));
+      }
+
+      if (iNama === -1 || iKelas === -1 || iPwd === -1) {
+        return showAlert("Format salah! Harus ada kolom Nama Siswa, Kelas, dan Password.", "danger");
+      }
+
+      const batch = {};
+      let count = 0;
+
+      rows.slice(1).forEach(r => {
+        if (!r.some(c => c !== "")) return; // skip row kosong
+        const nis = String(r[iNis]||"").trim();
+        const nama = String(r[iNama]||"").trim();
+        const kelas = String(r[iKelas]||"").trim();
+        const pwd = String(r[iPwd]||"").trim();
+        if (!nama || !kelas || !pwd) return;
+
+        const record = {
+          nis: nis, nama: nama, kelas: kelas, password: pwd,
+          createdAt: Date.now()
+        };
+        
+        if (iSumat >= 0 && r[iSumat] !== "") record[`q${activeQuarter}_sumatif`] = Number(r[iSumat]);
+        
+        qCols.forEach((colIdx, arrIdx) => {
+            if (colIdx >= 0 && r[colIdx] !== "") record[`q${activeQuarter}_f${arrIdx+1}`] = Number(r[colIdx]);
+        });
+
+        // Insert new child (bisa update ke auto-upsert lain waktu)
+        batch[siswaRef.push().key] = record;
+        count++;
+      });
+
+      if (count === 0) return showAlert("Tidak baris valid untuk diimpor.", "warning");
+
+      db.ref("siswa").update(batch).then(() => {
+        showAlert(`Import sukses: ${count} data siswa dimasukkan ke Quarter ${activeQuarter}!`, "success");
+      });
+    } catch(err) {
+      showAlert("Gagal membaca Excel: " + err.message, "danger");
+    } finally {
+      event.target.value = ""; // Reset file input
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}

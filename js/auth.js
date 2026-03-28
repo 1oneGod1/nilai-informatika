@@ -7,6 +7,15 @@
 
 let pendingEmailForResend = "";
 
+function isAdminEmailSafe(email) {
+  if (typeof isAdminEmail === "function") return isAdminEmail(email);
+  const normalized = String(email || "").trim().toLowerCase();
+  return (
+    normalized === "andi.purba@sdh.or.id" ||
+    normalized === "pandapotanandi@gmail.com"
+  );
+}
+
 function getLoginEmailInputValue() {
   return (document.getElementById("emailInput")?.value || "").trim();
 }
@@ -36,6 +45,8 @@ function openLoginModal() {
 function submitLogin(event) {
   event.preventDefault();
   const email = getLoginEmailInputValue();
+  const normalizedEmail = normalizeEmail(email);
+  const isAdminLogin = isAdminEmailSafe(normalizedEmail);
   const pwd   = getLoginPasswordInputValue();
 
   if (!email || !pwd) {
@@ -58,7 +69,7 @@ function submitLogin(event) {
       const uid  = user.uid;
 
       // ── Cek verifikasi email Firebase ──────────────────
-      if (!user.emailVerified && email !== ADMIN_UTAMA_EMAIL) {
+      if (!user.emailVerified && !isAdminLogin) {
         pendingEmailForResend = email;
         setResendVisibility(true);
         await auth.signOut();
@@ -74,7 +85,7 @@ function submitLogin(event) {
       let guruData = snap.val();
 
       if (!guruData) {
-        const isAdmin = email === ADMIN_UTAMA_EMAIL;
+        const isAdmin = isAdminLogin;
         guruData = {
           email, uid,
           isVerified: isAdmin,
@@ -87,6 +98,19 @@ function submitLogin(event) {
         await guruRef.child(uid).set(guruData);
       }
 
+      // Admin harus selalu lolos meski data lama belum sinkron.
+      if (isAdminLogin && (!guruData.isVerified || !guruData.emailVerified)) {
+        await guruRef.child(uid).update({
+          isVerified: true,
+          emailVerified: true,
+          verifiedAt: guruData.verifiedAt || nowTs(),
+          verifiedBy: guruData.verifiedBy || "auto",
+          emailVerifiedAt: guruData.emailVerifiedAt || nowTs(),
+        });
+        guruData.isVerified = true;
+        guruData.emailVerified = true;
+      }
+
       // ── Sync emailVerified jika baru saja diverifikasi ─
       if (user.emailVerified && !guruData.emailVerified) {
         await guruRef.child(uid).update({
@@ -97,7 +121,7 @@ function submitLogin(event) {
       }
 
       // ── Cek persetujuan Admin Utama ─────────────────────
-      if (!guruData.isVerified) {
+      if (!guruData.isVerified && !isAdminLogin) {
         setResendVisibility(false);
         await auth.signOut();
         showLoginError(
@@ -124,6 +148,8 @@ function submitLogin(event) {
 // ─── REGISTER ─────────────────────────────────────────────
 function submitRegister() {
   const email = getLoginEmailInputValue();
+  const normalizedEmail = normalizeEmail(email);
+  const isAdminRegister = isAdminEmailSafe(normalizedEmail);
   const pwd   = getLoginPasswordInputValue();
 
   if (!email || !pwd) {
@@ -142,7 +168,7 @@ function submitRegister() {
     .createUserWithEmailAndPassword(email, pwd)
     .then(async (result) => {
       const uid     = result.user.uid;
-      const isAdmin = email === ADMIN_UTAMA_EMAIL;
+      const isAdmin = isAdminRegister;
 
       // ── Simpan profil guru ke Realtime DB ───────────────
       const baseProfile = {
@@ -362,7 +388,9 @@ function checkAuthOnStudentPage() {
     try {
       const snap = await guruRef.child(user.uid).once("value");
       const data = snap.val();
-      if (data && data.isVerified && user.emailVerified) {
+      const isAdmin = isAdminEmailSafe(user.email) || isAdminEmailSafe(data?.email);
+      const canOpenDashboard = !!data && (data.isVerified || isAdmin) && (user.emailVerified || data.emailVerified || isAdmin);
+      if (canOpenDashboard) {
         const dashBtn = document.getElementById("dashboardBtn");
         if (dashBtn) {
           dashBtn.style.display = "";

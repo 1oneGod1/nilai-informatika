@@ -23,7 +23,21 @@ const auth    = firebase.auth();
 const siswaRef = db.ref("siswa");
 const guruRef  = db.ref("guru");
 
-const ADMIN_UTAMA_EMAIL = "andi.purba@sdh.or.id";
+const ADMIN_EMAILS = [
+  "andi.purba@sdh.or.id",
+  "pandapotanandi@gmail.com",
+];
+
+const ADMIN_UTAMA_EMAIL = ADMIN_EMAILS[0];
+
+function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
+function isAdminEmail(email) {
+  const normalized = normalizeEmail(email);
+  return ADMIN_EMAILS.some((adminEmail) => normalizeEmail(adminEmail) === normalized);
+}
 
 const KKM_MAP = { 7: 67, 8: 68, 9: 69, 10: 75, 11: 76, 12: 77 };
 
