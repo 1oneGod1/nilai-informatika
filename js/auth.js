@@ -211,7 +211,7 @@ function submitRegister() {
 
       await result.user.sendEmailVerification({
         url: verifyPageUrl,
-        handleCodeInApp: false,
+        handleCodeInApp: true,
       });
 
       await auth.signOut();
@@ -256,7 +256,7 @@ async function resendVerificationFromLogin() {
 
     await user.sendEmailVerification({
       url: verifyPageUrl,
-      handleCodeInApp: false,
+      handleCodeInApp: true,
     });
     await auth.signOut();
 
@@ -330,21 +330,23 @@ function showLoginError(message, isSuccess = false) {
     ?.replace(/[()]/g, "")
     || String(message || "").match(/auth\/[a-z-]+/)?.[0];
 
-  const text = AUTH_ERROR_MAP[code] || message || "Autentikasi gagal.";
+  const safeMessage = String(message || "").trim();
+  const text = AUTH_ERROR_MAP[code] || safeMessage || "Autentikasi gagal. Coba lagi beberapa saat.";
 
   const errWrap = document.getElementById("loginError");
-  const errIcon = errWrap ? errWrap.querySelector("i") : null;
   const errText = document.getElementById("loginErrorText");
-
-  if (errText) errText.textContent = text;
+  const errIcon = errWrap ? errWrap.querySelector("i") : null;
 
   if (errWrap) {
+    if (errText) errText.textContent = text;
     if (isSuccess) {
-      errWrap.className = "alert alert-success d-flex align-items-center gap-2";
-      if (errIcon) errIcon.className = "fas fa-check-circle me-2 text-success";
+      if (errIcon) errIcon.className = "fas fa-check-circle";
+      errWrap.style.borderColor = "rgba(16, 185, 129, 0.6)";
+      errWrap.style.background = "linear-gradient(135deg, rgba(6, 95, 70, 0.45), rgba(16, 185, 129, 0.2))";
     } else {
-      errWrap.className = "alert alert-danger d-flex align-items-center gap-2";
-      if (errIcon) errIcon.className = "fas fa-exclamation-circle me-2";
+      if (errIcon) errIcon.className = "fas fa-exclamation-circle";
+      errWrap.style.borderColor = "rgba(251, 113, 133, 0.45)";
+      errWrap.style.background = "linear-gradient(135deg, rgba(127, 29, 29, 0.3), rgba(190, 24, 93, 0.18))";
     }
     errWrap.style.display = "flex";
   }

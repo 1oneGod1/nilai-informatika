@@ -9,6 +9,17 @@ let allSiswa = [];
 let selectedStudentForDetail = null;
 let radarChartCtx = null;
 
+function showStudentPasswordError(message) {
+  const wrapEl = document.getElementById("passwordError");
+  const textEl = document.getElementById("passwordErrorText");
+  if (wrapEl) {
+    if (textEl) {
+      textEl.textContent = String(message || "Terjadi kesalahan. Coba lagi.");
+    }
+    wrapEl.style.display = "flex";
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   checkAuthOnStudentPage();
   listenToDataSiswa();
@@ -99,7 +110,10 @@ function requestPasswordForStudent(id) {
 
   selectedStudentForDetail = student;
   document.getElementById("studentPasswordInput").value = "";
-  document.getElementById("passwordError").style.display = "none";
+  const errWrap = document.getElementById("passwordError");
+  const errText = document.getElementById("passwordErrorText");
+  if (errWrap) errWrap.style.display = "none";
+  if (errText) errText.textContent = "";
   new bootstrap.Modal(document.getElementById("studentPasswordModal")).show();
 }
 
@@ -133,7 +147,10 @@ function toggleForgotPasswordView() {
 
   document.getElementById("studentPasswordInput").value = "";
   document.getElementById("newPasswordRequest").value = "";
-  document.getElementById("passwordError").style.display = "none";
+  const errWrap = document.getElementById("passwordError");
+  const errText = document.getElementById("passwordErrorText");
+  if (errWrap) errWrap.style.display = "none";
+  if (errText) errText.textContent = "";
 }
 
 function submitForgotPasswordRequest(event) {
@@ -148,9 +165,7 @@ function submitForgotPasswordRequest(event) {
     .getElementById("newPasswordRequest")
     .value.trim();
   if (newPassword.length < 6) {
-    document.getElementById("passwordErrorText").textContent =
-      "Password baru minimal 6 karakter.";
-    document.getElementById("passwordError").style.display = "flex";
+    showStudentPasswordError("Password baru minimal 6 karakter.");
     return;
   }
 
@@ -204,9 +219,7 @@ function verifyStudentPassword(event) {
   const correctPassword = selectedStudentForDetail.password || "Sph12345!";
 
   if (inputPassword !== correctPassword) {
-    document.getElementById("passwordErrorText").textContent =
-      "Password salah. Coba lagi.";
-    document.getElementById("passwordError").style.display = "flex";
+    showStudentPasswordError("Password salah. Coba lagi.");
     return;
   }
 
