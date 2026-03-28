@@ -36,12 +36,12 @@ function searchStudent() {
   const results = document.getElementById("searchResults");
   const detail = document.getElementById("studentDetail");
 
-  detail.style.display = "none";
+  detail.classList.add("hidden");
   detail.innerHTML = "";
 
   if (!query) {
-    results.style.display = "none";
-    placeholder.style.display = "";
+    results.classList.add("hidden");
+    placeholder.classList.remove("hidden");
     return;
   }
 
@@ -51,8 +51,8 @@ function searchStudent() {
     String(s.nama).toLowerCase().includes(query)
   );
 
-  placeholder.style.display = "none";
-  results.style.display = "";
+  placeholder.classList.add("hidden");
+  results.classList.remove("hidden");
 
   if (found.length === 0) {
     results.innerHTML = `
@@ -389,16 +389,16 @@ function renderStudentDetail(id) {
     </div>
   `;
   
-  detail.style.display = "";
-  document.getElementById("searchResults").style.display = "none";
+  detail.classList.remove("hidden");
+  document.getElementById("searchResults").classList.add("hidden");
   
   // Render ChartJS
   renderRadarChart(quartersData, kkm);
 }
 
 function closeStudentDetail() {
-  document.getElementById("studentDetail").style.display = "none";
-  document.getElementById("searchResults").style.display = "";
+  document.getElementById("studentDetail").classList.add("hidden");
+  document.getElementById("searchResults").classList.remove("hidden");
 }
 
 function renderRadarChart(quartersData, kkm) {
