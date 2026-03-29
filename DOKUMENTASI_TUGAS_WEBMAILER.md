@@ -11,7 +11,7 @@
 
 ---
 
-## ✅ Fitur yang Diimplementasikan
+##  Fitur yang Diimplementasikan
 
 ### 1. Webmailer - Email Verification saat Register
 - Sistem mengirimkan **link verifikasi** ke email yang didaftarkan
@@ -99,7 +99,7 @@ CloudComputing/
 
 ---
 
-## 🔧 Implementasi Detail
+##  Implementasi Detail
 
 ### A. Konfigurasi Firebase (`js/firebase-init.js`)
 
@@ -145,7 +145,7 @@ function submitRegister() {
       };
       await guruRef.child(uid).set(baseProfile);
 
-      // 2. Kirim Email Verifikasi ⭐
+      // 2. Kirim Email Verifikasi 
       const verifyPageUrl = window.location.origin + 
         window.location.pathname.replace(/[^/]*$/, "") + "verify.html";
       
@@ -229,7 +229,7 @@ function submitLogin(event) {
       const user = result.user;
       const uid = user.uid;
 
-      // ⭐ CEK VERIFIKASI EMAIL
+      //  CEK VERIFIKASI EMAIL
       if (!user.emailVerified && !isAdminLogin) {
         pendingEmailForResend = email;
         setResendVisibility(true);
@@ -250,7 +250,7 @@ function submitLogin(event) {
         return;
       }
 
-      // ✅ Login sukses → redirect dashboard
+      //  Login sukses → redirect dashboard
       window.location.href = "dashboard.html";
     })
     .catch((err) => showLoginError(err.message));
@@ -327,7 +327,7 @@ async function resendVerificationFromLogin() {
 
 ---
 
-## 🔄 Alur Kerja Lengkap
+##  Alur Kerja Lengkap
 
 ### Alur 1: Register → Email Verification → Admin Approval → Login
 
@@ -398,7 +398,7 @@ async function resendVerificationFromLogin() {
 └────────┬────────────────────┘
          ▼
 ┌─────────────────────────────┐
-│ Email Terverifikasi! ✅     │
+│ Email Terverifikasi!      │
 └────────┬────────────────────┘
          ▼
 ┌─────────────────────────────┐
@@ -452,7 +452,7 @@ async function resendVerificationFromLogin() {
     │
     ▼
 ┌─────────────────────────────┐
-│ ✅ LOGIN SUKSES             │
+│  LOGIN SUKSES             │
 │ Redirect ke dashboard.html  │
 └─────────────────────────────┘
 ```
@@ -461,14 +461,14 @@ async function resendVerificationFromLogin() {
 
 | Status | `emailVerified` | `isVerified` | Bisa Login? | Pesan Error |
 |--------|-----------------|--------------|-------------|-------------|
-| Baru daftar | ❌ false | ❌ false | ❌ Tidak | "Email belum diverifikasi" |
-| Email verified | ✅ true | ❌ false | ❌ Tidak | "Belum di-approve admin" |
-| **Fully verified** | ✅ **true** | ✅ **true** | ✅ **Ya** | - |
-| Admin utama | ✅ true | ✅ auto | ✅ Ya | - |
+| Baru daftar |  false |  false |  Tidak | "Email belum diverifikasi" |
+| Email verified |  true |  false |  Tidak | "Belum di-approve admin" |
+| **Fully verified** |  **true** |  **true** |  **Ya** | - |
+| Admin utama |  true |  auto |  Ya | - |
 
 ---
 
-## 🧪 Cara Testing
+##  Cara Testing
 
 ### 1. Test Register & Email Verifikasi
 1. Buka `index.html`
@@ -500,7 +500,7 @@ async function resendVerificationFromLogin() {
 
 ---
 
-## 📸 Screenshot Kode Penting
+##  Screenshot Kode Penting
 
 ### 1. Kirim Email Verifikasi saat Register
 ```javascript
@@ -543,7 +543,7 @@ const AUTH_ERROR_MAP = {
 
 ---
 
-## 🎯 Kesimpulan
+##  Kesimpulan
 
 Implementasi fitur webmailer dengan verifikasi email ini menggunakan:
 - **Firebase Authentication** untuk manajemen user dan email verification
@@ -551,10 +551,10 @@ Implementasi fitur webmailer dengan verifikasi email ini menggunakan:
 - **JavaScript vanilla** untuk logika client-side
 
 Semua requirement tugas telah terpenuhi:
-- ✅ Kirim link verifikasi saat register
-- ✅ Redirect ke login setelah verifikasi
-- ✅ Login hanya bisa jika email terverifikasi
-- ✅ Error handling untuk akun tidak ditemukan & password salah
+-  Kirim link verifikasi saat register
+-  Redirect ke login setelah verifikasi
+-  Login hanya bisa jika email terverifikasi
+-  Error handling untuk akun tidak ditemukan & password salah
 
 ---
 
