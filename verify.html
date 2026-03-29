@@ -1,125 +1,158 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Verifikasi Email Guru</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body class="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
-  <main class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-    <div class="flex items-center gap-3 mb-4">
-      <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center">
-        <i class="fas fa-envelope-open-text"></i>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verifikasi Email Guru</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4"
+  >
+    <main
+      class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl"
+    >
+      <div class="flex items-center gap-3 mb-4">
+        <div
+          class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center"
+        >
+          <i class="fas fa-envelope-open-text"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold">Verifikasi Email Guru</h1>
+          <p class="text-xs text-slate-400">Sistem Nilai Informatika</p>
+        </div>
       </div>
-      <div>
-        <h1 class="text-lg font-bold">Verifikasi Email Guru</h1>
-        <p class="text-xs text-slate-400">Sistem Nilai Informatika</p>
+
+      <div id="statusBox" class="rounded-xl border p-4 text-sm"></div>
+
+      <div class="mt-5 flex gap-3">
+        <a
+          href="index.html"
+          class="flex-1 text-center px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold transition-colors"
+          >Kembali ke Login</a
+        >
+        <button
+          id="retryBtn"
+          type="button"
+          class="px-4 py-2 rounded-lg border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white transition-colors hidden"
+        >
+          Coba Lagi
+        </button>
       </div>
-    </div>
+    </main>
 
-    <div id="statusBox" class="rounded-xl border p-4 text-sm"></div>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
+    <script src="js/firebase-init.js?v=20260329d"></script>
+    <script>
+      const statusBox = document.getElementById("statusBox");
+      const retryBtn = document.getElementById("retryBtn");
 
-    <div class="mt-5 flex gap-3">
-      <a href="index.html" class="flex-1 text-center px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold transition-colors">Kembali ke Login</a>
-      <button id="retryBtn" type="button" class="px-4 py-2 rounded-lg border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white transition-colors hidden">Coba Lagi</button>
-    </div>
-  </main>
-
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
-  <script src="js/firebase-init.js?v=20260329d"></script>
-  <script>
-    const statusBox = document.getElementById("statusBox");
-    const retryBtn = document.getElementById("retryBtn");
-
-    function setStatus(type, title, message) {
-      const styles = {
-        loading: "border-cyan-500/40 bg-cyan-500/10 text-cyan-300",
-        success: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
-        error: "border-rose-500/40 bg-rose-500/10 text-rose-300",
-        warn: "border-amber-500/40 bg-amber-500/10 text-amber-300",
-      };
-      statusBox.className = `rounded-xl border p-4 text-sm ${styles[type] || styles.loading}`;
-      statusBox.innerHTML = `
+      function setStatus(type, title, message) {
+        const styles = {
+          loading: "border-cyan-500/40 bg-cyan-500/10 text-cyan-300",
+          success: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
+          error: "border-rose-500/40 bg-rose-500/10 text-rose-300",
+          warn: "border-amber-500/40 bg-amber-500/10 text-amber-300",
+        };
+        statusBox.className = `rounded-xl border p-4 text-sm ${styles[type] || styles.loading}`;
+        statusBox.innerHTML = `
         <p class="font-bold mb-1">${title}</p>
         <p class="text-slate-200/90">${message}</p>
       `;
-    }
-
-    function redirectToLogin(delay = 2500) {
-      window.setTimeout(() => {
-        // Redirect ke login dengan flag ?verified=1 agar modal login
-        // terbuka otomatis dengan pesan "email berhasil diverifikasi"
-        window.location.href = "index.html?verified=1";
-      }, delay);
-    }
-
-    function parseVerifyParamsFromUrl(rawUrl) {
-      try {
-        const url = new URL(rawUrl, window.location.origin);
-        const p = url.searchParams;
-        const mode = (p.get("mode") || "").trim();
-        const oobCode = (p.get("oobCode") || "").trim();
-        return { mode, oobCode };
-      } catch (_) {
-        return { mode: "", oobCode: "" };
-      }
-    }
-
-    function resolveVerifyParams() {
-      const direct = parseVerifyParamsFromUrl(window.location.href);
-      if (direct.mode === "verifyEmail" && direct.oobCode) return direct;
-
-      const params = new URLSearchParams(window.location.search);
-
-      const continueUrl = params.get("continueUrl");
-      if (continueUrl) {
-        const fromContinue = parseVerifyParamsFromUrl(decodeURIComponent(continueUrl));
-        if (fromContinue.mode === "verifyEmail" && fromContinue.oobCode) return fromContinue;
       }
 
-      const nestedLink = params.get("link");
-      if (nestedLink) {
-        const fromNestedLink = parseVerifyParamsFromUrl(decodeURIComponent(nestedLink));
-        if (fromNestedLink.mode === "verifyEmail" && fromNestedLink.oobCode) return fromNestedLink;
+      function redirectToLogin(delay = 2500) {
+        window.setTimeout(() => {
+          // Redirect ke login dengan flag ?verified=1 agar modal login
+          // terbuka otomatis dengan pesan "email berhasil diverifikasi"
+          window.location.href = "index.html?verified=1";
+        }, delay);
       }
 
-      return { mode: "", oobCode: "" };
-    }
+      function parseVerifyParamsFromUrl(rawUrl) {
+        try {
+          const url = new URL(rawUrl, window.location.origin);
+          const p = url.searchParams;
+          const mode = (p.get("mode") || "").trim();
+          const oobCode = (p.get("oobCode") || "").trim();
+          return { mode, oobCode };
+        } catch (_) {
+          return { mode: "", oobCode: "" };
+        }
+      }
 
-    async function verifyEmailToken() {
-      try {
-        setStatus("loading", "Memverifikasi...", "Sedang memproses verifikasi email dari Firebase.");
+      function resolveVerifyParams() {
+        const direct = parseVerifyParamsFromUrl(window.location.href);
+        if (direct.mode === "verifyEmail" && direct.oobCode) return direct;
 
-        const { mode, oobCode } = resolveVerifyParams();
+        const params = new URLSearchParams(window.location.search);
 
-        if (mode !== "verifyEmail" || !oobCode) {
-          setStatus(
-            "warn",
-            "Link Verifikasi Tidak Lengkap",
-            "Halaman ini harus dibuka dari link verifikasi asli yang dikirim Firebase ke email Anda. Silakan buka email terbaru lalu klik tombol verifikasi dari sana."
+        const continueUrl = params.get("continueUrl");
+        if (continueUrl) {
+          const fromContinue = parseVerifyParamsFromUrl(
+            decodeURIComponent(continueUrl),
           );
-          retryBtn.classList.remove("hidden");
-          return;
+          if (fromContinue.mode === "verifyEmail" && fromContinue.oobCode)
+            return fromContinue;
         }
 
-        await auth.applyActionCode(oobCode);
-        setStatus("success", "Verifikasi Berhasil", "Email Anda berhasil diverifikasi. Anda akan diarahkan ke halaman login.");
-        redirectToLogin();
-      } catch (err) {
-        setStatus("error", "Gagal Memverifikasi", String(err.message || err));
-        retryBtn.classList.remove("hidden");
+        const nestedLink = params.get("link");
+        if (nestedLink) {
+          const fromNestedLink = parseVerifyParamsFromUrl(
+            decodeURIComponent(nestedLink),
+          );
+          if (fromNestedLink.mode === "verifyEmail" && fromNestedLink.oobCode)
+            return fromNestedLink;
+        }
+
+        return { mode: "", oobCode: "" };
       }
-    }
 
-    retryBtn.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
+      async function verifyEmailToken() {
+        try {
+          setStatus(
+            "loading",
+            "Memverifikasi...",
+            "Sedang memproses verifikasi email dari Firebase.",
+          );
 
-    verifyEmailToken();
-  </script>
-</body>
+          const { mode, oobCode } = resolveVerifyParams();
+
+          if (mode !== "verifyEmail" || !oobCode) {
+            setStatus(
+              "warn",
+              "Link Verifikasi Tidak Lengkap",
+              "Halaman ini harus dibuka dari link verifikasi asli yang dikirim Firebase ke email Anda. Silakan buka email terbaru lalu klik tombol verifikasi dari sana.",
+            );
+            retryBtn.classList.remove("hidden");
+            return;
+          }
+
+          await auth.applyActionCode(oobCode);
+          setStatus(
+            "success",
+            "Verifikasi Berhasil",
+            "Email Anda berhasil diverifikasi. Anda akan diarahkan ke halaman login.",
+          );
+          redirectToLogin();
+        } catch (err) {
+          setStatus("error", "Gagal Memverifikasi", String(err.message || err));
+          retryBtn.classList.remove("hidden");
+        }
+      }
+
+      retryBtn.addEventListener("click", () => {
+        window.location.href = "index.html";
+      });
+
+      verifyEmailToken();
+    </script>
+  </body>
 </html>

@@ -4,6 +4,30 @@ Aplikasi web **Buku Nilai Informatika** yang dibangun menggunakan **Firebase Rea
 Aplikasi ini memungkinkan guru mengelola nilai siswa dan siswa melihat nilai mereka secara real-time melalui website.
 
 > Project ini dibuat sebagai implementasi Firebase Realtime Database dengan fitur CRUD sesuai tugas modul **Backend as a Service**.
+> 
+> **🆕 Update Terbaru:** Fitur Webmailer dengan Verifikasi Email - Register guru kini harus verifikasi email terlebih dahulu sebelum bisa login.
+
+---
+
+## 🆕 Fitur Baru: Webmailer & Email Verification
+
+### Ringkasan
+- **Email Verification:** Saat register, sistem mengirim link verifikasi ke email yang didaftarkan
+- **Login Restriction:** User hanya bisa login jika email sudah diverifikasi
+- **Auto Redirect:** Setelah klik link verifikasi, otomatis redirect ke halaman login
+- **Error Handling:** Pesan error jelas untuk akun tidak ditemukan & password salah
+- **Resend Verification:** Tombol kirim ulang email verifikasi jika email hilang
+
+### Alur Verifikasi Email
+```
+Register → Kirim Email Verifikasi → User Cek Email → Klik Link → Verifikasi Sukses → Redirect Login
+```
+
+File terkait fitur ini:
+- `js/auth.js` - Logika login, register, dan verifikasi
+- `js/firebase-init.js` - Inisialisasi Firebase
+- `verify.html` - Halaman handler verifikasi email
+- `DOKUMENTASI_TUGAS_WEBMAILER.md` - Dokumentasi lengkap fitur
 
 ---
 
@@ -29,11 +53,11 @@ Aplikasi dapat diakses di:
 
 ### Backend (Firebase)
 
-| Layanan                    | Fungsi                                      |
-| -------------------------- | ------------------------------------------- |
-| Firebase Realtime Database | Penyimpanan & sinkronisasi data real-time   |
-| Firebase Authentication    | Register & login akun guru (Email/Password) |
-| Firebase Hosting           | Deploy & hosting aplikasi                   |
+| Layanan                    | Fungsi                                          |
+| -------------------------- | ----------------------------------------------- |
+| Firebase Realtime Database | Penyimpanan & sinkronisasi data real-time       |
+| Firebase Authentication    | Register & login akun guru dengan verifikasi email |
+| Firebase Hosting           | Deploy & hosting aplikasi                       |
 
 ---
 
@@ -46,48 +70,59 @@ User (Browser)
      ▼
 Frontend Web (HTML + CSS + JS)
      │
-     │ Firebase SDK (Realtime Database)
+     │ Firebase SDK (Auth + Realtime Database)
      ▼
-Firebase Realtime Database (Google Cloud)
+Firebase Services
+     ├── Authentication (Email Verification)
+     ├── Realtime Database (Data Storage)
+     └── Hosting (Deployment)
 ```
 
 Firebase digunakan sebagai **Backend as a Service** yang menangani:
 
-- Penyimpanan data siswa
-- Sinkronisasi data real-time
-- Hosting aplikasi
+- 🔐 Autentikasi dengan verifikasi email
+- 💾 Penyimpanan data siswa & guru
+- 🔄 Sinkronisasi data real-time
+- 🌐 Hosting aplikasi
 
 ---
 
 ## Struktur Data Database
 
-Data disimpan pada Firebase Realtime Database dengan struktur berikut:
-
+### Data Siswa
 ```json
 {
   "siswa": {
     "student_id": {
+      "nis": "12345678",
       "nama": "ALEXANDER CHRISTIAN",
       "kelas": "9B",
-      "formatif1": 88,
-      "formatif2": 95,
-      "sumatif": 90,
+      "password": "Sph12345!",
+      "q3_f1": 88,
+      "q3_f2": 95,
+      "q3_sumatif": 90,
       "createdAt": 1773105238331
     }
   }
 }
 ```
 
-Setiap siswa memiliki **6 field data**:
-
-| Field       | Tipe      | Keterangan                    |
-| ----------- | --------- | ----------------------------- |
-| `nama`      | String    | Nama lengkap siswa            |
-| `kelas`     | String    | Kelas siswa (contoh: 9B, 10A) |
-| `formatif1` | Number    | Nilai formatif pertama        |
-| `formatif2` | Number    | Nilai formatif kedua          |
-| `sumatif`   | Number    | Nilai sumatif / ujian akhir   |
-| `createdAt` | Timestamp | Waktu data dibuat             |
+### Data Guru (dengan Verifikasi)
+```json
+{
+  "guru": {
+    "uid_guru": {
+      "email": "guru@sekolah.id",
+      "uid": "uid_guru",
+      "isVerified": true,
+      "emailVerified": true,
+      "createdAt": 1773105238331,
+      "verifiedAt": 1773105238331,
+      "verifiedBy": "admin@sekolah.id"
+    }
+  }
+}
+```
 
 ---
 
@@ -97,56 +132,88 @@ Setiap siswa memiliki **6 field data**:
 
 Siswa **tidak perlu login** untuk melihat nilai. Cukup:
 
-- Cari nama mereka di kolom pencarian
-- Lihat nilai formatif dan sumatif
-- Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
+- 🔍 Cari nama/NIS mereka di kolom pencarian
+- 🔒 Verifikasi password siswa
+- 📊 Lihat nilai formatif dan sumatif per quarter
+- 📈 Lihat chart radar performa
+- ✅ Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
 
 ### Mode Guru
 
-Guru melakukan **register/login** menggunakan Firebase Authentication (Email/Password), lalu dapat melakukan CRUD data nilai siswa:
+Guru melakukan **register/login** menggunakan Firebase Authentication dengan **verifikasi email wajib**:
 
-| Fungsi     | Keterangan                         |
-| ---------- | ---------------------------------- |
-| **Create** | Tambah siswa baru via form input   |
-| **Read**   | Lihat seluruh data siswa real-time |
-| **Update** | Edit nilai langsung dari tabel     |
-| **Delete** | Hapus data siswa dari database     |
+| Fungsi     | Keterangan                                    |
+| ---------- | --------------------------------------------- |
+| **Register** | Buat akun dengan email → Verifikasi email    |
+| **Login**  | Masuk dengan email terverifikasi              |
+| **Create** | Tambah siswa baru via form input              |
+| **Read**   | Lihat seluruh data siswa real-time            |
+| **Update** | Edit nilai langsung dari tabel                |
+| **Delete** | Hapus data siswa dari database                |
+
+### Sistem Verifikasi Guru (Baru!)
+
+| Tahap | Proses |
+|-------|--------|
+| 1. Register | Guru daftar dengan email & password |
+| 2. Email Sent | Firebase kirim link verifikasi ke email |
+| 3. Verifikasi | Guru klik link di email → `verify.html` |
+| 4. Approval | Admin utama approve akun guru (jika bukan admin) |
+| 5. Login | Guru bisa login dan akses dashboard |
 
 ### Fitur Tambahan
 
-- Pencarian nama siswa (live search)
-- Import data massal dari Excel
-- Export seluruh data ke Excel
-- Indikator otomatis: **Tuntas** / **Remedial** / **Susulan**
-- UI Responsif (mobile-friendly)
-- Dashboard guru dilindungi password
-- Register/Login guru via Firebase Authentication
+- 📧 **Email Verification** - Verifikasi email otomatis via Firebase
+- 🔒 **Password Protection** - Siswa perlu password untuk lihat nilai
+- 🔄 **Multi Quarter** - Support 4 quarter (Q1, Q2, Q3, Q4)
+- 📥 **Import Excel** - Import data massal dari Excel
+- 📤 **Export Excel** - Export seluruh data ke Excel
+- 🎯 **KKM Calculator** - Hitung status otomatis (Tuntas/Remedial/Susulan)
+- 📱 **UI Responsif** - Mobile-friendly design
+- 👨‍💼 **Admin Panel** - Super admin bisa approve/reject guru
 
 ---
 
 ## Screenshot Aplikasi
 
 ### Halaman Pencarian Nilai (Mode Siswa)
-
-### Tampilan Nilai Siswa
-
 <img width="1754" height="1053" alt="image" src="https://github.com/user-attachments/assets/adda0834-9136-4edf-9a61-9a811d4b6ebd" />
 
 ### Login Guru
-
 <img width="922" height="816" alt="image" src="https://github.com/user-attachments/assets/15a60fb7-0697-40a8-975f-80348b99a9ba" />
 
 ### Dashboard Guru
-
 <img width="2090" height="1309" alt="image" src="https://github.com/user-attachments/assets/aca36eb9-46ce-453f-b761-062ce762f06e" />
 
 ### Firebase Realtime Database
-
 <img width="1952" height="1091" alt="image" src="https://github.com/user-attachments/assets/0ccd252d-1957-466f-8ae5-0934eaa05911" />
 
 ### Firebase Authentication
-
 <img width="1727" height="648" alt="image" src="https://github.com/user-attachments/assets/4af02c1c-7e80-4aa1-a5fd-609797ee81a1" />
+
+---
+
+## Struktur File
+
+```
+nilai-informatika/
+├── 📄 index.html              # Halaman utama (student search + login modal)
+├── 📄 verify.html             # 🆕 Halaman verifikasi email
+├── 📄 dashboard.html          # Dashboard guru (CRUD nilai)
+├── 📁 js/
+│   ├── 📄 firebase-init.js    # Inisialisasi Firebase & helper functions
+│   ├── 📄 auth.js             # 🆕 Logika auth: login, register, verifikasi
+│   ├── 📄 student.js          # Fitur pencarian siswa
+│   └── 📄 teacher.js          # Fitur dashboard guru
+├── 📄 app.js                  # File lama (legacy)
+├── 📄 style.css               # Custom CSS
+├── 📄 firebase.json           # Konfigurasi Firebase Hosting & Cache
+├── 📄 database.rules.json     # Security rules database
+├── 📄 .firebaserc             # Firebase project alias
+├── 📄 README.md               # Dokumentasi project
+├── 📄 DOKUMENTASI_TUGAS_WEBMAILER.md  # 🆕 Dokumentasi fitur webmailer
+└── 📁 screenshots/            # Screenshot untuk README
+```
 
 ---
 
@@ -185,24 +252,16 @@ firebase deploy --only hosting
 
 **URL Hosting:** [https://nilai-informatika.web.app](https://nilai-informatika.web.app)
 
----
+### Deploy Database Rules
 
-## Struktur File
-
+```bash
+firebase deploy --only database
 ```
-nilai-informatika/
-├── index.html          # Halaman utama (student view + teacher dashboard)
-├── app.js              # Logic Firebase CRUD + UI rendering
-├── style.css           # Custom CSS tambahan
-├── firebase.json       # Konfigurasi Firebase Hosting & Cache
-├── .firebaserc         # Firebase project alias
-├── README.md           # Dokumentasi project
-└── screenshots/        # Screenshot untuk README
-    ├── search.png
-    ├── nilai.png
-    ├── login.png
-    ├── dashboard.png
-    └── firebase_database.png
+
+### Deploy Semua (Hosting + Database)
+
+```bash
+firebase deploy --only hosting,database
 ```
 
 ---
@@ -215,81 +274,81 @@ Project ini dibuat untuk:
 - Mengimplementasikan **Firebase Realtime Database**
 - Membangun aplikasi **CRUD berbasis web**
 - Mengintegrasikan frontend dengan **cloud backend**
+- 🆕 Mengimplementasikan **Email Verification** dengan Firebase Auth
 
 ---
 
 ## Fitur Utama
 
-- CRUD nilai siswa (Create, Read, Update, Delete)
-- Register/login guru (Firebase Authentication)
-- Pencarian nama siswa (live search)
-- Import/export data Excel
-- Dashboard guru dengan proteksi password
-- Real-time update via Firebase Realtime Database
-- Hosting di Firebase Hosting
+### Core Features
+- ✅ CRUD nilai siswa (Create, Read, Update, Delete)
+- ✅ Register/login guru dengan **email verification**
+- ✅ Pencarian nama/NIS siswa (live search)
+- ✅ Import/export data Excel
+- ✅ Dashboard guru dengan proteksi login
+- ✅ Real-time update via Firebase Realtime Database
+
+### 🆕 Email Verification Features
+- 📧 Kirim link verifikasi saat register
+- 🔒 Login hanya untuk email terverifikasi
+- 🔄 Redirect otomatis ke login setelah verifikasi
+- 📤 Kirim ulang email verifikasi
+- 👨‍💼 Admin approval system
 
 ---
 
 ## Alur Penggunaan (User Flow)
 
-1. Siswa membuka website, mencari nama, dan melihat nilai tanpa login.
-2. Guru register/login dengan email & password.
-3. Setelah login, guru dapat menambah, edit, atau hapus nilai siswa.
-4. Guru bisa import data dari Excel atau export ke Excel.
-5. Semua perubahan langsung tersimpan dan tampil real-time.
+### Alur Siswa
+1. Siswa membuka website
+2. Cari nama/NIS di kolom pencarian
+3. Masukkan password untuk verifikasi
+4. Lihat detail nilai dan status
+
+### Alur Guru (dengan Verifikasi Email)
+1. Guru klik "Login Guru"
+2. Pilih "Belum punya akun? Register"
+3. Isi email & password → Klik "Daftar"
+4. **Cek email** dan klik link verifikasi
+5. Setelah verifikasi, kembali ke halaman login
+6. Login dengan email & password
+7. **Admin approve** (jika bukan admin utama)
+8. Akses dashboard dan kelola nilai
 
 ---
 
-## Struktur Kode
+## Error Handling
 
-- `index.html`: Tampilan utama, form login/register, dashboard guru, tabel nilai siswa.
-- `app.js`: Logika Firebase, autentikasi, CRUD, UI rendering.
-- `style.css`: Custom styling.
-- `firebase.json`: Konfigurasi hosting & cache.
-- `.firebaserc`: Alias project Firebase.
-- `README.md`: Dokumentasi.
-
----
-
-## Setup & Deploy (Detail)
-
-1. Pastikan Node.js & npm sudah terinstall.
-2. Install Firebase CLI:
-   ```bash
-   npm install -g firebase-tools
-   ```
+| Error | Penyebab | Solusi |
+|-------|----------|--------|
+| "Akun tidak ditemukan" | Email belum terdaftar | Register terlebih dahulu |
+| "Password salah" | Password tidak cocok | Periksa caps lock, coba lagi |
+| "Email belum diverifikasi" | Belum klik link verifikasi | Cek inbox/spam, klik link |
+| "Email sudah terdaftar" | Email sudah ada di sistem | Gunakan email lain atau login |
+| "Password terlalu lemah" | Password < 6 karakter | Gunakan password lebih kuat |
 
 ---
 
-## Setup EmailJS Custom Verification
+## Realtime Database Rules
 
-Untuk fitur verifikasi email custom (EmailJS), lakukan langkah berikut:
+File `database.rules.json` menyediakan security rules:
 
-1. Buat service dan template di EmailJS.
-2. Gunakan template siap pakai di file `EMAILJS_TEMPLATE.md`.
-3. Ambil `publicKey`, `serviceId`, dan `templateId` dari dashboard EmailJS.
-4. Isi konfigurasi pada file `js/firebase-init.js` di object `EMAILJS_CONFIG`.
-
-Contoh konfigurasi:
-
-```js
-const EMAILJS_CONFIG = {
-   publicKey: "YOUR_EMAILJS_PUBLIC_KEY",
-   serviceId: "YOUR_EMAILJS_SERVICE_ID",
-   templateId: "YOUR_EMAILJS_TEMPLATE_ID",
-};
+```json
+{
+  "rules": {
+    "siswa": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "guru": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    }
+  }
+}
 ```
-
----
-
-## Realtime Database Rules (Minimum)
-
-Project ini sekarang menyediakan file rules minimum di `database.rules.json` untuk:
-
-- Public read data siswa (`siswa`)
-- Write data siswa hanya user login
-- Data guru hanya terbaca user login
-- Field approval admin (`isVerified`, `verifiedBy`, `verifiedAt`) hanya bisa ditulis Admin Utama
 
 Deploy rules:
 
@@ -297,48 +356,22 @@ Deploy rules:
 firebase deploy --only database
 ```
 
-Deploy hosting + rules sekaligus:
-
-```bash
-firebase deploy --only hosting,database
-```
-3. Login ke Firebase:
-   ```bash
-   firebase login
-   ```
-4. Inisialisasi project (jika belum):
-   ```bash
-   firebase init
-   ```
-5. Deploy ke Firebase Hosting:
-   ```bash
-   firebase deploy --only hosting
-   ```
-
----
-
-## Contoh Error & Solusi
-
-- **Login gagal:** Pastikan email valid, password benar, dan koneksi internet stabil.
-- **Data tidak muncul:** Refresh halaman, cek status hosting, atau periksa console browser.
-- **Deploy gagal:** Pastikan sudah login Firebase, cek koneksi, dan pastikan folder project benar.
-
----
-
-## Cara Penggunaan
-
-1. Buka halaman utama: [https://nilai-informatika.web.app](https://nilai-informatika.web.app)
-2. Siswa dapat mencari nama dan melihat nilai tanpa login.
-3. Guru register/login dengan email & password untuk mengelola data nilai.
-4. Gunakan fitur CRUD, import/export Excel, dan dashboard guru.
-
 ---
 
 ## Troubleshooting
 
-- Jika gagal login/register, pastikan email valid dan koneksi internet stabil.
-- Jika data tidak muncul, refresh halaman atau cek status Firebase Hosting.
-- Untuk error deployment, pastikan Firebase CLI sudah terinstall dan login.
+### Masalah Login/Register
+- **Login gagal:** Pastikan email sudah diverifikasi (cek inbox)
+- **Tidak menerima email verifikasi:** Cek folder spam/promotions
+- **Link verifikasi expired:** Klik "Kirim Ulang Verifikasi" di modal login
+
+### Masalah Data
+- **Data tidak muncul:** Refresh halaman, cek koneksi internet
+- **Gagal import Excel:** Pastikan format sesuai template
+
+### Masalah Deploy
+- **Deploy gagal:** Pastikan sudah `firebase login`
+- **Error permission:** Cek role Firebase project
 
 ---
 
@@ -348,12 +381,42 @@ Pull request dan issue dipersilakan untuk pengembangan fitur atau perbaikan bug.
 
 ---
 
+## Changelog
+
+### v2.0.0 - Webmailer & Email Verification (Terbaru)
+- ✅ Fitur webmailer dengan email verification
+- ✅ Login restriction untuk email belum terverifikasi
+- ✅ Halaman verifikasi email (`verify.html`)
+- ✅ Error handling untuk auth errors
+- ✅ Resend verification email
+- ✅ Admin approval system
+- ✅ Restructure folder (`js/`)
+
+### v1.0.0 - Initial Release
+- ✅ Firebase Realtime Database integration
+- ✅ CRUD nilai siswa
+- ✅ Firebase Authentication (basic)
+- ✅ Import/Export Excel
+- ✅ Firebase Hosting deployment
+
+---
+
 ## Referensi
 
 - [Firebase Documentation](https://firebase.google.com/docs)
 - [Firebase Realtime Database Guide](https://firebase.google.com/docs/database)
 - [Firebase Authentication Guide](https://firebase.google.com/docs/auth)
+- [Firebase Email Verification](https://firebase.google.com/docs/auth/web/email-verification)
 - [Tailwind CSS Docs](https://tailwindcss.com/docs)
 - [Bootstrap 5 Docs](https://getbootstrap.com/docs/5.0)
 
 ---
+
+## Dokumentasi Tambahan
+
+- **[DOKUMENTASI_TUGAS_WEBMAILER.md](DOKUMENTASI_TUGAS_WEBMAILER.md)** - Dokumentasi lengkap fitur webmailer & email verification
+
+---
+
+**Project by:** [1oneGod1](https://github.com/1oneGod1)  
+**Last Updated:** 29 Maret 2026

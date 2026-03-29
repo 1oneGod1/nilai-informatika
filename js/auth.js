@@ -9,7 +9,9 @@ let pendingEmailForResend = "";
 
 function isAdminEmailSafe(email) {
   if (typeof isAdminEmail === "function") return isAdminEmail(email);
-  const normalized = String(email || "").trim().toLowerCase();
+  const normalized = String(email || "")
+    .trim()
+    .toLowerCase();
   return (
     normalized === "andi.purba@sdh.or.id" ||
     normalized === "pandapotanandi@gmail.com"
@@ -47,7 +49,7 @@ function submitLogin(event) {
   const email = getLoginEmailInputValue();
   const normalizedEmail = normalizeEmail(email);
   const isAdminLogin = isAdminEmailSafe(normalizedEmail);
-  const pwd   = getLoginPasswordInputValue();
+  const pwd = getLoginPasswordInputValue();
 
   if (!email || !pwd) {
     showLoginError("Email dan password harus diisi.");
@@ -66,7 +68,7 @@ function submitLogin(event) {
     .signInWithEmailAndPassword(email, pwd)
     .then(async (result) => {
       const user = result.user;
-      const uid  = user.uid;
+      const uid = user.uid;
 
       // ── Cek verifikasi email Firebase ──────────────────
       if (!user.emailVerified && !isAdminLogin) {
@@ -74,9 +76,12 @@ function submitLogin(event) {
         setResendVisibility(true);
         await auth.signOut();
         showLoginError(
-          "Email Anda belum diverifikasi. Silakan cek inbox/spam dan klik link verifikasi yang dikirim saat register."
+          "Email Anda belum diverifikasi. Silakan cek inbox/spam dan klik link verifikasi yang dikirim saat register.",
         );
-        if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalBtnText;
+        }
         return;
       }
 
@@ -87,7 +92,8 @@ function submitLogin(event) {
       if (!guruData) {
         const isAdmin = isAdminLogin;
         guruData = {
-          email, uid,
+          email,
+          uid,
           isVerified: isAdmin,
           emailVerified: user.emailVerified || isAdmin,
           createdAt: nowTs(),
@@ -125,9 +131,12 @@ function submitLogin(event) {
         setResendVisibility(false);
         await auth.signOut();
         showLoginError(
-          "Akun Anda belum diverifikasi oleh admin utama. Silakan hubungi admin."
+          "Akun Anda belum diverifikasi oleh admin utama. Silakan hubungi admin.",
         );
-        if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalBtnText;
+        }
         return;
       }
 
@@ -137,10 +146,15 @@ function submitLogin(event) {
       const modalEl = document.getElementById("loginModal");
       const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
       modal.hide();
-      setTimeout(() => { window.location.href = "dashboard.html"; }, 300);
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 300);
     })
     .catch((err) => {
-      if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnText;
+      }
       showLoginError(normalizeAuthErrorMessage(err.message));
     });
 }
@@ -150,7 +164,7 @@ function submitRegister() {
   const email = getLoginEmailInputValue();
   const normalizedEmail = normalizeEmail(email);
   const isAdminRegister = isAdminEmailSafe(normalizedEmail);
-  const pwd   = getLoginPasswordInputValue();
+  const pwd = getLoginPasswordInputValue();
 
   if (!email || !pwd) {
     showLoginError("Email dan password harus diisi.");
@@ -161,18 +175,20 @@ function submitRegister() {
   const originalBtnText = btn ? btn.innerHTML : "";
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mendaftarkan...';
+    btn.innerHTML =
+      '<i class="fas fa-spinner fa-spin me-2"></i>Mendaftarkan...';
   }
 
   auth
     .createUserWithEmailAndPassword(email, pwd)
     .then(async (result) => {
-      const uid     = result.user.uid;
+      const uid = result.user.uid;
       const isAdmin = isAdminRegister;
 
       // ── Simpan profil guru ke Realtime DB ───────────────
       const baseProfile = {
-        email, uid,
+        email,
+        uid,
         isVerified: isAdmin,
         emailVerified: isAdmin,
         createdAt: nowTs(),
@@ -185,18 +201,25 @@ function submitRegister() {
       // ── Sembunyikan modal ───────────────────────────────
       hideLoginError();
       setResendVisibility(false);
-      const modal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
+      const modal = bootstrap.Modal.getInstance(
+        document.getElementById("loginModal"),
+      );
       if (modal) modal.hide();
 
-      if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnText;
+      }
 
       // ── Admin Utama: langsung redirect ──────────────────
       if (isAdmin) {
         showAlert(
           "Register berhasil! Anda adalah Admin Utama dan langsung bisa mengakses dashboard.",
-          "success"
+          "success",
         );
-        setTimeout(() => { window.location.href = "dashboard.html"; }, 1200);
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1200);
         return;
       }
 
@@ -219,11 +242,14 @@ function submitRegister() {
       showAlert(
         `<strong>Register berhasil!</strong> Link verifikasi telah dikirim ke <strong>${escHtml(email)}</strong>.<br>
          Silakan cek <strong>inbox</strong> atau folder <strong>spam</strong> Anda, lalu klik link verifikasi sebelum login.`,
-        "info"
+        "info",
       );
     })
     .catch((err) => {
-      if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnText;
+      }
       showLoginError(normalizeAuthErrorMessage(err.message));
     });
 }
@@ -232,15 +258,17 @@ function submitRegister() {
 async function resendVerificationFromLogin() {
   try {
     const email = pendingEmailForResend || getLoginEmailInputValue();
-    const pwd   = getLoginPasswordInputValue();
+    const pwd = getLoginPasswordInputValue();
 
     if (!email || !pwd) {
-      showLoginError("Masukkan email dan password terlebih dahulu sebelum kirim ulang verifikasi.");
+      showLoginError(
+        "Masukkan email dan password terlebih dahulu sebelum kirim ulang verifikasi.",
+      );
       return;
     }
 
     const result = await auth.signInWithEmailAndPassword(email, pwd);
-    const user   = result.user;
+    const user = result.user;
 
     if (user.emailVerified) {
       setResendVisibility(false);
@@ -261,8 +289,10 @@ async function resendVerificationFromLogin() {
     await auth.signOut();
 
     showLoginError(
-      "Email verifikasi berhasil dikirim ulang ke " + escHtml(email) + ". Silakan cek inbox/spam.",
-      true
+      "Email verifikasi berhasil dikirim ulang ke " +
+        escHtml(email) +
+        ". Silakan cek inbox/spam.",
+      true,
     );
   } catch (err) {
     showLoginError(normalizeAuthErrorMessage(err.message));
@@ -271,26 +301,37 @@ async function resendVerificationFromLogin() {
 
 // ─── TOGGLE FORM LOGIN ↔ REGISTER ────────────────────────
 function showRegisterForm() {
-  const loginForm     = document.getElementById("loginForm");
+  const loginForm = document.getElementById("loginForm");
   const registerLabel = document.getElementById("registerToggleBtn");
-  const submitBtn     = document.querySelector("#loginForm button[type=submit]");
-  const modalTitle    = document.querySelector("#loginModal .modal-title");
+  const submitBtn = document.querySelector("#loginForm button[type=submit]");
+  const modalTitle = document.querySelector("#loginModal .modal-title");
 
   if (loginForm.getAttribute("data-mode") === "register") {
     // Kembali ke mode Login
     loginForm.setAttribute("data-mode", "login");
     loginForm.onsubmit = submitLogin;
-    if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-unlock-fill me-2"></i>Masuk';
-    if (registerLabel) registerLabel.textContent = "Belum punya akun? Register di sini";
-    if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> LOGIN GURU';
+    if (submitBtn)
+      submitBtn.innerHTML = '<i class="bi bi-unlock-fill me-2"></i>Masuk';
+    if (registerLabel)
+      registerLabel.textContent = "Belum punya akun? Register di sini";
+    if (modalTitle)
+      modalTitle.innerHTML =
+        '<i class="fas fa-sign-in-alt me-2"></i> LOGIN GURU';
     setResendVisibility(false);
   } else {
     // Beralih ke mode Register
     loginForm.setAttribute("data-mode", "register");
-    loginForm.onsubmit = (e) => { e.preventDefault(); submitRegister(); };
-    if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-person-plus-fill me-2"></i>Daftar Akun';
+    loginForm.onsubmit = (e) => {
+      e.preventDefault();
+      submitRegister();
+    };
+    if (submitBtn)
+      submitBtn.innerHTML =
+        '<i class="bi bi-person-plus-fill me-2"></i>Daftar Akun';
     if (registerLabel) registerLabel.textContent = "Sudah punya akun? Login";
-    if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-user-plus me-2"></i> REGISTER GURU';
+    if (modalTitle)
+      modalTitle.innerHTML =
+        '<i class="fas fa-user-plus me-2"></i> REGISTER GURU';
     setResendVisibility(false);
   }
   hideLoginError();
@@ -298,7 +339,7 @@ function showRegisterForm() {
 
 // ─── TOGGLE SHOW/HIDE PASSWORD ────────────────────────────
 function togglePassword() {
-  const inp  = document.getElementById("passwordInput");
+  const inp = document.getElementById("passwordInput");
   const icon = document.getElementById("eyeIcon");
   if (inp.type === "password") {
     inp.type = "text";
@@ -311,27 +352,34 @@ function togglePassword() {
 
 // ─── ERROR MAP ────────────────────────────────────────────
 const AUTH_ERROR_MAP = {
-  "auth/invalid-email":        "Format email tidak valid.",
-  "auth/missing-password":     "Kata sandi wajib diisi.",
-  "auth/invalid-credential":   "Email atau password salah. Periksa kembali.",
-  "auth/wrong-password":       "Password salah. Coba lagi.",
-  "auth/user-not-found":       "Akun dengan email ini tidak ditemukan. Silakan register terlebih dahulu.",
+  "auth/invalid-email": "Format email tidak valid.",
+  "auth/missing-password": "Kata sandi wajib diisi.",
+  "auth/invalid-credential": "Email atau password salah. Periksa kembali.",
+  "auth/wrong-password": "Password salah. Coba lagi.",
+  "auth/user-not-found":
+    "Akun dengan email ini tidak ditemukan. Silakan register terlebih dahulu.",
   "auth/email-already-in-use": "Email sudah terdaftar. Silakan login.",
-  "auth/weak-password":        "Password terlalu lemah (minimal 6 karakter).",
-  "auth/too-many-requests":    "Terlalu banyak percobaan login. Coba beberapa saat lagi.",
+  "auth/weak-password": "Password terlalu lemah (minimal 6 karakter).",
+  "auth/too-many-requests":
+    "Terlalu banyak percobaan login. Coba beberapa saat lagi.",
   "auth/network-request-failed": "Koneksi gagal. Periksa internet Anda.",
-  "auth/user-disabled":        "Akun ini telah dinonaktifkan. Hubungi admin.",
+  "auth/user-disabled": "Akun ini telah dinonaktifkan. Hubungi admin.",
 };
 
 // ─── SHOW / HIDE LOGIN ERROR ──────────────────────────────
 function showLoginError(message, isSuccess = false) {
   // Coba ekstrak kode error Firebase (auth/...)
-  const code = String(message || "").match(/\(auth\/[a-z-]+\)/)?.[0]
-    ?.replace(/[()]/g, "")
-    || String(message || "").match(/auth\/[a-z-]+/)?.[0];
+  const code =
+    String(message || "")
+      .match(/\(auth\/[a-z-]+\)/)?.[0]
+      ?.replace(/[()]/g, "") ||
+    String(message || "").match(/auth\/[a-z-]+/)?.[0];
 
   const safeMessage = String(message || "").trim();
-  const text = AUTH_ERROR_MAP[code] || safeMessage || "Autentikasi gagal. Coba lagi beberapa saat.";
+  const text =
+    AUTH_ERROR_MAP[code] ||
+    safeMessage ||
+    "Autentikasi gagal. Coba lagi beberapa saat.";
 
   const errWrap = document.getElementById("loginError");
   const errText = document.getElementById("loginErrorText");
@@ -342,11 +390,13 @@ function showLoginError(message, isSuccess = false) {
     if (isSuccess) {
       if (errIcon) errIcon.className = "fas fa-check-circle";
       errWrap.style.borderColor = "rgba(16, 185, 129, 0.6)";
-      errWrap.style.background = "linear-gradient(135deg, rgba(6, 95, 70, 0.45), rgba(16, 185, 129, 0.2))";
+      errWrap.style.background =
+        "linear-gradient(135deg, rgba(6, 95, 70, 0.45), rgba(16, 185, 129, 0.2))";
     } else {
       if (errIcon) errIcon.className = "fas fa-exclamation-circle";
       errWrap.style.borderColor = "rgba(251, 113, 133, 0.45)";
-      errWrap.style.background = "linear-gradient(135deg, rgba(127, 29, 29, 0.3), rgba(190, 24, 93, 0.18))";
+      errWrap.style.background =
+        "linear-gradient(135deg, rgba(127, 29, 29, 0.3), rgba(190, 24, 93, 0.18))";
     }
     errWrap.style.display = "flex";
   }
@@ -379,7 +429,7 @@ function checkAuthOnStudentPage() {
       openLoginModal();
       showLoginError(
         "Email Anda berhasil diverifikasi! Silakan login untuk melanjutkan.",
-        true
+        true,
       );
     }, 400);
   }
@@ -390,15 +440,23 @@ function checkAuthOnStudentPage() {
     try {
       const snap = await guruRef.child(user.uid).once("value");
       const data = snap.val();
-      const isAdmin = isAdminEmailSafe(user.email) || isAdminEmailSafe(data?.email);
-      const canOpenDashboard = !!data && (data.isVerified || isAdmin) && (user.emailVerified || data.emailVerified || isAdmin);
+      const isAdmin =
+        isAdminEmailSafe(user.email) || isAdminEmailSafe(data?.email);
+      const canOpenDashboard =
+        !!data &&
+        (data.isVerified || isAdmin) &&
+        (user.emailVerified || data.emailVerified || isAdmin);
       if (canOpenDashboard) {
         const dashBtn = document.getElementById("dashboardBtn");
         if (dashBtn) {
           dashBtn.style.display = "";
-          dashBtn.onclick = () => { window.location.href = "dashboard.html"; };
+          dashBtn.onclick = () => {
+            window.location.href = "dashboard.html";
+          };
         }
       }
-    } catch (_) { /* abaikan */ }
+    } catch (_) {
+      /* abaikan */
+    }
   });
 }

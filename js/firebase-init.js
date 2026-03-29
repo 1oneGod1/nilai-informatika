@@ -18,25 +18,26 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-const db      = firebase.database();
-const auth    = firebase.auth();
+const db = firebase.database();
+const auth = firebase.auth();
 const siswaRef = db.ref("siswa");
-const guruRef  = db.ref("guru");
+const guruRef = db.ref("guru");
 
-const ADMIN_EMAILS = [
-  "andi.purba@sdh.or.id",
-  "pandapotanandi@gmail.com",
-];
+const ADMIN_EMAILS = ["andi.purba@sdh.or.id", "pandapotanandi@gmail.com"];
 
 const ADMIN_UTAMA_EMAIL = ADMIN_EMAILS[0];
 
 function normalizeEmail(email) {
-  return String(email || "").trim().toLowerCase();
+  return String(email || "")
+    .trim()
+    .toLowerCase();
 }
 
 function isAdminEmail(email) {
   const normalized = normalizeEmail(email);
-  return ADMIN_EMAILS.some((adminEmail) => normalizeEmail(adminEmail) === normalized);
+  return ADMIN_EMAILS.some(
+    (adminEmail) => normalizeEmail(adminEmail) === normalized,
+  );
 }
 
 const KKM_MAP = { 7: 67, 8: 68, 9: 69, 10: 75, 11: 76, 12: 77 };
@@ -62,9 +63,9 @@ function showAlert(message, type = "success") {
   const id = "alert_" + Date.now();
   const icons = {
     success: "fa-check-circle",
-    danger:  "fa-times-circle",
+    danger: "fa-times-circle",
     warning: "fa-exclamation-triangle",
-    info:    "fa-info-circle",
+    info: "fa-info-circle",
   };
   area.innerHTML = `
     <div id="${id}" class="alert alert-${type} alert-dismissible d-flex align-items-center gap-2" role="alert">
