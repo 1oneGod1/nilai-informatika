@@ -35,7 +35,10 @@ File terkait fitur ini:
 
 Aplikasi dapat diakses di:
 
-**[https://nilai-informatika.web.app](https://nilai-informatika.web.app)**
+| Platform | URL |
+|----------|-----|
+| **Firebase Hosting** | **[https://nilai-informatika.web.app](https://nilai-informatika.web.app)** |
+| **Render** | **[https://nilai-informatikasss.onrender.com](https://nilai-informatikasss.onrender.com)** |
 
 **[https://nilai-informatikasss.onrender.com](https://nilai-informatikasss.onrender.com)**
 
@@ -59,7 +62,14 @@ Aplikasi dapat diakses di:
 | -------------------------- | ----------------------------------------------- |
 | Firebase Realtime Database | Penyimpanan & sinkronisasi data real-time       |
 | Firebase Authentication    | Register & login akun guru dengan verifikasi email |
-| Firebase Hosting           | Deploy & hosting aplikasi                       |
+| Firebase Hosting           | Deploy & hosting aplikasi (Primary)             |
+
+### Hosting
+
+| Platform | URL | Keterangan |
+|----------|-----|------------|
+| **Firebase Hosting** | [nilai-informatika.web.app](https://nilai-informatika.web.app) | Hosting utama via Firebase |
+| **Render** | [nilai-informatikasss.onrender.com](https://nilai-informatikasss.onrender.com) | Hosting alternatif via Render |
 
 ---
 
@@ -239,7 +249,9 @@ cd nilai-informatika
 
 ## Deployment
 
-Project di-deploy menggunakan **Firebase Hosting**.
+Project di-deploy menggunakan dua platform hosting:
+
+### Option 1: Firebase Hosting (Primary)
 
 ```bash
 # Install Firebase CLI
@@ -252,7 +264,20 @@ firebase login
 firebase deploy --only hosting
 ```
 
-**URL Hosting:** [https://nilai-informatika.web.app](https://nilai-informatika.web.app)
+**URL:** [https://nilai-informatika.web.app](https://nilai-informatika.web.app)
+
+### Option 2: Render Hosting (Alternatif)
+
+Aplikasi juga di-deploy di **Render** sebagai hosting alternatif:
+
+**URL:** [https://nilai-informatikasss.onrender.com](https://nilai-informatikasss.onrender.com)
+
+Untuk deploy ke Render:
+1. Connect GitHub repository ke Render
+2. Pilih branch `main`
+3. Set build command: *(static site - no build needed)*
+4. Set publish directory: `/`
+5. Klik "Deploy"
 
 ### Deploy Database Rules
 
