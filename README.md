@@ -223,7 +223,7 @@ Sistem menggunakan **dua layer verifikasi** untuk keamanan:
 
 ---
 
-## Screenshot Aplikasi
+## Screenshot Aplikasi V1
 
 ### Halaman Pencarian Nilai (Mode Siswa)
 <img width="1754" height="1053" alt="image" src="https://github.com/user-attachments/assets/adda0834-9136-4edf-9a61-9a811d4b6ebd" />
@@ -239,6 +239,36 @@ Sistem menggunakan **dua layer verifikasi** untuk keamanan:
 
 ### Firebase Authentication
 <img width="1727" height="648" alt="image" src="https://github.com/user-attachments/assets/4af02c1c-7e80-4aa1-a5fd-609797ee81a1" />
+
+---
+
+## Screenshot Aplikasi V2
+
+### Halaman Pencarian Nilai (Mode Siswa)
+<img width="2545" height="1322" alt="image" src="https://github.com/user-attachments/assets/3f1c6d6b-2508-4c01-aae0-ae9c5248a89c" />
+
+<img width="684" height="753" alt="image" src="https://github.com/user-attachments/assets/c2c0fe82-4658-45e4-ac93-c662b3c48a3c" />
+
+<img width="694" height="683" alt="image" src="https://github.com/user-attachments/assets/fd97b381-f516-4970-898c-fccfe3a716fe" />
+
+<img width="1300" height="1203" alt="image" src="https://github.com/user-attachments/assets/e1411b21-58db-4a4f-9a1e-9961e150415d" />
+
+
+### Login Guru
+<img width="935" height="651" alt="image" src="https://github.com/user-attachments/assets/52d0c96c-ab88-4d09-873d-ead251c30bed" />
+
+### Dashboard Guru
+<img width="2000" height="1250" alt="image" src="https://github.com/user-attachments/assets/444967a2-4fa1-463f-a059-854083c3edbb" />
+
+### Firebase Realtime Database
+<img width="1481" height="960" alt="image" src="https://github.com/user-attachments/assets/aa5649df-75dd-4478-b29e-3a08528ac294" />
+
+### Firebase Authentication
+<img width="1121" height="432" alt="image" src="https://github.com/user-attachments/assets/bd617fc0-3372-4d9b-93e9-c569ff93b598" />
+
+<img width="1116" height="801" alt="image" src="https://github.com/user-attachments/assets/db742c89-3c08-43f1-9da9-40972bdc6eb2" />
+
+
 
 ---
 
