@@ -36,6 +36,50 @@
 | Email sudah terdaftar | "Email sudah terdaftar. Silakan login." |
 | Password lemah | "Password terlalu lemah (minimal 6 karakter)." |
 
+### 5. Admin Panel - Approval System (`js/teacher.js` baris 447-520)
+
+**Fungsi:** Admin utama dapat approve/reject akun guru
+
+```javascript
+function loadAdminPanel(adminEmail) {
+  activeAdminEmail = adminEmail;
+  
+  // Listen data guru dari Realtime DB
+  guruRef.on("value", (snap) => {
+    const allGuru = snap.val() || {};
+    
+    // Filter guru yang belum di-approve
+    const pendingGuru = Object.entries(allGuru)
+      .filter(([uid, data]) => {
+        const isVerifiedStrict = data.isVerified === true;
+        return !isVerifiedStrict && !isAdminEmailSafe(data.email);
+      })
+      .map(([uid, data]) => ({ uid, ...data }));
+    
+    renderAdminPanel(pendingGuru);
+  });
+}
+
+function verifyGuruAccount(uid) {
+  // Approve guru
+  guruRef.child(uid).update({ 
+    isVerified: true, 
+    verifiedAt: Date.now(), 
+    verifiedBy: activeAdminEmail 
+  });
+}
+
+function rejectGuruAccount(uid) {
+  // Reject dan hapus akun guru
+  guruRef.child(uid).remove();
+}
+```
+
+**Tampilan Admin Panel:**
+- Badge jumlah guru pending
+- List email guru yang menunggu approval
+- Tombol **Approve** (hijau) / **Reject** (merah)
+
 ---
 
 ## 📁 Struktur File Implementasi
@@ -285,7 +329,7 @@ async function resendVerificationFromLogin() {
 
 ## 🔄 Alur Kerja Lengkap
 
-### Alur 1: Register → Verifikasi → Login
+### Alur 1: Register → Email Verification → Admin Approval → Login
 
 ```
 ┌─────────────────┐
@@ -302,8 +346,8 @@ async function resendVerificationFromLogin() {
 │ Simpan ke Realtime DB:      │
 │ guru/{uid} = {              │
 │   email,                    │
-│   isVerified: false,        │
-│   emailVerified: false      │
+│   isVerified: false,        │  ← Perlu Admin Approval
+│   emailVerified: false      │  ← Perlu Email Verification
 │ }                           │
 └────────┬────────────────────┘
          ▼
@@ -316,7 +360,25 @@ async function resendVerificationFromLogin() {
 │ Logout & Tampil Pesan       │
 │ "Cek email untuk verifikasi"│
 └─────────────────────────────┘
+         │
+         │ STEP 2: Admin Approval
+         ▼
+┌─────────────────────────────┐
+│ Admin Panel (Admin Utama)   │
+│ • Lihat daftar guru pending │
+│ • Klik "Approve"            │
+│ → Update: isVerified: true  │
+└─────────────────────────────┘
 ```
+
+### Alur 2-Step Verification
+
+| Layer | Proses | Status Database | Dicek Saat |
+|-------|--------|-----------------|------------|
+| 1 | Email Verification | `emailVerified: true` | Login (Firebase Auth) |
+| 2 | Admin Approval | `isVerified: true` | Login (Realtime DB) |
+
+> **Kedua layer harus lolos** agar guru bisa login dan akses dashboard.
 
 ### Alur 2: User Klik Link Verifikasi
 
@@ -344,7 +406,7 @@ async function resendVerificationFromLogin() {
 └─────────────────────────────┘
 ```
 
-### Alur 3: Login
+### Alur 3: Login (2-Step Verification Check)
 
 ```
 ┌─────────────────────────────┐
@@ -356,31 +418,53 @@ async function resendVerificationFromLogin() {
 │ signInWithEmailAndPassword()│
 └────────┬────────────────────┘
          ▼
-      ┌──────────────┐
-      │emailVerified?│
-      └──────┬───────┘
-         Yes/No
-        /      \
-       ▼        ▼
-   ┌──────┐   ┌──────────────────┐
-   │ Lanjut│   │ Sign Out         │
-   │ Cek   │   │ Tampil Error:    │
-   │ Admin │   │ "Email belum     │
-   │Approval│   │ diverifikasi"    │
-   └───┬───┘   └──────────────────┘
-       ▼
-   ┌──────────────────┐
-   │ approved?        │
-   └──────┬───────────┘
-      Yes/No
-     /      \
-    ▼        ▼
-┌────────┐ ┌──────────────────┐
-│Dashboard│ │ Sign Out         │
-│  ✅    │ │ "Belum di-approve│
-└────────┘ │ oleh admin"      │
-           └──────────────────┘
+┌─────────────────────────────┐
+│ STEP 1: Cek Email Verified  │
+│ (Firebase Auth)             │
+└────────┬────────────────────┘
+         │
+    ┌────┴────┐
+    │         │
+    ▼         ▼
+┌───────┐  ┌──────────────────────┐
+│✅ Yes  │  │❌ No                 │
+│Lanjut  │  │• Sign Out            │
+│        │  │• Error: "Email belum │
+│        │  │  diverifikasi"       │
+└───┬───┘  └──────────────────────┘
+    │
+    ▼
+┌─────────────────────────────┐
+│ STEP 2: Cek Admin Approval  │
+│ (Realtime Database)         │
+│ guru/{uid}/isVerified       │
+└────────┬────────────────────┘
+         │
+    ┌────┴────┐
+    │         │
+    ▼         ▼
+┌───────┐  ┌──────────────────────┐
+│✅ Yes  │  │❌ No                 │
+│Lanjut  │  │• Sign Out            │
+│        │  │• Error: "Akun belum  │
+│        │  │  di-approve admin"   │
+└───┬───┘  └──────────────────────┘
+    │
+    ▼
+┌─────────────────────────────┐
+│ ✅ LOGIN SUKSES             │
+│ Redirect ke dashboard.html  │
+└─────────────────────────────┘
 ```
+
+### Status Guru dan Akses
+
+| Status | `emailVerified` | `isVerified` | Bisa Login? | Pesan Error |
+|--------|-----------------|--------------|-------------|-------------|
+| Baru daftar | ❌ false | ❌ false | ❌ Tidak | "Email belum diverifikasi" |
+| Email verified | ✅ true | ❌ false | ❌ Tidak | "Belum di-approve admin" |
+| **Fully verified** | ✅ **true** | ✅ **true** | ✅ **Ya** | - |
+| Admin utama | ✅ true | ✅ auto | ✅ Ya | - |
 
 ---
 

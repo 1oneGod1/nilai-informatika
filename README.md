@@ -163,15 +163,52 @@ Guru melakukan **register/login** menggunakan Firebase Authentication dengan **v
 | **Update** | Edit nilai langsung dari tabel                |
 | **Delete** | Hapus data siswa dari database                |
 
-### Sistem Verifikasi Guru (Baru!)
+### Sistem 2-Step Verification
 
-| Tahap | Proses |
-|-------|--------|
-| 1. Register | Guru daftar dengan email & password |
-| 2. Email Sent | Firebase kirim link verifikasi ke email |
-| 3. Verifikasi | Guru klik link di email → `verify.html` |
-| 4. Approval | Admin utama approve akun guru (jika bukan admin) |
-| 5. Login | Guru bisa login dan akses dashboard |
+Sistem menggunakan **dua layer verifikasi** untuk keamanan:
+
+#### Layer 1: Email Verification (Firebase Auth)
+- Verifikasi kepemilikan email yang didaftarkan
+- Firebase kirim link verifikasi ke email guru
+- Status: `emailVerified: true`
+
+#### Layer 2: Admin Approval (Database)
+- Admin utama cek dan approve akun guru
+- Melalui Admin Panel di dashboard
+- Status: `isVerified: true`
+
+#### Struktur Data Guru
+```json
+{
+  "guru": {
+    "uid_guru": {
+      "email": "guru@sekolah.id",
+      "uid": "uid_guru",
+      "emailVerified": true,      // ← Layer 1: Firebase Auth
+      "isVerified": true,          // ← Layer 2: Admin Approval
+      "verifiedBy": "andi.purba@sdh.or.id",
+      "verifiedAt": 1773105238331,
+      "createdAt": 1773105238331
+    }
+  }
+}
+```
+
+#### Admin Panel
+- Hanya admin utama yang bisa akses
+- Menampilkan daftar guru pending approval
+- Tombol **Approve** atau **Reject**
+
+### Skenario Verifikasi
+
+| Skenario | Email Verified | Admin Approved | Bisa Login? |
+|----------|---------------|----------------|-------------|
+| Guru baru | ❌ No | ❌ No | ❌ Tidak - Cek email verifikasi |
+| Email verified | ✅ Yes | ❌ No | ❌ Tidak - Tunggu admin approve |
+| Fully verified | ✅ Yes | ✅ Yes | ✅ Ya - Bisa akses dashboard |
+| Admin utama | ✅ Yes | ✅ Auto | ✅ Ya - Auto-approve |
+| Email belum verified | ❌ No | - | ❌ Tidak - Error: "Email belum diverifikasi" |
+| Pending admin | ✅ Yes | ❌ No | ❌ Tidak - Error: "Belum di-approve admin" |
 
 ### Fitur Tambahan
 
