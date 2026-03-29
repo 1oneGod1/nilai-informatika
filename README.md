@@ -5,11 +5,11 @@ Aplikasi ini memungkinkan guru mengelola nilai siswa dan siswa melihat nilai mer
 
 > Project ini dibuat sebagai implementasi Firebase Realtime Database dengan fitur CRUD sesuai tugas modul **Backend as a Service**.
 > 
-> **🆕 Update Terbaru:** Fitur Webmailer dengan Verifikasi Email - Register guru kini harus verifikasi email terlebih dahulu sebelum bisa login.
+> ** Update Terbaru:** Fitur Webmailer dengan Verifikasi Email - Register guru kini harus verifikasi email terlebih dahulu sebelum bisa login.
 
 ---
 
-## 🆕 Fitur Baru: Webmailer & Email Verification
+##  Fitur Baru: Webmailer & Email Verification
 
 ### Ringkasan
 - **Email Verification:** Saat register, sistem mengirim link verifikasi ke email yang didaftarkan
