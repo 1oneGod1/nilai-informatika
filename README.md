@@ -80,10 +80,10 @@ Firebase Services
 
 Firebase digunakan sebagai **Backend as a Service** yang menangani:
 
-- 🔐 Autentikasi dengan verifikasi email
-- 💾 Penyimpanan data siswa & guru
-- 🔄 Sinkronisasi data real-time
-- 🌐 Hosting aplikasi
+-  Autentikasi dengan verifikasi email
+-  Penyimpanan data siswa & guru
+-  Sinkronisasi data real-time
+-  Hosting aplikasi
 
 ---
 
@@ -132,11 +132,11 @@ Firebase digunakan sebagai **Backend as a Service** yang menangani:
 
 Siswa **tidak perlu login** untuk melihat nilai. Cukup:
 
-- 🔍 Cari nama/NIS mereka di kolom pencarian
-- 🔒 Verifikasi password siswa
-- 📊 Lihat nilai formatif dan sumatif per quarter
-- 📈 Lihat chart radar performa
-- ✅ Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
+-  Cari nama/NIS mereka di kolom pencarian
+-  Verifikasi password siswa
+-  Lihat nilai formatif dan sumatif per quarter
+-  Lihat chart radar performa
+-  Lihat status kelulusan KKM (Tuntas / Remedial / Susulan)
 
 ### Mode Guru
 
@@ -163,14 +163,14 @@ Guru melakukan **register/login** menggunakan Firebase Authentication dengan **v
 
 ### Fitur Tambahan
 
-- 📧 **Email Verification** - Verifikasi email otomatis via Firebase
-- 🔒 **Password Protection** - Siswa perlu password untuk lihat nilai
-- 🔄 **Multi Quarter** - Support 4 quarter (Q1, Q2, Q3, Q4)
-- 📥 **Import Excel** - Import data massal dari Excel
-- 📤 **Export Excel** - Export seluruh data ke Excel
-- 🎯 **KKM Calculator** - Hitung status otomatis (Tuntas/Remedial/Susulan)
-- 📱 **UI Responsif** - Mobile-friendly design
-- 👨‍💼 **Admin Panel** - Super admin bisa approve/reject guru
+-  **Email Verification** - Verifikasi email otomatis via Firebase
+-  **Password Protection** - Siswa perlu password untuk lihat nilai
+-  **Multi Quarter** - Support 4 quarter (Q1, Q2, Q3, Q4)
+-  **Import Excel** - Import data massal dari Excel
+-  **Export Excel** - Export seluruh data ke Excel
+-  **KKM Calculator** - Hitung status otomatis (Tuntas/Remedial/Susulan)
+-  **UI Responsif** - Mobile-friendly design
+-  **Admin Panel** - Super admin bisa approve/reject guru
 
 ---
 
@@ -198,11 +198,11 @@ Guru melakukan **register/login** menggunakan Firebase Authentication dengan **v
 ```
 nilai-informatika/
 ├── 📄 index.html              # Halaman utama (student search + login modal)
-├── 📄 verify.html             # 🆕 Halaman verifikasi email
+├── 📄 verify.html             #  Halaman verifikasi email
 ├── 📄 dashboard.html          # Dashboard guru (CRUD nilai)
 ├── 📁 js/
 │   ├── 📄 firebase-init.js    # Inisialisasi Firebase & helper functions
-│   ├── 📄 auth.js             # 🆕 Logika auth: login, register, verifikasi
+│   ├── 📄 auth.js             #  Logika auth: login, register, verifikasi
 │   ├── 📄 student.js          # Fitur pencarian siswa
 │   └── 📄 teacher.js          # Fitur dashboard guru
 ├── 📄 app.js                  # File lama (legacy)
@@ -211,7 +211,7 @@ nilai-informatika/
 ├── 📄 database.rules.json     # Security rules database
 ├── 📄 .firebaserc             # Firebase project alias
 ├── 📄 README.md               # Dokumentasi project
-├── 📄 DOKUMENTASI_TUGAS_WEBMAILER.md  # 🆕 Dokumentasi fitur webmailer
+├── 📄 DOKUMENTASI_TUGAS_WEBMAILER.md  #  Dokumentasi fitur webmailer
 └── 📁 screenshots/            # Screenshot untuk README
 ```
 
@@ -274,26 +274,26 @@ Project ini dibuat untuk:
 - Mengimplementasikan **Firebase Realtime Database**
 - Membangun aplikasi **CRUD berbasis web**
 - Mengintegrasikan frontend dengan **cloud backend**
-- 🆕 Mengimplementasikan **Email Verification** dengan Firebase Auth
+- Mengimplementasikan **Email Verification** dengan Firebase Auth
 
 ---
 
 ## Fitur Utama
 
 ### Core Features
-- ✅ CRUD nilai siswa (Create, Read, Update, Delete)
-- ✅ Register/login guru dengan **email verification**
-- ✅ Pencarian nama/NIS siswa (live search)
-- ✅ Import/export data Excel
-- ✅ Dashboard guru dengan proteksi login
-- ✅ Real-time update via Firebase Realtime Database
+-  CRUD nilai siswa (Create, Read, Update, Delete)
+-  Register/login guru dengan **email verification**
+-  Pencarian nama/NIS siswa (live search)
+-  Import/export data Excel
+-  Dashboard guru dengan proteksi login
+-  Real-time update via Firebase Realtime Database
 
-### 🆕 Email Verification Features
-- 📧 Kirim link verifikasi saat register
-- 🔒 Login hanya untuk email terverifikasi
-- 🔄 Redirect otomatis ke login setelah verifikasi
-- 📤 Kirim ulang email verifikasi
-- 👨‍💼 Admin approval system
+###  Email Verification Features
+-  Kirim link verifikasi saat register
+-  Login hanya untuk email terverifikasi
+-  Redirect otomatis ke login setelah verifikasi
+-  Kirim ulang email verifikasi
+-  Admin approval system
 
 ---
 
@@ -384,20 +384,20 @@ Pull request dan issue dipersilakan untuk pengembangan fitur atau perbaikan bug.
 ## Changelog
 
 ### v2.0.0 - Webmailer & Email Verification (Terbaru)
-- ✅ Fitur webmailer dengan email verification
-- ✅ Login restriction untuk email belum terverifikasi
-- ✅ Halaman verifikasi email (`verify.html`)
-- ✅ Error handling untuk auth errors
-- ✅ Resend verification email
-- ✅ Admin approval system
-- ✅ Restructure folder (`js/`)
+-  Fitur webmailer dengan email verification
+-  Login restriction untuk email belum terverifikasi
+-  Halaman verifikasi email (`verify.html`)
+-  Error handling untuk auth errors
+-  Resend verification email
+-  Admin approval system
+-  Restructure folder (`js/`)
 
 ### v1.0.0 - Initial Release
-- ✅ Firebase Realtime Database integration
-- ✅ CRUD nilai siswa
-- ✅ Firebase Authentication (basic)
-- ✅ Import/Export Excel
-- ✅ Firebase Hosting deployment
+-  Firebase Realtime Database integration
+-  CRUD nilai siswa
+-  Firebase Authentication (basic)
+-  Import/Export Excel
+-  Firebase Hosting deployment
 
 ---
 
