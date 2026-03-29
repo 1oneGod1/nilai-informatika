@@ -20,7 +20,7 @@ Aplikasi ini memungkinkan guru mengelola nilai siswa dan siswa melihat nilai mer
 
 ### Alur Verifikasi Email
 ```
-Register → Kirim Email Verifikasi → User Cek Email → Klik Link → Verifikasi Sukses → Redirect Login
+Register → Kirim Email Verifikasi → User Cek Email → Klik Link → Verifikasi Sukses → Redirect Login → Perlu tunggu verifikasi terakhir dari admin utama
 ```
 
 File terkait fitur ini:
