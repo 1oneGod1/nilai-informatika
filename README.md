@@ -40,7 +40,7 @@ Aplikasi dapat diakses di:
 | **Firebase Hosting** | **[https://nilai-informatika.web.app](https://nilai-informatika.web.app)** |
 | **Render** | **[https://nilai-informatikasss.onrender.com](https://nilai-informatikasss.onrender.com)** |
 
-**[https://nilai-informatikasss.onrender.com](https://nilai-informatikasss.onrender.com)**
+
 
 ---
 
