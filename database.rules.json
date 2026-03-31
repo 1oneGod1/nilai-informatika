@@ -4,7 +4,21 @@
     ".write": false,
     "siswa": {
       ".read": true,
-      ".write": "auth != null"
+      ".write": "auth != null",
+      "$siswaId": {
+        "password": {
+          ".write": true,
+          ".validate": "newData.isString() && newData.val().length >= 6"
+        },
+        "pendingPassword": {
+          ".write": true,
+          ".validate": "!newData.exists() || (newData.isString() && newData.val().length >= 6)"
+        },
+        "pendingPasswordAt": {
+          ".write": true,
+          ".validate": "!newData.exists() || newData.isNumber()"
+        }
+      }
     },
     "guru": {
       ".read": "auth != null",

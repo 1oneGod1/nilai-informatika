@@ -171,22 +171,25 @@ function submitForgotPasswordRequest(event) {
 
   const btn = event.target.querySelector('button[type="submit"]');
   const originalText = btn.innerHTML;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
   btn.disabled = true;
 
   siswaRef
     .child(selectedStudentForDetail.id)
     .update({
-      pendingPassword: newPassword,
-      pendingPasswordAt: Date.now(),
+      password: newPassword,
+      pendingPassword: null,
+      pendingPasswordAt: null,
     })
     .then(() => {
+      selectedStudentForDetail.password = newPassword;
+
       const modal = bootstrap.Modal.getInstance(
         document.getElementById("studentPasswordModal"),
       );
       if (modal) modal.hide();
       showAlert(
-        "Pengajuan password baru berhasil dikirim. Silakan hubungi guru Informatika Anda untuk meminta persetujuan.",
+        "Password berhasil diubah. Gunakan password baru Anda untuk masuk berikutnya.",
         "success",
       );
 
@@ -201,7 +204,7 @@ function submitForgotPasswordRequest(event) {
     .catch((err) => {
       btn.innerHTML = originalText;
       btn.disabled = false;
-      showAlert("Gagal mengirim pengajuan: " + err.message, "danger");
+      showAlert("Gagal mengubah password: " + err.message, "danger");
     });
 }
 
