@@ -743,16 +743,41 @@ function exportExcel() {
 }
 
 function downloadTemplate() {
+  const selFilter = document.getElementById("filterKelas");
+  const currentKelas = selFilter?.value || "";
+  const searchVal = (
+    document.getElementById("teacherSearch")?.value || ""
+  ).toLowerCase();
+
+  const filteredSiswa = allSiswa.filter((s) => {
+    const matchName = s.nama.toLowerCase().includes(searchVal);
+    const matchKelas = currentKelas ? s.kelas === currentKelas : true;
+    return matchName && matchKelas;
+  });
+
   const headers = ["NIS", "Nama Siswa", "Kelas", "Password"];
   for (let i = 1; i <= numFormatif[activeQuarter]; i++)
     headers.push(`Formatif ${i}`);
   headers.push("Sumatif");
 
-  const example = ["12345678", "Contoh Nama", "10 RPL 1", "SandiKuat123!"];
-  for (let i = 0; i < numFormatif[activeQuarter]; i++) example.push(75);
-  example.push(85);
+  let rows;
+  if (filteredSiswa.length > 0) {
+    // Pre-fill dengan daftar siswa yang sedang ditampilkan; kolom nilai dikosongkan untuk diisi
+    rows = filteredSiswa.map((s) => {
+      const row = [s.nis || "", s.nama, s.kelas, s.password || ""];
+      for (let i = 0; i < numFormatif[activeQuarter]; i++) row.push("");
+      row.push("");
+      return row;
+    });
+  } else {
+    // Fallback: tidak ada siswa terfilter, sediakan satu baris contoh
+    const example = ["12345678", "Contoh Nama", "10 RPL 1", "SandiKuat123!"];
+    for (let i = 0; i < numFormatif[activeQuarter]; i++) example.push(75);
+    example.push(85);
+    rows = [example];
+  }
 
-  const ws = XLSX.utils.aoa_to_sheet([headers, example]);
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
   ws["!cols"] = [
     { wch: 15 },
     { wch: 25 },
@@ -763,9 +788,16 @@ function downloadTemplate() {
   ];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Template Import");
-  XLSX.writeFile(wb, `Template_Import_Nilai_Q${activeQuarter}.xlsx`);
+
+  const fileNameClass = currentKelas ? `_${currentKelas.replace(/\s+/g, "")}` : "";
+  XLSX.writeFile(
+    wb,
+    `Template_Import_Nilai_Q${activeQuarter}${fileNameClass}.xlsx`,
+  );
   showAlert(
-    `Template Excel Quarter ${activeQuarter} berhasil diunduh.`,
+    filteredSiswa.length > 0
+      ? `Template Q${activeQuarter} berisi ${filteredSiswa.length} siswa${currentKelas ? " kelas " + currentKelas : ""} berhasil diunduh.`
+      : `Template Excel Quarter ${activeQuarter} berhasil diunduh.`,
     "success",
   );
 }
