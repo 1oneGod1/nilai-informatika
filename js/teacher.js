@@ -836,53 +836,82 @@ function importExcel(event) {
         );
       }
 
-      if (iNama === -1 || iKelas === -1 || iPwd === -1) {
+      if (iNama === -1 || iKelas === -1) {
         return showAlert(
-          "Format salah! Harus ada kolom Nama Siswa, Kelas, dan Password.",
+          "Format salah! Harus ada kolom Nama Siswa dan Kelas.",
           "danger",
         );
       }
 
       const batch = {};
-      let count = 0;
+      let updated = 0;
+      let created = 0;
 
       rows.slice(1).forEach((r) => {
         if (!r.some((c) => c !== "")) return; // skip row kosong
         const nis = String(r[iNis] || "").trim();
         const nama = String(r[iNama] || "").trim();
         const kelas = String(r[iKelas] || "").trim();
-        const pwd = String(r[iPwd] || "").trim();
-        if (!nama || !kelas || !pwd) return;
+        const pwd = iPwd >= 0 ? String(r[iPwd] || "").trim() : "";
+        if (!nama || !kelas) return;
 
-        const record = {
-          nis: nis,
-          nama: nama,
-          kelas: kelas,
-          password: pwd,
-          createdAt: Date.now(),
-        };
-
-        if (iSumat >= 0 && r[iSumat] !== "")
-          record[`q${activeQuarter}_sumatif`] = Number(r[iSumat]);
-
-        qCols.forEach((colIdx, arrIdx) => {
-          if (colIdx >= 0 && r[colIdx] !== "")
-            record[`q${activeQuarter}_f${arrIdx + 1}`] = Number(r[colIdx]);
+        // Cocokkan dengan siswa yang sudah ada: utamakan NIS, lalu nama+kelas
+        const existing = allSiswa.find((s) => {
+          if (nis && s.nis) return String(s.nis).trim() === nis;
+          return (
+            s.nama.trim().toLowerCase() === nama.toLowerCase() &&
+            s.kelas.trim() === kelas
+          );
         });
 
-        // Insert new child (bisa update ke auto-upsert lain waktu)
-        batch[siswaRef.push().key] = record;
-        count++;
+        // Kumpulkan nilai dari baris template
+        const scores = {};
+        if (iSumat >= 0 && r[iSumat] !== "" && r[iSumat] !== null)
+          scores[`q${activeQuarter}_sumatif`] = Number(r[iSumat]);
+        qCols.forEach((colIdx, arrIdx) => {
+          if (colIdx >= 0 && r[colIdx] !== "" && r[colIdx] !== null)
+            scores[`q${activeQuarter}_f${arrIdx + 1}`] = Number(r[colIdx]);
+        });
+
+        if (existing) {
+          // UPDATE: hanya ubah nilai siswa yang ada, jangan timpa password/nama
+          Object.keys(scores).forEach((field) => {
+            batch[`${existing.id}/${field}`] = scores[field];
+          });
+          // Isi NIS bila sebelumnya kosong
+          if (nis && !existing.nis) batch[`${existing.id}/nis`] = nis;
+          updated++;
+        } else {
+          // CREATE: siswa baru butuh password valid (min 6 karakter)
+          if (pwd.length < 6) return; // lewati: rule database menolak password pendek
+          const key = siswaRef.push().key;
+          batch[`${key}/nis`] = nis;
+          batch[`${key}/nama`] = nama;
+          batch[`${key}/kelas`] = kelas;
+          batch[`${key}/password`] = pwd;
+          batch[`${key}/createdAt`] = Date.now();
+          Object.keys(scores).forEach((field) => {
+            batch[`${key}/${field}`] = scores[field];
+          });
+          created++;
+        }
       });
 
+      const count = updated + created;
       if (count === 0)
-        return showAlert("Tidak baris valid untuk diimpor.", "warning");
+        return showAlert(
+          "Tidak ada baris valid untuk diimpor. Pastikan nama/kelas sesuai siswa terdaftar.",
+          "warning",
+        );
 
       db.ref("siswa")
         .update(batch)
         .then(() => {
+          const parts = [];
+          if (updated) parts.push(`${updated} nilai diperbarui`);
+          if (created) parts.push(`${created} siswa baru`);
           showAlert(
-            `Import sukses: ${count} data siswa dimasukkan ke Quarter ${activeQuarter}!`,
+            `Import sukses (Quarter ${activeQuarter}): ${parts.join(", ")}.`,
             "success",
           );
         });
