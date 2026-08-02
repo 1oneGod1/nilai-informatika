@@ -368,7 +368,7 @@ function renderStudentDetail(id) {
 
     allTilesHtml += `
       <div class="mb-5">
-        <h4 class="text-xs font-bold text-slate-500 mb-3 ml-1 uppercase tracking-widest font-mono-tech border-b border-white/5 pb-2">Quarter ${q}</h4>
+        <h4 class="text-xs font-bold text-slate-500 mb-3 ml-1 uppercase tracking-widest font-mono-tech border-b border-white/5 pb-2">Q${q}</h4>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
           ${tiles}
         </div>
@@ -379,9 +379,14 @@ function renderStudentDetail(id) {
     allTilesHtml = `
       <div class="text-center py-10 bg-[#1e2d45] border border-white/5 rounded-xl mb-5 flex flex-col items-center justify-center">
         <i class="fas fa-folder-open text-3xl text-slate-600 mb-2"></i>
-        <p class="text-sm text-slate-500 font-mono-tech">Belum ada nilai yang diinput di Quarter manapun.</p>
+        <p class="text-sm text-slate-500 font-mono-tech">Belum ada nilai yang diinput pada Q1–Q4.</p>
       </div>`;
   }
+
+  const digitalCitizenshipHtml =
+    typeof dcBuildStudentAssessmentHtml === "function"
+      ? dcBuildStudentAssessmentHtml(s, kkm)
+      : "";
 
   // Notification block (dark)
   let notifHtml = "";
@@ -390,7 +395,7 @@ function renderStudentDetail(id) {
       <div class="mt-4 bg-rose-500/10 border border-rose-500/30 rounded-xl p-4 flex gap-3">
         <div class="text-rose-400 mt-0.5"><i class="fas fa-exclamation-triangle text-xl"></i></div>
         <div>
-          <h4 class="text-rose-300 font-bold text-sm">Ada Quarter belum Tuntas / Kosong!</h4>
+          <h4 class="text-rose-300 font-bold text-sm">Ada periode yang belum tuntas atau masih kosong.</h4>
           <p class="text-rose-400/70 text-xs font-mono-tech mt-1">Status belum tuntas karena ada nilai di bawah KKM (${kkm}).</p>
         </div>
       </div>`;
@@ -435,6 +440,8 @@ function renderStudentDetail(id) {
 
       ${allTilesHtml}
 
+      ${digitalCitizenshipHtml}
+
       <div class="w-full h-72 lg:h-80 bg-[#0b1121] border border-white/5 rounded-xl p-2 relative overflow-hidden">
         <canvas id="studentRadarChart"></canvas>
       </div>
@@ -458,7 +465,7 @@ function closeStudentDetail() {
 }
 
 function renderRadarChart(quartersData, kkm) {
-  const labels = ["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"];
+  const labels = ["Q1", "Q2", "Q3", "Q4"];
   const sumatifData = [0, 0, 0, 0];
 
   let globalMaxF = 0;
