@@ -4,8 +4,9 @@
     ".write": false,
     "siswa": {
       ".read": true,
-      ".write": "auth != null",
+      ".write": "auth != null && (newData.exists() || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
       "$siswaId": {
+        ".write": "auth != null",
         "password": {
           ".write": true,
           ".validate": "newData.isString() && newData.val().length >= 6"

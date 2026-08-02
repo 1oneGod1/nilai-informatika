@@ -5,7 +5,7 @@
    ======================================================== */
 
 let allSiswa = [];
-let activeQuarter = 3; // Default ke Q3 karena migrasi data kesana
+let activeQuarter = 4; // Default ke Q4 untuk Sense, Decide, and Deliver with VEX IQ
 let numFormatif = { 1: 2, 2: 2, 3: 2, 4: 2 }; // Default fields per quarter
 
 function isAdminEmailSafe(email) {
@@ -27,7 +27,7 @@ function setQuarter(q) {
     if (btn)
       btn.className = `quarter-tab px-6 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto ${i === activeQuarter ? "active" : ""}`;
     if (btn)
-      btn.innerHTML = `<i class="fas fa-cube mr-1 text-purple-400"></i> Quarter ${i}`;
+      btn.innerHTML = `<i class="fas fa-cube mr-1 text-purple-400"></i> Q${i}`;
   }
   // Sync input value
   const inputNum = document.getElementById("numFormatif");
@@ -36,6 +36,9 @@ function setQuarter(q) {
   renderFormFormatifInputs();
   renderTableHead();
   renderTableBody(allSiswa);
+  if (typeof syncAssessmentQuarter === "function") {
+    syncAssessmentQuarter(activeQuarter);
+  }
 }
 
 // G��G��G�� AUTHENTICATION CHECK G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
@@ -191,6 +194,9 @@ function listenToSiswaData() {
         }
       }
       renderTableBody(allSiswa);
+      if (typeof refreshAssessmentStudentOptions === "function") {
+        refreshAssessmentStudentOptions();
+      }
     },
     (err) => {
       showAlert("Gagal memuat data Firebase: " + err.message, "danger");
@@ -556,6 +562,8 @@ function loadAdminPanel(adminEmail) {
   activeAdminEmail = adminEmail;
   const adminPanelBtn = document.getElementById("adminPanelBtn");
   if (adminPanelBtn) adminPanelBtn.style.display = ""; // Munculkan accordion admin
+  const deleteAllStudentsBtn = document.getElementById("deleteAllStudentsBtn");
+  if (deleteAllStudentsBtn) deleteAllStudentsBtn.style.display = "inline-flex";
 
   guruRef.on(
     "value",
@@ -640,6 +648,69 @@ function rejectGuruAccount(uid) {
 }
 
 // G��G��G�� LOGOUT GURU G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+async function deleteAllStudentData() {
+  const button = document.getElementById("deleteAllStudentsBtn");
+  const currentEmail = String(auth.currentUser?.email || activeAdminEmail || "")
+    .trim()
+    .toLowerCase();
+
+  if (!auth.currentUser || !isAdminEmailSafe(currentEmail)) {
+    showAlert("Hanya Super Admin yang dapat menghapus semua data siswa.", "danger");
+    return;
+  }
+
+  const totalStudents = allSiswa.length;
+  if (totalStudents === 0) {
+    showAlert("Tidak ada data siswa yang perlu dihapus.", "info");
+    return;
+  }
+
+  const firstConfirmation = window.confirm(
+    `Anda akan menghapus ${totalStudents} siswa beserta seluruh nilai, password, dan rubriknya. Data ini tidak dapat dipulihkan. Lanjutkan?`,
+  );
+  if (!firstConfirmation) return;
+
+  const verificationPhrase = `HAPUS ${totalStudents} SISWA`;
+  const typedPhrase = window.prompt(
+    `Untuk mengonfirmasi, ketik persis:\n${verificationPhrase}`,
+    "",
+  );
+
+  if (typedPhrase !== verificationPhrase) {
+    showAlert("Frasa verifikasi tidak sesuai. Penghapusan dibatalkan.", "warning");
+    return;
+  }
+
+  const finalConfirmation = window.confirm(
+    `Konfirmasi terakhir: hapus permanen seluruh ${totalStudents} data siswa sekarang?`,
+  );
+  if (!finalConfirmation) return;
+
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML =
+      '<i class="fas fa-circle-notch fa-spin"></i> Menghapus data…';
+  }
+
+  try {
+    await siswaRef.remove();
+    showAlert(
+      `${totalStudents} data siswa berhasil dihapus. Daftar siswa sekarang kosong dan siap diisi dengan data terbaru.`,
+      "success",
+    );
+  } catch (error) {
+    showAlert("Gagal menghapus semua data siswa: " + error.message, "danger");
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+  }
+}
+
+window.deleteAllStudentData = deleteAllStudentData;
+
 function logoutGuru() {
   auth
     .signOut()
