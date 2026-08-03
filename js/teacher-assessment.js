@@ -1,24 +1,34 @@
 /* ========================================================
    teacher-assessment.js
-   Workspace assessment khusus Grade 9 yang berganti per quarter.
+   Workspace assessment Grade 9 dan Grade 12 per quarter.
    ======================================================== */
 
 const dcTeacherState = {
   studentId: "",
+  grade: 9,
   quarter: 4,
   selectedAssessmentId: "",
-  draft: dcCreateEmptyDraft(4),
+  draft: dcCreateEmptyDraft(4, 9),
   dirty: false,
 };
 
 document.addEventListener("DOMContentLoaded", () => {
   const studentSelect = document.getElementById("dcAssessmentStudent");
+  const gradeSelect = document.getElementById("dcAssessmentGrade");
   const periodSelect = document.getElementById("dcAssessmentPeriod");
-  if (!studentSelect || !periodSelect) return;
+  if (!studentSelect || !gradeSelect || !periodSelect) return;
 
+  dcTeacherState.grade = Number(gradeSelect.value || 9);
   dcTeacherState.quarter = Number(activeQuarter || 4);
-  dcTeacherState.draft = dcCreateEmptyDraft(dcTeacherState.quarter);
+  dcTeacherState.draft = dcCreateEmptyDraft(
+    dcTeacherState.quarter,
+    dcTeacherState.grade,
+  );
   periodSelect.value = String(dcTeacherState.quarter);
+
+  gradeSelect.addEventListener("change", () => {
+    changeDcAssessmentGrade(Number(gradeSelect.value));
+  });
 
   studentSelect.addEventListener("change", () => {
     const nextStudentId = studentSelect.value;
@@ -48,14 +58,45 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function getCurrentDcCourse() {
-  return dcGetCourseConfig(dcTeacherState.quarter);
+  return dcGetCourseConfig(dcTeacherState.quarter, dcTeacherState.grade);
 }
 
 function ensureDcSelectedAssessment() {
-  const items = dcGetAssessmentItems(dcTeacherState.quarter);
+  const items = dcGetAssessmentItems(
+    dcTeacherState.quarter,
+    dcTeacherState.grade,
+  );
   if (!items.some((item) => item.id === dcTeacherState.selectedAssessmentId)) {
     dcTeacherState.selectedAssessmentId = items[0]?.id || "";
   }
+}
+
+function changeDcAssessmentGrade(grade) {
+  const nextGrade = Number(grade || 9);
+  const gradeSelect = document.getElementById("dcAssessmentGrade");
+  if (![9, 12].includes(nextGrade)) return;
+  if (
+    dcTeacherState.dirty &&
+    nextGrade !== dcTeacherState.grade &&
+    !window.confirm("Perubahan penilaian belum disimpan. Tetap ganti kelas?")
+  ) {
+    if (gradeSelect) gradeSelect.value = String(dcTeacherState.grade);
+    return;
+  }
+
+  dcTeacherState.grade = nextGrade;
+  dcTeacherState.studentId = "";
+  dcTeacherState.selectedAssessmentId = "";
+  dcTeacherState.dirty = false;
+
+  if (!dcGetCourseConfig(dcTeacherState.quarter, nextGrade)) {
+    const firstQuarter = [1, 2, 3, 4].find((quarter) =>
+      dcGetCourseConfig(quarter, nextGrade),
+    );
+    if (firstQuarter) setQuarter(firstQuarter);
+  }
+
+  refreshAssessmentStudentOptions();
 }
 
 function syncAssessmentQuarter(quarter) {
@@ -83,19 +124,19 @@ function refreshAssessmentStudentOptions() {
 
   const previousValue = dcTeacherState.studentId || select.value;
   const grouped = {};
-  const gradeNineStudents = allSiswa.filter((student) =>
-    dcIsGradeNine(student.kelas),
+  const assessmentStudents = allSiswa.filter((student) =>
+    dcIsAssessmentGrade(student.kelas, dcTeacherState.grade),
   );
 
-  gradeNineStudents.forEach((student) => {
+  assessmentStudents.forEach((student) => {
     const className = String(student.kelas || "Tanpa kelas");
     if (!grouped[className]) grouped[className] = [];
     grouped[className].push(student);
   });
 
-  let options = gradeNineStudents.length
-    ? '<option value="">Pilih siswa kelas 9…</option>'
-    : '<option value="">Belum ada siswa kelas 9</option>';
+  let options = assessmentStudents.length
+    ? `<option value="">Pilih siswa kelas ${dcTeacherState.grade}…</option>`
+    : `<option value="">Belum ada siswa kelas ${dcTeacherState.grade}</option>`;
   Object.keys(grouped)
     .sort((a, b) => a.localeCompare(b, "id"))
     .forEach((className) => {
@@ -109,7 +150,7 @@ function refreshAssessmentStudentOptions() {
   select.innerHTML = options;
   if (
     previousValue &&
-    gradeNineStudents.some((student) => student.id === previousValue)
+    assessmentStudents.some((student) => student.id === previousValue)
   ) {
     select.value = previousValue;
     dcTeacherState.studentId = previousValue;
@@ -123,7 +164,11 @@ function loadDcAssessmentDraft() {
   const student = allSiswa.find((item) => item.id === dcTeacherState.studentId);
   const stored =
     student?.digitalCitizenshipAssessment?.[`q${dcTeacherState.quarter}`];
-  dcTeacherState.draft = dcDraftFromStored(stored, dcTeacherState.quarter);
+  dcTeacherState.draft = dcDraftFromStored(
+    stored,
+    dcTeacherState.quarter,
+    dcTeacherState.grade,
+  );
   dcTeacherState.dirty = false;
   ensureDcSelectedAssessment();
   renderDcAssessmentPanel();
@@ -175,7 +220,7 @@ function renderDcWorkspaceMeta() {
   const description = document.getElementById("dcAssessmentDescription");
 
   if (eyebrow) {
-    eyebrow.textContent = `GRADE 9 · Q${dcTeacherState.quarter} ASSESSMENT WORKSPACE`;
+    eyebrow.textContent = `GRADE ${dcTeacherState.grade} · Q${dcTeacherState.quarter} ASSESSMENT WORKSPACE`;
   }
   if (title) {
     title.textContent = course?.title || `Assessment Q${dcTeacherState.quarter}`;
@@ -183,7 +228,7 @@ function renderDcWorkspaceMeta() {
   if (description) {
     description.textContent = course
       ? course.description
-      : `Assessment kelas 9 untuk Q${dcTeacherState.quarter} belum disiapkan.`;
+      : `Assessment kelas ${dcTeacherState.grade} untuk Q${dcTeacherState.quarter} belum disiapkan.`;
   }
   document.title = `Dashboard Guru - ${course?.title || `Assessment Q${dcTeacherState.quarter}`}`;
 }
@@ -216,8 +261,8 @@ async function saveDcAssessment() {
   }
 
   const student = allSiswa.find((item) => item.id === dcTeacherState.studentId);
-  if (!student || !dcIsGradeNine(student.kelas)) {
-    showAlert("Pilih siswa kelas 9 terlebih dahulu.", "warning");
+  if (!student || !dcIsAssessmentGrade(student.kelas, dcTeacherState.grade)) {
+    showAlert(`Pilih siswa kelas ${dcTeacherState.grade} terlebih dahulu.`, "warning");
     return;
   }
 
@@ -233,6 +278,7 @@ async function saveDcAssessment() {
       dcTeacherState.draft,
       dcTeacherState.quarter,
       auth.currentUser?.email || "",
+      dcTeacherState.grade,
     );
     await siswaRef
       .child(student.id)
@@ -271,6 +317,7 @@ function renderDcAssessmentPanel() {
   const summary = dcCalculateSummary(
     dcTeacherState.draft,
     dcTeacherState.quarter,
+    dcTeacherState.grade,
   );
   renderDcWorkspaceMeta();
   renderDcSummary(summary, student);
@@ -282,7 +329,7 @@ function renderDcAssessmentPanel() {
       <div class="dc-empty-state">
         <span><i class="fas fa-calendar-plus"></i></span>
         <h3>Assessment Q${dcTeacherState.quarter} belum tersedia</h3>
-        <p>Pilih Q1 untuk Technology and Me, Q2 untuk Code Your Own World with VR, Q3 untuk Team Freeze Tag, atau Q4 untuk Smart Warehouse Clawbot.</p>
+        <p>Pilih periode yang sudah memiliki assessment untuk Grade ${dcTeacherState.grade}. Grade 12 tersedia pada Q1 sampai Q4.</p>
       </div>`;
     return;
   }
@@ -295,7 +342,7 @@ function renderDcAssessmentPanel() {
       <div class="dc-empty-state">
         <span><i class="fas fa-user-check"></i></span>
         <h3>Pilih siswa untuk mulai menilai</h3>
-        <p>${escHtml(course.title)} hanya menampilkan siswa kelas 9 dari daftar Firebase. Pilih nama siswa, lalu isi checklist rubrik.</p>
+        <p>${escHtml(course.title)} hanya menampilkan siswa kelas ${dcTeacherState.grade} dari daftar Firebase. Pilih nama siswa, lalu isi checklist rubrik.</p>
       </div>`;
     return;
   }
@@ -347,11 +394,11 @@ function renderDcAssessmentPanel() {
       <div class="dc-rubric-head">
         <div class="dc-rubric-title">
           <span>${assessment.number}</span>
-          <div><small>${assessment.type} · bobot ${assessment.weight}%</small><h3>${escHtml(assessment.title)}</h3><p>${escHtml(assessment.subtitle)}</p></div>
+          <div><small>${assessment.type}${assessment.jp ? ` · ${assessment.jp} JP` : ""} · bobot ${assessment.weight}%</small><h3>${escHtml(assessment.title)}</h3><p>${escHtml(assessment.subtitle)}</p></div>
         </div>
         <div class="dc-unit-score"><span>Nilai proyek</span><strong>${raw}</strong><small>${completed}/${assessment.criteria.length} kriteria tuntas</small></div>
       </div>
-      <div class="dc-rubric-guide"><span><i class="fas fa-check-square"></i> Centang untuk poin penuh</span><span><i class="fas fa-keyboard"></i> Isi poin untuk nilai parsial</span></div>
+      <div class="dc-rubric-guide"><span><i class="fas fa-check-square"></i> Centang untuk poin penuh</span><span><i class="fas fa-keyboard"></i> Isi poin untuk nilai parsial</span><span><i class="fas fa-user-pen"></i> Versi siswa dan kalimat lengkap wajib</span></div>
       <div class="dc-criteria-list">${criteriaHtml}</div>
       <label class="dc-teacher-note"><span>Catatan guru</span><textarea oninput="dcSetAssessmentNote('${assessment.id}',this.value)" placeholder="Kekuatan, hal yang perlu diperbaiki, atau tindak lanjut…">${escHtml(assessmentDraft.note || "")}</textarea></label>
     </section>`;
@@ -360,7 +407,10 @@ function renderDcAssessmentPanel() {
 function renderDcAssessmentNav(summary) {
   const nav = document.getElementById("dcAssessmentNav");
   if (!nav) return;
-  const items = dcGetAssessmentItems(dcTeacherState.quarter);
+  const items = dcGetAssessmentItems(
+    dcTeacherState.quarter,
+    dcTeacherState.grade,
+  );
   nav.innerHTML = items
     .map((assessment) => {
       const selected = dcTeacherState.selectedAssessmentId === assessment.id;
@@ -368,7 +418,7 @@ function renderDcAssessmentNav(summary) {
       return `
         <button type="button" class="dc-nav-item ${selected ? "is-active" : ""}"
           style="--dc-item:${assessment.color}" onclick="dcSelectAssessment('${assessment.id}')">
-          <span>${assessment.number}</span><div><strong>${escHtml(assessment.title)}</strong><small>${assessment.type} · ${assessment.weight}%</small></div><b>${raw}</b>
+          <span>${assessment.number}</span><div><strong>${escHtml(assessment.title)}</strong><small>${assessment.type}${assessment.jp ? ` · ${assessment.jp} JP` : ""} · ${assessment.weight}%</small></div><b>${raw}</b>
         </button>`;
     })
     .join("");
@@ -382,9 +432,9 @@ function renderDcSummary(summary, student) {
     : "Belum ada siswa dipilih";
   area.innerHTML = `
     <div class="dc-selected-student"><span>SISWA TERPILIH</span><strong>${studentLabel}</strong><small>Periode Q${dcTeacherState.quarter}</small></div>
-    <div class="dc-summary-card"><span>Formatif</span><strong>${summary.formative.toFixed(1)}<small>/40</small></strong></div>
-    <div class="dc-summary-card"><span>Sumatif</span><strong>${summary.summative.toFixed(1)}<small>/60</small></strong></div>
-    <div class="dc-summary-card dc-summary-final"><span>Nilai akhir</span><strong>${summary.finalScore.toFixed(1)}</strong></div>`;
+    <div class="dc-summary-card"><span>Formatif</span><strong>${dcFormatOneDecimal(summary.formative)}<small>/40</small></strong></div>
+    <div class="dc-summary-card"><span>Sumatif</span><strong>${dcFormatOneDecimal(summary.summative)}<small>/60</small></strong></div>
+    <div class="dc-summary-card dc-summary-final"><span>Nilai akhir</span><strong>${dcFormatOneDecimal(summary.finalScore)}</strong></div>`;
 }
 
 function renderDcQuizPanel(content, summary, quiz) {
@@ -405,7 +455,7 @@ function renderDcQuizPanel(content, summary, quiz) {
         <div class="dc-unit-score"><span>Nilai tes</span><strong>${summary.rawScores[quiz.id] || 0}</strong><small>${summary.quizCorrect}/25 jawaban benar</small></div>
       </div>
       <div class="dc-question-grid">${checks}</div>
-      <div class="dc-quiz-strip"><div><span>Benar</span><strong>${summary.quizCorrect}</strong></div><div><span>Salah/kosong</span><strong>${25 - summary.quizCorrect}</strong></div><div><span>Nilai</span><strong>${summary.rawScores[quiz.id] || 0}</strong></div><div><span>Kontribusi</span><strong>${(summary.contributions[quiz.id] || 0).toFixed(1)}</strong></div></div>
+      <div class="dc-quiz-strip"><div><span>Benar</span><strong>${summary.quizCorrect}</strong></div><div><span>Salah/kosong</span><strong>${25 - summary.quizCorrect}</strong></div><div><span>Nilai</span><strong>${summary.rawScores[quiz.id] || 0}</strong></div><div><span>Kontribusi</span><strong>${dcFormatOneDecimal(summary.contributions[quiz.id] || 0)}</strong></div></div>
       <label class="dc-teacher-note"><span>Catatan guru</span><textarea oninput="dcSetQuizNote(this.value)" placeholder="Catatan tentang penguasaan konsep siswa…">${escHtml(dcTeacherState.draft.quizNote || "")}</textarea></label>
     </section>`;
 }

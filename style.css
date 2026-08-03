@@ -128,10 +128,10 @@
 
 .dc-assessment-controls {
   display: grid;
-  grid-template-columns: minmax(14rem, 1fr) 5.8rem auto;
+  grid-template-columns: 6.8rem minmax(14rem, 1fr) 5.8rem auto;
   align-items: end;
   gap: 0.75rem;
-  min-width: min(100%, 36rem);
+  min-width: min(100%, 44rem);
 }
 
 .dc-control-field select {
@@ -384,7 +384,7 @@
 
 @media (max-width: 760px) {
   .dc-assessment-header { padding: 1.1rem; }
-  .dc-assessment-controls { grid-template-columns: minmax(0, 1fr) 5.2rem; }
+  .dc-assessment-controls { grid-template-columns: 6.5rem minmax(0, 1fr) 5.2rem; }
   .dc-save-actions { grid-column: 1 / -1; align-items: stretch; }
   .dc-save-state { text-align: right; }
   .dc-assessment-summary { grid-template-columns: repeat(3, 1fr); }

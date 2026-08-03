@@ -359,7 +359,7 @@
           </button>
         </div>
 
-        <!-- PENILAIAN DIGITAL CITIZENSHIP (KHUSUS GURU) -->
+        <!-- WORKSPACE PENILAIAN KELAS 9 DAN 12 (KHUSUS GURU) -->
         <section
           id="dcAssessmentPanel"
           class="dc-assessment-shell glass-panel-teacher rounded-2xl"
@@ -372,11 +372,18 @@
               >
               <h2 id="dcAssessmentTitle">Assessment Technology and Me</h2>
               <p id="dcAssessmentDescription">
-                Khusus kelas 9 · Formatif 40% dan sumatif 60%. Checklist dapat
-                diberi poin penuh atau nilai parsial sesuai hasil website siswa.
+                Formatif 40% dan sumatif 60%. Checklist dapat diberi poin penuh
+                atau nilai parsial sesuai hasil proyek siswa.
               </p>
             </div>
             <div class="dc-assessment-controls">
+              <label class="dc-control-field dc-grade-field">
+                <span>Kelas</span>
+                <select id="dcAssessmentGrade">
+                  <option value="9">Grade 9</option>
+                  <option value="12">Grade 12</option>
+                </select>
+              </label>
               <label class="dc-control-field">
                 <span>Nama siswa</span>
                 <select id="dcAssessmentStudent">
@@ -607,9 +614,9 @@
     <!-- Custom Scripts -->
     <script src="js/firebase-init.js?v=20260329b"></script>
     <script src="js/auth.js?v=20260329b"></script>
-    <script src="js/assessment-config.js?v=20260803b"></script>
+    <script src="js/assessment-config.js?v=20260804a"></script>
     <!-- teacher.js contains only the logic needed for the dashboard page (auth check, CRUD, admins) -->
     <script src="js/teacher.js?v=20260803b"></script>
-    <script src="js/teacher-assessment.js?v=20260803b"></script>
+    <script src="js/teacher-assessment.js?v=20260804a"></script>
   </body>
 </html>
