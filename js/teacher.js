@@ -7,6 +7,23 @@
 let allSiswa = [];
 let activeQuarter = 4; // Default ke Q4 untuk Sense, Decide, and Deliver with VEX IQ
 let numFormatif = { 1: 2, 2: 2, 3: 2, 4: 2 }; // Default fields per quarter
+let selectedLearningProgressStudent = null;
+
+const GRADE10_UIUX_XP = {
+  preTest: 80,
+  section1: 120,
+  section2: 100,
+  postTest1: 100,
+  figmaPreTest: 80,
+  section3: 120,
+  section4: 180,
+  postTest2: 100,
+};
+
+const GRADE10_UIUX_TOTAL_XP = Object.values(GRADE10_UIUX_XP).reduce(
+  (total, value) => total + value,
+  0,
+);
 
 function isAdminEmailSafe(email) {
   if (typeof isAdminEmail === "function") return isAdminEmail(email);
@@ -17,6 +34,262 @@ function isAdminEmailSafe(email) {
     normalized === "andi.purba@sdh.or.id" ||
     normalized === "pandapotanandi@gmail.com"
   );
+}
+
+function getTeacherStudentGrade(student) {
+  const match = String(student?.kelas || "").match(/\d+/);
+  return match ? Number(match[0]) : 0;
+}
+
+function teacherChecksComplete(saved, keys) {
+  return Boolean(saved) && keys.every((key) => saved[key] === true);
+}
+
+function teacherSection1DiscoveryComplete(discovery) {
+  if (!discovery || discovery.conceptDone !== true || discovery.exitCorrect !== true)
+    return false;
+  const foundZones = discovery.foundZones;
+  if (Array.isArray(foundZones)) return new Set(foundZones).size >= 6;
+  if (!foundZones || typeof foundZones !== "object") return false;
+  return Object.values(foundZones).filter((value) => value === true).length >= 6;
+}
+
+function calculateGrade10UiUxProgress(progress = {}) {
+  const section1 =
+    teacherSection1DiscoveryComplete(progress.section1Discovery) &&
+    Boolean(progress.websitePlan) &&
+    teacherChecksComplete(progress.section1Checklist, [
+      "reference",
+      "structure",
+      "fidelity",
+      "journey",
+    ]);
+  const section2 =
+    Boolean(progress.groupPlan) &&
+    teacherChecksComplete(progress.section2Checklist, [
+      "group",
+      "file",
+      "match",
+      "responsive",
+      "explain",
+    ]);
+  const section3State = progress.section3Progress || {};
+  const section3Zones = section3State.zones || {};
+  const section3 =
+    section3State.environment === true &&
+    section3State.route === true &&
+    section3State.shortcut === true &&
+    ["toolbar", "layers", "canvas", "inspector"].every(
+      (key) => section3Zones[key] === true,
+    );
+  const section4State = progress.section4Workshop || {};
+  const exploredTools = section4State.toolsExplored || {};
+  const section4 =
+    Boolean(section4State.framePreset) &&
+    section4State.layerChallenge === true &&
+    ["move", "frame", "shape", "pen", "text", "layers"].every(
+      (key) => exploredTools[key] === true,
+    ) &&
+    Boolean(progress.figmaFoundationPlan) &&
+    teacherChecksComplete(progress.section4Checklist, [
+      "assignedGroup",
+      "sharedFile",
+      "frame",
+      "objects",
+      "layers",
+      "explain",
+    ]);
+
+  const states = {
+    preTest: Boolean(progress.preTest),
+    section1,
+    section2,
+    postTest1: Boolean(progress.postTest),
+    figmaPreTest: Boolean(progress.figmaPreTest),
+    section3,
+    section4,
+    postTest2: Boolean(progress.postTest2),
+  };
+  const xp = Object.entries(GRADE10_UIUX_XP).reduce(
+    (total, [key, points]) => total + (states[key] ? points : 0),
+    0,
+  );
+
+  const section1Product = section1 ? 70 : 0;
+  const section4Product = section4 ? 70 : 0;
+  const post1Points = progress.postTest
+    ? Number(progress.postTest.score || 0) * 0.3
+    : 0;
+  const post2Points = progress.postTest2
+    ? Number(progress.postTest2.score || 0) * 0.3
+    : 0;
+
+  return {
+    states,
+    xp,
+    percent: Math.round((xp / GRADE10_UIUX_TOTAL_XP) * 100),
+    formative1: section1Product + post1Points,
+    formative2: section4Product + post2Points,
+  };
+}
+
+function formatTeacherProgressScore(value) {
+  const rounded = Math.round(Number(value || 0) * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+}
+
+function findLatestProgressTimestamp(value) {
+  if (!value || typeof value !== "object") return 0;
+  return Object.entries(value).reduce((latest, [key, child]) => {
+    if (
+      ["savedAt", "submittedAt", "updatedAt"].includes(key) &&
+      Number.isFinite(Number(child))
+    ) {
+      return Math.max(latest, Number(child));
+    }
+    return Math.max(latest, findLatestProgressTimestamp(child));
+  }, 0);
+}
+
+async function openStudentLearningProgress(studentId) {
+  const student = allSiswa.find((item) => item.id === studentId);
+  if (!student) {
+    showAlert("Data siswa tidak ditemukan.", "danger");
+    return;
+  }
+
+  selectedLearningProgressStudent = student;
+  const modal = document.getElementById("learningProgressModal");
+  const body = document.getElementById("learningProgressBody");
+  const resetButton = document.getElementById("resetLearningProgressButton");
+  document.getElementById("learningProgressTitle").textContent = student.nama;
+  document.getElementById("learningProgressStudentMeta").textContent =
+    `${student.nis || "NIS belum tersedia"} · ${student.kelas || "Kelas belum tersedia"}`;
+  body.innerHTML = `
+    <div class="py-14 text-center text-slate-500 font-mono-tech text-sm">
+      <i class="fas fa-circle-notch fa-spin text-cyan-400 text-2xl mb-3 block"></i>
+      Memuat progress siswa…
+    </div>`;
+  resetButton.disabled = true;
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+
+  if (getTeacherStudentGrade(student) !== 10) {
+    body.innerHTML = `
+      <div class="rounded-xl border border-amber-500/30 bg-amber-500/10 p-5 text-amber-200">
+        <strong class="block mb-2"><i class="fas fa-circle-info mr-2"></i>Materi belum tersedia</strong>
+        <p class="text-sm text-amber-100/70">Progress UI/UX interaktif saat ini hanya digunakan oleh siswa Grade 10.</p>
+      </div>`;
+    return;
+  }
+
+  try {
+    const snapshot = await db
+      .ref("learningProgress")
+      .child(student.id)
+      .child("grade10UiUx")
+      .once("value");
+    renderStudentLearningProgress(snapshot.val() || {});
+  } catch (error) {
+    body.innerHTML = `
+      <div class="rounded-xl border border-rose-500/30 bg-rose-500/10 p-5 text-rose-200">
+        <strong class="block mb-2"><i class="fas fa-triangle-exclamation mr-2"></i>Progress gagal dimuat</strong>
+        <p class="text-sm text-rose-100/70">${escHtml(error.message || "Periksa koneksi lalu coba lagi.")}</p>
+      </div>`;
+  }
+}
+
+function renderStudentLearningProgress(progress) {
+  const body = document.getElementById("learningProgressBody");
+  const resetButton = document.getElementById("resetLearningProgressButton");
+  const summary = calculateGrade10UiUxProgress(progress);
+  const hasProgress = Object.keys(progress || {}).length > 0;
+  const latestTimestamp = findLatestProgressTimestamp(progress);
+  const latestLabel = latestTimestamp
+    ? new Date(latestTimestamp).toLocaleString("id-ID")
+    : "Belum ada aktivitas";
+  const steps = [
+    ["preTest", "Pre-test 1", progress.preTest?.score],
+    ["section1", "Section 1 · Wireframe"],
+    ["section2", "Section 2 · Figma Match"],
+    ["postTest1", "Post-test 1", progress.postTest?.score],
+    ["figmaPreTest", "Figma Pre-test", progress.figmaPreTest?.score],
+    ["section3", "Section 3 · Figma Basics"],
+    ["section4", "Section 4 · Toolbar Lab"],
+    ["postTest2", "Post-test 2", progress.postTest2?.score],
+  ];
+
+  body.innerHTML = `
+    <div class="grid md:grid-cols-[1.25fr_.75fr] gap-4 mb-5">
+      <article class="rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-5">
+        <div class="flex items-end justify-between gap-3 mb-3">
+          <div><span class="text-[10px] font-mono-tech tracking-widest text-cyan-300">TOTAL EXPERIENCE</span><h3 class="text-3xl font-black text-white mt-1">${summary.xp} <small class="text-sm text-slate-500">/ ${GRADE10_UIUX_TOTAL_XP} XP</small></h3></div>
+          <strong class="text-2xl text-lime-300">${summary.percent}%</strong>
+        </div>
+        <div class="h-2 rounded-full bg-slate-800 overflow-hidden"><span class="block h-full rounded-full bg-gradient-to-r from-cyan-400 via-violet-400 to-lime-300" style="width:${summary.percent}%"></span></div>
+        <p class="text-[11px] text-slate-500 font-mono-tech mt-3"><i class="fas fa-clock mr-1"></i> Aktivitas terakhir: ${escHtml(latestLabel)}</p>
+      </article>
+      <article class="grid grid-cols-2 gap-3">
+        <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="text-slate-500">provisional</small></div>
+        <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="text-slate-500">provisional</small></div>
+      </article>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-2.5">
+      ${steps
+        .map(([key, label, score]) => {
+          const complete = summary.states[key] === true;
+          const scoreLabel = Number.isFinite(Number(score)) ? `${Number(score)}%` : "";
+          return `<article class="flex items-center gap-3 rounded-xl border ${complete ? "border-emerald-500/25 bg-emerald-500/5" : "border-slate-700 bg-slate-900/45"} p-3.5">
+            <span class="grid w-9 h-9 shrink-0 place-items-center rounded-lg ${complete ? "bg-emerald-500/15 text-emerald-300" : "bg-slate-800 text-slate-600"}"><i class="fas ${complete ? "fa-check" : "fa-minus"}"></i></span>
+            <div class="min-w-0 flex-1"><strong class="block text-sm ${complete ? "text-white" : "text-slate-400"}">${escHtml(label)}</strong><small class="text-[10px] font-mono-tech ${complete ? "text-emerald-400" : "text-slate-600"}">${complete ? "SELESAI" : "BELUM SELESAI"}</small></div>
+            ${scoreLabel ? `<b class="text-sm text-cyan-300">${scoreLabel}</b>` : ""}
+          </article>`;
+        })
+        .join("")}
+    </div>
+    ${
+      hasProgress
+        ? ""
+        : `<div class="mt-5 rounded-xl border border-dashed border-slate-600 p-4 text-center text-sm text-slate-500">Siswa belum memulai kegiatan UI/UX.</div>`
+    }`;
+  resetButton.disabled = !hasProgress;
+}
+
+function closeStudentLearningProgress() {
+  document.getElementById("learningProgressModal")?.classList.add("hidden");
+  document.body.style.overflow = "";
+  selectedLearningProgressStudent = null;
+}
+
+async function resetStudentLearningProgress() {
+  const student = selectedLearningProgressStudent;
+  if (!student || getTeacherStudentGrade(student) !== 10) return;
+  const confirmed = confirm(
+    `Reset seluruh progress UI/UX milik ${student.nama}?\n\nPre-test, post-test, checklist, file evidence, dan seluruh XP akan dihapus. Nilai serta akun siswa tidak ikut terhapus.`,
+  );
+  if (!confirmed) return;
+
+  const button = document.getElementById("resetLearningProgressButton");
+  const originalHtml = button.innerHTML;
+  button.disabled = true;
+  button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Mereset…';
+  try {
+    await db
+      .ref("learningProgress")
+      .child(student.id)
+      .child("grade10UiUx")
+      .remove();
+    renderStudentLearningProgress({});
+    showAlert(
+      `Progress UI/UX <strong>${escHtml(student.nama)}</strong> berhasil direset ke 0 XP.`,
+      "success",
+    );
+  } catch (error) {
+    button.disabled = false;
+    showAlert("Gagal mereset progress: " + error.message, "danger");
+  } finally {
+    button.innerHTML = originalHtml;
+  }
 }
 
 function setQuarter(q) {
@@ -43,6 +316,16 @@ function setQuarter(q) {
 
 // G��G��G�� AUTHENTICATION CHECK G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
 document.addEventListener("DOMContentLoaded", () => {
+  const progressModal = document.getElementById("learningProgressModal");
+  progressModal?.addEventListener("click", (event) => {
+    if (event.target === progressModal) closeStudentLearningProgress();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !progressModal?.classList.contains("hidden")) {
+      closeStudentLearningProgress();
+    }
+  });
+
   auth.onAuthStateChanged((user) => {
     if (!user) {
       window.location.href = "index.html"; // Belum login G�� usir
@@ -482,12 +765,19 @@ function renderTableBody(data) {
           "inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider";
       }
       const statusChip = `<span class="${chipCls}"><span class="w-1.5 h-1.5 rounded-full ${dotCls} flex-shrink-0 ${animateDot}"></span>${chipLabel}</span>`;
+      const studentNameCell =
+        getTeacherStudentGrade(s) === 10
+          ? `<button type="button" onclick="openStudentLearningProgress('${escHtml(s.id)}')" class="group/name text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-cyan-500/10 transition-colors" title="Lihat dan reset progress UI/UX">
+              <strong class="block text-slate-200 group-hover/name:text-cyan-300 transition-colors">${escHtml(s.nama)}</strong>
+              <small class="block text-[9px] text-cyan-500/70 font-mono-tech mt-0.5"><i class="fas fa-chart-line mr-1"></i>LIHAT PROGRESS</small>
+            </button>`
+          : `<span class="font-bold text-slate-200">${escHtml(s.nama)}</span>`;
 
       return `
       <tr id="row-${s.id}" class="hover:bg-slate-800/50 transition-colors group">
         <td class="px-3 py-3 text-center text-slate-500 font-mono-tech text-sm">${idx + 1}</td>
         <td class="px-3 py-3 font-mono-tech text-sm w-[120px]">${nisEditable}</td>
-        <td class="px-3 py-3 font-bold text-slate-200 whitespace-nowrap">${escHtml(s.nama)}</td>
+        <td class="px-3 py-3 whitespace-nowrap">${studentNameCell}</td>
         <td class="px-3 py-3 text-center">
           <span class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs font-mono-tech text-slate-300">${escHtml(s.kelas)}</span>
         </td>

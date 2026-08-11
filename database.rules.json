@@ -41,6 +41,7 @@
       "$studentId": {
         "grade10UiUx": {
           ".read": true,
+          ".write": "auth != null && (root.child('guru').child(auth.uid).child('isVerified').val() === true || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
           "preTest": {
             ".write": "!data.exists() && newData.exists()",
             ".validate": "newData.hasChildren(['correct', 'total', 'score', 'attempts', 'submittedAt']) && newData.child('correct').isNumber() && newData.child('correct').val() >= 0 && newData.child('correct').val() <= 5 && newData.child('total').val() === 5 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100 && newData.child('attempts').isNumber() && newData.child('attempts').val() === 1 && newData.child('submittedAt').isNumber()"

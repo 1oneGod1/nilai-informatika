@@ -606,6 +606,57 @@
       </main>
     </div>
 
+    <!-- GRADE 10 LEARNING PROGRESS DETAIL -->
+    <div
+      id="learningProgressModal"
+      class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm p-4 overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="learningProgressTitle"
+    >
+      <div class="min-h-full flex items-center justify-center py-6">
+        <section class="w-full max-w-3xl rounded-2xl border border-cyan-500/25 bg-[#111c2d] shadow-2xl shadow-black/50 overflow-hidden">
+          <header class="flex items-start justify-between gap-4 p-5 md:p-6 border-b border-slate-700/70 bg-gradient-to-r from-cyan-500/10 to-violet-500/10">
+            <div>
+              <p class="text-[10px] font-mono-tech tracking-[0.2em] text-cyan-300 font-bold mb-2">GRADE 10 · UI/UX LEARNING PROGRESS</p>
+              <h2 id="learningProgressTitle" class="text-xl md:text-2xl font-black text-white">Student activity</h2>
+              <p id="learningProgressStudentMeta" class="text-xs text-slate-400 font-mono-tech mt-2"></p>
+            </div>
+            <button
+              type="button"
+              onclick="closeStudentLearningProgress()"
+              class="w-9 h-9 shrink-0 rounded-lg border border-slate-600 text-slate-400 hover:text-white hover:border-cyan-400 transition-colors"
+              aria-label="Tutup detail progress"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </header>
+
+          <div id="learningProgressBody" class="p-5 md:p-6">
+            <div class="py-14 text-center text-slate-500 font-mono-tech text-sm">
+              <i class="fas fa-circle-notch fa-spin text-cyan-400 text-2xl mb-3 block"></i>
+              Memuat progress siswa…
+            </div>
+          </div>
+
+          <footer class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 md:px-6 border-t border-slate-700/70 bg-slate-900/45">
+            <p class="text-[11px] text-slate-500 leading-relaxed max-w-xl">
+              Reset hanya menghapus aktivitas UI/UX, jawaban tes, checklist, dan XP. Data akun serta nilai pada tabel tidak ikut terhapus.
+            </p>
+            <button
+              id="resetLearningProgressButton"
+              type="button"
+              onclick="resetStudentLearningProgress()"
+              class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 font-bold text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+              disabled
+            >
+              <i class="fas fa-rotate-left"></i> Reset progress
+            </button>
+          </footer>
+        </section>
+      </div>
+    </div>
+
     <!-- Firebase SDK Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
@@ -616,7 +667,7 @@
     <script src="js/auth.js?v=20260329b"></script>
     <script src="js/assessment-config.js?v=20260804a"></script>
     <!-- teacher.js contains only the logic needed for the dashboard page (auth check, CRUD, admins) -->
-    <script src="js/teacher.js?v=20260803b"></script>
+    <script src="js/teacher.js?v=20260811e"></script>
     <script src="js/teacher-assessment.js?v=20260804a"></script>
   </body>
 </html>
