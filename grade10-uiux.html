@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Interactive Grade 10 UI/UX and wireframing class materials"
+    />
+    <title>Grade 10 UI/UX Lab · CS.Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="grade10-uiux.css?v=20260811a" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+
+    <div id="accessGate" class="access-gate" hidden>
+      <div class="gate-card">
+        <div class="gate-icon"><i class="fas fa-lock"></i></div>
+        <p class="eyebrow">ACCESS REQUIRED</p>
+        <h1>Open this material from your gradebook.</h1>
+        <p>
+          Search for your name, enter your student password, and select
+          <strong>Open Materials</strong> from your Grade 10 record.
+        </p>
+        <a class="primary-button" href="index.html">
+          <i class="fas fa-arrow-left"></i> Return to CS.Report
+        </a>
+      </div>
+    </div>
+
+    <div id="learningApp" class="app-shell" hidden>
+      <header class="topbar">
+        <a class="brand" href="index.html" aria-label="Return to CS.Report">
+          <span class="brand-mark">&gt;_</span>
+          <span>CS<span>.</span>Report</span>
+        </a>
+        <div class="topbar-course">
+          <span>GRADE 10</span>
+          <strong>UI/UX LAB</strong>
+        </div>
+        <div class="student-chip">
+          <span class="student-avatar" id="studentAvatar">G</span>
+          <span>
+            <strong id="studentName">Grade 10 Student</strong>
+            <small id="studentClass">Grade 10</small>
+          </span>
+          <a href="index.html" title="Back to grades" aria-label="Back to grades">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+          </a>
+        </div>
+      </header>
+
+      <div class="mobile-progress">
+        <span id="mobileProgressLabel">0% complete</span>
+        <div class="progress-track"><span id="mobileProgressBar"></span></div>
+      </div>
+
+      <div class="workspace">
+        <aside class="course-rail">
+          <div class="rail-heading">
+            <p class="eyebrow">MISSION MAP</p>
+            <h2>From skeleton<br />to interface.</h2>
+            <p>Build the structure first. Recreate the visual system next.</p>
+          </div>
+
+          <nav class="mission-nav" aria-label="Course sections">
+            <button class="mission-link is-active" data-panel-target="overview">
+              <span class="mission-number"><i class="fas fa-compass"></i></span>
+              <span><strong>Start here</strong><small>Mission briefing</small></span>
+              <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="mission-link" data-panel-target="pre-test">
+              <span class="mission-number">00</span>
+              <span><strong>Pre-test</strong><small>Check your baseline</small></span>
+              <span class="status-dot" id="preTestStatus"></span>
+            </button>
+            <button class="mission-link" data-panel-target="section-1">
+              <span class="mission-number">01</span>
+              <span><strong>Wireframe</strong><small>Individual formative</small></span>
+              <span class="status-dot" id="section1Status"></span>
+            </button>
+            <button class="mission-link" data-panel-target="section-2">
+              <span class="mission-number">02</span>
+              <span><strong>Figma match</strong><small>Assigned-group work</small></span>
+              <span class="status-dot" id="section2Status"></span>
+            </button>
+            <button class="mission-link" data-panel-target="post-test">
+              <span class="mission-number">03</span>
+              <span><strong>Post-test</strong><small>One attempt only</small></span>
+              <span class="status-dot is-locked" id="postTestStatus"><i class="fas fa-lock"></i></span>
+            </button>
+          </nav>
+
+          <div class="xp-card">
+            <div><span>MISSION PROGRESS</span><strong id="progressPercent">0%</strong></div>
+            <div class="progress-track"><span id="progressBar"></span></div>
+            <p><i class="fas fa-bolt"></i> <span id="xpLabel">0 / 500 XP</span></p>
+          </div>
+        </aside>
+
+        <main class="content-stage">
+          <section class="learning-panel is-active" data-panel="overview">
+            <div class="hero-panel">
+              <div class="hero-copy">
+                <p class="eyebrow"><span class="live-dot"></span> DIGITAL DESIGN MISSION</p>
+                <h1>See the structure.<br /><em>Rebuild the experience.</em></h1>
+                <p class="hero-lead">
+                  In two focused sections, you will reverse-engineer a real
+                  website: first as a low-fidelity wireframe, then as an accurate
+                  Figma recreation with your assigned group.
+                </p>
+                <div class="hero-actions">
+                  <button class="primary-button" data-go-to="pre-test">
+                    Begin pre-test <i class="fas fa-arrow-right"></i>
+                  </button>
+                  <button class="text-button" data-go-to="section-1">
+                    Preview Section 1
+                  </button>
+                </div>
+              </div>
+              <div class="wireframe-window" aria-label="Decorative wireframe example">
+                <div class="window-bar"><span></span><span></span><span></span><small>chosen-site.com</small></div>
+                <div class="wire-nav"><b>LOGO</b><i></i><i></i><i></i><button>CTA</button></div>
+                <div class="wire-hero"><div><span></span><strong></strong><p></p><button></button></div><figure></figure></div>
+                <div class="wire-cards"><i></i><i></i><i></i></div>
+                <div class="scan-line"></div>
+              </div>
+            </div>
+
+            <div class="brief-grid">
+              <article class="brief-card lime">
+                <span>SECTION 01</span>
+                <h3>Decode the layout</h3>
+                <p>Choose a website, identify its hierarchy and user journey, then create a low-fidelity wireframe.</p>
+                <div><i class="fas fa-user"></i> Individual formative</div>
+              </article>
+              <article class="brief-card violet">
+                <span>SECTION 02</span>
+                <h3>Match the interface</h3>
+                <p>Learn essential Figma tools and recreate the selected website as accurately as possible.</p>
+                <div><i class="fas fa-users"></i> Assigned group</div>
+              </article>
+              <article class="brief-card cyan">
+                <span>NEXT MILESTONE</span>
+                <h3>Redesign with purpose</h3>
+                <p>Your later summative will redesign this same website using evidence and clearer UX decisions.</p>
+                <div><i class="fas fa-wand-magic-sparkles"></i> Summative preview</div>
+              </article>
+            </div>
+
+            <div class="protocol-card">
+              <div>
+                <p class="eyebrow">SUCCESS PROTOCOL</p>
+                <h2>How to work in this lab</h2>
+              </div>
+              <ol>
+                <li><span>01</span><p><strong>Observe before creating.</strong> Find patterns, spacing, hierarchy, and actions.</p></li>
+                <li><span>02</span><p><strong>Use evidence.</strong> Explain design decisions with what the user needs.</p></li>
+                <li><span>03</span><p><strong>Finish each checkpoint.</strong> Your progress and quiz scores are saved to your record.</p></li>
+              </ol>
+            </div>
+          </section>
+
+          <section class="learning-panel" data-panel="pre-test">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">DIAGNOSTIC · INDIVIDUAL</p>
+                <h1>Pre-test</h1>
+                <p>Answer from what you already know. This score helps you see your starting point and may be retaken.</p>
+              </div>
+              <div class="score-orbit"><span id="preScore">—</span><small>LATEST</small></div>
+            </div>
+            <div id="preTestResult" class="result-banner" hidden></div>
+            <form id="preTestForm" class="quiz-form" novalidate></form>
+            <div class="form-actions">
+              <button type="submit" form="preTestForm" class="primary-button">
+                Submit pre-test <i class="fas fa-paper-plane"></i>
+              </button>
+              <span id="preAttemptText" class="quiet-text">No attempt recorded</span>
+            </div>
+          </section>
+
+          <section class="learning-panel" data-panel="section-1">
+            <div class="panel-heading section-heading">
+              <div>
+                <p class="eyebrow">SECTION 01 · INDIVIDUAL FORMATIVE</p>
+                <h1>Wireframe Detective</h1>
+                <p>Strip a real website down to its structure, content priority, and user journey.</p>
+              </div>
+              <span class="section-badge lime"><i class="fas fa-pen-ruler"></i> Any wireframing tool</span>
+            </div>
+
+            <div class="definition-card">
+              <div class="definition-number">01</div>
+              <div>
+                <p class="eyebrow">CORE IDEA</p>
+                <h2>A wireframe is a plan, not a polished screen.</h2>
+                <p>
+                  A wireframe is a two-dimensional diagram showing layout,
+                  functionality, interface elements, and the user journey. It is
+                  intentionally low-fidelity: focus on structure before colors,
+                  typography, images, or final written content.
+                </p>
+              </div>
+            </div>
+
+            <div class="design-ladder" aria-label="Design process">
+              <article><span>01</span><i class="fas fa-border-all"></i><h3>Wireframe</h3><p>Structure, hierarchy, flow</p><b>LOW FIDELITY</b></article>
+              <i class="fas fa-arrow-right ladder-arrow"></i>
+              <article><span>02</span><i class="fas fa-palette"></i><h3>Mockup</h3><p>Color, type, visual detail</p><b>STATIC</b></article>
+              <i class="fas fa-arrow-right ladder-arrow"></i>
+              <article><span>03</span><i class="fas fa-hand-pointer"></i><h3>Prototype</h3><p>Interaction and testing</p><b>INTERACTIVE</b></article>
+            </div>
+
+            <div class="two-column">
+              <article class="lesson-card">
+                <p class="eyebrow">WHY START HERE?</p>
+                <h2>Wireframes make mistakes cheap.</h2>
+                <ul class="benefit-list">
+                  <li><i class="fas fa-magnifying-glass"></i><span><strong>Spot usability issues early</strong> before visual polish hides them.</span></li>
+                  <li><i class="fas fa-gauge-high"></i><span><strong>Move quickly</strong> because simple blocks are easy to change.</span></li>
+                  <li><i class="fas fa-comments"></i><span><strong>Communicate clearly</strong> about layout and flow with a team.</span></li>
+                  <li><i class="fas fa-coins"></i><span><strong>Reduce cost</strong> by fixing the plan before production.</span></li>
+                </ul>
+              </article>
+              <article class="lesson-card discussion-card">
+                <p class="eyebrow">PAIR DISCUSSION · 4 MIN</p>
+                <h2>What breaks without a plan?</h2>
+                <p>Discuss both prompts with a partner, then prepare one example to share.</p>
+                <ol>
+                  <li>What problem might appear if a designer builds the final interface before making a wireframe?</li>
+                  <li>Why does simplicity make a wireframe more useful during feedback?</li>
+                </ol>
+              </article>
+            </div>
+
+            <div class="challenge-card">
+              <div class="challenge-heading">
+                <div><p class="eyebrow">QUICK CHALLENGE · +50 XP</p><h2>Name that design stage</h2></div>
+                <strong id="stageChallengeScore">0 / 3</strong>
+              </div>
+              <p>Choose the stage that best matches each description.</p>
+              <div id="stageChallenge" class="stage-challenge"></div>
+            </div>
+
+            <div class="formative-brief">
+              <div class="formative-title">
+                <p class="eyebrow">FORMATIVE MISSION</p>
+                <h2>Reverse-engineer one real website.</h2>
+                <p>You are studying the existing experience—not redesigning it yet.</p>
+              </div>
+              <div class="mission-steps">
+                <article><span>1</span><h3>Choose</h3><p>Select a website with a clear purpose and at least one important user action.</p></article>
+                <article><span>2</span><h3>Observe</h3><p>Identify header, navigation, content blocks, calls to action, and footer.</p></article>
+                <article><span>3</span><h3>Wireframe</h3><p>Recreate the structure using boxes, lines, labels, and placeholder content.</p></article>
+                <article><span>4</span><h3>Explain</h3><p>Label the main user journey and explain what should be noticed first.</p></article>
+              </div>
+              <div class="tool-strip">
+                <span>YOU MAY USE</span>
+                <b><i class="fas fa-pencil"></i> Paper</b>
+                <b><i class="fas fa-shapes"></i> Canva</b>
+                <b><i class="fas fa-display"></i> Slides</b>
+                <b><i class="fab fa-figma"></i> Figma</b>
+                <b><i class="fas fa-plus"></i> Another suitable tool</b>
+              </div>
+            </div>
+
+            <form id="websitePlanForm" class="planning-form">
+              <div class="form-title"><span>YOUR CASE FILE</span><strong>Save your website choice</strong></div>
+              <label><span>Website name</span><input id="websiteName" maxlength="80" required placeholder="Example: Spotify" /></label>
+              <label><span>Website URL</span><input id="websiteUrl" type="url" maxlength="240" required placeholder="https://..." /></label>
+              <label class="wide"><span>Why is this website worth studying?</span><textarea id="websiteReason" maxlength="320" required placeholder="Describe its purpose, audience, or important user journey."></textarea></label>
+              <label><span>Wireframing tool</span><select id="wireframeTool" required><option value="">Choose a tool</option><option>Paper / hand-drawn</option><option>Canva</option><option>Google Slides / PowerPoint</option><option>Figma</option><option>Another suitable tool</option></select></label>
+              <button class="primary-button" type="submit">Save case file <i class="fas fa-floppy-disk"></i></button>
+            </form>
+
+            <div class="checkpoint-card">
+              <div><p class="eyebrow">SECTION 01 CHECKPOINT</p><h2>Mark each item only when it is true.</h2></div>
+              <div id="section1Checklist" class="checklist"></div>
+            </div>
+          </section>
+
+          <section class="learning-panel" data-panel="section-2">
+            <div class="panel-heading section-heading">
+              <div>
+                <p class="eyebrow">SECTION 02 · ASSIGNED GROUP</p>
+                <h1>Figma Pixel-Match Lab</h1>
+                <p>Learn the essential tools, then reproduce your selected website as accurately as possible.</p>
+              </div>
+              <span class="section-badge violet"><i class="fas fa-users"></i> Work with your assigned group</span>
+            </div>
+
+            <div class="group-alert">
+              <i class="fas fa-people-group"></i>
+              <div><strong>This entire section is group work.</strong><p>Use the group determined by your teacher. Share one Figma file and make every member’s contribution visible.</p></div>
+            </div>
+
+            <div class="figma-crash-course">
+              <div class="figma-copy">
+                <p class="eyebrow">FIGMA ESSENTIALS · ONE FOCUSED LAB</p>
+                <h2>Six moves you need before recreating a page.</h2>
+                <p>Do not try to learn every Figma feature. Use only the tools that help your group measure, structure, and reproduce the reference.</p>
+                <a class="resource-link" href="https://www.youtube.com/watch?v=HoKD1qIcchQ" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i> Open the Figma learning resource <i class="fas fa-arrow-up-right-from-square"></i></a>
+              </div>
+              <div class="figma-grid">
+                <article><kbd>F</kbd><div><strong>Frame</strong><p>Set the correct desktop or mobile canvas.</p></div></article>
+                <article><kbd>R</kbd><div><strong>Shape</strong><p>Build containers, cards, and visual blocks.</p></div></article>
+                <article><kbd>T</kbd><div><strong>Text</strong><p>Match hierarchy, size, weight, and line height.</p></div></article>
+                <article><kbd>⇧ A</kbd><div><strong>Auto layout</strong><p>Control gaps, padding, alignment, and resizing.</p></div></article>
+                <article><kbd>Alt</kbd><div><strong>Measure</strong><p>Check spacing between interface elements.</p></div></article>
+                <article><kbd>⌘/Ctrl G</kbd><div><strong>Organize</strong><p>Name layers and keep sections easy to edit.</p></div></article>
+              </div>
+            </div>
+
+            <div class="fidelity-rule">
+              <div class="reference-side"><span>REFERENCE WEBSITE</span><div class="mini-browser color"><i></i><i></i><i></i></div></div>
+              <div class="match-arrow"><small>MEASURE</small><i class="fas fa-arrow-right-long"></i><small>RECREATE</small></div>
+              <div class="reference-side"><span>GROUP FIGMA FILE</span><div class="mini-browser figma"><i></i><i></i><i></i></div></div>
+            </div>
+
+            <div class="accuracy-grid">
+              <article><span>01</span><i class="fas fa-table-columns"></i><h3>Layout</h3><p>Page width, grid, section order, columns, and alignment.</p></article>
+              <article><span>02</span><i class="fas fa-arrows-left-right-to-line"></i><h3>Spacing</h3><p>Margins, padding, gaps, and consistent visual rhythm.</p></article>
+              <article><span>03</span><i class="fas fa-font"></i><h3>Typography</h3><p>Font family, hierarchy, weight, line height, and wrapping.</p></article>
+              <article><span>04</span><i class="fas fa-droplet"></i><h3>Visual style</h3><p>Color, radius, borders, shadows, imagery, and icons.</p></article>
+            </div>
+
+            <div class="two-column">
+              <article class="lesson-card group-roles-card">
+                <p class="eyebrow">RECOMMENDED GROUP ROLES</p>
+                <h2>Divide ownership, not understanding.</h2>
+                <ul>
+                  <li><b>Layout lead</b><span>Frames, grid, major sections</span></li>
+                  <li><b>Style lead</b><span>Type, color, icons, imagery</span></li>
+                  <li><b>QA lead</b><span>Measurements and comparison</span></li>
+                  <li><b>Flow lead</b><span>Components, links, presentation</span></li>
+                </ul>
+                <p class="role-note">Every member must still be able to explain the whole design.</p>
+              </article>
+              <form id="groupPlanForm" class="lesson-card group-form">
+                <p class="eyebrow">GROUP RECORD</p>
+                <h2>Identify your assigned team.</h2>
+                <label><span>Group name / number</span><input id="groupName" maxlength="60" required placeholder="Provided by your teacher" /></label>
+                <label><span>Your responsibility</span><select id="studentRole" required><option value="">Choose a responsibility</option><option>Layout lead</option><option>Style lead</option><option>QA lead</option><option>Flow lead</option><option>Shared responsibility</option></select></label>
+                <label><span>Shared Figma file link</span><input id="figmaUrl" type="url" maxlength="300" required placeholder="https://www.figma.com/..." /></label>
+                <button class="primary-button" type="submit">Save group record <i class="fas fa-floppy-disk"></i></button>
+              </form>
+            </div>
+
+            <div class="checkpoint-card violet-checkpoint">
+              <div><p class="eyebrow">SECTION 02 CHECKPOINT</p><h2>Complete this with your assigned group.</h2></div>
+              <div id="section2Checklist" class="checklist"></div>
+            </div>
+
+            <div class="summative-preview">
+              <span><i class="fas fa-lock"></i> SUMMATIVE PREVIEW</span>
+              <div><h2>Same website. Better experience.</h2><p>After this faithful recreation, your summative challenge will redesign the same website. Your changes must solve clear user problems—not only make the screen look different.</p></div>
+            </div>
+          </section>
+
+          <section class="learning-panel" data-panel="post-test">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">FINAL CHECK · INDIVIDUAL</p>
+                <h1>Post-test</h1>
+                <p>Show what you understand about wireframing, UI/UX decisions, and the Figma recreation workflow.</p>
+              </div>
+              <div class="score-orbit danger"><span id="postScore">—</span><small>FINAL</small></div>
+            </div>
+
+            <div class="one-attempt-warning">
+              <i class="fas fa-triangle-exclamation"></i>
+              <div><strong>Submit carefully: this post-test can be completed only once.</strong><p>Read every question, check all answers, and use a stable connection. Your first successful submission becomes your final recorded result.</p></div>
+            </div>
+
+            <div id="postTestLocked" class="locked-result" hidden></div>
+            <div id="postTestLauncher" class="post-launcher">
+              <div class="launcher-icon"><i class="fas fa-shield-halved"></i></div>
+              <h2>Ready for your one attempt?</h2>
+              <p>The questions remain hidden until you acknowledge the attempt rule.</p>
+              <button id="openPostWarning" class="danger-button">Review warning &amp; start <i class="fas fa-arrow-right"></i></button>
+            </div>
+            <form id="postTestForm" class="quiz-form" hidden novalidate></form>
+            <div id="postTestActions" class="form-actions" hidden>
+              <button type="submit" form="postTestForm" class="danger-button">Submit final answers <i class="fas fa-lock"></i></button>
+              <span class="quiet-text">One successful submission only</span>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div id="postWarningModal" class="modal-backdrop" hidden>
+      <div class="warning-modal" role="dialog" aria-modal="true" aria-labelledby="postWarningTitle">
+        <button id="closePostWarning" class="modal-close" aria-label="Close"><i class="fas fa-times"></i></button>
+        <div class="warning-symbol"><i class="fas fa-triangle-exclamation"></i></div>
+        <p class="eyebrow">ONE-ATTEMPT RULE</p>
+        <h2 id="postWarningTitle">Pause. Check before you begin.</h2>
+        <ul>
+          <li>Use your own understanding; this is an individual post-test.</li>
+          <li>Answer every question and review before submitting.</li>
+          <li>Your first successful submission is final and cannot be replaced.</li>
+        </ul>
+        <label class="confirm-check"><input id="postAttemptConfirm" type="checkbox" /><span>I understand that I can submit the post-test only once.</span></label>
+        <button id="confirmPostStart" class="danger-button" disabled>Start my attempt <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
+    <script src="js/firebase-init.js?v=20260329c"></script>
+    <script src="js/grade10-uiux.js?v=20260811a"></script>
+  </body>
+</html>

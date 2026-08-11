@@ -231,7 +231,69 @@ function verifyStudentPassword(event) {
   );
   if (modal) modal.hide();
 
+  rememberVerifiedStudent(selectedStudentForDetail);
   renderStudentDetail(selectedStudentForDetail.id);
+}
+
+function getStudentGrade(student) {
+  const match = String(student?.kelas || "").match(/\d+/);
+  return match ? Number(match[0]) : 0;
+}
+
+function rememberVerifiedStudent(student) {
+  if (!student || getStudentGrade(student) !== 10) return;
+
+  const learningSession = {
+    id: student.id,
+    name: String(student.nama || "Grade 10 Student"),
+    className: String(student.kelas || "Grade 10"),
+    groupName: String(student.uiuxGroup || ""),
+    verifiedAt: Date.now(),
+  };
+
+  sessionStorage.setItem(
+    "csReportGrade10Session",
+    JSON.stringify(learningSession),
+  );
+}
+
+function openGrade10Materials() {
+  if (!selectedStudentForDetail || getStudentGrade(selectedStudentForDetail) !== 10) {
+    showAlert("Grade 10 class materials are not available for this account.", "warning");
+    return;
+  }
+
+  rememberVerifiedStudent(selectedStudentForDetail);
+  window.location.href = "grade10-uiux.html";
+}
+
+function buildGrade10MaterialsCard(student) {
+  if (getStudentGrade(student) !== 10) return "";
+
+  return `
+    <section class="mb-6 rounded-2xl border border-cyan-400/25 bg-gradient-to-br from-cyan-500/10 via-slate-900/70 to-violet-500/10 overflow-hidden">
+      <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center text-cyan-300 text-xl shrink-0">
+          <i class="fas fa-bezier-curve"></i>
+        </div>
+        <div class="flex-1">
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span class="text-[10px] font-mono-tech tracking-[0.2em] text-cyan-300 font-bold">CLASS MATERIALS</span>
+            <span class="text-[10px] font-mono-tech text-violet-200 bg-violet-500/10 border border-violet-400/20 px-2 py-0.5 rounded-full">GRADE 10</span>
+          </div>
+          <h3 class="text-xl font-black text-white">Digital Design: UI/UX Foundations</h3>
+          <p class="text-sm text-slate-300 mt-1 max-w-2xl">Learn wireframing, complete the pre-test, recreate a selected website in Figma with your assigned group, and take the one-attempt post-test.</p>
+          <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech">
+            <span class="text-emerald-300"><i class="fas fa-check-circle mr-1"></i>Section 1 · Wireframe</span>
+            <span class="text-violet-300"><i class="fas fa-users mr-1"></i>Section 2 · Group Figma Lab</span>
+          </div>
+        </div>
+        <button type="button" onclick="openGrade10Materials()"
+          class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black font-mono-tech text-xs px-5 py-3 rounded-xl transition-all shadow-[0_0_24px_rgba(34,211,238,0.18)] flex items-center justify-center gap-2 shrink-0">
+          OPEN MATERIALS <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>`;
 }
 
 // ─── UBAH PASSWORD MANDIRI ────────────────────────────────
@@ -387,6 +449,7 @@ function renderStudentDetail(id) {
     typeof dcBuildStudentAssessmentHtml === "function"
       ? dcBuildStudentAssessmentHtml(s, kkm)
       : "";
+  const grade10MaterialsHtml = buildGrade10MaterialsCard(s);
 
   // Notification block (dark)
   let notifHtml = "";
@@ -437,6 +500,8 @@ function renderStudentDetail(id) {
           </button>
         </div>
       </div>
+
+      ${grade10MaterialsHtml}
 
       ${allTilesHtml}
 
