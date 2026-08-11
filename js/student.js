@@ -282,7 +282,7 @@ function buildGrade10MaterialsCard(student) {
             <span class="text-[10px] font-mono-tech text-violet-200 bg-violet-500/10 border border-violet-400/20 px-2 py-0.5 rounded-full">GRADE 10</span>
           </div>
           <h3 class="text-xl font-black text-white">Digital Design: UI/UX Foundations</h3>
-          <p class="text-sm text-slate-300 mt-1 max-w-2xl">Complete four interactive sections: investigate a wireframe, recreate a selected website, master the Figma environment and toolbar, and submit two one-attempt post-tests.</p>
+          <p class="text-sm text-slate-300 mt-1 max-w-2xl">Complete four interactive sections with a separate one-attempt baseline before the Figma foundations, then submit two locked post-tests.</p>
           <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech">
             <span class="text-emerald-300"><i class="fas fa-check-circle mr-1"></i>Section 1 · Wireframe</span>
             <span class="text-violet-300"><i class="fas fa-users mr-1"></i>Section 2 · Group Figma Lab</span>

@@ -19,7 +19,7 @@
       rel="stylesheet"
     />
     <link href="grade10-uiux.css?v=20260811a" rel="stylesheet" />
-    <link href="grade10-figma.css?v=20260811c" rel="stylesheet" />
+    <link href="grade10-figma.css?v=20260811d" rel="stylesheet" />
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
@@ -100,6 +100,11 @@
               <span><strong>Post-test 1</strong><small>Wireframe concepts</small></span>
               <span class="status-dot is-locked" id="postTestStatus"><i class="fas fa-lock"></i></span>
             </button>
+            <button class="mission-link" data-panel-target="pre-test-2">
+              <span class="mission-number">P2</span>
+              <span><strong>Figma pre-test</strong><small>Before Section 3</small></span>
+              <span class="status-dot" id="figmaPreTestStatus"></span>
+            </button>
             <button class="mission-link" data-panel-target="section-3">
               <span class="mission-number">03</span>
               <span><strong>Figma basics</strong><small>Environment &amp; interface</small></span>
@@ -120,7 +125,7 @@
           <div class="xp-card">
             <div><span>MISSION PROGRESS</span><strong id="progressPercent">0%</strong></div>
             <div class="progress-track"><span id="progressBar"></span></div>
-            <p><i class="fas fa-bolt"></i> <span id="xpLabel">0 / 800 XP</span></p>
+            <p><i class="fas fa-bolt"></i> <span id="xpLabel">0 / 880 XP</span></p>
           </div>
         </aside>
 
@@ -377,9 +382,37 @@
               <button type="submit" form="postTestForm" class="danger-button">Submit final answers <i class="fas fa-lock"></i></button>
               <span class="quiet-text">One successful submission only</span>
             </div>
+            <div class="section-complete-strip pretest-bridge">
+              <div><span>NEXT REQUIRED STEP</span><strong>Complete the Figma Pre-test before opening Section 3.</strong></div>
+              <button type="button" class="primary-button" data-go-to="pre-test-2">Open Figma Pre-test <i class="fas fa-arrow-right"></i></button>
+            </div>
           </section>
 
-          <section class="learning-panel" data-panel="section-3">
+          <section class="learning-panel figma-pretest-panel" data-panel="pre-test-2">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">FIGMA BASELINE · BEFORE SECTION 03</p>
+                <h1>Figma Pre-test</h1>
+                <p>Check what you already know about the Figma environment, frames, tools, properties, and layers before starting Section 3.</p>
+              </div>
+              <div class="score-orbit figma-orbit"><span id="figmaPreScore">—</span><small>ONE TRY</small></div>
+            </div>
+            <div class="figma-pretest-route" aria-label="Learning route">
+              <span class="is-current"><b>01</b> Pre-test</span><i class="fas fa-arrow-right"></i><span><b>02</b> Section 3</span><i class="fas fa-arrow-right"></i><span><b>03</b> Section 4</span>
+            </div>
+            <div class="one-attempt-warning figma-pre-warning">
+              <i class="fas fa-eye-slash"></i>
+              <div><strong>Submit only when every answer is ready.</strong><p>This Figma Pre-test can be completed once. After submission, the questions disappear and only your score remains visible.</p></div>
+            </div>
+            <div id="figmaPreTestResult" class="result-banner" hidden></div>
+            <form id="figmaPreTestForm" class="quiz-form" novalidate></form>
+            <div id="figmaPreTestActions" class="form-actions">
+              <button type="submit" form="figmaPreTestForm" class="figma-pre-submit">Submit Figma Pre-test <i class="fas fa-lock"></i></button>
+              <span id="figmaPreAttemptText" class="quiet-text">One attempt available</span>
+            </div>
+          </section>
+
+          <section class="learning-panel figma-color-section section-3-theme" data-panel="section-3">
             <div class="panel-heading section-heading">
               <div>
                 <p class="eyebrow">SECTION 03 · INDIVIDUAL EXPLORATION</p>
@@ -461,7 +494,7 @@
             </div>
           </section>
 
-          <section class="learning-panel" data-panel="section-4">
+          <section class="learning-panel figma-color-section section-4-theme" data-panel="section-4">
             <div class="panel-heading section-heading">
               <div>
                 <p class="eyebrow">SECTION 04 · ASSIGNED GROUP</p>
@@ -596,6 +629,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
     <script src="js/firebase-init.js?v=20260329c"></script>
     <script src="js/wireframe-detective-section.js?v=20260811b"></script>
-    <script src="js/grade10-uiux.js?v=20260811c"></script>
+    <script src="js/grade10-uiux.js?v=20260811d"></script>
   </body>
 </html>

@@ -138,6 +138,49 @@ const POST_TEST_QUESTIONS = [
   },
 ];
 
+const FIGMA_PRE_TEST_QUESTIONS = [
+  {
+    question: "Which Figma product is mainly used to design website and app interfaces?",
+    options: ["FigJam", "Figma Design", "Figma Slides", "Dev Mode only"],
+    answer: 1,
+  },
+  {
+    question: "What is a frame used for in Figma?",
+    options: [
+      "To represent a screen or design surface",
+      "To delete unused colors",
+      "To open the Community page",
+      "To write JavaScript code",
+    ],
+    answer: 0,
+  },
+  {
+    question: "Which region contains the objects and layer order in a design file?",
+    options: ["Canvas", "Pages & Layers", "Dashboard", "Export window"],
+    answer: 1,
+  },
+  {
+    question: "Where would you normally change an object's size, fill, stroke, and position?",
+    options: ["Design Inspector", "FigJam timer", "Community", "File browser"],
+    answer: 0,
+  },
+  {
+    question: "Which shortcut creates a frame?",
+    options: ["T", "P", "F", "K"],
+    answer: 2,
+  },
+  {
+    question: "Why should a group rename and organise its layers?",
+    options: [
+      "To make the file easier to understand and edit together",
+      "To automatically publish a website",
+      "To change the account password",
+      "To avoid using frames",
+    ],
+    answer: 0,
+  },
+];
+
 const POST_TEST_2_QUESTIONS = [
   {
     question: "Your group needs to design interface screens and connect a clickable prototype. Which Figma product should you use?",
@@ -399,6 +442,7 @@ function openPanelFromHash() {
     "section-1",
     "section-2",
     "post-test",
+    "pre-test-2",
     "section-3",
     "section-4",
     "post-test-2",
@@ -407,6 +451,12 @@ function openPanelFromHash() {
 }
 
 function openPanel(panelName, updateHash = true) {
+  const figmaPreTestRequired = ["section-3", "section-4", "post-test-2"].includes(panelName);
+  if (figmaPreTestRequired && !uiuxProgress.figmaPreTest) {
+    panelName = "pre-test-2";
+    updateHash = true;
+    showToast("Complete the one-attempt Figma Pre-test before opening Section 3.", true);
+  }
   const target = document.querySelector(`[data-panel="${panelName}"]`);
   if (!target) return;
   document.querySelectorAll("[data-panel]").forEach((panel) => {
@@ -421,6 +471,7 @@ function openPanel(panelName, updateHash = true) {
 
 function bindForms() {
   document.getElementById("preTestForm").addEventListener("submit", submitPreTest);
+  document.getElementById("figmaPreTestForm").addEventListener("submit", submitFigmaPreTest);
   document.getElementById("postTestForm").addEventListener("submit", submitPostTest);
   document.getElementById("post2TestForm").addEventListener("submit", submitPostTest2);
   document.getElementById("websitePlanForm").addEventListener("submit", saveWebsitePlan);
@@ -528,6 +579,39 @@ async function submitPreTest(event) {
     showToast("Pre-test submitted. Only your score remains visible.");
   } catch (error) {
     showToast("The pre-test could not be saved. Please try again.", true);
+  } finally {
+    setButtonBusy(button, false);
+  }
+}
+
+async function submitFigmaPreTest(event) {
+  event.preventDefault();
+  if (uiuxProgress.figmaPreTest) {
+    renderFigmaPreTestState();
+    showToast("Your Figma Pre-test attempt is already locked.", true);
+    return;
+  }
+  const answers = collectQuizAnswers("figmaPre", FIGMA_PRE_TEST_QUESTIONS);
+  if (!answers) {
+    showToast("Answer every Figma Pre-test question before submitting.", true);
+    return;
+  }
+  const result = calculateQuizResult(answers, FIGMA_PRE_TEST_QUESTIONS);
+  const payload = { ...result, attempts: 1, submittedAt: Date.now() };
+  const button = event.submitter;
+  setButtonBusy(button, true, "Locking score...");
+  try {
+    const saved = await commitOneAttempt("figmaPreTest", payload);
+    uiuxProgress.figmaPreTest = saved.value;
+    renderProgressState();
+    showToast(
+      saved.committed
+        ? "Figma Pre-test submitted. Section 3 is now available."
+        : "A Figma Pre-test score is already recorded for this student.",
+      !saved.committed,
+    );
+  } catch (error) {
+    showToast("The Figma Pre-test could not be saved. Please try again.", true);
   } finally {
     setButtonBusy(button, false);
   }
@@ -1016,6 +1100,7 @@ function hydrateChecklist(containerId, saved) {
 
 function renderProgressState() {
   const preComplete = Boolean(uiuxProgress.preTest);
+  const figmaPreComplete = Boolean(uiuxProgress.figmaPreTest);
   const section1Complete =
     isSection1DiscoveryComplete(uiuxProgress.section1Discovery) &&
     Boolean(uiuxProgress.websitePlan) &&
@@ -1031,6 +1116,7 @@ function renderProgressState() {
   setStatus("section1Status", section1Complete);
   setStatus("section2Status", section2Complete);
   setStatus("postTestStatus", postComplete);
+  setStatus("figmaPreTestStatus", figmaPreComplete);
   setStatus("section3Status", section3Complete);
   setStatus("section4Status", section4Complete);
   setStatus("postTest2Status", post2Complete);
@@ -1040,17 +1126,19 @@ function renderProgressState() {
     (section1Complete ? 120 : 0) +
     (section2Complete ? 100 : 0) +
     (postComplete ? 100 : 0) +
+    (figmaPreComplete ? 80 : 0) +
     (section3Complete ? 120 : 0) +
     (section4Complete ? 180 : 0) +
     (post2Complete ? 100 : 0);
-  const percent = Math.round((xp / 800) * 100);
+  const percent = Math.round((xp / 880) * 100);
   document.getElementById("progressPercent").textContent = `${percent}%`;
   document.getElementById("progressBar").style.width = `${percent}%`;
-  document.getElementById("xpLabel").textContent = `${xp} / 800 XP`;
+  document.getElementById("xpLabel").textContent = `${xp} / 880 XP`;
   document.getElementById("mobileProgressLabel").textContent = `${percent}% complete`;
   document.getElementById("mobileProgressBar").style.width = `${percent}%`;
 
   renderPreTestState();
+  renderFigmaPreTestState();
   renderPostTestState();
   renderPostTest2State();
   renderSection3State();
@@ -1078,6 +1166,28 @@ function renderPreTestState() {
   actions.hidden = true;
   banner.hidden = false;
   banner.innerHTML = `<strong>Baseline recorded: ${score}%.</strong> Your one attempt is locked. Questions and answers are no longer available for review.`;
+}
+
+function renderFigmaPreTestState() {
+  const result = uiuxProgress.figmaPreTest;
+  const form = document.getElementById("figmaPreTestForm");
+  const actions = document.getElementById("figmaPreTestActions");
+  const banner = document.getElementById("figmaPreTestResult");
+  if (!result) {
+    renderQuiz("figmaPre", FIGMA_PRE_TEST_QUESTIONS);
+    form.hidden = false;
+    actions.hidden = false;
+    banner.hidden = true;
+    return;
+  }
+  const score = safeNumber(result.score);
+  document.getElementById("figmaPreScore").textContent = `${score}%`;
+  document.getElementById("figmaPreAttemptText").textContent = "Attempt locked · score only";
+  form.hidden = true;
+  form.innerHTML = "";
+  actions.hidden = true;
+  banner.hidden = false;
+  banner.innerHTML = `<strong>Figma baseline recorded: ${score}%.</strong> Questions and answers are no longer available. Continue to Section 3 to strengthen your understanding.`;
 }
 
 function renderPostTestState() {
