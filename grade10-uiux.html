@@ -191,78 +191,18 @@
           </section>
 
           <section class="learning-panel" data-panel="section-1">
-            <div class="panel-heading section-heading">
+            <wireframe-detective-section id="wireframeDetectiveSection"></wireframe-detective-section>
+
+            <div class="embedded-formative-intro">
               <div>
-                <p class="eyebrow">SECTION 01 · INDIVIDUAL FORMATIVE</p>
-                <h1>Wireframe Detective</h1>
-                <p>Strip a real website down to its structure, content priority, and user journey.</p>
-              </div>
-              <span class="section-badge lime"><i class="fas fa-pen-ruler"></i> Any wireframing tool</span>
-            </div>
-
-            <div class="definition-card">
-              <div class="definition-number">01</div>
-              <div>
-                <p class="eyebrow">CORE IDEA</p>
-                <h2>A wireframe is a plan, not a polished screen.</h2>
-                <p>
-                  A wireframe is a two-dimensional diagram showing layout,
-                  functionality, interface elements, and the user journey. It is
-                  intentionally low-fidelity: focus on structure before colors,
-                  typography, images, or final written content.
-                </p>
-              </div>
-            </div>
-
-            <div class="design-ladder" aria-label="Design process">
-              <article><span>01</span><i class="fas fa-border-all"></i><h3>Wireframe</h3><p>Structure, hierarchy, flow</p><b>LOW FIDELITY</b></article>
-              <i class="fas fa-arrow-right ladder-arrow"></i>
-              <article><span>02</span><i class="fas fa-palette"></i><h3>Mockup</h3><p>Color, type, visual detail</p><b>STATIC</b></article>
-              <i class="fas fa-arrow-right ladder-arrow"></i>
-              <article><span>03</span><i class="fas fa-hand-pointer"></i><h3>Prototype</h3><p>Interaction and testing</p><b>INTERACTIVE</b></article>
-            </div>
-
-            <div class="two-column">
-              <article class="lesson-card">
-                <p class="eyebrow">WHY START HERE?</p>
-                <h2>Wireframes make mistakes cheap.</h2>
-                <ul class="benefit-list">
-                  <li><i class="fas fa-magnifying-glass"></i><span><strong>Spot usability issues early</strong> before visual polish hides them.</span></li>
-                  <li><i class="fas fa-gauge-high"></i><span><strong>Move quickly</strong> because simple blocks are easy to change.</span></li>
-                  <li><i class="fas fa-comments"></i><span><strong>Communicate clearly</strong> about layout and flow with a team.</span></li>
-                  <li><i class="fas fa-coins"></i><span><strong>Reduce cost</strong> by fixing the plan before production.</span></li>
-                </ul>
-              </article>
-              <article class="lesson-card discussion-card">
-                <p class="eyebrow">PAIR DISCUSSION · 4 MIN</p>
-                <h2>What breaks without a plan?</h2>
-                <p>Discuss both prompts with a partner, then prepare one example to share.</p>
-                <ol>
-                  <li>What problem might appear if a designer builds the final interface before making a wireframe?</li>
-                  <li>Why does simplicity make a wireframe more useful during feedback?</li>
-                </ol>
-              </article>
-            </div>
-
-            <div class="challenge-card">
-              <div class="challenge-heading">
-                <div><p class="eyebrow">QUICK CHALLENGE · +50 XP</p><h2>Name that design stage</h2></div>
-                <strong id="stageChallengeScore">0 / 3</strong>
-              </div>
-              <p>Choose the stage that best matches each description.</p>
-              <div id="stageChallenge" class="stage-challenge"></div>
-            </div>
-
-            <div class="formative-brief">
-              <div class="formative-title">
-                <p class="eyebrow">FORMATIVE MISSION</p>
-                <h2>Reverse-engineer one real website.</h2>
-                <p>You are studying the existing experience—not redesigning it yet.</p>
+                <p class="eyebrow">FORMATIVE MISSION · INDIVIDUAL</p>
+                <h2>Now investigate one real website.</h2>
+                <p>Choose a homepage or landing page, identify its structure and user journey, then create a low-fidelity wireframe. You are studying the current experience—not redesigning it yet.</p>
               </div>
               <div class="mission-steps">
-                <article><span>1</span><h3>Choose</h3><p>Select a website with a clear purpose and at least one important user action.</p></article>
-                <article><span>2</span><h3>Observe</h3><p>Identify header, navigation, content blocks, calls to action, and footer.</p></article>
-                <article><span>3</span><h3>Wireframe</h3><p>Recreate the structure using boxes, lines, labels, and placeholder content.</p></article>
+                <article><span>1</span><h3>Choose</h3><p>Select a website with a clear purpose and an important user action.</p></article>
+                <article><span>2</span><h3>Observe</h3><p>Identify its header, navigation, content blocks, CTA, and footer.</p></article>
+                <article><span>3</span><h3>Wireframe</h3><p>Recreate the structure with boxes, lines, labels, and placeholders.</p></article>
                 <article><span>4</span><h3>Explain</h3><p>Label the main user journey and explain what should be noticed first.</p></article>
               </div>
               <div class="tool-strip">
@@ -422,6 +362,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
     <script src="js/firebase-init.js?v=20260329c"></script>
-    <script src="js/grade10-uiux.js?v=20260811a"></script>
+    <script src="js/wireframe-detective-section.js?v=20260811b"></script>
+    <script src="js/grade10-uiux.js?v=20260811b"></script>
   </body>
 </html>

@@ -15,7 +15,8 @@
       "**/*.pyc",
       "**/Scripts/**",
       "**/Lib/**",
-      "**/Include/**"
+      "**/Include/**",
+      "design-qa.md"
     ],
     "headers": [
       {

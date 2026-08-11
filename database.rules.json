@@ -45,6 +45,10 @@
             ".write": true,
             ".validate": "newData.hasChildren(['answers', 'correct', 'total', 'score', 'attempts', 'submittedAt']) && newData.child('correct').isNumber() && newData.child('correct').val() >= 0 && newData.child('correct').val() <= 5 && newData.child('total').val() === 5 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100 && newData.child('attempts').isNumber() && newData.child('attempts').val() >= 1 && newData.child('submittedAt').isNumber()"
           },
+          "section1Discovery": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['conceptDone', 'foundZones', 'exitAnswer', 'exitCorrect', 'savedAt']) && newData.child('conceptDone').isBoolean() && newData.child('foundZones').hasChildren(['header', 'navigation', 'hero', 'cta', 'content', 'footer']) && newData.child('foundZones').child('header').isBoolean() && newData.child('foundZones').child('navigation').isBoolean() && newData.child('foundZones').child('hero').isBoolean() && newData.child('foundZones').child('cta').isBoolean() && newData.child('foundZones').child('content').isBoolean() && newData.child('foundZones').child('footer').isBoolean() && newData.child('exitAnswer').isString() && newData.child('exitAnswer').val().length <= 20 && newData.child('exitCorrect').isBoolean() && newData.child('savedAt').isNumber()"
+          },
           "websitePlan": {
             ".write": true,
             ".validate": "newData.hasChildren(['websiteName', 'websiteUrl', 'reason', 'tool', 'savedAt']) && newData.child('websiteName').isString() && newData.child('websiteName').val().length > 0 && newData.child('websiteName').val().length <= 80 && newData.child('websiteUrl').isString() && newData.child('websiteUrl').val().length > 0 && newData.child('websiteUrl').val().length <= 240 && newData.child('reason').isString() && newData.child('reason').val().length > 0 && newData.child('reason').val().length <= 320 && newData.child('tool').isString() && newData.child('savedAt').isNumber()"

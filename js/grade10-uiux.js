@@ -143,21 +143,6 @@ const POST_TEST_QUESTIONS = [
   },
 ];
 
-const STAGE_CHALLENGES = [
-  {
-    prompt: "Gray boxes show where the header, content, and CTA will go.",
-    answer: "Wireframe",
-  },
-  {
-    prompt: "The screen has final colors, typography, icons, and imagery, but no interactions.",
-    answer: "Mockup",
-  },
-  {
-    prompt: "A user can click through screens to test the checkout journey.",
-    answer: "Prototype",
-  },
-];
-
 const SECTION_1_CHECKS = [
   ["reference", "I selected one real website and recorded its URL."],
   ["structure", "My wireframe shows the header, navigation, main sections, CTA, and footer."],
@@ -177,7 +162,6 @@ let uiuxStudent = null;
 let uiuxProgress = {};
 let uiuxProgressRef = null;
 let toastTimer = null;
-let stageSolved = new Set();
 
 document.addEventListener("DOMContentLoaded", initializeUiUxLab);
 
@@ -203,9 +187,9 @@ async function initializeUiUxLab() {
 
   bindNavigation();
   bindForms();
+  bindWireframeDetective();
   renderQuiz("pre", PRE_TEST_QUESTIONS);
   renderQuiz("post", POST_TEST_QUESTIONS);
-  renderStageChallenge();
   renderChecklist("section1Checklist", SECTION_1_CHECKS, "section1Checklist");
   renderChecklist("section2Checklist", SECTION_2_CHECKS, "section2Checklist");
   bindPostTestWarning();
@@ -304,6 +288,51 @@ function bindForms() {
   document.getElementById("postTestForm").addEventListener("submit", submitPostTest);
   document.getElementById("websitePlanForm").addEventListener("submit", saveWebsitePlan);
   document.getElementById("groupPlanForm").addEventListener("submit", saveGroupPlan);
+}
+
+function bindWireframeDetective() {
+  const section = document.getElementById("wireframeDetectiveSection");
+  if (!section) return;
+
+  section.addEventListener("wireframe-progress", (event) => {
+    saveSection1Discovery(event.detail);
+  });
+
+  section.addEventListener("wireframe-next", () => {
+    openPanel("section-2");
+  });
+}
+
+async function saveSection1Discovery(discovery) {
+  const discoveredZones = discovery?.foundZones || {};
+  const payload = {
+    conceptDone: discovery?.conceptDone === true,
+    foundZones: {
+      header: discoveredZones.header === true,
+      navigation: discoveredZones.navigation === true,
+      hero: discoveredZones.hero === true,
+      cta: discoveredZones.cta === true,
+      content: discoveredZones.content === true,
+      footer: discoveredZones.footer === true,
+    },
+    exitAnswer: typeof discovery?.exitAnswer === "string" ? discovery.exitAnswer : "",
+    exitCorrect: discovery?.exitCorrect === true,
+    savedAt: Date.now(),
+  };
+
+  if (uiuxStudent?.isLocalPreview) {
+    uiuxProgress.section1Discovery = payload;
+    renderProgressState();
+    return;
+  }
+
+  try {
+    await uiuxProgressRef.child("section1Discovery").set(payload);
+    uiuxProgress.section1Discovery = payload;
+    renderProgressState();
+  } catch (error) {
+    showToast("This investigation checkpoint could not be saved. Please try again.", true);
+  }
 }
 
 function renderQuiz(prefix, questions) {
@@ -478,42 +507,6 @@ async function saveChecklist(containerId, progressKey) {
   }
 }
 
-function renderStageChallenge() {
-  const container = document.getElementById("stageChallenge");
-  const choices = ["Wireframe", "Mockup", "Prototype"];
-  container.innerHTML = STAGE_CHALLENGES.map(
-    (item, index) => `
-      <article class="stage-question" data-stage-index="${index}">
-        <p>${item.prompt}</p>
-        <div class="stage-buttons">
-          ${choices.map((choice) => `<button type="button" data-stage-choice="${choice}">${choice}</button>`).join("")}
-        </div>
-      </article>`,
-  ).join("");
-
-  container.querySelectorAll("[data-stage-choice]").forEach((button) => {
-    button.addEventListener("click", () => checkStageAnswer(button));
-  });
-}
-
-function checkStageAnswer(button) {
-  const card = button.closest("[data-stage-index]");
-  const index = Number(card.dataset.stageIndex);
-  if (stageSolved.has(index)) return;
-
-  const isCorrect = button.dataset.stageChoice === STAGE_CHALLENGES[index].answer;
-  card.classList.remove("is-correct", "is-wrong");
-  void card.offsetWidth;
-  card.classList.add(isCorrect ? "is-correct" : "is-wrong");
-
-  if (isCorrect) {
-    stageSolved.add(index);
-    card.querySelectorAll("button").forEach((item) => (item.disabled = true));
-    document.getElementById("stageChallengeScore").textContent = `${stageSolved.size} / 3`;
-    if (stageSolved.size === 3) showToast("Challenge complete. You identified all three design stages.");
-  }
-}
-
 function bindPostTestWarning() {
   const modal = document.getElementById("postWarningModal");
   const checkbox = document.getElementById("postAttemptConfirm");
@@ -597,6 +590,8 @@ async function submitPostTest(event) {
 }
 
 function hydrateSavedWork() {
+  document.getElementById("wireframeDetectiveSection")?.setProgress(uiuxProgress.section1Discovery || {});
+
   const websitePlan = uiuxProgress.websitePlan || {};
   document.getElementById("websiteName").value = websitePlan.websiteName || "";
   document.getElementById("websiteUrl").value = websitePlan.websiteUrl || "";
@@ -621,7 +616,9 @@ function hydrateChecklist(containerId, saved) {
 function renderProgressState() {
   const preComplete = Boolean(uiuxProgress.preTest);
   const section1Complete =
-    Boolean(uiuxProgress.websitePlan) && allChecksComplete(uiuxProgress.section1Checklist, SECTION_1_CHECKS);
+    isSection1DiscoveryComplete(uiuxProgress.section1Discovery) &&
+    Boolean(uiuxProgress.websitePlan) &&
+    allChecksComplete(uiuxProgress.section1Checklist, SECTION_1_CHECKS);
   const section2Complete =
     Boolean(uiuxProgress.groupPlan) && allChecksComplete(uiuxProgress.section2Checklist, SECTION_2_CHECKS);
   const postComplete = Boolean(uiuxProgress.postTest);
@@ -682,6 +679,14 @@ function setStatus(elementId, complete) {
 function allChecksComplete(saved, definitions) {
   if (!saved) return false;
   return definitions.every(([key]) => saved[key] === true);
+}
+
+function isSection1DiscoveryComplete(discovery) {
+  if (!discovery || discovery.conceptDone !== true || discovery.exitCorrect !== true) return false;
+  const foundZones = discovery.foundZones;
+  if (Array.isArray(foundZones)) return new Set(foundZones).size >= 6;
+  if (!foundZones || typeof foundZones !== "object") return false;
+  return Object.values(foundZones).filter((value) => value === true).length >= 6;
 }
 
 function safeNumber(value, fallback = 0) {
