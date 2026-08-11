@@ -19,6 +19,7 @@
       rel="stylesheet"
     />
     <link href="grade10-uiux.css?v=20260811a" rel="stylesheet" />
+    <link href="grade10-figma.css?v=20260811c" rel="stylesheet" />
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
@@ -95,16 +96,31 @@
               <span class="status-dot" id="section2Status"></span>
             </button>
             <button class="mission-link" data-panel-target="post-test">
-              <span class="mission-number">03</span>
-              <span><strong>Post-test</strong><small>One attempt only</small></span>
+              <span class="mission-number">T1</span>
+              <span><strong>Post-test 1</strong><small>Wireframe concepts</small></span>
               <span class="status-dot is-locked" id="postTestStatus"><i class="fas fa-lock"></i></span>
+            </button>
+            <button class="mission-link" data-panel-target="section-3">
+              <span class="mission-number">03</span>
+              <span><strong>Figma basics</strong><small>Environment &amp; interface</small></span>
+              <span class="status-dot" id="section3Status"></span>
+            </button>
+            <button class="mission-link" data-panel-target="section-4">
+              <span class="mission-number">04</span>
+              <span><strong>Toolbar lab</strong><small>Assigned-group build</small></span>
+              <span class="status-dot" id="section4Status"></span>
+            </button>
+            <button class="mission-link" data-panel-target="post-test-2">
+              <span class="mission-number">T2</span>
+              <span><strong>Post-test 2</strong><small>Figma foundations</small></span>
+              <span class="status-dot is-locked" id="postTest2Status"><i class="fas fa-lock"></i></span>
             </button>
           </nav>
 
           <div class="xp-card">
             <div><span>MISSION PROGRESS</span><strong id="progressPercent">0%</strong></div>
             <div class="progress-track"><span id="progressBar"></span></div>
-            <p><i class="fas fa-bolt"></i> <span id="xpLabel">0 / 500 XP</span></p>
+            <p><i class="fas fa-bolt"></i> <span id="xpLabel">0 / 800 XP</span></p>
           </div>
         </aside>
 
@@ -115,9 +131,9 @@
                 <p class="eyebrow"><span class="live-dot"></span> DIGITAL DESIGN MISSION</p>
                 <h1>See the structure.<br /><em>Rebuild the experience.</em></h1>
                 <p class="hero-lead">
-                  In two focused sections, you will reverse-engineer a real
-                  website: first as a low-fidelity wireframe, then as an accurate
-                  Figma recreation with your assigned group.
+                  Across four focused sections, you will reverse-engineer a real
+                  website, learn the Figma environment and toolbar, then rebuild
+                  an interface with your assigned group.
                 </p>
                 <div class="hero-actions">
                   <button class="primary-button" data-go-to="pre-test">
@@ -151,12 +167,34 @@
                 <div><i class="fas fa-users"></i> Assigned group</div>
               </article>
               <article class="brief-card cyan">
-                <span>NEXT MILESTONE</span>
-                <h3>Redesign with purpose</h3>
-                <p>Your later summative will redesign this same website using evidence and clearer UX decisions.</p>
-                <div><i class="fas fa-wand-magic-sparkles"></i> Summative preview</div>
+                <span>SECTIONS 03–04</span>
+                <h3>Control the Figma workspace</h3>
+                <p>Explore the editor regions, frame presets, tools, inspector properties, and layer order through interactive missions.</p>
+                <div><i class="fab fa-figma"></i> Foundations + group lab</div>
               </article>
             </div>
+
+            <section class="formative-ledger" aria-labelledby="formativeLedgerTitle">
+              <div class="ledger-heading">
+                <div><p class="eyebrow">FORMATIVE SCORE MODEL</p><h2 id="formativeLedgerTitle">Product evidence 70% + post-test 30%</h2></div>
+                <span>LIVE ACCUMULATION</span>
+              </div>
+              <div class="ledger-grid">
+                <article>
+                  <div><span>FORMATIVE 01</span><strong id="formative1Score">0</strong></div>
+                  <h3>Wireframe investigation</h3>
+                  <p><b id="formative1Product">0 / 70</b> product completion <i></i> <b id="formative1Quiz">0 / 30</b> Post-test 1</p>
+                  <small id="formative1State">Complete Section 1 and Post-test 1.</small>
+                </article>
+                <article>
+                  <div><span>FORMATIVE 02</span><strong id="formative2Score">0</strong></div>
+                  <h3>Figma foundations build</h3>
+                  <p><b id="formative2Product">0 / 70</b> product completion <i></i> <b id="formative2Quiz">0 / 30</b> Post-test 2</p>
+                  <small id="formative2State">Complete Section 4 and Post-test 2.</small>
+                </article>
+              </div>
+              <p class="ledger-note"><i class="fas fa-circle-info"></i> The website shows a provisional completion score. Your teacher may still review the quality of each submitted product before recording the grade.</p>
+            </section>
 
             <div class="protocol-card">
               <div>
@@ -176,17 +214,21 @@
               <div>
                 <p class="eyebrow">DIAGNOSTIC · INDIVIDUAL</p>
                 <h1>Pre-test</h1>
-                <p>Answer from what you already know. This score helps you see your starting point and may be retaken.</p>
+                <p>Answer from what you already know. You may submit only once; afterwards, only your score will remain visible.</p>
               </div>
-              <div class="score-orbit"><span id="preScore">—</span><small>LATEST</small></div>
+              <div class="score-orbit"><span id="preScore">—</span><small>ONE TRY</small></div>
+            </div>
+            <div class="one-attempt-warning pre-warning">
+              <i class="fas fa-eye-slash"></i>
+              <div><strong>The questions cannot be reviewed after submission.</strong><p>Check every answer before submitting. Your first successful attempt is locked and the page will display only the final score.</p></div>
             </div>
             <div id="preTestResult" class="result-banner" hidden></div>
             <form id="preTestForm" class="quiz-form" novalidate></form>
-            <div class="form-actions">
+            <div id="preTestActions" class="form-actions">
               <button type="submit" form="preTestForm" class="primary-button">
                 Submit pre-test <i class="fas fa-paper-plane"></i>
               </button>
-              <span id="preAttemptText" class="quiet-text">No attempt recorded</span>
+              <span id="preAttemptText" class="quiet-text">One attempt available</span>
             </div>
           </section>
 
@@ -311,16 +353,16 @@
           <section class="learning-panel" data-panel="post-test">
             <div class="panel-heading">
               <div>
-                <p class="eyebrow">FINAL CHECK · INDIVIDUAL</p>
-                <h1>Post-test</h1>
+                <p class="eyebrow">SESSION 01 CHECK · INDIVIDUAL</p>
+                <h1>Post-test 1</h1>
                 <p>Show what you understand about wireframing, UI/UX decisions, and the Figma recreation workflow.</p>
               </div>
-              <div class="score-orbit danger"><span id="postScore">—</span><small>FINAL</small></div>
+              <div class="score-orbit danger"><span id="postScore">—</span><small>30%</small></div>
             </div>
 
             <div class="one-attempt-warning">
               <i class="fas fa-triangle-exclamation"></i>
-              <div><strong>Submit carefully: this post-test can be completed only once.</strong><p>Read every question, check all answers, and use a stable connection. Your first successful submission becomes your final recorded result.</p></div>
+              <div><strong>Submit carefully: this post-test can be completed only once.</strong><p>Read every question, check all answers, and use a stable connection. Its percentage contributes up to 30 points toward Formative 1.</p></div>
             </div>
 
             <div id="postTestLocked" class="locked-result" hidden></div>
@@ -333,6 +375,181 @@
             <form id="postTestForm" class="quiz-form" hidden novalidate></form>
             <div id="postTestActions" class="form-actions" hidden>
               <button type="submit" form="postTestForm" class="danger-button">Submit final answers <i class="fas fa-lock"></i></button>
+              <span class="quiet-text">One successful submission only</span>
+            </div>
+          </section>
+
+          <section class="learning-panel" data-panel="section-3">
+            <div class="panel-heading section-heading">
+              <div>
+                <p class="eyebrow">SECTION 03 · INDIVIDUAL EXPLORATION</p>
+                <h1>Inside Figma</h1>
+                <p>Learn where files live, how the editor is organised, and which workspace controls help you navigate confidently.</p>
+              </div>
+              <span class="section-badge cyan"><i class="fab fa-figma"></i> Environment + interface</span>
+            </div>
+
+            <div class="source-note">
+              <i class="fas fa-book-open"></i>
+              <div><strong>Adapted for Grade 10</strong><p>This mission uses selected concepts from the Environment, Interface, and Toolbar learning resources by Dr. Andreas Jodhinata.</p></div>
+            </div>
+
+            <div class="figma-foundation-grid">
+              <article class="foundation-card product-mission">
+                <div class="foundation-title"><span>01</span><div><p class="eyebrow">PRODUCT CHECK</p><h2>Choose the right Figma product</h2></div></div>
+                <p>Your team needs to design screens and connect them into a clickable prototype. Which product should you open?</p>
+                <div class="product-options" id="figmaProductOptions">
+                  <button type="button" data-figma-product="figjam"><i class="fas fa-note-sticky"></i><span>FigJam<small>Whiteboarding and brainstorming</small></span></button>
+                  <button type="button" data-figma-product="design"><i class="fab fa-figma"></i><span>Figma Design<small>Interface design and prototyping</small></span></button>
+                  <button type="button" data-figma-product="slides"><i class="fas fa-file-powerpoint"></i><span>Figma Slides<small>Presentation decks</small></span></button>
+                  <button type="button" data-figma-product="dev"><i class="fas fa-code"></i><span>Dev Mode<small>Developer handoff and code details</small></span></button>
+                </div>
+                <div id="figmaProductFeedback" class="mission-feedback" hidden></div>
+              </article>
+
+              <article class="foundation-card dashboard-mission">
+                <div class="foundation-title"><span>02</span><div><p class="eyebrow">DASHBOARD ROUTE</p><h2>Open a blank design file</h2></div></div>
+                <p>Click the dashboard controls in the correct order. A wrong choice resets the route.</p>
+                <div class="dashboard-sim">
+                  <div class="dashboard-side">
+                    <button type="button" data-route-step="recents">Recents</button>
+                    <button type="button" data-route-step="drafts">Drafts</button>
+                    <button type="button" data-route-step="community">Explore Community</button>
+                  </div>
+                  <div class="dashboard-main">
+                    <div class="dashboard-bar"><span>Figma dashboard</span><button type="button" data-route-step="create">+ Create new</button></div>
+                    <div class="dashboard-files"><button type="button" data-route-step="design">Design file</button><button type="button" data-route-step="figjam">FigJam board</button><button type="button" data-route-step="import">Import</button></div>
+                  </div>
+                </div>
+                <div class="route-progress"><span id="routeStep1">1</span><i></i><span id="routeStep2">2</span><i></i><span id="routeStep3">3</span><b id="routeStatus">Start with Drafts</b></div>
+              </article>
+            </div>
+
+            <article class="figma-map-card">
+              <div class="foundation-title"><span>03</span><div><p class="eyebrow">EDITOR ANATOMY</p><h2>Find the four regions of the Figma editor</h2></div><strong id="figmaZoneCount">0 / 4</strong></div>
+              <p>Click each highlighted region. Use the explanation panel to connect its position with its job.</p>
+              <div class="editor-map-layout">
+                <div class="figma-editor-sim">
+                  <button type="button" class="editor-toolbar" data-figma-zone="toolbar"><span>Toolbar</span><i>Move</i><i>Frame</i><i>Shape</i><i>Pen</i><i>Text</i></button>
+                  <button type="button" class="editor-layers" data-figma-zone="layers"><span>Pages &amp; Layers</span><i>Page 1</i><i>Hero</i><i>CTA button</i><i>Background</i></button>
+                  <button type="button" class="editor-canvas" data-figma-zone="canvas"><span>Canvas</span><div class="canvas-frame"><i></i><b></b><em></em></div></button>
+                  <button type="button" class="editor-inspector" data-figma-zone="inspector"><span>Design Inspector</span><i>X&nbsp;&nbsp;24&nbsp;&nbsp;&nbsp;Y&nbsp;&nbsp;48</i><i>W&nbsp;&nbsp;320&nbsp;&nbsp;H&nbsp;&nbsp;180</i><i>Fill&nbsp;&nbsp;#35E1E8</i><i>Opacity&nbsp;&nbsp;100%</i></button>
+                </div>
+                <aside class="map-evidence">
+                  <span>SELECTED REGION</span>
+                  <i id="figmaZoneIcon" class="fas fa-layer-group"></i>
+                  <h3 id="figmaZoneTitle">Select a region</h3>
+                  <p id="figmaZoneDescription">Every Figma region has a different responsibility in the design process.</p>
+                  <div id="figmaZoneEvidence" class="zone-evidence-list"></div>
+                </aside>
+              </div>
+            </article>
+
+            <article class="shortcut-mission">
+              <div><p class="eyebrow">NAVIGATION CHECK</p><h2>Move around a large canvas</h2><p>You need to pan without moving any design layer. Which control should you use?</p></div>
+              <div class="shortcut-options" id="shortcutOptions">
+                <button type="button" data-shortcut="move"><kbd>V</kbd><span>Move tool</span></button>
+                <button type="button" data-shortcut="pan"><kbd>Space + drag</kbd><span>Pan the canvas</span></button>
+                <button type="button" data-shortcut="scale"><kbd>K</kbd><span>Scale tool</span></button>
+              </div>
+              <div id="shortcutFeedback" class="mission-feedback" hidden></div>
+            </article>
+
+            <div class="section-complete-strip">
+              <div><span>SECTION 03 PROGRESS</span><strong id="section3TaskCount">0 / 4 missions</strong></div>
+              <button type="button" class="primary-button" data-go-to="section-4">Open Section 4 <i class="fas fa-arrow-right"></i></button>
+            </div>
+          </section>
+
+          <section class="learning-panel" data-panel="section-4">
+            <div class="panel-heading section-heading">
+              <div>
+                <p class="eyebrow">SECTION 04 · ASSIGNED GROUP</p>
+                <h1>Figma Toolbar Lab</h1>
+                <p>Use frames, shapes, text, inspector properties, and layer order to build a controlled interface foundation.</p>
+              </div>
+              <span class="section-badge violet"><i class="fas fa-users"></i> Use your assigned group</span>
+            </div>
+
+            <div class="group-alert">
+              <i class="fas fa-people-group"></i>
+              <div><strong>Build together in one shared Figma file.</strong><p>Each member should operate at least one tool and explain how the layer structure affects the final frame.</p></div>
+            </div>
+
+            <article class="toolbar-explorer">
+              <div class="foundation-title"><span>01</span><div><p class="eyebrow">TOOLBAR EXPLORER</p><h2>Inspect the tools before using them</h2></div><strong id="toolbarExploreCount">0 / 6</strong></div>
+              <div class="toolbar-buttons" id="toolbarButtons">
+                <button type="button" data-figma-tool="move"><kbd>V / K</kbd><span>Move &amp; Scale</span></button>
+                <button type="button" data-figma-tool="frame"><kbd>F</kbd><span>Frame</span></button>
+                <button type="button" data-figma-tool="shape"><kbd>R / O</kbd><span>Shape</span></button>
+                <button type="button" data-figma-tool="pen"><kbd>P</kbd><span>Pen</span></button>
+                <button type="button" data-figma-tool="text"><kbd>T</kbd><span>Text</span></button>
+                <button type="button" data-figma-tool="layers"><kbd>⇧⌘L</kbd><span>Layers</span></button>
+              </div>
+              <div class="tool-detail" id="toolbarDetail"><i class="fas fa-arrow-pointer"></i><div><span>SELECT A TOOL</span><h3>Explore all six controls</h3><p>The description will explain what the tool changes and which mistake to avoid.</p></div></div>
+            </article>
+
+            <div class="figma-lab-grid">
+              <article class="frame-lab">
+                <div class="foundation-title"><span>02</span><div><p class="eyebrow">FRAME PRESET</p><h2>Choose the correct canvas</h2></div></div>
+                <label><span>Target device</span><select id="framePreset"><option value="">Choose a preset</option><option value="desktop">Desktop · 1440 × 1024</option><option value="iphone">iPhone · 430 × 932</option><option value="android">Android · 360 × 800</option></select></label>
+                <div class="frame-stage"><div id="framePreview" class="frame-preview"><span id="framePreviewName">No frame selected</span><b id="framePreviewSize">— × —</b><i></i><i></i><i></i></div></div>
+                <p class="lab-hint"><i class="fas fa-circle-info"></i> A frame is the design surface for a screen or device—not merely a decorative rectangle.</p>
+              </article>
+
+              <article class="layer-lab">
+                <div class="foundation-title"><span>03</span><div><p class="eyebrow">LAYER ORDER</p><h2>Put the CTA on top</h2></div></div>
+                <p>Reorder the layers until the CTA is above the hero image and the background is at the bottom.</p>
+                <div id="layerChallenge" class="layer-challenge"></div>
+                <div class="layer-stage"><div class="layer-visual background-layer">Background</div><div class="layer-visual image-layer">Hero image</div><div class="layer-visual cta-layer">CTA</div></div>
+                <div id="layerFeedback" class="mission-feedback" hidden></div>
+              </article>
+            </div>
+
+            <form id="figmaFoundationForm" class="planning-form figma-foundation-form">
+              <div class="form-title"><span>GROUP EVIDENCE</span><strong>Save your Section 4 file</strong></div>
+              <label><span>Assigned group</span><input id="foundationGroupName" maxlength="60" required placeholder="Group set by your teacher" /></label>
+              <label><span>Your contribution</span><select id="foundationRole" required><option value="">Choose your contribution</option><option>Frame and layout</option><option>Shapes and visual elements</option><option>Typography</option><option>Layer organisation and QA</option><option>Shared responsibility</option></select></label>
+              <label class="wide"><span>Shared Figma file link</span><input id="foundationFigmaUrl" type="url" maxlength="300" required placeholder="https://www.figma.com/design/..." /></label>
+              <button class="primary-button" type="submit">Save group evidence <i class="fas fa-floppy-disk"></i></button>
+            </form>
+
+            <div class="checkpoint-card violet-checkpoint">
+              <div><p class="eyebrow">SECTION 04 CHECKPOINT</p><h2>Verify the shared file with your group.</h2></div>
+              <div id="section4Checklist" class="checklist"></div>
+            </div>
+
+            <div class="section-complete-strip violet-strip">
+              <div><span>FORMATIVE 02 PRODUCT</span><strong>Complete this section for the 70-point product component.</strong></div>
+              <button type="button" class="primary-button" data-go-to="post-test-2">Open Post-test 2 <i class="fas fa-arrow-right"></i></button>
+            </div>
+          </section>
+
+          <section class="learning-panel" data-panel="post-test-2">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">SESSION 02 CHECK · INDIVIDUAL</p>
+                <h1>Post-test 2</h1>
+                <p>Show that you understand the Figma environment, editor regions, toolbar, properties, frames, and layer order.</p>
+              </div>
+              <div class="score-orbit danger"><span id="post2Score">—</span><small>30%</small></div>
+            </div>
+
+            <div class="one-attempt-warning">
+              <i class="fas fa-triangle-exclamation"></i>
+              <div><strong>This post-test can be submitted only once.</strong><p>Its percentage contributes up to 30 points toward Formative 2. Review Section 3 and your Section 4 group work before beginning.</p></div>
+            </div>
+
+            <div id="postTest2Locked" class="locked-result" hidden></div>
+            <div id="postTest2Launcher" class="post-launcher">
+              <div class="launcher-icon"><i class="fas fa-shield-halved"></i></div>
+              <h2>Ready for your one attempt?</h2>
+              <p>The questions stay hidden until you acknowledge the one-attempt rule.</p>
+              <button id="openPost2Warning" class="danger-button">Review warning &amp; start <i class="fas fa-arrow-right"></i></button>
+            </div>
+            <form id="post2TestForm" class="quiz-form" hidden novalidate></form>
+            <div id="postTest2Actions" class="form-actions" hidden>
+              <button type="submit" form="post2TestForm" class="danger-button">Submit final answers <i class="fas fa-lock"></i></button>
               <span class="quiet-text">One successful submission only</span>
             </div>
           </section>
@@ -356,6 +573,22 @@
       </div>
     </div>
 
+    <div id="post2WarningModal" class="modal-backdrop" hidden>
+      <div class="warning-modal" role="dialog" aria-modal="true" aria-labelledby="post2WarningTitle">
+        <button id="closePost2Warning" class="modal-close" aria-label="Close"><i class="fas fa-times"></i></button>
+        <div class="warning-symbol"><i class="fas fa-triangle-exclamation"></i></div>
+        <p class="eyebrow">ONE-ATTEMPT RULE · SESSION 02</p>
+        <h2 id="post2WarningTitle">Pause. Check before you begin.</h2>
+        <ul>
+          <li>Review the editor regions, frame presets, tools, properties, and layers.</li>
+          <li>Answer every question and check your choices before submitting.</li>
+          <li>Your first successful submission is final and contributes 30% to Formative 2.</li>
+        </ul>
+        <label class="confirm-check"><input id="post2AttemptConfirm" type="checkbox" /><span>I understand that I can submit Post-test 2 only once.</span></label>
+        <button id="confirmPost2Start" class="danger-button" disabled>Start my attempt <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
@@ -363,6 +596,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
     <script src="js/firebase-init.js?v=20260329c"></script>
     <script src="js/wireframe-detective-section.js?v=20260811b"></script>
-    <script src="js/grade10-uiux.js?v=20260811b"></script>
+    <script src="js/grade10-uiux.js?v=20260811c"></script>
   </body>
 </html>
