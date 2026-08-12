@@ -365,7 +365,7 @@ async function loadGrade10ReportScores(studentId, kkm) {
       .once("value");
     const scores = calculateGrade10ReportScores(snapshot.val() || {});
     const assessments = [
-      ["Formatif 1", "Wireframe product", "Post-test 1", scores.formative1, "cyan"],
+      ["Formatif 1", "Wireframe analysis accuracy", "Post-test 1", scores.formative1, "cyan"],
       ["Formatif 2", "Figma product", "Post-test 2", scores.formative2, "violet"],
     ];
 

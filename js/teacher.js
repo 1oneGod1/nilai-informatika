@@ -13,38 +13,38 @@ let selectedLearningProgressData = {};
 const GRADE10_WIREFRAME_RUBRIC = [
   {
     id: "reference",
-    label: "Reference and scope",
-    description: "The selected webpage and the area being wireframed are clearly identified.",
+    label: "Reference is identifiable",
+    description: "The selected webpage and the page area analysed by the student are clearly identifiable.",
   },
   {
     id: "structure",
-    label: "Major page sections",
-    description: "Header, navigation, main content blocks, CTA, and footer are represented.",
+    label: "Major sections correspond",
+    description: "The wireframe represents the major sections that actually appear on the selected webpage.",
   },
   {
     id: "hierarchy",
-    label: "Visual hierarchy",
-    description: "The size, order, and placement of blocks show clear content priority.",
+    label: "Hierarchy corresponds",
+    description: "Block size and emphasis reflect what the webpage communicates as primary and secondary.",
   },
   {
     id: "navigation",
-    label: "Navigation and user flow",
-    description: "Important links, buttons, and the main user journey are easy to follow.",
+    label: "Navigation and CTA correspond",
+    description: "Navigation, important controls, CTA, and the main user path match what can be observed.",
   },
   {
     id: "spacing",
-    label: "Alignment and spacing",
-    description: "Elements use consistent alignment, grouping, and spacing.",
+    label: "Order and grouping correspond",
+    description: "Content order, grouping, and approximate spatial relationships follow the webpage.",
   },
   {
     id: "fidelity",
-    label: "Appropriate low fidelity",
-    description: "The work uses simple shapes and labels without unnecessary visual decoration.",
+    label: "Evidence is translated correctly",
+    description: "The student uses simple shapes and labels to communicate findings without copying colours or decoration.",
   },
   {
     id: "completeness",
-    label: "Completeness and readability",
-    description: "The chosen page is fully represented and every block is understandable.",
+    label: "Analysis is complete and explainable",
+    description: "Important observed parts are not omitted, and the student can explain each wireframe block using the reference.",
   },
 ];
 
@@ -78,6 +78,15 @@ function isAdminEmailSafe(email) {
 function getTeacherStudentGrade(student) {
   const match = String(student?.kelas || "").match(/\d+/);
   return match ? Number(match[0]) : 0;
+}
+
+function getSafeReferenceUrl(value) {
+  try {
+    const parsed = new URL(String(value || ""));
+    return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "";
+  } catch (error) {
+    return "";
+  }
 }
 
 function teacherChecksComplete(saved, keys) {
@@ -284,6 +293,8 @@ function renderStudentLearningProgress(progress) {
   const wireframeUpdatedLabel = wireframeAssessment.updatedAt
     ? new Date(wireframeAssessment.updatedAt).toLocaleString("id-ID")
     : "Belum pernah disimpan";
+  const websitePlan = progress.websitePlan || {};
+  const referenceUrl = getSafeReferenceUrl(websitePlan.websiteUrl);
   const steps = [
     ["preTest", "Pre-test 1", progress.preTest?.score],
     ["section1", "Section 1 · Wireframe"],
@@ -314,12 +325,23 @@ function renderStudentLearningProgress(progress) {
       <div class="p-5 border-b border-slate-700/60 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <span class="text-[10px] font-mono-tech tracking-[0.18em] text-lime-300 font-bold">FORMATIF 1 · WIREFRAME RUBRIC</span>
-          <h3 class="text-lg font-black text-white mt-1">Centang setiap kriteria yang tercapai</h3>
-          <p class="text-xs text-slate-400 mt-1">Setiap item bernilai 10 poin. Total produk maksimal 70 poin.</p>
+          <h3 class="text-lg font-black text-white mt-1">Nilai kesesuaian analisis dengan website acuan</h3>
+          <p class="text-xs text-slate-400 mt-1">Bandingkan gambar wireframe siswa dengan website pilihannya. Setiap kesesuaian bernilai 10 poin; warna dan dekorasi tidak dinilai.</p>
         </div>
         <div class="sm:text-right shrink-0">
           <strong id="wireframeRubricScore" class="block text-3xl font-black text-lime-300">${wireframeAssessment.score}<small class="text-sm text-slate-500">/70</small></strong>
           <span id="wireframeRubricCount" class="text-[10px] font-mono-tech text-slate-500">${wireframeAssessment.achieved}/7 CRITERIA</span>
+        </div>
+      </div>
+      <div class="mx-5 mt-5 rounded-xl border border-cyan-400/20 bg-cyan-400/[0.05] p-4">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div class="min-w-0">
+            <span class="text-[9px] font-mono-tech tracking-widest text-cyan-300">WEBSITE ACUAN SISWA</span>
+            <h4 class="text-white font-black mt-1">${escHtml(websitePlan.websiteName || "Belum memilih website")}</h4>
+            <p class="text-xs leading-relaxed text-slate-400 mt-2">${escHtml(websitePlan.reason || "Fokus investigasi belum ditulis.")}</p>
+            <small class="block text-[10px] font-mono-tech text-slate-500 mt-2">Alat: ${escHtml(websitePlan.tool || "Belum dipilih")}</small>
+          </div>
+          ${referenceUrl ? `<a href="${escHtml(referenceUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-2.5 text-xs font-bold text-cyan-200 hover:bg-cyan-400/20 shrink-0">BUKA WEBSITE <i class="fas fa-arrow-up-right-from-square"></i></a>` : `<span class="text-[10px] font-mono-tech text-amber-400">URL BELUM TERSEDIA</span>`}
         </div>
       </div>
       <div class="grid md:grid-cols-2 gap-2.5 p-5">

@@ -241,9 +241,9 @@ const POST_TEST_2_QUESTIONS = [
 
 const SECTION_1_CHECKS = [
   ["reference", "I selected one real website and recorded its URL."],
-  ["structure", "My wireframe shows the header, navigation, main sections, CTA, and footer."],
-  ["fidelity", "I used simple boxes, lines, labels, and placeholders instead of polished visuals."],
-  ["journey", "I labelled the main user journey and can explain what the user should notice first."],
+  ["structure", "My drawing follows the major sections and content order I observed on the selected webpage."],
+  ["fidelity", "I translated the webpage into simple boxes, lines, labels, and placeholders without copying its visual styling."],
+  ["journey", "I can explain how the hierarchy, navigation, CTA, and user journey in my wireframe correspond to the webpage."],
 ];
 
 const SECTION_2_CHECKS = [
@@ -1238,19 +1238,42 @@ function renderLockedQuizState(config) {
 }
 
 function renderFormativeLedger(section1Complete, section4Complete) {
-  const product1 = section1Complete ? 70 : 0;
+  const wireframeAssessment = uiuxProgress.teacherAssessment?.wireframe || {};
+  const wireframeCriteria = wireframeAssessment.criteria || {};
+  const wireframeCriterionKeys = [
+    "reference",
+    "structure",
+    "hierarchy",
+    "navigation",
+    "spacing",
+    "fidelity",
+    "completeness",
+  ];
+  const wireframeAssessed = wireframeAssessment.assessed === true;
+  const product1 = wireframeAssessed
+    ? wireframeCriterionKeys.filter((key) => wireframeCriteria[key] === true)
+        .length * 10
+    : 0;
   const product2 = section4Complete ? 70 : 0;
   const quiz1 = uiuxProgress.postTest ? safeNumber(uiuxProgress.postTest.score) * 0.3 : 0;
   const quiz2 = uiuxProgress.postTest2 ? safeNumber(uiuxProgress.postTest2.score) * 0.3 : 0;
-  const total1 = product1 + quiz1;
+  const total1 = wireframeAssessed && uiuxProgress.postTest
+    ? product1 + quiz1
+    : null;
   const total2 = product2 + quiz2;
-  document.getElementById("formative1Score").textContent = formatScore(total1);
-  document.getElementById("formative1Product").textContent = `${product1} / 70`;
+  document.getElementById("formative1Score").textContent =
+    total1 === null ? "—" : formatScore(total1);
+  document.getElementById("formative1Product").textContent =
+    wireframeAssessed ? `${product1} / 70` : "— / 70";
   document.getElementById("formative1Quiz").textContent = `${formatScore(quiz1)} / 30`;
   document.getElementById("formative1State").textContent =
-    section1Complete && uiuxProgress.postTest
-      ? "Provisional total complete · awaiting teacher product review."
-      : "Complete Section 1 and Post-test 1.";
+    total1 !== null
+      ? "Recorded from the teacher's wireframe accuracy rubric and Post-test 1."
+      : !section1Complete
+        ? "Complete the website investigation and your wireframe."
+        : !wireframeAssessed
+          ? "Investigation complete · waiting for the teacher's accuracy rubric."
+          : "Teacher rubric recorded · complete Post-test 1.";
   document.getElementById("formative2Score").textContent = formatScore(total2);
   document.getElementById("formative2Product").textContent = `${product2} / 70`;
   document.getElementById("formative2Quiz").textContent = `${formatScore(quiz2)} / 30`;

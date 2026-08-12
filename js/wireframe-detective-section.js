@@ -66,7 +66,7 @@ class WireframeDetectiveSection extends HTMLElement {
             <div class="hero-copy">
               <div class="eyebrow"><span>SECTION 01</span><i></i> LEARN · EXPLORE · DISCUSS</div>
               <h1>See the <em>structure</em>,<br />not the colour.</h1>
-              <p>Today you will break a website into a simple, understandable structure. That structure is its wireframe.</p>
+              <p>Today you will investigate how a website organises information, then draw the structure you can support with evidence. That drawing is its wireframe.</p>
               <div class="hero-actions">
                 <button class="primary-button" type="button" data-start-investigation>Start the investigation <span>↘</span></button>
                 <div class="mission-stat"><strong>3</strong><span>checkpoints<br />in this section</span></div>
@@ -124,7 +124,7 @@ class WireframeDetectiveSection extends HTMLElement {
                   <div class="compare-hero"><div><small>MAKE EVERY DAY BRIGHTER</small><strong>Light for<br />better living.</strong><span>Browse lamps</span></div><figure></figure></div>
                   <div class="compare-content"><i></i><i></i><i></i></div>
                 </div>
-                <p class="compare-caption">The content and position stay the same. Only the visual detail is simplified.</p>
+              <p class="compare-caption">Read the same content order, grouping, and hierarchy. Translate those findings into simple structural blocks.</p>
               </div>
             </div>
           </section>
@@ -213,7 +213,7 @@ class WireframeDetectiveSection extends HTMLElement {
             </div>
             <div class="quiz-feedback" data-exit-feedback hidden role="status"></div>
             <div class="continue-row">
-              <span>Finished the investigation? Apply the evidence to your selected website below.</span>
+              <span>Finished the investigation? Use the same evidence-reading process on your selected website below.</span>
               <button class="primary-button" type="button" data-next-section>Continue to Section 2 <span>→</span></button>
             </div>
           </section>
