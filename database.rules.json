@@ -36,6 +36,69 @@
           ".write": "auth != null && (auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')"
         }
       }
+    },
+    "learningProgress": {
+      "$studentId": {
+        "grade10UiUx": {
+          ".read": true,
+          ".write": "auth != null && (root.child('guru').child(auth.uid).child('isVerified').val() === true || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
+          "preTest": {
+            ".write": "!data.exists() && newData.exists()",
+            ".validate": "newData.hasChildren(['correct', 'total', 'score', 'attempts', 'submittedAt']) && newData.child('correct').isNumber() && newData.child('correct').val() >= 0 && newData.child('correct').val() <= 5 && newData.child('total').val() === 5 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100 && newData.child('attempts').isNumber() && newData.child('attempts').val() === 1 && newData.child('submittedAt').isNumber()"
+          },
+          "section1Discovery": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['conceptDone', 'foundZones', 'exitAnswer', 'exitCorrect', 'savedAt']) && newData.child('conceptDone').isBoolean() && newData.child('foundZones').hasChildren(['header', 'navigation', 'hero', 'cta', 'content', 'footer']) && newData.child('foundZones').child('header').isBoolean() && newData.child('foundZones').child('navigation').isBoolean() && newData.child('foundZones').child('hero').isBoolean() && newData.child('foundZones').child('cta').isBoolean() && newData.child('foundZones').child('content').isBoolean() && newData.child('foundZones').child('footer').isBoolean() && newData.child('exitAnswer').isString() && newData.child('exitAnswer').val().length <= 20 && newData.child('exitCorrect').isBoolean() && newData.child('savedAt').isNumber()"
+          },
+          "websitePlan": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['websiteName', 'websiteUrl', 'reason', 'tool', 'savedAt']) && newData.child('websiteName').isString() && newData.child('websiteName').val().length > 0 && newData.child('websiteName').val().length <= 80 && newData.child('websiteUrl').isString() && newData.child('websiteUrl').val().length > 0 && newData.child('websiteUrl').val().length <= 240 && newData.child('reason').isString() && newData.child('reason').val().length > 0 && newData.child('reason').val().length <= 320 && newData.child('tool').isString() && newData.child('savedAt').isNumber()"
+          },
+          "section1Checklist": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['reference', 'structure', 'fidelity', 'journey']) && newData.child('reference').isBoolean() && newData.child('structure').isBoolean() && newData.child('fidelity').isBoolean() && newData.child('journey').isBoolean()"
+          },
+          "groupPlan": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['groupName', 'studentRole', 'figmaUrl', 'savedAt']) && newData.child('groupName').isString() && newData.child('groupName').val().length > 0 && newData.child('groupName').val().length <= 60 && newData.child('studentRole').isString() && newData.child('figmaUrl').isString() && newData.child('figmaUrl').val().length > 0 && newData.child('figmaUrl').val().length <= 300 && newData.child('savedAt').isNumber()"
+          },
+          "section2Checklist": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['group', 'file', 'match', 'responsive', 'explain']) && newData.child('group').isBoolean() && newData.child('file').isBoolean() && newData.child('match').isBoolean() && newData.child('responsive').isBoolean() && newData.child('explain').isBoolean()"
+          },
+          "postTest": {
+            ".write": "!data.exists() && newData.exists()",
+            ".validate": "newData.hasChildren(['correct', 'total', 'score', 'submittedAt']) && newData.child('correct').isNumber() && newData.child('correct').val() >= 0 && newData.child('correct').val() <= 8 && newData.child('total').val() === 8 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100 && newData.child('submittedAt').isNumber()"
+          },
+          "figmaPreTest": {
+            ".write": "!data.exists() && newData.exists()",
+            ".validate": "newData.hasChildren(['correct', 'total', 'score', 'attempts', 'submittedAt']) && newData.child('correct').isNumber() && newData.child('correct').val() >= 0 && newData.child('correct').val() <= 6 && newData.child('total').val() === 6 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100 && newData.child('attempts').isNumber() && newData.child('attempts').val() === 1 && newData.child('submittedAt').isNumber()"
+          },
+          "section3Progress": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['environment', 'route', 'zones', 'shortcut', 'savedAt']) && newData.child('environment').isBoolean() && newData.child('route').isBoolean() && newData.child('zones').hasChildren(['toolbar', 'layers', 'canvas', 'inspector']) && newData.child('zones').child('toolbar').isBoolean() && newData.child('zones').child('layers').isBoolean() && newData.child('zones').child('canvas').isBoolean() && newData.child('zones').child('inspector').isBoolean() && newData.child('shortcut').isBoolean() && newData.child('savedAt').isNumber()"
+          },
+          "section4Workshop": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['framePreset', 'toolsExplored', 'layerChallenge', 'savedAt']) && newData.child('framePreset').isString() && newData.child('framePreset').val().length <= 20 && newData.child('toolsExplored').hasChildren(['move', 'frame', 'shape', 'pen', 'text', 'layers']) && newData.child('toolsExplored').child('move').isBoolean() && newData.child('toolsExplored').child('frame').isBoolean() && newData.child('toolsExplored').child('shape').isBoolean() && newData.child('toolsExplored').child('pen').isBoolean() && newData.child('toolsExplored').child('text').isBoolean() && newData.child('toolsExplored').child('layers').isBoolean() && newData.child('layerChallenge').isBoolean() && newData.child('savedAt').isNumber()"
+          },
+          "figmaFoundationPlan": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['groupName', 'role', 'figmaUrl', 'savedAt']) && newData.child('groupName').isString() && newData.child('groupName').val().length > 0 && newData.child('groupName').val().length <= 60 && newData.child('role').isString() && newData.child('role').val().length > 0 && newData.child('role').val().length <= 80 && newData.child('figmaUrl').isString() && newData.child('figmaUrl').val().length > 0 && newData.child('figmaUrl').val().length <= 300 && newData.child('savedAt').isNumber()"
+          },
+          "section4Checklist": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['assignedGroup', 'sharedFile', 'frame', 'objects', 'layers', 'explain']) && newData.child('assignedGroup').isBoolean() && newData.child('sharedFile').isBoolean() && newData.child('frame').isBoolean() && newData.child('objects').isBoolean() && newData.child('layers').isBoolean() && newData.child('explain').isBoolean()"
+          },
+          "postTest2": {
+            ".write": "!data.exists() && newData.exists()",
+            ".validate": "newData.hasChildren(['correct', 'total', 'score', 'submittedAt']) && newData.child('correct').isNumber() && newData.child('correct').val() >= 0 && newData.child('correct').val() <= 8 && newData.child('total').val() === 8 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100 && newData.child('submittedAt').isNumber()"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
     }
   }
 }

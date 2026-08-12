@@ -290,6 +290,10 @@
 .dc-rubric-title small { color: var(--dc-accent); font-family: "JetBrains Mono", monospace; font-size: 0.6rem; text-transform: uppercase; }
 .dc-rubric-title h3 { margin: 0.15rem 0 0.2rem; color: #fff; font-size: 1rem; font-weight: 800; }
 .dc-rubric-title p { margin: 0; color: #8192aa; font-size: 0.72rem; }
+.dc-assessment-brief { padding: 0.8rem 1.1rem; border-bottom: 1px solid var(--dc-line); background: color-mix(in srgb, var(--dc-accent) 6%, transparent); }
+.dc-assessment-brief > span { display: block; color: var(--dc-accent); font-family: "JetBrains Mono", monospace; font-size: 0.64rem; font-weight: 800; letter-spacing: 0.02em; text-transform: uppercase; }
+.dc-assessment-brief i { margin-right: 0.3rem; }
+.dc-assessment-brief p { margin: 0.35rem 0 0; color: #b9c7d9; font-size: 0.72rem; line-height: 1.55; }
 .dc-unit-score { min-width: 7.6rem; text-align: right; }
 .dc-unit-score span, .dc-unit-score small { display: block; color: #8192aa; font-size: 0.6rem; }
 .dc-unit-score strong { color: var(--dc-accent); font-family: "JetBrains Mono", monospace; font-size: 1.8rem; line-height: 1.05; }
