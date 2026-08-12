@@ -535,17 +535,18 @@ function renderQuiz(prefix, questions) {
   form.innerHTML = questions
     .map(
       (item, questionIndex) => `
-        <fieldset class="question-card">
+        <fieldset class="question-card" aria-labelledby="${prefix}Question${questionIndex}">
           <div class="question-number">${String(questionIndex + 1).padStart(2, "0")}</div>
-          <div>
-            <h3>${item.question}</h3>
+          <div class="question-content">
+            <h3 id="${prefix}Question${questionIndex}">${item.question}</h3>
             <div class="answer-grid">
               ${item.options
                 .map(
                   (option, optionIndex) => `
                     <label class="answer-option">
                       <input type="radio" name="${prefix}_q${questionIndex}" value="${optionIndex}" />
-                      <span>${option}</span>
+                      <span class="answer-letter" aria-hidden="true">${String.fromCharCode(65 + optionIndex)}</span>
+                      <span class="answer-text">${option}</span>
                     </label>`,
                 )
                 .join("")}
