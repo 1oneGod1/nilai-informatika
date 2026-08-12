@@ -240,6 +240,16 @@ function getStudentGrade(student) {
   return match ? Number(match[0]) : 0;
 }
 
+const GRADE10_WIREFRAME_RUBRIC_KEYS = [
+  "reference",
+  "structure",
+  "hierarchy",
+  "navigation",
+  "spacing",
+  "fidelity",
+  "completeness",
+];
+
 function grade10ReportChecksComplete(saved, keys) {
   return Boolean(saved) && keys.every((key) => saved[key] === true);
 }
@@ -286,7 +296,14 @@ function grade10ReportSection4Complete(progress) {
 }
 
 function calculateGrade10ReportScores(progress = {}) {
-  const product1Complete = grade10ReportSection1Complete(progress);
+  const wireframeAssessment = progress.teacherAssessment?.wireframe || {};
+  const wireframeCriteria = wireframeAssessment.criteria || {};
+  const product1Complete = wireframeAssessment.assessed === true;
+  const product1Points = product1Complete
+    ? GRADE10_WIREFRAME_RUBRIC_KEYS.filter(
+        (key) => wireframeCriteria[key] === true,
+      ).length * 10
+    : 0;
   const product2Complete = grade10ReportSection4Complete(progress);
   const post1Complete = Boolean(progress.postTest);
   const post2Complete = Boolean(progress.postTest2);
@@ -299,9 +316,12 @@ function calculateGrade10ReportScores(progress = {}) {
     formative1: {
       productComplete: product1Complete,
       postComplete: post1Complete,
-      productPoints: product1Complete ? 70 : 0,
+      productPoints: product1Points,
       postPoints: post1Points,
-      score: product1Complete && post1Complete ? 70 + post1Points : null,
+      score:
+        product1Complete && post1Complete
+          ? product1Points + post1Points
+          : null,
     },
     formative2: {
       productComplete: product2Complete,
@@ -367,7 +387,7 @@ async function loadGrade10ReportScores(studentId, kkm) {
                 <strong class="text-3xl font-black ${scoreClass}">${score}</strong>
               </div>
               <div class="mt-4 grid gap-2 text-xs">
-                <div class="flex items-center justify-between gap-3 rounded-lg bg-white/[0.035] px-3 py-2"><span class="text-slate-400">${productLabel} · 70%</span><b class="${result.productComplete ? "text-white" : "text-slate-600"}">${result.productComplete ? "70 / 70" : "Incomplete"}</b></div>
+                <div class="flex items-center justify-between gap-3 rounded-lg bg-white/[0.035] px-3 py-2"><span class="text-slate-400">${productLabel} · 70%</span><b class="${result.productComplete ? "text-white" : "text-slate-600"}">${result.productComplete ? `${formatGrade10ReportScore(result.productPoints)} / 70` : "Waiting for teacher"}</b></div>
                 <div class="flex items-center justify-between gap-3 rounded-lg bg-white/[0.035] px-3 py-2"><span class="text-slate-400">${postLabel} · 30%</span><b class="${result.postComplete ? "text-white" : "text-slate-600"}">${result.postComplete ? `${formatGrade10ReportScore(result.postPoints)} / 30` : "Incomplete"}</b></div>
               </div>
               <p class="mt-3 text-[10px] font-mono-tech ${recorded ? "text-emerald-400" : "text-amber-400"}"><i class="fas ${recorded ? "fa-circle-check" : "fa-clock"} mr-1"></i>${recorded ? "RECORDED IN Q1 REPORT" : "WAITING FOR BOTH COMPONENTS"}</p>

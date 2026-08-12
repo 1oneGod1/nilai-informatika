@@ -8,6 +8,45 @@ let allSiswa = [];
 let activeQuarter = 4; // Default ke Q4 untuk Sense, Decide, and Deliver with VEX IQ
 let numFormatif = { 1: 2, 2: 2, 3: 2, 4: 2 }; // Default fields per quarter
 let selectedLearningProgressStudent = null;
+let selectedLearningProgressData = {};
+
+const GRADE10_WIREFRAME_RUBRIC = [
+  {
+    id: "reference",
+    label: "Reference and scope",
+    description: "The selected webpage and the area being wireframed are clearly identified.",
+  },
+  {
+    id: "structure",
+    label: "Major page sections",
+    description: "Header, navigation, main content blocks, CTA, and footer are represented.",
+  },
+  {
+    id: "hierarchy",
+    label: "Visual hierarchy",
+    description: "The size, order, and placement of blocks show clear content priority.",
+  },
+  {
+    id: "navigation",
+    label: "Navigation and user flow",
+    description: "Important links, buttons, and the main user journey are easy to follow.",
+  },
+  {
+    id: "spacing",
+    label: "Alignment and spacing",
+    description: "Elements use consistent alignment, grouping, and spacing.",
+  },
+  {
+    id: "fidelity",
+    label: "Appropriate low fidelity",
+    description: "The work uses simple shapes and labels without unnecessary visual decoration.",
+  },
+  {
+    id: "completeness",
+    label: "Completeness and readability",
+    description: "The chosen page is fully represented and every block is understandable.",
+  },
+];
 
 const GRADE10_UIUX_XP = {
   preTest: 80,
@@ -52,6 +91,21 @@ function teacherSection1DiscoveryComplete(discovery) {
   if (Array.isArray(foundZones)) return new Set(foundZones).size >= 6;
   if (!foundZones || typeof foundZones !== "object") return false;
   return Object.values(foundZones).filter((value) => value === true).length >= 6;
+}
+
+function getWireframeRubricAssessment(progress = {}) {
+  const saved = progress.teacherAssessment?.wireframe || {};
+  const criteria = saved.criteria || {};
+  const achieved = GRADE10_WIREFRAME_RUBRIC.filter(
+    (criterion) => criteria[criterion.id] === true,
+  ).length;
+  return {
+    assessed: saved.assessed === true,
+    criteria,
+    achieved,
+    score: achieved * 10,
+    updatedAt: Number(saved.updatedAt || 0),
+  };
 }
 
 function calculateGrade10UiUxProgress(progress = {}) {
@@ -115,7 +169,10 @@ function calculateGrade10UiUxProgress(progress = {}) {
     0,
   );
 
-  const section1Product = section1 ? 70 : 0;
+  const wireframeAssessment = getWireframeRubricAssessment(progress);
+  const section1Product = wireframeAssessment.assessed
+    ? wireframeAssessment.score
+    : 0;
   const section4Product = section4 ? 70 : 0;
   const post1Points = progress.postTest
     ? Number(progress.postTest.score || 0) * 0.3
@@ -129,10 +186,16 @@ function calculateGrade10UiUxProgress(progress = {}) {
     xp,
     percent: Math.round((xp / GRADE10_UIUX_TOTAL_XP) * 100),
     formative1:
-      section1 && states.postTest1 ? section1Product + post1Points : null,
+      wireframeAssessment.assessed && states.postTest1
+        ? section1Product + post1Points
+        : null,
     formative2:
       section4 && states.postTest2 ? section4Product + post2Points : null,
-    formative1Breakdown: { product: section1Product, postTest: post1Points },
+    formative1Breakdown: {
+      product: section1Product,
+      productAssessed: wireframeAssessment.assessed,
+      postTest: post1Points,
+    },
     formative2Breakdown: { product: section4Product, postTest: post2Points },
   };
 }
@@ -207,12 +270,20 @@ async function openStudentLearningProgress(studentId) {
 function renderStudentLearningProgress(progress) {
   const body = document.getElementById("learningProgressBody");
   const resetButton = document.getElementById("resetLearningProgressButton");
+  selectedLearningProgressData = progress || {};
   const summary = calculateGrade10UiUxProgress(progress);
-  const hasProgress = Object.keys(progress || {}).length > 0;
-  const latestTimestamp = findLatestProgressTimestamp(progress);
+  const activityProgress = Object.fromEntries(
+    Object.entries(progress || {}).filter(([key]) => key !== "teacherAssessment"),
+  );
+  const hasProgress = Object.keys(activityProgress).length > 0;
+  const latestTimestamp = findLatestProgressTimestamp(activityProgress);
   const latestLabel = latestTimestamp
     ? new Date(latestTimestamp).toLocaleString("id-ID")
     : "Belum ada aktivitas";
+  const wireframeAssessment = getWireframeRubricAssessment(progress);
+  const wireframeUpdatedLabel = wireframeAssessment.updatedAt
+    ? new Date(wireframeAssessment.updatedAt).toLocaleString("id-ID")
+    : "Belum pernah disimpan";
   const steps = [
     ["preTest", "Pre-test 1", progress.preTest?.score],
     ["section1", "Section 1 · Wireframe"],
@@ -225,7 +296,7 @@ function renderStudentLearningProgress(progress) {
   ];
 
   body.innerHTML = `
-    <div class="grid md:grid-cols-[1.25fr_.75fr] gap-4 mb-5">
+    <div class="grid gap-4 mb-5">
       <article class="rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-5">
         <div class="flex items-end justify-between gap-3 mb-3">
           <div><span class="text-[10px] font-mono-tech tracking-widest text-cyan-300">TOTAL EXPERIENCE</span><h3 class="text-3xl font-black text-white mt-1">${summary.xp} <small class="text-sm text-slate-500">/ ${GRADE10_UIUX_TOTAL_XP} XP</small></h3></div>
@@ -235,10 +306,39 @@ function renderStudentLearningProgress(progress) {
         <p class="text-[11px] text-slate-500 font-mono-tech mt-3"><i class="fas fa-clock mr-1"></i> Aktivitas terakhir: ${escHtml(latestLabel)}</p>
       </article>
       <article class="grid grid-cols-2 gap-3">
-        <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">RAPORT Q1 · FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="block text-slate-500 mt-1">Produk ${summary.formative1Breakdown.product}/70 + Post-test ${formatTeacherProgressScore(summary.formative1Breakdown.postTest)}/30</small></div>
+        <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">RAPORT Q1 · FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="block text-slate-500 mt-1">${summary.formative1Breakdown.productAssessed ? `Rubrik ${summary.formative1Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative1Breakdown.postTest)}/30</small></div>
         <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">RAPORT Q1 · FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="block text-slate-500 mt-1">Produk ${summary.formative2Breakdown.product}/70 + Post-test ${formatTeacherProgressScore(summary.formative2Breakdown.postTest)}/30</small></div>
       </article>
     </div>
+    <section class="mb-5 rounded-2xl border border-lime-400/25 bg-gradient-to-br from-lime-400/[0.07] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
+      <div class="p-5 border-b border-slate-700/60 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div>
+          <span class="text-[10px] font-mono-tech tracking-[0.18em] text-lime-300 font-bold">FORMATIF 1 · WIREFRAME RUBRIC</span>
+          <h3 class="text-lg font-black text-white mt-1">Centang setiap kriteria yang tercapai</h3>
+          <p class="text-xs text-slate-400 mt-1">Setiap item bernilai 10 poin. Total produk maksimal 70 poin.</p>
+        </div>
+        <div class="sm:text-right shrink-0">
+          <strong id="wireframeRubricScore" class="block text-3xl font-black text-lime-300">${wireframeAssessment.score}<small class="text-sm text-slate-500">/70</small></strong>
+          <span id="wireframeRubricCount" class="text-[10px] font-mono-tech text-slate-500">${wireframeAssessment.achieved}/7 CRITERIA</span>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-2.5 p-5">
+        ${GRADE10_WIREFRAME_RUBRIC.map(
+          (criterion, index) => `<label class="flex items-start gap-3 rounded-xl border border-slate-700 bg-slate-950/45 p-3.5 cursor-pointer hover:border-lime-400/40 transition-colors">
+            <input type="checkbox" data-wireframe-rubric="${criterion.id}" onchange="updateWireframeRubricPreview()" ${wireframeAssessment.criteria[criterion.id] === true ? "checked" : ""} class="mt-1 h-4 w-4 accent-lime-400 shrink-0" />
+            <span class="grid w-7 h-7 shrink-0 place-items-center rounded-lg bg-lime-400/10 text-lime-300 text-xs font-black">${index + 1}</span>
+            <span class="min-w-0 flex-1"><strong class="block text-sm text-white">${criterion.label}</strong><small class="block text-[11px] leading-relaxed text-slate-500 mt-1">${criterion.description}</small></span>
+            <b class="text-xs text-lime-300 shrink-0">+10</b>
+          </label>`,
+        ).join("")}
+      </div>
+      <div class="px-5 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p class="text-[10px] font-mono-tech text-slate-500"><i class="fas fa-clock mr-1"></i>${escHtml(wireframeUpdatedLabel)}</p>
+        <button id="saveWireframeRubricButton" type="button" onclick="saveWireframeAssessment()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-lime-300 hover:bg-lime-200 px-4 py-2.5 text-xs font-black text-slate-950 transition-colors">
+          <i class="fas fa-floppy-disk"></i> SAVE WIREFRAME SCORE
+        </button>
+      </div>
+    </section>
     <div class="grid sm:grid-cols-2 gap-2.5">
       ${steps
         .map(([key, label, score]) => {
@@ -260,10 +360,70 @@ function renderStudentLearningProgress(progress) {
   resetButton.disabled = !hasProgress;
 }
 
+function updateWireframeRubricPreview() {
+  const inputs = Array.from(
+    document.querySelectorAll("[data-wireframe-rubric]"),
+  );
+  const achieved = inputs.filter((input) => input.checked).length;
+  const scoreElement = document.getElementById("wireframeRubricScore");
+  const countElement = document.getElementById("wireframeRubricCount");
+  if (scoreElement) {
+    scoreElement.innerHTML = `${achieved * 10}<small class="text-sm text-slate-500">/70</small>`;
+  }
+  if (countElement) countElement.textContent = `${achieved}/7 CRITERIA`;
+}
+
+async function saveWireframeAssessment() {
+  const student = selectedLearningProgressStudent;
+  if (!student || getTeacherStudentGrade(student) !== 10) return;
+
+  const criteria = {};
+  GRADE10_WIREFRAME_RUBRIC.forEach((criterion) => {
+    criteria[criterion.id] = Boolean(
+      document.querySelector(
+        `[data-wireframe-rubric="${criterion.id}"]`,
+      )?.checked,
+    );
+  });
+  const achieved = Object.values(criteria).filter(Boolean).length;
+  const button = document.getElementById("saveWireframeRubricButton");
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> SAVING…';
+  }
+
+  const progressRef = db
+    .ref("learningProgress")
+    .child(student.id)
+    .child("grade10UiUx");
+  try {
+    await progressRef.child("teacherAssessment").child("wireframe").set({
+      assessed: true,
+      criteria,
+      score: achieved * 10,
+      updatedAt: Date.now(),
+    });
+    const snapshot = await progressRef.once("value");
+    renderStudentLearningProgress(snapshot.val() || {});
+    showAlert(
+      `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan: ${achieved * 10}/70.`,
+      "success",
+    );
+  } catch (error) {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+    showAlert("Gagal menyimpan nilai Wireframe: " + error.message, "danger");
+  }
+}
+
 function closeStudentLearningProgress() {
   document.getElementById("learningProgressModal")?.classList.add("hidden");
   document.body.style.overflow = "";
   selectedLearningProgressStudent = null;
+  selectedLearningProgressData = {};
 }
 
 async function resetStudentLearningProgress() {
@@ -279,12 +439,18 @@ async function resetStudentLearningProgress() {
   button.disabled = true;
   button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Mereset…';
   try {
-    await db
+    const progressRef = db
       .ref("learningProgress")
       .child(student.id)
-      .child("grade10UiUx")
-      .remove();
-    renderStudentLearningProgress({});
+      .child("grade10UiUx");
+    const teacherAssessment = selectedLearningProgressData.teacherAssessment;
+    if (teacherAssessment) {
+      await progressRef.set({ teacherAssessment });
+      renderStudentLearningProgress({ teacherAssessment });
+    } else {
+      await progressRef.remove();
+      renderStudentLearningProgress({});
+    }
     showAlert(
       `Progress UI/UX <strong>${escHtml(student.nama)}</strong> berhasil direset ke 0 XP.`,
       "success",
