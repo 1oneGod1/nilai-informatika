@@ -214,7 +214,7 @@ class WireframeDetectiveSection extends HTMLElement {
             <div class="quiz-feedback" data-exit-feedback hidden role="status"></div>
             <div class="continue-row">
               <span>Finished the investigation? Use the same evidence-reading process on your selected website below.</span>
-              <button class="primary-button" type="button" data-next-section>Continue to Section 2 <span>→</span></button>
+              <button class="primary-button" type="button" data-next-section>Apply this to my website <span>↓</span></button>
             </div>
           </section>
         </div>

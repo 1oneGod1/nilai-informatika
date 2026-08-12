@@ -87,32 +87,32 @@ const POST_TEST_QUESTIONS = [
     answer: 0,
   },
   {
-    question: "Your group must recreate a website accurately in Figma. What should the QA lead check first?",
+    question: "When investigating a webpage before drawing, what should you record first?",
     options: [
-      "Whether the team likes the brand",
-      "Layout, spacing, type, and visual differences from the reference",
-      "How many plugins are installed",
-      "Whether every layer has a gradient",
+      "Only the brand colours",
+      "The order, grouping, hierarchy, navigation, and important actions",
+      "The website's source code",
+      "Every animation duration",
     ],
     answer: 1,
   },
   {
-    question: "Why is Auto Layout useful in the recreation task?",
+    question: "A webpage uses a large photograph in its hero section. How should a low-fidelity wireframe represent it?",
     options: [
-      "It automatically redesigns the website",
-      "It controls alignment, padding, gaps, and resizing",
-      "It replaces the need to measure",
-      "It publishes the website as code",
+      "Copy the photograph in full colour",
+      "Use a labelled image placeholder in the observed position and approximate size",
+      "Remove the entire hero section",
+      "Replace it with decorative icons",
     ],
     answer: 1,
   },
   {
-    question: "Which action belongs in Section 1 rather than Section 2?",
+    question: "What is the strongest evidence that a student's wireframe corresponds to the selected webpage?",
     options: [
-      "Matching the final font weight in Figma",
-      "Recreating shadows and border radius",
-      "Mapping content blocks and the main user journey",
-      "Sharing one group Figma file",
+      "It uses the student's favourite colour",
+      "It contains more sections than the webpage",
+      "Its major sections, order, hierarchy, navigation, and CTA match the observations",
+      "It includes realistic photographs",
     ],
     answer: 2,
   },
@@ -127,14 +127,14 @@ const POST_TEST_QUESTIONS = [
     answer: 0,
   },
   {
-    question: "What should make the later summative redesign successful?",
+    question: "A teacher asks why one block appears first in the wireframe. What is the best response?",
     options: [
-      "It looks different from the original at any cost",
-      "It uses more visual effects",
-      "It solves clear user problems with explainable design decisions",
-      "It copies another redesign exactly",
+      "It looked easier to draw there",
+      "The reference webpage gives that content priority and it supports the page's main purpose",
+      "Every wireframe must begin with the largest rectangle",
+      "The colour would look better in that position",
     ],
-    answer: 2,
+    answer: 1,
   },
 ];
 
@@ -440,8 +440,8 @@ function openPanelFromHash() {
     "overview",
     "pre-test",
     "section-1",
-    "section-2",
     "post-test",
+    "section-2",
     "pre-test-2",
     "section-3",
     "section-4",
@@ -451,6 +451,26 @@ function openPanelFromHash() {
 }
 
 function openPanel(panelName, updateHash = true) {
+  const section1Complete = isSection1Complete();
+  const requiresPostTest1 = [
+    "section-2",
+    "pre-test-2",
+    "section-3",
+    "section-4",
+    "post-test-2",
+  ].includes(panelName);
+  if (
+    (panelName === "post-test" || requiresPostTest1) &&
+    !section1Complete
+  ) {
+    panelName = "section-1";
+    updateHash = true;
+    showToast("Complete the Section 1 investigation before opening Post-test 1.", true);
+  } else if (requiresPostTest1 && !uiuxProgress.postTest) {
+    panelName = "post-test";
+    updateHash = true;
+    showToast("Complete Post-test 1 before opening Section 2.", true);
+  }
   const figmaPreTestRequired = ["section-3", "section-4", "post-test-2"].includes(panelName);
   if (figmaPreTestRequired && !uiuxProgress.figmaPreTest) {
     panelName = "pre-test-2";
@@ -483,7 +503,11 @@ function bindWireframeDetective() {
   const section = document.getElementById("wireframeDetectiveSection");
   if (!section) return;
   section.addEventListener("wireframe-progress", (event) => saveSection1Discovery(event.detail));
-  section.addEventListener("wireframe-next", () => openPanel("section-2"));
+  section.addEventListener("wireframe-next", () => {
+    document
+      .getElementById("websitePlanForm")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 async function saveSection1Discovery(discovery) {
@@ -1101,10 +1125,7 @@ function hydrateChecklist(containerId, saved) {
 function renderProgressState() {
   const preComplete = Boolean(uiuxProgress.preTest);
   const figmaPreComplete = Boolean(uiuxProgress.figmaPreTest);
-  const section1Complete =
-    isSection1DiscoveryComplete(uiuxProgress.section1Discovery) &&
-    Boolean(uiuxProgress.websitePlan) &&
-    allChecksComplete(uiuxProgress.section1Checklist, SECTION_1_CHECKS);
+  const section1Complete = isSection1Complete();
   const section2Complete =
     Boolean(uiuxProgress.groupPlan) && allChecksComplete(uiuxProgress.section2Checklist, SECTION_2_CHECKS);
   const section3Complete = isSection3Complete();
@@ -1333,6 +1354,14 @@ function isSection1DiscoveryComplete(discovery) {
   if (Array.isArray(foundZones)) return new Set(foundZones).size >= 6;
   if (!foundZones || typeof foundZones !== "object") return false;
   return Object.values(foundZones).filter((value) => value === true).length >= 6;
+}
+
+function isSection1Complete() {
+  return (
+    isSection1DiscoveryComplete(uiuxProgress.section1Discovery) &&
+    Boolean(uiuxProgress.websitePlan) &&
+    allChecksComplete(uiuxProgress.section1Checklist, SECTION_1_CHECKS)
+  );
 }
 
 function arraysEqual(first, second) {

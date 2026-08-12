@@ -298,8 +298,8 @@ function renderStudentLearningProgress(progress) {
   const steps = [
     ["preTest", "Pre-test 1", progress.preTest?.score],
     ["section1", "Section 1 · Wireframe"],
-    ["section2", "Section 2 · Figma Match"],
     ["postTest1", "Post-test 1", progress.postTest?.score],
+    ["section2", "Section 2 · Figma Match"],
     ["figmaPreTest", "Figma Pre-test", progress.figmaPreTest?.score],
     ["section3", "Section 3 · Figma Basics"],
     ["section4", "Section 4 · Toolbar Lab"],

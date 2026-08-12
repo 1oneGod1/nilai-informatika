@@ -90,15 +90,15 @@
               <span><strong>Wireframe</strong><small>Individual investigation</small></span>
               <span class="status-dot" id="section1Status"></span>
             </button>
-            <button class="mission-link" data-panel-target="section-2">
-              <span class="mission-number">02</span>
-              <span><strong>Figma match</strong><small>Assigned-group work</small></span>
-              <span class="status-dot" id="section2Status"></span>
-            </button>
             <button class="mission-link" data-panel-target="post-test">
               <span class="mission-number">T1</span>
               <span><strong>Post-test 1</strong><small>Wireframe concepts</small></span>
               <span class="status-dot is-locked" id="postTestStatus"><i class="fas fa-lock"></i></span>
+            </button>
+            <button class="mission-link" data-panel-target="section-2">
+              <span class="mission-number">02</span>
+              <span><strong>Figma match</strong><small>Assigned-group work</small></span>
+              <span class="status-dot" id="section2Status"></span>
             </button>
             <button class="mission-link" data-panel-target="pre-test-2">
               <span class="mission-number">P2</span>
@@ -275,6 +275,10 @@
               <div><p class="eyebrow">SECTION 01 CHECKPOINT</p><h2>Confirm that your drawing is supported by what you observed.</h2></div>
               <div id="section1Checklist" class="checklist"></div>
             </div>
+            <div class="section-complete-strip">
+              <div><span>NEXT REQUIRED STEP</span><strong>Complete Post-test 1 before entering Section 2.</strong></div>
+              <button type="button" class="primary-button" data-go-to="post-test">Open Post-test 1 <i class="fas fa-arrow-right"></i></button>
+            </div>
           </section>
 
           <section class="learning-panel" data-panel="section-2">
@@ -353,6 +357,10 @@
               <span><i class="fas fa-lock"></i> SUMMATIVE PREVIEW</span>
               <div><h2>Same website. Better experience.</h2><p>After this faithful recreation, your summative challenge will redesign the same website. Your changes must solve clear user problems—not only make the screen look different.</p></div>
             </div>
+            <div class="section-complete-strip violet-strip">
+              <div><span>SECTION 02 COMPLETE</span><strong>Continue to the Figma Pre-test before starting Section 3.</strong></div>
+              <button type="button" class="primary-button" data-go-to="pre-test-2">Open Figma Pre-test <i class="fas fa-arrow-right"></i></button>
+            </div>
           </section>
 
           <section class="learning-panel" data-panel="post-test">
@@ -360,7 +368,7 @@
               <div>
                 <p class="eyebrow">SESSION 01 CHECK · INDIVIDUAL</p>
                 <h1>Post-test 1</h1>
-                <p>Show what you understand about wireframing, UI/UX decisions, and the Figma recreation workflow.</p>
+                <p>Show what you understand about investigating a webpage and translating its structure into a low-fidelity wireframe.</p>
               </div>
               <div class="score-orbit danger"><span id="postScore">—</span><small>30%</small></div>
             </div>
@@ -383,8 +391,8 @@
               <span class="quiet-text">One successful submission only</span>
             </div>
             <div class="section-complete-strip pretest-bridge">
-              <div><span>NEXT REQUIRED STEP</span><strong>Complete the Figma Pre-test before opening Section 3.</strong></div>
-              <button type="button" class="primary-button" data-go-to="pre-test-2">Open Figma Pre-test <i class="fas fa-arrow-right"></i></button>
+              <div><span>NEXT REQUIRED STEP</span><strong>Continue to the assigned-group Figma matching activity.</strong></div>
+              <button type="button" class="primary-button" data-go-to="section-2">Open Section 2 <i class="fas fa-arrow-right"></i></button>
             </div>
           </section>
 
@@ -628,7 +636,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
     <script src="js/firebase-init.js?v=20260329c"></script>
-    <script src="js/wireframe-detective-section.js?v=20260812c"></script>
-    <script src="js/grade10-uiux.js?v=20260812c"></script>
+    <script src="js/wireframe-detective-section.js?v=20260812d"></script>
+    <script src="js/grade10-uiux.js?v=20260812d"></script>
   </body>
 </html>
