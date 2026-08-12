@@ -128,13 +128,18 @@ function calculateGrade10UiUxProgress(progress = {}) {
     states,
     xp,
     percent: Math.round((xp / GRADE10_UIUX_TOTAL_XP) * 100),
-    formative1: section1Product + post1Points,
-    formative2: section4Product + post2Points,
+    formative1:
+      section1 && states.postTest1 ? section1Product + post1Points : null,
+    formative2:
+      section4 && states.postTest2 ? section4Product + post2Points : null,
+    formative1Breakdown: { product: section1Product, postTest: post1Points },
+    formative2Breakdown: { product: section4Product, postTest: post2Points },
   };
 }
 
 function formatTeacherProgressScore(value) {
-  const rounded = Math.round(Number(value || 0) * 10) / 10;
+  if (value === null || value === undefined) return "—";
+  const rounded = Math.round(Number(value) * 10) / 10;
   return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
 }
 
@@ -230,8 +235,8 @@ function renderStudentLearningProgress(progress) {
         <p class="text-[11px] text-slate-500 font-mono-tech mt-3"><i class="fas fa-clock mr-1"></i> Aktivitas terakhir: ${escHtml(latestLabel)}</p>
       </article>
       <article class="grid grid-cols-2 gap-3">
-        <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="text-slate-500">provisional</small></div>
-        <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="text-slate-500">provisional</small></div>
+        <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">RAPORT Q1 · FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="block text-slate-500 mt-1">Produk ${summary.formative1Breakdown.product}/70 + Post-test ${formatTeacherProgressScore(summary.formative1Breakdown.postTest)}/30</small></div>
+        <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">RAPORT Q1 · FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="block text-slate-500 mt-1">Produk ${summary.formative2Breakdown.product}/70 + Post-test ${formatTeacherProgressScore(summary.formative2Breakdown.postTest)}/30</small></div>
       </article>
     </div>
     <div class="grid sm:grid-cols-2 gap-2.5">

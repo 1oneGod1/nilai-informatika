@@ -240,6 +240,147 @@ function getStudentGrade(student) {
   return match ? Number(match[0]) : 0;
 }
 
+function grade10ReportChecksComplete(saved, keys) {
+  return Boolean(saved) && keys.every((key) => saved[key] === true);
+}
+
+function grade10ReportSection1Complete(progress) {
+  const discovery = progress?.section1Discovery;
+  if (!discovery || discovery.conceptDone !== true || discovery.exitCorrect !== true)
+    return false;
+  const zones = discovery.foundZones || {};
+  const zonesComplete = Array.isArray(zones)
+    ? new Set(zones).size >= 6
+    : Object.values(zones).filter((value) => value === true).length >= 6;
+  return (
+    zonesComplete &&
+    Boolean(progress.websitePlan) &&
+    grade10ReportChecksComplete(progress.section1Checklist, [
+      "reference",
+      "structure",
+      "fidelity",
+      "journey",
+    ])
+  );
+}
+
+function grade10ReportSection4Complete(progress) {
+  const workshop = progress?.section4Workshop || {};
+  const tools = workshop.toolsExplored || {};
+  return (
+    Boolean(workshop.framePreset) &&
+    workshop.layerChallenge === true &&
+    ["move", "frame", "shape", "pen", "text", "layers"].every(
+      (key) => tools[key] === true,
+    ) &&
+    Boolean(progress.figmaFoundationPlan) &&
+    grade10ReportChecksComplete(progress.section4Checklist, [
+      "assignedGroup",
+      "sharedFile",
+      "frame",
+      "objects",
+      "layers",
+      "explain",
+    ])
+  );
+}
+
+function calculateGrade10ReportScores(progress = {}) {
+  const product1Complete = grade10ReportSection1Complete(progress);
+  const product2Complete = grade10ReportSection4Complete(progress);
+  const post1Complete = Boolean(progress.postTest);
+  const post2Complete = Boolean(progress.postTest2);
+  const post1Score = post1Complete ? Number(progress.postTest.score || 0) : 0;
+  const post2Score = post2Complete ? Number(progress.postTest2.score || 0) : 0;
+  const post1Points = Math.round(post1Score * 0.3 * 10) / 10;
+  const post2Points = Math.round(post2Score * 0.3 * 10) / 10;
+
+  return {
+    formative1: {
+      productComplete: product1Complete,
+      postComplete: post1Complete,
+      productPoints: product1Complete ? 70 : 0,
+      postPoints: post1Points,
+      score: product1Complete && post1Complete ? 70 + post1Points : null,
+    },
+    formative2: {
+      productComplete: product2Complete,
+      postComplete: post2Complete,
+      productPoints: product2Complete ? 70 : 0,
+      postPoints: post2Points,
+      score: product2Complete && post2Complete ? 70 + post2Points : null,
+    },
+  };
+}
+
+function formatGrade10ReportScore(value) {
+  if (value === null || value === undefined) return "—";
+  const rounded = Math.round(Number(value) * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+}
+
+function buildGrade10ReportCard() {
+  return `
+    <section id="grade10UiUxReport" class="mb-6 rounded-2xl border border-cyan-400/25 bg-gradient-to-br from-slate-900 via-cyan-950/30 to-violet-950/30 overflow-hidden">
+      <div class="p-5 md:p-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="grid w-11 h-11 place-items-center rounded-xl bg-lime-300 text-slate-950"><i class="fas fa-file-lines"></i></div>
+          <div><span class="text-[10px] font-mono-tech tracking-[0.2em] text-lime-300 font-bold">RAPORT Q1 · DIGITAL DESIGN</span><h3 class="text-xl font-black text-white mt-1">UI/UX Formative Assessment</h3></div>
+        </div>
+        <div id="grade10UiUxReportBody" class="py-8 text-center text-slate-500 font-mono-tech text-xs">
+          <i class="fas fa-circle-notch fa-spin text-cyan-400 text-xl mb-3 block"></i>Calculating formative scores…
+        </div>
+      </div>
+    </section>`;
+}
+
+async function loadGrade10ReportScores(studentId, kkm) {
+  const container = document.getElementById("grade10UiUxReportBody");
+  if (!container) return;
+  try {
+    const snapshot = await db
+      .ref("learningProgress")
+      .child(studentId)
+      .child("grade10UiUx")
+      .once("value");
+    const scores = calculateGrade10ReportScores(snapshot.val() || {});
+    const assessments = [
+      ["Formatif 1", "Wireframe product", "Post-test 1", scores.formative1, "cyan"],
+      ["Formatif 2", "Figma product", "Post-test 2", scores.formative2, "violet"],
+    ];
+
+    container.innerHTML = `
+      <div class="grid md:grid-cols-2 gap-4 text-left">
+        ${assessments
+          .map(([label, productLabel, postLabel, result, accent]) => {
+            const recorded = result.score !== null;
+            const score = formatGrade10ReportScore(result.score);
+            const belowKkm = recorded && Number(result.score) < Number(kkm);
+            const scoreClass = !recorded
+              ? "text-slate-500"
+              : belowKkm
+                ? "text-rose-400"
+                : "text-emerald-400";
+            return `<article class="rounded-xl border border-${accent}-400/25 bg-slate-950/45 p-4 md:p-5">
+              <div class="flex items-start justify-between gap-3">
+                <div><span class="text-[10px] font-mono-tech tracking-widest text-${accent}-300">${label.toUpperCase()}</span><h4 class="text-white font-black mt-1">${label}</h4></div>
+                <strong class="text-3xl font-black ${scoreClass}">${score}</strong>
+              </div>
+              <div class="mt-4 grid gap-2 text-xs">
+                <div class="flex items-center justify-between gap-3 rounded-lg bg-white/[0.035] px-3 py-2"><span class="text-slate-400">${productLabel} · 70%</span><b class="${result.productComplete ? "text-white" : "text-slate-600"}">${result.productComplete ? "70 / 70" : "Incomplete"}</b></div>
+                <div class="flex items-center justify-between gap-3 rounded-lg bg-white/[0.035] px-3 py-2"><span class="text-slate-400">${postLabel} · 30%</span><b class="${result.postComplete ? "text-white" : "text-slate-600"}">${result.postComplete ? `${formatGrade10ReportScore(result.postPoints)} / 30` : "Incomplete"}</b></div>
+              </div>
+              <p class="mt-3 text-[10px] font-mono-tech ${recorded ? "text-emerald-400" : "text-amber-400"}"><i class="fas ${recorded ? "fa-circle-check" : "fa-clock"} mr-1"></i>${recorded ? "RECORDED IN Q1 REPORT" : "WAITING FOR BOTH COMPONENTS"}</p>
+            </article>`;
+          })
+          .join("")}
+      </div>
+      <p class="mt-4 text-[11px] text-slate-500 leading-relaxed"><i class="fas fa-circle-info text-cyan-400 mr-1"></i>Pre-tests and XP do not affect the report score. Each formative score is recorded only after its product and related post-test are complete.</p>`;
+  } catch (error) {
+    container.innerHTML = `<div class="rounded-xl border border-rose-500/25 bg-rose-500/10 p-4 text-rose-300"><i class="fas fa-triangle-exclamation mr-2"></i>Raport UI/UX gagal dimuat. Silakan coba kembali.</div>`;
+  }
+}
+
 function rememberVerifiedStudent(student) {
   if (!student || getStudentGrade(student) !== 10) return;
 
@@ -452,6 +593,8 @@ function renderStudentDetail(id) {
       ? dcBuildStudentAssessmentHtml(s, kkm)
       : "";
   const grade10MaterialsHtml = buildGrade10MaterialsCard(s);
+  const grade10ReportHtml =
+    getStudentGrade(s) === 10 ? buildGrade10ReportCard() : "";
 
   // Notification block (dark)
   let notifHtml = "";
@@ -505,6 +648,8 @@ function renderStudentDetail(id) {
 
       ${grade10MaterialsHtml}
 
+      ${grade10ReportHtml}
+
       ${allTilesHtml}
 
       ${digitalCitizenshipHtml}
@@ -521,6 +666,7 @@ function renderStudentDetail(id) {
   document.getElementById("searchResults").classList.add("hidden");
   if (awaitingText) awaitingText.classList.add("hidden");
 
+  if (getStudentGrade(s) === 10) loadGrade10ReportScores(s.id, kkm);
   renderRadarChart(quartersData, kkm);
 }
 
