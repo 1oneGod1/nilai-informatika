@@ -1,6 +1,6 @@
 /* ========================================================
    teacher-assessment.js
-   Workspace assessment Grade 7, Grade 9, dan Grade 12 per quarter.
+   Workspace assessment Grade 8, Grade 9, dan Grade 12 per quarter.
    ======================================================== */
 
 const dcTeacherState = {

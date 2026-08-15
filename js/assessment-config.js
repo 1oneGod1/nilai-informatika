@@ -99,10 +99,10 @@ const DC_Q1_FINAL_QUIZ = {
   color: "#ef6a54",
 };
 
-// Grade 7 uses the same Q1 assessment model as Grade 9, while the task briefs
-// follow the Grade 7 activity list and the supplied Digital Footprint and
+// Grade 8 uses the same Q1 assessment model as Grade 9, while the task briefs
+// follow the Grade 8 activity list and the supplied Digital Footprint and
 // Evaluating News workbooks.
-const G7_Q1_BRIEFS = {
+const G8_Q1_BRIEFS = {
   personalWebpage:
     "Buat personal webpage yang hanya membagikan informasi pribadi yang aman. Sertakan judul, bio singkat, tiga bagian lengkap, gambar yang sesuai, serta HTML/CSS yang dipersonalisasi tanpa informasi privat atau placeholder.",
   onlineSafety:
@@ -113,12 +113,12 @@ const G7_Q1_BRIEFS = {
     "Buat kuis pilihan ganda berisi tiga pertanyaan tentang alasan fake information dibuat dan REAL Test: Reliable, Evidence, Author, dan Logic. Setiap pertanyaan memiliki empat pilihan, index jawaban yang akurat, feedback, skor, dan struktur data JavaScript yang benar.",
 };
 
-const G7_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS.map((assessment) => ({
+const G8_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS.map((assessment) => ({
   ...assessment,
-  brief: G7_Q1_BRIEFS[assessment.id] || "",
+  brief: G8_Q1_BRIEFS[assessment.id] || "",
 }));
 
-const G7_Q1_FINAL_QUIZ = {
+const G8_Q1_FINAL_QUIZ = {
   ...DC_Q1_FINAL_QUIZ,
   subtitle: "25 soal: privacy, online safety, digital footprint, dan evaluating information",
 };
@@ -1315,17 +1315,17 @@ const DC_COURSES = {
   },
 };
 
-const G7_COURSES = {
+const G8_COURSES = {
   1: {
     id: "digitalCitizenshipFoundations",
-    grade: 7,
+    grade: 8,
     quarter: 1,
     title: "Digital Citizenship Foundations",
     shortTitle: "Digital Citizenship",
     description:
-      "Grade 7 | Q1 | Personal information, online safety, digital footprint, and evaluating information | Formatif 40% dan sumatif 60%.",
-    assessments: G7_Q1_ASSESSMENTS,
-    finalQuiz: G7_Q1_FINAL_QUIZ,
+      "Grade 8 | Q1 | Personal information, online safety, digital footprint, and evaluating information | Formatif 40% dan sumatif 60%.",
+    assessments: G8_Q1_ASSESSMENTS,
+    finalQuiz: G8_Q1_FINAL_QUIZ,
   },
 };
 
@@ -1373,7 +1373,7 @@ const G12_COURSES = {
 };
 
 const DC_COURSES_BY_GRADE = {
-  7: G7_COURSES,
+  8: G8_COURSES,
   9: DC_COURSES,
   12: G12_COURSES,
 };
