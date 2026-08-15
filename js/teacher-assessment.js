@@ -1,6 +1,6 @@
 /* ========================================================
    teacher-assessment.js
-   Workspace assessment Grade 9 dan Grade 12 per quarter.
+   Workspace assessment Grade 7, Grade 9, dan Grade 12 per quarter.
    ======================================================== */
 
 const dcTeacherState = {
@@ -74,7 +74,7 @@ function ensureDcSelectedAssessment() {
 function changeDcAssessmentGrade(grade) {
   const nextGrade = Number(grade || 9);
   const gradeSelect = document.getElementById("dcAssessmentGrade");
-  if (![9, 12].includes(nextGrade)) return;
+  if (!DC_COURSES_BY_GRADE[nextGrade]) return;
   if (
     dcTeacherState.dirty &&
     nextGrade !== dcTeacherState.grade &&
@@ -324,12 +324,18 @@ function renderDcAssessmentPanel() {
   updateDcSaveState();
 
   if (!course) {
+    const availableQuarters = [1, 2, 3, 4].filter((quarter) =>
+      dcGetCourseConfig(quarter, dcTeacherState.grade),
+    );
+    const availability = availableQuarters.length
+      ? `Assessment Grade ${dcTeacherState.grade} tersedia pada ${availableQuarters.map((quarter) => `Q${quarter}`).join(", ")}.`
+      : `Assessment Grade ${dcTeacherState.grade} belum tersedia.`;
     nav.innerHTML = "";
     content.innerHTML = `
       <div class="dc-empty-state">
         <span><i class="fas fa-calendar-plus"></i></span>
         <h3>Assessment Q${dcTeacherState.quarter} belum tersedia</h3>
-        <p>Pilih periode yang sudah memiliki assessment untuk Grade ${dcTeacherState.grade}. Grade 12 tersedia pada Q1 sampai Q4.</p>
+        <p>Pilih periode yang sudah memiliki assessment. ${availability}</p>
       </div>`;
     return;
   }

@@ -359,7 +359,7 @@
           </button>
         </div>
 
-        <!-- WORKSPACE PENILAIAN KELAS 9 DAN 12 (KHUSUS GURU) -->
+        <!-- WORKSPACE PENILAIAN KELAS 7, 9, DAN 12 (KHUSUS GURU) -->
         <section
           id="dcAssessmentPanel"
           class="dc-assessment-shell glass-panel-teacher rounded-2xl"
@@ -380,7 +380,8 @@
               <label class="dc-control-field dc-grade-field">
                 <span>Kelas</span>
                 <select id="dcAssessmentGrade">
-                  <option value="9">Grade 9</option>
+                  <option value="7">Grade 7</option>
+                  <option value="9" selected>Grade 9</option>
                   <option value="12">Grade 12</option>
                 </select>
               </label>
@@ -665,9 +666,9 @@
     <!-- Custom Scripts -->
     <script src="js/firebase-init.js?v=20260329b"></script>
     <script src="js/auth.js?v=20260329b"></script>
-    <script src="js/assessment-config.js?v=20260804a"></script>
+    <script src="js/assessment-config.js?v=20260816a"></script>
     <!-- teacher.js contains only the logic needed for the dashboard page (auth check, CRUD, admins) -->
     <script src="js/teacher.js?v=20260812d"></script>
-    <script src="js/teacher-assessment.js?v=20260804a"></script>
+    <script src="js/teacher-assessment.js?v=20260816a"></script>
   </body>
 </html>
