@@ -6,7 +6,7 @@
 
 let allSiswa = [];
 let activeQuarter = 4; // Default ke Q4 untuk Sense, Decide, and Deliver with VEX IQ
-let numFormatif = { 1: 2, 2: 2, 3: 2, 4: 2 }; // Default fields per quarter
+let numFormatif = { 1: 3, 2: 3, 3: 3, 4: 3 }; // Grade 8–9 use three formative projects per quarter
 let selectedLearningProgressStudent = null;
 let selectedLearningProgressData = {};
 
@@ -78,6 +78,22 @@ function isAdminEmailSafe(email) {
 function getTeacherStudentGrade(student) {
   const match = String(student?.kelas || "").match(/\d+/);
   return match ? Number(match[0]) : 0;
+}
+
+function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
+  const grade = getTeacherStudentGrade(student);
+  if (
+    ![8, 9].includes(grade) ||
+    typeof dcBuildFormativeGradebookFields !== "function"
+  ) {
+    return {};
+  }
+
+  const storedRecord =
+    student?.digitalCitizenshipAssessment?.[`q${Number(quarter)}`];
+  return storedRecord
+    ? dcBuildFormativeGradebookFields(storedRecord, quarter, grade)
+    : {};
 }
 
 function getSafeReferenceUrl(value) {
@@ -654,6 +670,25 @@ function listenToSiswaData() {
             needsMigration = true;
           }
 
+          for (let quarter = 1; quarter <= 4; quarter++) {
+            const autoFormativeFields = getStudentAutoFormativeFields(
+              val,
+              quarter,
+            );
+            Object.entries(autoFormativeFields).forEach(([field, score]) => {
+              const currentScore = val[field];
+              const alreadySynced =
+                currentScore !== "" &&
+                currentScore !== null &&
+                currentScore !== undefined &&
+                Number(currentScore) === Number(score);
+              if (!alreadySynced) {
+                updates[`${id}/${field}`] = score;
+                needsMigration = true;
+              }
+            });
+          }
+
           if (needsMigration) {
             madeChanges = true;
           } else {
@@ -663,7 +698,9 @@ function listenToSiswaData() {
 
         if (madeChanges) {
           siswaRef.update(updates).then(() => {
-            console.log("Auto-migrasi data lama ke Quarter 3 berhasil.");
+            console.log(
+              "Auto-migrasi dan sinkronisasi nilai formatif berhasil.",
+            );
           });
         } else {
           allSiswa.sort((a, b) => a.nama.localeCompare(b.nama, "id"));
@@ -744,10 +781,19 @@ function saveSiswaRow(id) {
       ? Number(sumatifEl.value.trim())
       : "";
 
+  const autoFormativeFields = getStudentAutoFormativeFields(
+    siswa,
+    activeQuarter,
+  );
   for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
+    const field = `q${activeQuarter}_f${i}`;
+    if (Object.prototype.hasOwnProperty.call(autoFormativeFields, field)) {
+      updated[field] = autoFormativeFields[field];
+      continue;
+    }
     const el = document.getElementById("r-f" + i + "-" + id);
     const v = el ? el.value.trim() : "";
-    updated[`q${activeQuarter}_f${i}`] = v !== "" ? Number(v) : "";
+    updated[field] = v !== "" ? Number(v) : "";
   }
 
   siswaRef
@@ -868,6 +914,10 @@ function renderTableBody(data) {
   tbody.innerHTML = filtered
     .map((s, idx) => {
       const kkm = getKKM(s.kelas);
+      const autoFormativeFields = getStudentAutoFormativeFields(
+        s,
+        activeQuarter,
+      );
       const fArr = [];
       for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
         fArr.push(
@@ -895,6 +945,11 @@ function renderTableBody(data) {
       let fInputs = "";
       for (let i = 0; i < numFormatif[activeQuarter]; i++) {
         const val = fArr[i];
+        const field = `q${activeQuarter}_f${i + 1}`;
+        const isAutoFilled = Object.prototype.hasOwnProperty.call(
+          autoFormativeFields,
+          field,
+        );
         const num =
           val !== "" && val !== null && val !== undefined ? Number(val) : "";
         const cls =
@@ -903,7 +958,7 @@ function renderTableBody(data) {
             : "table-input";
         fInputs += `
         <td class="px-2 py-3">
-          <input type="number" min="0" max="100" class="${cls}" id="r-f${i + 1}-${s.id}" value="${num}" placeholder="-" oninput="highlightScore(this,${kkm})" />
+          <input type="number" min="0" max="100" class="${cls}${isAutoFilled ? " cursor-not-allowed opacity-80" : ""}" id="r-f${i + 1}-${s.id}" value="${num}" placeholder="-" oninput="highlightScore(this,${kkm})" ${isAutoFilled ? 'readonly title="Terisi otomatis dari rubrik penilaian" aria-label="Nilai formatif otomatis dari rubrik"' : ""} />
         </td>`;
       }
 

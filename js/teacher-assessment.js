@@ -280,20 +280,29 @@ async function saveDcAssessment() {
       auth.currentUser?.email || "",
       dcTeacherState.grade,
     );
-    await siswaRef
-      .child(student.id)
-      .child("digitalCitizenshipAssessment")
-      .child(`q${dcTeacherState.quarter}`)
-      .set(record);
+    const formativeGradebookFields = [8, 9].includes(dcTeacherState.grade)
+      ? dcBuildFormativeGradebookFields(
+          record,
+          dcTeacherState.quarter,
+          dcTeacherState.grade,
+        )
+      : {};
+    await siswaRef.child(student.id).update({
+      [`digitalCitizenshipAssessment/q${dcTeacherState.quarter}`]: record,
+      ...formativeGradebookFields,
+    });
 
     if (!student.digitalCitizenshipAssessment) {
       student.digitalCitizenshipAssessment = {};
     }
     student.digitalCitizenshipAssessment[`q${dcTeacherState.quarter}`] = record;
+    Object.assign(student, formativeGradebookFields);
     dcTeacherState.dirty = false;
     updateDcSaveState();
+    renderTableBody(allSiswa);
+    const syncedCount = Object.keys(formativeGradebookFields).length;
     showAlert(
-      `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.`,
+      `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.${syncedCount ? ` Nilai F1–F${syncedCount} otomatis masuk ke buku nilai.` : ""}`,
       "success",
     );
   } catch (error) {

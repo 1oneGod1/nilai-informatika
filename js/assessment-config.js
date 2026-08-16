@@ -1594,6 +1594,40 @@ function dcBuildStoredRecord(draft, quarter, updatedBy, grade = 9) {
   return record;
 }
 
+function dcBuildFormativeGradebookFields(
+  storedRecord,
+  quarter,
+  grade = 9,
+) {
+  const course = dcGetCourseConfig(quarter, grade);
+  if (!course || !storedRecord || typeof storedRecord !== "object") return {};
+
+  const recalculatedSummary = dcCalculateSummary(
+    dcDraftFromStored(storedRecord, quarter, grade),
+    quarter,
+    grade,
+  );
+  const rawScores =
+    storedRecord.rawScores && typeof storedRecord.rawScores === "object"
+      ? storedRecord.rawScores
+      : {};
+  const fields = {};
+
+  course.assessments
+    .filter((assessment) => assessment.type === "Formatif")
+    .forEach((assessment, index) => {
+      const savedRaw = rawScores[assessment.id];
+      const sourceScore = Number.isFinite(Number(savedRaw))
+        ? Number(savedRaw)
+        : recalculatedSummary.rawScores[assessment.id];
+      fields[`q${Number(quarter)}_f${index + 1}`] = Number(
+        dcClampScore(sourceScore, 100).toFixed(2),
+      );
+    });
+
+  return fields;
+}
+
 function dcScoreStatus(score, kkm) {
   if (!Number.isFinite(Number(score))) return "Belum dinilai";
   return Number(score) >= Number(kkm || 0) ? "Tuntas" : "Perlu tindak lanjut";
