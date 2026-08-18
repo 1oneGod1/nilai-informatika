@@ -277,11 +277,15 @@ function grade10ReportSection1Complete(progress) {
 function grade10ReportSection4Complete(progress) {
   const workshop = progress?.section4Workshop || {};
   const tools = workshop.toolsExplored || {};
+  const guidedBuildSteps = workshop.guidedBuildSteps || {};
   return (
     Boolean(workshop.framePreset) &&
     workshop.layerChallenge === true &&
     ["move", "frame", "shape", "pen", "text", "layers"].every(
       (key) => tools[key] === true,
+    ) &&
+    ["frame", "layout", "typography", "image", "style", "autolayout"].every(
+      (key) => guidedBuildSteps[key] === true,
     ) &&
     Boolean(progress.figmaFoundationPlan) &&
     grade10ReportChecksComplete(progress.section4Checklist, [
@@ -446,7 +450,7 @@ function buildGrade10MaterialsCard(student) {
           <p class="text-sm text-slate-300 mt-1 max-w-2xl">Complete four interactive sections with a separate one-attempt baseline before the Figma foundations, then submit two locked post-tests.</p>
           <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech">
             <span class="text-emerald-300"><i class="fas fa-check-circle mr-1"></i>Section 1 · Wireframe</span>
-            <span class="text-violet-300"><i class="fas fa-users mr-1"></i>Section 2 · Group Figma Lab</span>
+            <span class="text-violet-300"><i class="fas fa-users mr-1"></i>Section 2 · Group Project Setup</span>
             <span class="text-cyan-300"><i class="fab fa-figma mr-1"></i>Section 3 · Figma Foundations</span>
             <span class="text-fuchsia-300"><i class="fas fa-layer-group mr-1"></i>Section 4 · Toolbar Lab</span>
           </div>

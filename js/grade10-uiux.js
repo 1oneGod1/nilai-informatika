@@ -248,19 +248,19 @@ const SECTION_1_CHECKS = [
 
 const SECTION_2_CHECKS = [
   ["group", "I worked with the group assigned by my teacher."],
-  ["file", "Our group uses one shared Figma file with clearly named sections or layers."],
-  ["match", "Our layout, spacing, typography, colors, and visual details match the reference."],
-  ["responsive", "We checked at least one desktop or mobile frame size against the reference."],
-  ["explain", "Every member can explain the design structure and their contribution."],
+  ["file", "Our group prepared one shared Figma Design file for the project."],
+  ["match", "We agreed on the exact webpage or page area that we will match."],
+  ["responsive", "We selected the target device and frame size shown by the reference."],
+  ["explain", "Every member understands their responsibility and the four accuracy criteria."],
 ];
 
 const SECTION_4_CHECKS = [
   ["assignedGroup", "We worked only with the group assigned by our teacher."],
   ["sharedFile", "We created one shared Figma Design file and saved its link."],
   ["frame", "We selected a frame preset that matches our target device."],
-  ["objects", "We used shapes and text to create a simple interface composition."],
-  ["layers", "We renamed and ordered layers so the visual stack is clear."],
-  ["explain", "Every member can explain one tool and their contribution."],
+  ["objects", "We completed the guided hero build, including text, image, CTA, and Auto Layout."],
+  ["layers", "We renamed, measured, and ordered layers so the visual stack is clear."],
+  ["explain", "Our selected webpage match follows the reference layout, spacing, typography, and visual style."],
 ];
 
 const FIGMA_ZONES = {
@@ -327,6 +327,15 @@ const FRAME_PRESETS = {
 
 const SECTION_3_ROUTE = ["drafts", "create", "design"];
 const SECTION_4_TOOL_KEYS = Object.keys(FIGMA_TOOLS);
+const GUIDED_BUILD_STEPS = {
+  frame: "Create the target frame",
+  layout: "Build the header and hero layout",
+  typography: "Create the type hierarchy",
+  image: "Place and crop the image",
+  style: "Style the CTA in the inspector",
+  autolayout: "Apply Auto Layout, measure, and organise",
+};
+const GUIDED_BUILD_KEYS = Object.keys(GUIDED_BUILD_STEPS);
 const CORRECT_LAYER_ORDER = ["cta", "image", "background"];
 const LAYER_LABELS = { cta: "CTA button", image: "Hero image", background: "Background" };
 const LAYER_ICONS = { cta: "fa-square", image: "fa-image", background: "fa-fill-drip" };
@@ -1044,6 +1053,17 @@ function bindSection4Interactions() {
     state.savedAt = Date.now();
     await saveProgressRecord("section4Workshop", state, "The frame preset could not be saved.");
   });
+
+  document.querySelectorAll("[data-guided-build-step]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const key = button.dataset.guidedBuildStep;
+      if (!GUIDED_BUILD_KEYS.includes(key)) return;
+      const state = getSection4WorkshopState();
+      state.guidedBuildSteps[key] = !state.guidedBuildSteps[key];
+      state.savedAt = Date.now();
+      await saveProgressRecord("section4Workshop", state, "The guided build progress could not be saved.");
+    });
+  });
 }
 
 function getSection3State() {
@@ -1066,10 +1086,12 @@ function getSection3State() {
 function getSection4WorkshopState() {
   const saved = uiuxProgress.section4Workshop || {};
   const tools = saved.toolsExplored || {};
+  const guidedBuildSteps = saved.guidedBuildSteps || {};
   return {
     framePreset: typeof saved.framePreset === "string" ? saved.framePreset : "",
     toolsExplored: Object.fromEntries(SECTION_4_TOOL_KEYS.map((key) => [key, tools[key] === true])),
     layerChallenge: saved.layerChallenge === true,
+    guidedBuildSteps: Object.fromEntries(GUIDED_BUILD_KEYS.map((key) => [key, guidedBuildSteps[key] === true])),
     savedAt: safeNumber(saved.savedAt, Date.now()),
   };
 }
@@ -1141,7 +1163,35 @@ function renderSection4State() {
     const tool = FIGMA_TOOLS[section4SelectedTool];
     document.getElementById("toolbarDetail").innerHTML = `<i class="fas ${tool.icon}"></i><div><span>SELECTED TOOL</span><h3>${tool.title}</h3><p>${tool.description}</p></div>`;
   }
+  renderGuidedBuild(state.guidedBuildSteps);
   renderLayerChallenge();
+}
+
+function renderGuidedBuild(steps) {
+  const completedCount = GUIDED_BUILD_KEYS.filter((key) => steps[key] === true).length;
+  const percentage = Math.round((completedCount / GUIDED_BUILD_KEYS.length) * 100);
+  const count = document.getElementById("guidedBuildCount");
+  const preview = document.getElementById("guidedBuildPreview");
+  if (!count || !preview) return;
+
+  count.textContent = `${completedCount} / ${GUIDED_BUILD_KEYS.length}`;
+  document.getElementById("guidedBuildPercent").textContent = `${percentage}%`;
+  document.querySelectorAll("[data-guided-build-step]").forEach((button) => {
+    const complete = steps[button.dataset.guidedBuildStep] === true;
+    button.classList.toggle("is-complete", complete);
+    button.setAttribute("aria-pressed", String(complete));
+  });
+  GUIDED_BUILD_KEYS.forEach((key) => preview.classList.toggle(`step-${key}`, steps[key] === true));
+
+  const nextKey = GUIDED_BUILD_KEYS.find((key) => steps[key] !== true);
+  document.getElementById("guidedBuildNext").textContent = nextKey
+    ? `Next in Figma: ${GUIDED_BUILD_STEPS[nextKey]}.`
+    : "Mini-build complete. Apply the same workflow to your selected webpage.";
+  const feedback = document.getElementById("guidedBuildFeedback");
+  feedback.classList.toggle("is-success", !nextKey);
+  feedback.textContent = nextKey
+    ? "Do the work in your real Figma file. This checklist records your progress; it does not replace the design activity."
+    : "Guided build complete. Compare your practice hero with the instructions, then begin the selected webpage match below.";
 }
 
 function renderFramePreview(presetKey) {
@@ -1419,6 +1469,7 @@ function isSection4Complete() {
     Boolean(state.framePreset) &&
     state.layerChallenge &&
     Object.values(state.toolsExplored).every(Boolean) &&
+    Object.values(state.guidedBuildSteps).every(Boolean) &&
     Boolean(uiuxProgress.figmaFoundationPlan) &&
     allChecksComplete(uiuxProgress.section4Checklist, SECTION_4_CHECKS)
   );

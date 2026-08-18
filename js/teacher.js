@@ -207,11 +207,15 @@ function calculateGrade10UiUxProgress(progress = {}) {
     );
   const section4State = progress.section4Workshop || {};
   const exploredTools = section4State.toolsExplored || {};
+  const guidedBuildSteps = section4State.guidedBuildSteps || {};
   const section4 =
     Boolean(section4State.framePreset) &&
     section4State.layerChallenge === true &&
     ["move", "frame", "shape", "pen", "text", "layers"].every(
       (key) => exploredTools[key] === true,
+    ) &&
+    ["frame", "layout", "typography", "image", "style", "autolayout"].every(
+      (key) => guidedBuildSteps[key] === true,
     ) &&
     Boolean(progress.figmaFoundationPlan) &&
     teacherChecksComplete(progress.section4Checklist, [
@@ -359,7 +363,7 @@ function renderStudentLearningProgress(progress) {
     ["preTest", "Pre-test 1", progress.preTest?.score],
     ["section1", "Section 1 · Wireframe"],
     ["postTest1", "Post-test 1", progress.postTest?.score],
-    ["section2", "Section 2 · Figma Match"],
+    ["section2", "Section 2 · Project Setup"],
     ["figmaPreTest", "Figma Pre-test", progress.figmaPreTest?.score],
     ["section3", "Section 3 · Figma Basics"],
     ["section4", "Section 4 · Toolbar Lab"],
