@@ -80,6 +80,50 @@ function getTeacherStudentGrade(student) {
   return match ? Number(match[0]) : 0;
 }
 
+function openGrade10TeacherPreview() {
+  const teacher = auth.currentUser;
+  if (!teacher) {
+    showAlert("Sesi guru tidak ditemukan. Silakan masuk kembali.", "warning");
+    return;
+  }
+
+  const sectionSelect = document.getElementById(
+    "grade10TeacherPreviewSection",
+  );
+  const requestedSection = String(sectionSelect?.value || "overview");
+  const validSections = [
+    "overview",
+    "pre-test",
+    "section-1",
+    "post-test",
+    "section-2",
+    "pre-test-2",
+    "section-3",
+    "section-4",
+    "post-test-2",
+  ];
+  const section = validSections.includes(requestedSection)
+    ? requestedSection
+    : "overview";
+  const previewSession = {
+    id: `teacher-preview-${teacher.uid}`,
+    name: "Teacher Review",
+    className: "Grade 10 · Preview only",
+    groupName: "Teacher review",
+    verifiedAt: Date.now(),
+    teacherUid: teacher.uid,
+    teacherEmail: String(teacher.email || ""),
+    isLocalPreview: true,
+    isTeacherPreview: true,
+  };
+
+  sessionStorage.setItem(
+    "csReportGrade10Session",
+    JSON.stringify(previewSession),
+  );
+  window.location.href = `grade10-uiux.html?teacherPreview=1#${section}`;
+}
+
 function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
   const grade = getTeacherStudentGrade(student);
   if (

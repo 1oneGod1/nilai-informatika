@@ -359,6 +359,64 @@
           </button>
         </div>
 
+        <!-- GRADE 10 MATERIAL REVIEW -->
+        <section
+          class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-cyan-400"
+          aria-labelledby="grade10ReviewTitle"
+        >
+          <div class="flex flex-col lg:flex-row lg:items-center gap-5">
+            <div
+              class="w-12 h-12 rounded-xl bg-cyan-400/10 border border-cyan-400/30 text-cyan-300 flex items-center justify-center text-lg shrink-0"
+            >
+              <i class="fas fa-eye"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p
+                class="text-[10px] font-mono-tech tracking-[0.2em] text-cyan-300 font-bold uppercase mb-1.5"
+              >
+                Grade 10 · Teacher Review
+              </p>
+              <h2 id="grade10ReviewTitle" class="text-lg font-black text-white">
+                Review materi UI/UX yang diterima siswa
+              </h2>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">
+                Buka seluruh materi, pre-test, post-test, dan Section 1–4 tanpa
+                memakai akun siswa. Aktivitas dalam mode review tidak akan
+                menyimpan progress atau nilai ke Firebase.
+              </p>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:items-end gap-3 w-full lg:w-auto">
+              <label class="flex-1 lg:w-52">
+                <span
+                  class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-1.5"
+                  >Mulai dari</span
+                >
+                <select
+                  id="grade10TeacherPreviewSection"
+                  class="w-full bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-400"
+                >
+                  <option value="overview">Course overview</option>
+                  <option value="pre-test">Pre-test: Wireframe</option>
+                  <option value="section-1">Section 1: Wireframe</option>
+                  <option value="post-test">Post-test 1</option>
+                  <option value="section-2">Section 2: Figma Match</option>
+                  <option value="pre-test-2">Figma Pre-test</option>
+                  <option value="section-3">Section 3: Figma Basics</option>
+                  <option value="section-4">Section 4: Toolbar Lab</option>
+                  <option value="post-test-2">Post-test 2</option>
+                </select>
+              </label>
+              <button
+                type="button"
+                onclick="openGrade10TeacherPreview()"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"
+              >
+                <i class="fas fa-arrow-up-right-from-square"></i> Review materi
+              </button>
+            </div>
+          </div>
+        </section>
+
         <!-- WORKSPACE PENILAIAN KELAS 8, 9, DAN 12 (KHUSUS GURU) -->
         <section
           id="dcAssessmentPanel"
@@ -668,7 +726,7 @@
     <script src="js/auth.js?v=20260329b"></script>
     <script src="js/assessment-config.js?v=20260816d"></script>
     <!-- teacher.js contains only the logic needed for the dashboard page (auth check, CRUD, admins) -->
-    <script src="js/teacher.js?v=20260816a"></script>
+    <script src="js/teacher.js?v=20260818a"></script>
     <script src="js/teacher-assessment.js?v=20260816c"></script>
   </body>
 </html>

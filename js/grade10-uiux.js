@@ -350,11 +350,38 @@ async function initializeUiUxLab() {
     return;
   }
 
+  if (
+    uiuxStudent.isTeacherPreview === true &&
+    !(await validateTeacherPreviewAccess(uiuxStudent))
+  ) {
+    sessionStorage.removeItem(UIUX_SESSION_KEY);
+    showTeacherPreviewAccessDenied();
+    return;
+  }
+
   document.getElementById("learningApp").hidden = false;
   document.getElementById("studentName").textContent = uiuxStudent.name;
-  document.getElementById("studentClass").textContent = uiuxStudent.className;
+  document.getElementById("studentClass").textContent =
+    uiuxStudent.isTeacherPreview === true
+      ? "Grade 10 materials · preview only"
+      : uiuxStudent.className;
   document.getElementById("studentAvatar").textContent =
-    uiuxStudent.name.trim().charAt(0).toUpperCase() || "G";
+    uiuxStudent.isTeacherPreview === true
+      ? "T"
+      : uiuxStudent.name.trim().charAt(0).toUpperCase() || "G";
+
+  if (uiuxStudent.isTeacherPreview === true) {
+    document.body.classList.add("is-teacher-preview");
+    document.getElementById("teacherPreviewBanner").hidden = false;
+    document.getElementById("courseHomeLink").href = "dashboard.html";
+    document.getElementById("courseExitLink").href = "dashboard.html";
+    document.getElementById("courseExitLink").title =
+      "Back to teacher dashboard";
+    document.getElementById("courseExitLink").setAttribute(
+      "aria-label",
+      "Back to teacher dashboard",
+    );
+  }
 
   if (!uiuxStudent.isLocalPreview) {
     uiuxProgressRef = db.ref("learningProgress").child(uiuxStudent.id).child(UIUX_COURSE_ID);
@@ -412,7 +439,15 @@ function readVerifiedStudentSession() {
     const grade = gradeMatch ? Number(gradeMatch[0]) : 0;
     const sessionAge = Date.now() - Number(parsed.verifiedAt || 0);
 
-    if (!parsed.id || !parsed.name || grade !== 10 || sessionAge > UIUX_SESSION_MAX_AGE) {
+    const teacherPreviewRequested =
+      new URLSearchParams(window.location.search).get("teacherPreview") === "1";
+    if (
+      !parsed.id ||
+      !parsed.name ||
+      grade !== 10 ||
+      sessionAge > UIUX_SESSION_MAX_AGE ||
+      (parsed.isTeacherPreview === true && !teacherPreviewRequested)
+    ) {
       sessionStorage.removeItem(UIUX_SESSION_KEY);
       return null;
     }
@@ -422,6 +457,65 @@ function readVerifiedStudentSession() {
     sessionStorage.removeItem(UIUX_SESSION_KEY);
     return null;
   }
+}
+
+async function validateTeacherPreviewAccess(session) {
+  if (!session || session.isTeacherPreview !== true || !session.teacherUid)
+    return false;
+
+  try {
+    const user = await new Promise((resolve) => {
+      let unsubscribe = () => undefined;
+      unsubscribe = auth.onAuthStateChanged((currentUser) => {
+        unsubscribe();
+        resolve(currentUser || null);
+      });
+    });
+    if (!user || user.uid !== session.teacherUid) return false;
+
+    const email = String(user.email || session.teacherEmail || "")
+      .trim()
+      .toLowerCase();
+    const isAdmin = [
+      "andi.purba@sdh.or.id",
+      "pandapotanandi@gmail.com",
+    ].includes(email);
+    const snapshot = await db.ref("guru").child(user.uid).once("value");
+    const teacherRecord = snapshot.val() || {};
+    const accountVerified = teacherRecord.isVerified === true || isAdmin;
+    const emailVerified =
+      teacherRecord.emailVerified === true || user.emailVerified || isAdmin;
+    return accountVerified && emailVerified;
+  } catch (error) {
+    return false;
+  }
+}
+
+function showTeacherPreviewAccessDenied() {
+  const gate = document.getElementById("accessGate");
+  gate.hidden = false;
+  const eyebrow = gate.querySelector(".eyebrow");
+  const title = gate.querySelector("h1");
+  const copy = gate.querySelector("p:not(.eyebrow)");
+  const link = gate.querySelector("a");
+  if (eyebrow) eyebrow.textContent = "TEACHER ACCESS REQUIRED";
+  if (title) title.textContent = "Return to the teacher dashboard.";
+  if (copy)
+    copy.textContent =
+      "Teacher Review Mode must be opened from an active, verified teacher session.";
+  if (link) {
+    link.href = "dashboard.html";
+    link.innerHTML = '<i class="fas fa-arrow-left"></i> Teacher dashboard';
+  }
+}
+
+function exitUiUxLab() {
+  if (uiuxStudent?.isTeacherPreview === true) {
+    sessionStorage.removeItem(UIUX_SESSION_KEY);
+    window.location.href = "dashboard.html";
+    return false;
+  }
+  return true;
 }
 
 function bindNavigation() {
@@ -460,19 +554,28 @@ function openPanel(panelName, updateHash = true) {
     "post-test-2",
   ].includes(panelName);
   if (
+    uiuxStudent?.isTeacherPreview !== true &&
     (panelName === "post-test" || requiresPostTest1) &&
     !section1Complete
   ) {
     panelName = "section-1";
     updateHash = true;
     showToast("Complete the Section 1 investigation before opening Post-test 1.", true);
-  } else if (requiresPostTest1 && !uiuxProgress.postTest) {
+  } else if (
+    uiuxStudent?.isTeacherPreview !== true &&
+    requiresPostTest1 &&
+    !uiuxProgress.postTest
+  ) {
     panelName = "post-test";
     updateHash = true;
     showToast("Complete Post-test 1 before opening Section 2.", true);
   }
   const figmaPreTestRequired = ["section-3", "section-4", "post-test-2"].includes(panelName);
-  if (figmaPreTestRequired && !uiuxProgress.figmaPreTest) {
+  if (
+    uiuxStudent?.isTeacherPreview !== true &&
+    figmaPreTestRequired &&
+    !uiuxProgress.figmaPreTest
+  ) {
     panelName = "pre-test-2";
     updateHash = true;
     showToast("Complete the one-attempt Figma Pre-test before opening Section 3.", true);

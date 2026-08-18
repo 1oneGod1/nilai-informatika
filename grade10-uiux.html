@@ -18,7 +18,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       rel="stylesheet"
     />
-    <link href="grade10-uiux.css?v=20260812e" rel="stylesheet" />
+    <link href="grade10-uiux.css?v=20260818a" rel="stylesheet" />
     <link href="grade10-figma.css?v=20260811d" rel="stylesheet" />
   </head>
   <body>
@@ -41,7 +41,13 @@
 
     <div id="learningApp" class="app-shell" hidden>
       <header class="topbar">
-        <a class="brand" href="index.html" aria-label="Return to CS.Report">
+        <a
+          id="courseHomeLink"
+          class="brand"
+          href="index.html"
+          aria-label="Return to CS.Report"
+          onclick="return exitUiUxLab()"
+        >
           <span class="brand-mark">&gt;_</span>
           <span>CS<span>.</span>Report</span>
         </a>
@@ -55,11 +61,33 @@
             <strong id="studentName">Grade 10 Student</strong>
             <small id="studentClass">Grade 10</small>
           </span>
-          <a href="index.html" title="Back to grades" aria-label="Back to grades">
+          <a
+            id="courseExitLink"
+            href="index.html"
+            title="Back to grades"
+            aria-label="Back to grades"
+            onclick="return exitUiUxLab()"
+          >
             <i class="fas fa-arrow-right-from-bracket"></i>
           </a>
         </div>
       </header>
+
+      <div id="teacherPreviewBanner" class="teacher-preview-banner" hidden>
+        <div>
+          <i class="fas fa-eye"></i>
+          <span>
+            <strong>Teacher Review Mode</strong>
+            <small
+              >All sections are open. Answers and progress are not saved to
+              student records.</small
+            >
+          </span>
+        </div>
+        <button type="button" onclick="exitUiUxLab()">
+          <i class="fas fa-arrow-left"></i> Back to teacher dashboard
+        </button>
+      </div>
 
       <div class="mobile-progress">
         <span id="mobileProgressLabel">0% complete</span>
@@ -637,6 +665,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
     <script src="js/firebase-init.js?v=20260329c"></script>
     <script src="js/wireframe-detective-section.js?v=20260812d"></script>
-    <script src="js/grade10-uiux.js?v=20260812e"></script>
+    <script src="js/grade10-uiux.js?v=20260818a"></script>
   </body>
 </html>
