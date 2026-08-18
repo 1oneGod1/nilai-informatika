@@ -1042,6 +1042,20 @@
   color: #6b7280;
 }
 
+.figma-color-section .mission-feedback {
+  color: #991b1b;
+  border-color: #fda4af;
+  background: #fff1f2;
+  font-weight: 700;
+}
+
+.figma-color-section .mission-feedback.is-success {
+  color: #14532d;
+  border-color: #84cc16;
+  background: #f0fdf4;
+  font-weight: 700;
+}
+
 .figma-color-section .map-evidence,
 .figma-color-section .tool-detail {
   border-color: var(--figma-accent);
