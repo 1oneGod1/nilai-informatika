@@ -80,6 +80,50 @@ function getTeacherStudentGrade(student) {
   return match ? Number(match[0]) : 0;
 }
 
+function openGrade10TeacherPreview() {
+  const teacher = auth.currentUser;
+  if (!teacher) {
+    showAlert("Sesi guru tidak ditemukan. Silakan masuk kembali.", "warning");
+    return;
+  }
+
+  const sectionSelect = document.getElementById(
+    "grade10TeacherPreviewSection",
+  );
+  const requestedSection = String(sectionSelect?.value || "overview");
+  const validSections = [
+    "overview",
+    "pre-test",
+    "section-1",
+    "post-test",
+    "section-2",
+    "pre-test-2",
+    "section-3",
+    "section-4",
+    "post-test-2",
+  ];
+  const section = validSections.includes(requestedSection)
+    ? requestedSection
+    : "overview";
+  const previewSession = {
+    id: `teacher-preview-${teacher.uid}`,
+    name: "Teacher Review",
+    className: "Grade 10 · Preview only",
+    groupName: "Teacher review",
+    verifiedAt: Date.now(),
+    teacherUid: teacher.uid,
+    teacherEmail: String(teacher.email || ""),
+    isLocalPreview: true,
+    isTeacherPreview: true,
+  };
+
+  sessionStorage.setItem(
+    "csReportGrade10Session",
+    JSON.stringify(previewSession),
+  );
+  window.location.href = `grade10-uiux.html?teacherPreview=1#${section}`;
+}
+
 function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
   const grade = getTeacherStudentGrade(student);
   if (
@@ -163,11 +207,15 @@ function calculateGrade10UiUxProgress(progress = {}) {
     );
   const section4State = progress.section4Workshop || {};
   const exploredTools = section4State.toolsExplored || {};
+  const guidedBuildSteps = section4State.guidedBuildSteps || {};
   const section4 =
     Boolean(section4State.framePreset) &&
     section4State.layerChallenge === true &&
     ["move", "frame", "shape", "pen", "text", "layers"].every(
       (key) => exploredTools[key] === true,
+    ) &&
+    ["frame", "layout", "typography", "image", "style", "autolayout"].every(
+      (key) => guidedBuildSteps[key] === true,
     ) &&
     Boolean(progress.figmaFoundationPlan) &&
     teacherChecksComplete(progress.section4Checklist, [
@@ -315,7 +363,7 @@ function renderStudentLearningProgress(progress) {
     ["preTest", "Pre-test 1", progress.preTest?.score],
     ["section1", "Section 1 · Wireframe"],
     ["postTest1", "Post-test 1", progress.postTest?.score],
-    ["section2", "Section 2 · Figma Match"],
+    ["section2", "Section 2 · Project Setup"],
     ["figmaPreTest", "Figma Pre-test", progress.figmaPreTest?.score],
     ["section3", "Section 3 · Figma Basics"],
     ["section4", "Section 4 · Toolbar Lab"],

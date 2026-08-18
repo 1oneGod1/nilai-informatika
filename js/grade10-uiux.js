@@ -248,19 +248,19 @@ const SECTION_1_CHECKS = [
 
 const SECTION_2_CHECKS = [
   ["group", "I worked with the group assigned by my teacher."],
-  ["file", "Our group uses one shared Figma file with clearly named sections or layers."],
-  ["match", "Our layout, spacing, typography, colors, and visual details match the reference."],
-  ["responsive", "We checked at least one desktop or mobile frame size against the reference."],
-  ["explain", "Every member can explain the design structure and their contribution."],
+  ["file", "Our group prepared one shared Figma Design file for the project."],
+  ["match", "We agreed on the exact webpage or page area that we will match."],
+  ["responsive", "We selected the target device and frame size shown by the reference."],
+  ["explain", "Every member understands their responsibility and the four accuracy criteria."],
 ];
 
 const SECTION_4_CHECKS = [
   ["assignedGroup", "We worked only with the group assigned by our teacher."],
   ["sharedFile", "We created one shared Figma Design file and saved its link."],
   ["frame", "We selected a frame preset that matches our target device."],
-  ["objects", "We used shapes and text to create a simple interface composition."],
-  ["layers", "We renamed and ordered layers so the visual stack is clear."],
-  ["explain", "Every member can explain one tool and their contribution."],
+  ["objects", "We completed the guided hero build, including text, image, CTA, and Auto Layout."],
+  ["layers", "We renamed, measured, and ordered layers so the visual stack is clear."],
+  ["explain", "Our selected webpage match follows the reference layout, spacing, typography, and visual style."],
 ];
 
 const FIGMA_ZONES = {
@@ -327,6 +327,15 @@ const FRAME_PRESETS = {
 
 const SECTION_3_ROUTE = ["drafts", "create", "design"];
 const SECTION_4_TOOL_KEYS = Object.keys(FIGMA_TOOLS);
+const GUIDED_BUILD_STEPS = {
+  frame: "Create the target frame",
+  layout: "Build the header and hero layout",
+  typography: "Create the type hierarchy",
+  image: "Place and crop the image",
+  style: "Style the CTA in the inspector",
+  autolayout: "Apply Auto Layout, measure, and organise",
+};
+const GUIDED_BUILD_KEYS = Object.keys(GUIDED_BUILD_STEPS);
 const CORRECT_LAYER_ORDER = ["cta", "image", "background"];
 const LAYER_LABELS = { cta: "CTA button", image: "Hero image", background: "Background" };
 const LAYER_ICONS = { cta: "fa-square", image: "fa-image", background: "fa-fill-drip" };
@@ -350,11 +359,38 @@ async function initializeUiUxLab() {
     return;
   }
 
+  if (
+    uiuxStudent.isTeacherPreview === true &&
+    !(await validateTeacherPreviewAccess(uiuxStudent))
+  ) {
+    sessionStorage.removeItem(UIUX_SESSION_KEY);
+    showTeacherPreviewAccessDenied();
+    return;
+  }
+
   document.getElementById("learningApp").hidden = false;
   document.getElementById("studentName").textContent = uiuxStudent.name;
-  document.getElementById("studentClass").textContent = uiuxStudent.className;
+  document.getElementById("studentClass").textContent =
+    uiuxStudent.isTeacherPreview === true
+      ? "Grade 10 materials · preview only"
+      : uiuxStudent.className;
   document.getElementById("studentAvatar").textContent =
-    uiuxStudent.name.trim().charAt(0).toUpperCase() || "G";
+    uiuxStudent.isTeacherPreview === true
+      ? "T"
+      : uiuxStudent.name.trim().charAt(0).toUpperCase() || "G";
+
+  if (uiuxStudent.isTeacherPreview === true) {
+    document.body.classList.add("is-teacher-preview");
+    document.getElementById("teacherPreviewBanner").hidden = false;
+    document.getElementById("courseHomeLink").href = "dashboard.html";
+    document.getElementById("courseExitLink").href = "dashboard.html";
+    document.getElementById("courseExitLink").title =
+      "Back to teacher dashboard";
+    document.getElementById("courseExitLink").setAttribute(
+      "aria-label",
+      "Back to teacher dashboard",
+    );
+  }
 
   if (!uiuxStudent.isLocalPreview) {
     uiuxProgressRef = db.ref("learningProgress").child(uiuxStudent.id).child(UIUX_COURSE_ID);
@@ -412,7 +448,15 @@ function readVerifiedStudentSession() {
     const grade = gradeMatch ? Number(gradeMatch[0]) : 0;
     const sessionAge = Date.now() - Number(parsed.verifiedAt || 0);
 
-    if (!parsed.id || !parsed.name || grade !== 10 || sessionAge > UIUX_SESSION_MAX_AGE) {
+    const teacherPreviewRequested =
+      new URLSearchParams(window.location.search).get("teacherPreview") === "1";
+    if (
+      !parsed.id ||
+      !parsed.name ||
+      grade !== 10 ||
+      sessionAge > UIUX_SESSION_MAX_AGE ||
+      (parsed.isTeacherPreview === true && !teacherPreviewRequested)
+    ) {
       sessionStorage.removeItem(UIUX_SESSION_KEY);
       return null;
     }
@@ -422,6 +466,65 @@ function readVerifiedStudentSession() {
     sessionStorage.removeItem(UIUX_SESSION_KEY);
     return null;
   }
+}
+
+async function validateTeacherPreviewAccess(session) {
+  if (!session || session.isTeacherPreview !== true || !session.teacherUid)
+    return false;
+
+  try {
+    const user = await new Promise((resolve) => {
+      let unsubscribe = () => undefined;
+      unsubscribe = auth.onAuthStateChanged((currentUser) => {
+        unsubscribe();
+        resolve(currentUser || null);
+      });
+    });
+    if (!user || user.uid !== session.teacherUid) return false;
+
+    const email = String(user.email || session.teacherEmail || "")
+      .trim()
+      .toLowerCase();
+    const isAdmin = [
+      "andi.purba@sdh.or.id",
+      "pandapotanandi@gmail.com",
+    ].includes(email);
+    const snapshot = await db.ref("guru").child(user.uid).once("value");
+    const teacherRecord = snapshot.val() || {};
+    const accountVerified = teacherRecord.isVerified === true || isAdmin;
+    const emailVerified =
+      teacherRecord.emailVerified === true || user.emailVerified || isAdmin;
+    return accountVerified && emailVerified;
+  } catch (error) {
+    return false;
+  }
+}
+
+function showTeacherPreviewAccessDenied() {
+  const gate = document.getElementById("accessGate");
+  gate.hidden = false;
+  const eyebrow = gate.querySelector(".eyebrow");
+  const title = gate.querySelector("h1");
+  const copy = gate.querySelector("p:not(.eyebrow)");
+  const link = gate.querySelector("a");
+  if (eyebrow) eyebrow.textContent = "TEACHER ACCESS REQUIRED";
+  if (title) title.textContent = "Return to the teacher dashboard.";
+  if (copy)
+    copy.textContent =
+      "Teacher Review Mode must be opened from an active, verified teacher session.";
+  if (link) {
+    link.href = "dashboard.html";
+    link.innerHTML = '<i class="fas fa-arrow-left"></i> Teacher dashboard';
+  }
+}
+
+function exitUiUxLab() {
+  if (uiuxStudent?.isTeacherPreview === true) {
+    sessionStorage.removeItem(UIUX_SESSION_KEY);
+    window.location.href = "dashboard.html";
+    return false;
+  }
+  return true;
 }
 
 function bindNavigation() {
@@ -460,19 +563,28 @@ function openPanel(panelName, updateHash = true) {
     "post-test-2",
   ].includes(panelName);
   if (
+    uiuxStudent?.isTeacherPreview !== true &&
     (panelName === "post-test" || requiresPostTest1) &&
     !section1Complete
   ) {
     panelName = "section-1";
     updateHash = true;
     showToast("Complete the Section 1 investigation before opening Post-test 1.", true);
-  } else if (requiresPostTest1 && !uiuxProgress.postTest) {
+  } else if (
+    uiuxStudent?.isTeacherPreview !== true &&
+    requiresPostTest1 &&
+    !uiuxProgress.postTest
+  ) {
     panelName = "post-test";
     updateHash = true;
     showToast("Complete Post-test 1 before opening Section 2.", true);
   }
   const figmaPreTestRequired = ["section-3", "section-4", "post-test-2"].includes(panelName);
-  if (figmaPreTestRequired && !uiuxProgress.figmaPreTest) {
+  if (
+    uiuxStudent?.isTeacherPreview !== true &&
+    figmaPreTestRequired &&
+    !uiuxProgress.figmaPreTest
+  ) {
     panelName = "pre-test-2";
     updateHash = true;
     showToast("Complete the one-attempt Figma Pre-test before opening Section 3.", true);
@@ -941,6 +1053,17 @@ function bindSection4Interactions() {
     state.savedAt = Date.now();
     await saveProgressRecord("section4Workshop", state, "The frame preset could not be saved.");
   });
+
+  document.querySelectorAll("[data-guided-build-step]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const key = button.dataset.guidedBuildStep;
+      if (!GUIDED_BUILD_KEYS.includes(key)) return;
+      const state = getSection4WorkshopState();
+      state.guidedBuildSteps[key] = !state.guidedBuildSteps[key];
+      state.savedAt = Date.now();
+      await saveProgressRecord("section4Workshop", state, "The guided build progress could not be saved.");
+    });
+  });
 }
 
 function getSection3State() {
@@ -963,10 +1086,12 @@ function getSection3State() {
 function getSection4WorkshopState() {
   const saved = uiuxProgress.section4Workshop || {};
   const tools = saved.toolsExplored || {};
+  const guidedBuildSteps = saved.guidedBuildSteps || {};
   return {
     framePreset: typeof saved.framePreset === "string" ? saved.framePreset : "",
     toolsExplored: Object.fromEntries(SECTION_4_TOOL_KEYS.map((key) => [key, tools[key] === true])),
     layerChallenge: saved.layerChallenge === true,
+    guidedBuildSteps: Object.fromEntries(GUIDED_BUILD_KEYS.map((key) => [key, guidedBuildSteps[key] === true])),
     savedAt: safeNumber(saved.savedAt, Date.now()),
   };
 }
@@ -1038,7 +1163,35 @@ function renderSection4State() {
     const tool = FIGMA_TOOLS[section4SelectedTool];
     document.getElementById("toolbarDetail").innerHTML = `<i class="fas ${tool.icon}"></i><div><span>SELECTED TOOL</span><h3>${tool.title}</h3><p>${tool.description}</p></div>`;
   }
+  renderGuidedBuild(state.guidedBuildSteps);
   renderLayerChallenge();
+}
+
+function renderGuidedBuild(steps) {
+  const completedCount = GUIDED_BUILD_KEYS.filter((key) => steps[key] === true).length;
+  const percentage = Math.round((completedCount / GUIDED_BUILD_KEYS.length) * 100);
+  const count = document.getElementById("guidedBuildCount");
+  const preview = document.getElementById("guidedBuildPreview");
+  if (!count || !preview) return;
+
+  count.textContent = `${completedCount} / ${GUIDED_BUILD_KEYS.length}`;
+  document.getElementById("guidedBuildPercent").textContent = `${percentage}%`;
+  document.querySelectorAll("[data-guided-build-step]").forEach((button) => {
+    const complete = steps[button.dataset.guidedBuildStep] === true;
+    button.classList.toggle("is-complete", complete);
+    button.setAttribute("aria-pressed", String(complete));
+  });
+  GUIDED_BUILD_KEYS.forEach((key) => preview.classList.toggle(`step-${key}`, steps[key] === true));
+
+  const nextKey = GUIDED_BUILD_KEYS.find((key) => steps[key] !== true);
+  document.getElementById("guidedBuildNext").textContent = nextKey
+    ? `Next in Figma: ${GUIDED_BUILD_STEPS[nextKey]}.`
+    : "Mini-build complete. Apply the same workflow to your selected webpage.";
+  const feedback = document.getElementById("guidedBuildFeedback");
+  feedback.classList.toggle("is-success", !nextKey);
+  feedback.textContent = nextKey
+    ? "Do the work in your real Figma file. This checklist records your progress; it does not replace the design activity."
+    : "Guided build complete. Compare your practice hero with the instructions, then begin the selected webpage match below.";
 }
 
 function renderFramePreview(presetKey) {
@@ -1316,6 +1469,7 @@ function isSection4Complete() {
     Boolean(state.framePreset) &&
     state.layerChallenge &&
     Object.values(state.toolsExplored).every(Boolean) &&
+    Object.values(state.guidedBuildSteps).every(Boolean) &&
     Boolean(uiuxProgress.figmaFoundationPlan) &&
     allChecksComplete(uiuxProgress.section4Checklist, SECTION_4_CHECKS)
   );
