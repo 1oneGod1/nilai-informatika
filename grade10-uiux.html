@@ -18,7 +18,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       rel="stylesheet"
     />
-    <link href="grade10-uiux.css?v=20260811a" rel="stylesheet" />
+    <link href="grade10-uiux.css?v=20260812e" rel="stylesheet" />
     <link href="grade10-figma.css?v=20260811d" rel="stylesheet" />
   </head>
   <body>
@@ -70,8 +70,8 @@
         <aside class="course-rail">
           <div class="rail-heading">
             <p class="eyebrow">MISSION MAP</p>
-            <h2>From skeleton<br />to interface.</h2>
-            <p>Build the structure first. Recreate the visual system next.</p>
+            <h2>From webpage<br />to wireframe.</h2>
+            <p>Read the structure first. Build the visual system later.</p>
           </div>
 
           <nav class="mission-nav" aria-label="Course sections">
@@ -87,18 +87,18 @@
             </button>
             <button class="mission-link" data-panel-target="section-1">
               <span class="mission-number">01</span>
-              <span><strong>Wireframe</strong><small>Individual formative</small></span>
+              <span><strong>Wireframe</strong><small>Individual investigation</small></span>
               <span class="status-dot" id="section1Status"></span>
-            </button>
-            <button class="mission-link" data-panel-target="section-2">
-              <span class="mission-number">02</span>
-              <span><strong>Figma match</strong><small>Assigned-group work</small></span>
-              <span class="status-dot" id="section2Status"></span>
             </button>
             <button class="mission-link" data-panel-target="post-test">
               <span class="mission-number">T1</span>
               <span><strong>Post-test 1</strong><small>Wireframe concepts</small></span>
               <span class="status-dot is-locked" id="postTestStatus"><i class="fas fa-lock"></i></span>
+            </button>
+            <button class="mission-link" data-panel-target="section-2">
+              <span class="mission-number">02</span>
+              <span><strong>Figma match</strong><small>Assigned-group work</small></span>
+              <span class="status-dot" id="section2Status"></span>
             </button>
             <button class="mission-link" data-panel-target="pre-test-2">
               <span class="mission-number">P2</span>
@@ -162,7 +162,7 @@
               <article class="brief-card lime">
                 <span>SECTION 01</span>
                 <h3>Decode the layout</h3>
-                <p>Choose a website, identify its hierarchy and user journey, then create a low-fidelity wireframe.</p>
+                <p>Investigate one website, analyse how its information is organised, then draw the structure you observed as a low-fidelity wireframe.</p>
                 <div><i class="fas fa-user"></i> Individual formative</div>
               </article>
               <article class="brief-card violet">
@@ -188,8 +188,8 @@
                 <article>
                   <div><span>FORMATIVE 01</span><strong id="formative1Score">0</strong></div>
                   <h3>Wireframe investigation</h3>
-                  <p><b id="formative1Product">0 / 70</b> product completion <i></i> <b id="formative1Quiz">0 / 30</b> Post-test 1</p>
-                  <small id="formative1State">Complete Section 1 and Post-test 1.</small>
+                  <p><b id="formative1Product">— / 70</b> teacher accuracy rubric <i></i> <b id="formative1Quiz">0 / 30</b> Post-test 1</p>
+                  <small id="formative1State">Complete the investigation, then wait for your teacher's rubric score.</small>
                 </article>
                 <article>
                   <div><span>FORMATIVE 02</span><strong id="formative2Score">0</strong></div>
@@ -198,7 +198,7 @@
                   <small id="formative2State">Complete Section 4 and Post-test 2.</small>
                 </article>
               </div>
-              <p class="ledger-note"><i class="fas fa-circle-info"></i> The website shows a provisional completion score. Your teacher may still review the quality of each submitted product before recording the grade.</p>
+              <p class="ledger-note"><i class="fas fa-circle-info"></i> Formative 1 uses your teacher's accuracy rubric. The teacher compares your wireframe with the selected webpage; visual decoration is not graded.</p>
             </section>
 
             <div class="protocol-card">
@@ -244,13 +244,13 @@
               <div>
                 <p class="eyebrow">FORMATIVE MISSION · INDIVIDUAL</p>
                 <h2>Now investigate one real website.</h2>
-                <p>Choose a homepage or landing page, identify its structure and user journey, then create a low-fidelity wireframe. You are studying the current experience—not redesigning it yet.</p>
+                <p>Choose a homepage or landing page, investigate its structure and user journey, then draw what you observed as a low-fidelity wireframe. Analyse the current page—do not redesign it and do not copy its visual styling.</p>
               </div>
               <div class="mission-steps">
                 <article><span>1</span><h3>Choose</h3><p>Select a website with a clear purpose and an important user action.</p></article>
-                <article><span>2</span><h3>Observe</h3><p>Identify its header, navigation, content blocks, CTA, and footer.</p></article>
-                <article><span>3</span><h3>Wireframe</h3><p>Recreate the structure with boxes, lines, labels, and placeholders.</p></article>
-                <article><span>4</span><h3>Explain</h3><p>Label the main user journey and explain what should be noticed first.</p></article>
+                <article><span>2</span><h3>Investigate</h3><p>Read the order, grouping, hierarchy, navigation, CTA, and user journey.</p></article>
+                <article><span>3</span><h3>Draw</h3><p>Translate your findings into boxes, lines, labels, and placeholders.</p></article>
+                <article><span>4</span><h3>Explain</h3><p>Show how each major block in your wireframe corresponds to the webpage.</p></article>
               </div>
               <div class="tool-strip">
                 <span>YOU MAY USE</span>
@@ -266,14 +266,18 @@
               <div class="form-title"><span>YOUR CASE FILE</span><strong>Save your website choice</strong></div>
               <label><span>Website name</span><input id="websiteName" maxlength="80" required placeholder="Example: Spotify" /></label>
               <label><span>Website URL</span><input id="websiteUrl" type="url" maxlength="240" required placeholder="https://..." /></label>
-              <label class="wide"><span>Why is this website worth studying?</span><textarea id="websiteReason" maxlength="320" required placeholder="Describe its purpose, audience, or important user journey."></textarea></label>
+              <label class="wide"><span>What will you investigate on this website?</span><textarea id="websiteReason" maxlength="320" required placeholder="Describe the page structure, audience, hierarchy, or user journey you plan to analyse."></textarea></label>
               <label><span>Wireframing tool</span><select id="wireframeTool" required><option value="">Choose a tool</option><option>Paper / hand-drawn</option><option>Canva</option><option>Google Slides / PowerPoint</option><option>Figma</option><option>Another suitable tool</option></select></label>
               <button class="primary-button" type="submit">Save case file <i class="fas fa-floppy-disk"></i></button>
             </form>
 
             <div class="checkpoint-card">
-              <div><p class="eyebrow">SECTION 01 CHECKPOINT</p><h2>Mark each item only when it is true.</h2></div>
+              <div><p class="eyebrow">SECTION 01 CHECKPOINT</p><h2>Confirm that your drawing is supported by what you observed.</h2></div>
               <div id="section1Checklist" class="checklist"></div>
+            </div>
+            <div class="section-complete-strip">
+              <div><span>NEXT REQUIRED STEP</span><strong>Complete Post-test 1 before entering Section 2.</strong></div>
+              <button type="button" class="primary-button" data-go-to="post-test">Open Post-test 1 <i class="fas fa-arrow-right"></i></button>
             </div>
           </section>
 
@@ -353,6 +357,10 @@
               <span><i class="fas fa-lock"></i> SUMMATIVE PREVIEW</span>
               <div><h2>Same website. Better experience.</h2><p>After this faithful recreation, your summative challenge will redesign the same website. Your changes must solve clear user problems—not only make the screen look different.</p></div>
             </div>
+            <div class="section-complete-strip violet-strip">
+              <div><span>SECTION 02 COMPLETE</span><strong>Continue to the Figma Pre-test before starting Section 3.</strong></div>
+              <button type="button" class="primary-button" data-go-to="pre-test-2">Open Figma Pre-test <i class="fas fa-arrow-right"></i></button>
+            </div>
           </section>
 
           <section class="learning-panel" data-panel="post-test">
@@ -360,7 +368,7 @@
               <div>
                 <p class="eyebrow">SESSION 01 CHECK · INDIVIDUAL</p>
                 <h1>Post-test 1</h1>
-                <p>Show what you understand about wireframing, UI/UX decisions, and the Figma recreation workflow.</p>
+                <p>Show what you understand about investigating a webpage and translating its structure into a low-fidelity wireframe.</p>
               </div>
               <div class="score-orbit danger"><span id="postScore">—</span><small>30%</small></div>
             </div>
@@ -383,8 +391,8 @@
               <span class="quiet-text">One successful submission only</span>
             </div>
             <div class="section-complete-strip pretest-bridge">
-              <div><span>NEXT REQUIRED STEP</span><strong>Complete the Figma Pre-test before opening Section 3.</strong></div>
-              <button type="button" class="primary-button" data-go-to="pre-test-2">Open Figma Pre-test <i class="fas fa-arrow-right"></i></button>
+              <div><span>NEXT REQUIRED STEP</span><strong>Continue to the assigned-group Figma matching activity.</strong></div>
+              <button type="button" class="primary-button" data-go-to="section-2">Open Section 2 <i class="fas fa-arrow-right"></i></button>
             </div>
           </section>
 
@@ -628,7 +636,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
     <script src="js/firebase-init.js?v=20260329c"></script>
-    <script src="js/wireframe-detective-section.js?v=20260811b"></script>
-    <script src="js/grade10-uiux.js?v=20260811d"></script>
+    <script src="js/wireframe-detective-section.js?v=20260812d"></script>
+    <script src="js/grade10-uiux.js?v=20260812e"></script>
   </body>
 </html>

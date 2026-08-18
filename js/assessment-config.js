@@ -99,6 +99,25 @@ const DC_Q1_FINAL_QUIZ = {
   color: "#ef6a54",
 };
 
+// Grade 8 uses the same Q1 assessment model as Grade 9, while the task briefs
+// follow the Grade 8 activity list and the supplied Digital Footprint and
+// Evaluating News workbooks.
+const G8_Q1_BRIEFS = {
+  personalWebpage:
+    "Buat personal webpage yang hanya membagikan informasi pribadi yang aman. Sertakan judul, bio singkat, tiga bagian lengkap, gambar yang sesuai, serta HTML/CSS yang dipersonalisasi tanpa informasi privat atau placeholder.",
+  onlineSafety:
+    "Buat panduan online safety yang menjelaskan minimal tiga manfaat, tiga risiko, dan tiga respons praktis terhadap online red flags. Setiap saran harus akurat, realistis, dan ditulis dengan kata-kata siswa sendiri.",
+  digitalFootprint:
+    "Buat trivia game berisi tiga pertanyaan tentang digital footprint, persistence, invisible audience, dan pilihan online yang positif. Game harus memiliki judul, tagline, tombol Play, function, prompt(), alert(), variable, logika if/else, feedback, dan skor akhir yang berfungsi.",
+  evaluatingNews:
+    "Buat kuis pilihan ganda berisi tiga pertanyaan tentang alasan fake information dibuat dan REAL Test: Reliable, Evidence, Author, dan Logic. Setiap pertanyaan memiliki empat pilihan, index jawaban yang akurat, feedback, skor, dan struktur data JavaScript yang benar.",
+};
+
+const G8_Q1_FINAL_QUIZ = {
+  ...DC_Q1_FINAL_QUIZ,
+  subtitle: "25 soal: privacy, online safety, digital footprint, dan evaluating information",
+};
+
 const DC_Q2_ASSESSMENTS = [
   {
     id: "vrFundamentals",
@@ -393,6 +412,83 @@ const DC_Q4_ASSESSMENTS = [
     ],
   },
 ];
+
+const DC_PLANNING_CONSISTENCY_LABEL =
+  "Implementasi konsisten dengan planning document; setiap perubahan dari rencana dijelaskan berdasarkan hasil testing";
+
+// Each entry redistributes 10 existing rubric points to planning consistency,
+// so every project rubric remains capped at 100 points.
+const DC_PLANNING_POINT_ADJUSTMENTS = {
+  personalWebpage: { original: 10 },
+  onlineSafety: { original: 10 },
+  digitalFootprint: { original: 10 },
+  evaluatingNews: { concept: 10 },
+  vrFundamentals: { shapes: 5, textureColor: 5 },
+  modelsAnimation: { assets: 5, animation: 5 },
+  interactiveVr: { physics: 5, collision: 5 },
+  vrDiorama: { original: 5, function: 5 },
+  vrWalkthrough: { demo: 5, structure: 5 },
+  mechanicalDesign: { wagon: 5, iteration: 5 },
+  sensorProgramming: { logic: 5, debugging: 5 },
+  sensorTestbed: { fiveSensors: 5, observations: 5 },
+  teamFreezeTag: { strategy: 5, iteration: 5 },
+  engineeringReport: { documentation: 5, iteration: 5 },
+  sensorLogicActivities: { sensorIntegration: 5, debugging: 5 },
+  castleCrasherAlgorithm: {},
+  treasureHuntAutomation: { optical: 5, challenge: 5 },
+  smartWarehouseClawbot: {},
+  individualEngineeringPortfolio: { documentation: 5, iteration: 5 },
+};
+
+function dcAddPlanningConsistency(assessments) {
+  return assessments.map((assessment) => {
+    const adjustments = DC_PLANNING_POINT_ADJUSTMENTS[assessment.id];
+    if (!adjustments) return assessment;
+
+    const hasPlanningCriterion = assessment.criteria.some(
+      (criterion) => criterion.id === "planning",
+    );
+    const criteria = assessment.criteria.map((criterion) => {
+      if (criterion.id === "planning") {
+        return { ...criterion, label: DC_PLANNING_CONSISTENCY_LABEL };
+      }
+      const reduction = adjustments[criterion.id] || 0;
+      return reduction
+        ? { ...criterion, max: criterion.max - reduction }
+        : criterion;
+    });
+
+    if (!hasPlanningCriterion) {
+      criteria.push({
+        id: "planningConsistency",
+        label: DC_PLANNING_CONSISTENCY_LABEL,
+        max: 10,
+      });
+    }
+
+    return { ...assessment, criteria };
+  });
+}
+
+const DC_Q1_ASSESSMENTS_WITH_PLANNING = dcAddPlanningConsistency(
+  DC_Q1_ASSESSMENTS,
+);
+const DC_Q2_ASSESSMENTS_WITH_PLANNING = dcAddPlanningConsistency(
+  DC_Q2_ASSESSMENTS,
+);
+const DC_Q3_ASSESSMENTS_WITH_PLANNING = dcAddPlanningConsistency(
+  DC_Q3_ASSESSMENTS,
+);
+const DC_Q4_ASSESSMENTS_WITH_PLANNING = dcAddPlanningConsistency(
+  DC_Q4_ASSESSMENTS,
+);
+
+const G8_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING.map(
+  (assessment) => ({
+    ...assessment,
+    brief: G8_Q1_BRIEFS[assessment.id] || "",
+  }),
+);
 
 const G12_Q1_ASSESSMENTS = [
   {
@@ -1256,7 +1352,7 @@ const DC_COURSES = {
     title: "Assessment Technology and Me",
     shortTitle: "Technology and Me",
     description: "Digital Citizenship · Formatif 40% dan sumatif 60%.",
-    assessments: DC_Q1_ASSESSMENTS,
+    assessments: DC_Q1_ASSESSMENTS_WITH_PLANNING,
     finalQuiz: DC_Q1_FINAL_QUIZ,
   },
   2: {
@@ -1266,7 +1362,7 @@ const DC_COURSES = {
     title: "Code Your Own World with VR",
     shortTitle: "Code Your Own World with VR",
     description: "Construct a VR World · Formatif 40% dan sumatif 60%.",
-    assessments: DC_Q2_ASSESSMENTS,
+    assessments: DC_Q2_ASSESSMENTS_WITH_PLANNING,
     finalQuiz: null,
   },
   3: {
@@ -1276,7 +1372,7 @@ const DC_COURSES = {
     title: "Build, Sense, and Compete with VEX IQ",
     shortTitle: "VEX IQ Team Freeze Tag",
     description: "VEX IQ Robotics · Formatif 40% dan sumatif 60%.",
-    assessments: DC_Q3_ASSESSMENTS,
+    assessments: DC_Q3_ASSESSMENTS_WITH_PLANNING,
     finalQuiz: null,
   },
   4: {
@@ -1286,8 +1382,22 @@ const DC_COURSES = {
     title: "Sense, Decide, and Deliver with VEX IQ",
     shortTitle: "Smart Warehouse Clawbot",
     description: "Advanced VEX IQ Robotics · Formatif 40% dan sumatif 60%.",
-    assessments: DC_Q4_ASSESSMENTS,
+    assessments: DC_Q4_ASSESSMENTS_WITH_PLANNING,
     finalQuiz: null,
+  },
+};
+
+const G8_COURSES = {
+  1: {
+    id: "digitalCitizenshipFoundations",
+    grade: 8,
+    quarter: 1,
+    title: "Digital Citizenship Foundations",
+    shortTitle: "Digital Citizenship",
+    description:
+      "Grade 8 | Q1 | Personal information, online safety, digital footprint, and evaluating information | Formatif 40% dan sumatif 60%.",
+    assessments: G8_Q1_ASSESSMENTS,
+    finalQuiz: G8_Q1_FINAL_QUIZ,
   },
 };
 
@@ -1335,12 +1445,13 @@ const G12_COURSES = {
 };
 
 const DC_COURSES_BY_GRADE = {
+  8: G8_COURSES,
   9: DC_COURSES,
   12: G12_COURSES,
 };
 
 // Alias lama dipertahankan agar data dan kode Q1 tetap kompatibel.
-const DC_ASSESSMENTS = DC_Q1_ASSESSMENTS;
+const DC_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING;
 const DC_FINAL_QUIZ = DC_Q1_FINAL_QUIZ;
 
 function dcGetCourseConfig(quarter, grade = 9) {
@@ -1481,6 +1592,40 @@ function dcBuildStoredRecord(draft, quarter, updatedBy, grade = 9) {
     record.quizCorrect = summary.quizCorrect;
   }
   return record;
+}
+
+function dcBuildFormativeGradebookFields(
+  storedRecord,
+  quarter,
+  grade = 9,
+) {
+  const course = dcGetCourseConfig(quarter, grade);
+  if (!course || !storedRecord || typeof storedRecord !== "object") return {};
+
+  const recalculatedSummary = dcCalculateSummary(
+    dcDraftFromStored(storedRecord, quarter, grade),
+    quarter,
+    grade,
+  );
+  const rawScores =
+    storedRecord.rawScores && typeof storedRecord.rawScores === "object"
+      ? storedRecord.rawScores
+      : {};
+  const fields = {};
+
+  course.assessments
+    .filter((assessment) => assessment.type === "Formatif")
+    .forEach((assessment, index) => {
+      const savedRaw = rawScores[assessment.id];
+      const sourceScore = Number.isFinite(Number(savedRaw))
+        ? Number(savedRaw)
+        : recalculatedSummary.rawScores[assessment.id];
+      fields[`q${Number(quarter)}_f${index + 1}`] = Number(
+        dcClampScore(sourceScore, 100).toFixed(2),
+      );
+    });
+
+  return fields;
 }
 
 function dcScoreStatus(score, kkm) {

@@ -6,8 +6,47 @@
 
 let allSiswa = [];
 let activeQuarter = 4; // Default ke Q4 untuk Sense, Decide, and Deliver with VEX IQ
-let numFormatif = { 1: 2, 2: 2, 3: 2, 4: 2 }; // Default fields per quarter
+let numFormatif = { 1: 3, 2: 3, 3: 3, 4: 3 }; // Grade 8–9 use three formative projects per quarter
 let selectedLearningProgressStudent = null;
+let selectedLearningProgressData = {};
+
+const GRADE10_WIREFRAME_RUBRIC = [
+  {
+    id: "reference",
+    label: "Reference is identifiable",
+    description: "The selected webpage and the page area analysed by the student are clearly identifiable.",
+  },
+  {
+    id: "structure",
+    label: "Major sections correspond",
+    description: "The wireframe represents the major sections that actually appear on the selected webpage.",
+  },
+  {
+    id: "hierarchy",
+    label: "Hierarchy corresponds",
+    description: "Block size and emphasis reflect what the webpage communicates as primary and secondary.",
+  },
+  {
+    id: "navigation",
+    label: "Navigation and CTA correspond",
+    description: "Navigation, important controls, CTA, and the main user path match what can be observed.",
+  },
+  {
+    id: "spacing",
+    label: "Order and grouping correspond",
+    description: "Content order, grouping, and approximate spatial relationships follow the webpage.",
+  },
+  {
+    id: "fidelity",
+    label: "Evidence is translated correctly",
+    description: "The student uses simple shapes and labels to communicate findings without copying colours or decoration.",
+  },
+  {
+    id: "completeness",
+    label: "Analysis is complete and explainable",
+    description: "Important observed parts are not omitted, and the student can explain each wireframe block using the reference.",
+  },
+];
 
 const GRADE10_UIUX_XP = {
   preTest: 80,
@@ -41,6 +80,31 @@ function getTeacherStudentGrade(student) {
   return match ? Number(match[0]) : 0;
 }
 
+function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
+  const grade = getTeacherStudentGrade(student);
+  if (
+    ![8, 9].includes(grade) ||
+    typeof dcBuildFormativeGradebookFields !== "function"
+  ) {
+    return {};
+  }
+
+  const storedRecord =
+    student?.digitalCitizenshipAssessment?.[`q${Number(quarter)}`];
+  return storedRecord
+    ? dcBuildFormativeGradebookFields(storedRecord, quarter, grade)
+    : {};
+}
+
+function getSafeReferenceUrl(value) {
+  try {
+    const parsed = new URL(String(value || ""));
+    return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "";
+  } catch (error) {
+    return "";
+  }
+}
+
 function teacherChecksComplete(saved, keys) {
   return Boolean(saved) && keys.every((key) => saved[key] === true);
 }
@@ -52,6 +116,21 @@ function teacherSection1DiscoveryComplete(discovery) {
   if (Array.isArray(foundZones)) return new Set(foundZones).size >= 6;
   if (!foundZones || typeof foundZones !== "object") return false;
   return Object.values(foundZones).filter((value) => value === true).length >= 6;
+}
+
+function getWireframeRubricAssessment(progress = {}) {
+  const saved = progress.teacherAssessment?.wireframe || {};
+  const criteria = saved.criteria || {};
+  const achieved = GRADE10_WIREFRAME_RUBRIC.filter(
+    (criterion) => criteria[criterion.id] === true,
+  ).length;
+  return {
+    assessed: saved.assessed === true,
+    criteria,
+    achieved,
+    score: achieved * 10,
+    updatedAt: Number(saved.updatedAt || 0),
+  };
 }
 
 function calculateGrade10UiUxProgress(progress = {}) {
@@ -115,7 +194,10 @@ function calculateGrade10UiUxProgress(progress = {}) {
     0,
   );
 
-  const section1Product = section1 ? 70 : 0;
+  const wireframeAssessment = getWireframeRubricAssessment(progress);
+  const section1Product = wireframeAssessment.assessed
+    ? wireframeAssessment.score
+    : 0;
   const section4Product = section4 ? 70 : 0;
   const post1Points = progress.postTest
     ? Number(progress.postTest.score || 0) * 0.3
@@ -128,13 +210,24 @@ function calculateGrade10UiUxProgress(progress = {}) {
     states,
     xp,
     percent: Math.round((xp / GRADE10_UIUX_TOTAL_XP) * 100),
-    formative1: section1Product + post1Points,
-    formative2: section4Product + post2Points,
+    formative1:
+      wireframeAssessment.assessed && states.postTest1
+        ? section1Product + post1Points
+        : null,
+    formative2:
+      section4 && states.postTest2 ? section4Product + post2Points : null,
+    formative1Breakdown: {
+      product: section1Product,
+      productAssessed: wireframeAssessment.assessed,
+      postTest: post1Points,
+    },
+    formative2Breakdown: { product: section4Product, postTest: post2Points },
   };
 }
 
 function formatTeacherProgressScore(value) {
-  const rounded = Math.round(Number(value || 0) * 10) / 10;
+  if (value === null || value === undefined) return "—";
+  const rounded = Math.round(Number(value) * 10) / 10;
   return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
 }
 
@@ -202,17 +295,27 @@ async function openStudentLearningProgress(studentId) {
 function renderStudentLearningProgress(progress) {
   const body = document.getElementById("learningProgressBody");
   const resetButton = document.getElementById("resetLearningProgressButton");
+  selectedLearningProgressData = progress || {};
   const summary = calculateGrade10UiUxProgress(progress);
-  const hasProgress = Object.keys(progress || {}).length > 0;
-  const latestTimestamp = findLatestProgressTimestamp(progress);
+  const activityProgress = Object.fromEntries(
+    Object.entries(progress || {}).filter(([key]) => key !== "teacherAssessment"),
+  );
+  const hasProgress = Object.keys(activityProgress).length > 0;
+  const latestTimestamp = findLatestProgressTimestamp(activityProgress);
   const latestLabel = latestTimestamp
     ? new Date(latestTimestamp).toLocaleString("id-ID")
     : "Belum ada aktivitas";
+  const wireframeAssessment = getWireframeRubricAssessment(progress);
+  const wireframeUpdatedLabel = wireframeAssessment.updatedAt
+    ? new Date(wireframeAssessment.updatedAt).toLocaleString("id-ID")
+    : "Belum pernah disimpan";
+  const websitePlan = progress.websitePlan || {};
+  const referenceUrl = getSafeReferenceUrl(websitePlan.websiteUrl);
   const steps = [
     ["preTest", "Pre-test 1", progress.preTest?.score],
     ["section1", "Section 1 · Wireframe"],
-    ["section2", "Section 2 · Figma Match"],
     ["postTest1", "Post-test 1", progress.postTest?.score],
+    ["section2", "Section 2 · Figma Match"],
     ["figmaPreTest", "Figma Pre-test", progress.figmaPreTest?.score],
     ["section3", "Section 3 · Figma Basics"],
     ["section4", "Section 4 · Toolbar Lab"],
@@ -220,7 +323,7 @@ function renderStudentLearningProgress(progress) {
   ];
 
   body.innerHTML = `
-    <div class="grid md:grid-cols-[1.25fr_.75fr] gap-4 mb-5">
+    <div class="grid gap-4 mb-5">
       <article class="rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-5">
         <div class="flex items-end justify-between gap-3 mb-3">
           <div><span class="text-[10px] font-mono-tech tracking-widest text-cyan-300">TOTAL EXPERIENCE</span><h3 class="text-3xl font-black text-white mt-1">${summary.xp} <small class="text-sm text-slate-500">/ ${GRADE10_UIUX_TOTAL_XP} XP</small></h3></div>
@@ -230,10 +333,50 @@ function renderStudentLearningProgress(progress) {
         <p class="text-[11px] text-slate-500 font-mono-tech mt-3"><i class="fas fa-clock mr-1"></i> Aktivitas terakhir: ${escHtml(latestLabel)}</p>
       </article>
       <article class="grid grid-cols-2 gap-3">
-        <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="text-slate-500">provisional</small></div>
-        <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="text-slate-500">provisional</small></div>
+        <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">RAPORT Q1 · FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="block text-slate-500 mt-1">${summary.formative1Breakdown.productAssessed ? `Rubrik ${summary.formative1Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative1Breakdown.postTest)}/30</small></div>
+        <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">RAPORT Q1 · FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="block text-slate-500 mt-1">Produk ${summary.formative2Breakdown.product}/70 + Post-test ${formatTeacherProgressScore(summary.formative2Breakdown.postTest)}/30</small></div>
       </article>
     </div>
+    <section class="mb-5 rounded-2xl border border-lime-400/25 bg-gradient-to-br from-lime-400/[0.07] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
+      <div class="p-5 border-b border-slate-700/60 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div>
+          <span class="text-[10px] font-mono-tech tracking-[0.18em] text-lime-300 font-bold">FORMATIF 1 · WIREFRAME RUBRIC</span>
+          <h3 class="text-lg font-black text-white mt-1">Nilai kesesuaian analisis dengan website acuan</h3>
+          <p class="text-xs text-slate-400 mt-1">Bandingkan gambar wireframe siswa dengan website pilihannya. Setiap kesesuaian bernilai 10 poin; warna dan dekorasi tidak dinilai.</p>
+        </div>
+        <div class="sm:text-right shrink-0">
+          <strong id="wireframeRubricScore" class="block text-3xl font-black text-lime-300">${wireframeAssessment.score}<small class="text-sm text-slate-500">/70</small></strong>
+          <span id="wireframeRubricCount" class="text-[10px] font-mono-tech text-slate-500">${wireframeAssessment.achieved}/7 CRITERIA</span>
+        </div>
+      </div>
+      <div class="mx-5 mt-5 rounded-xl border border-cyan-400/20 bg-cyan-400/[0.05] p-4">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div class="min-w-0">
+            <span class="text-[9px] font-mono-tech tracking-widest text-cyan-300">WEBSITE ACUAN SISWA</span>
+            <h4 class="text-white font-black mt-1">${escHtml(websitePlan.websiteName || "Belum memilih website")}</h4>
+            <p class="text-xs leading-relaxed text-slate-400 mt-2">${escHtml(websitePlan.reason || "Fokus investigasi belum ditulis.")}</p>
+            <small class="block text-[10px] font-mono-tech text-slate-500 mt-2">Alat: ${escHtml(websitePlan.tool || "Belum dipilih")}</small>
+          </div>
+          ${referenceUrl ? `<a href="${escHtml(referenceUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-2.5 text-xs font-bold text-cyan-200 hover:bg-cyan-400/20 shrink-0">BUKA WEBSITE <i class="fas fa-arrow-up-right-from-square"></i></a>` : `<span class="text-[10px] font-mono-tech text-amber-400">URL BELUM TERSEDIA</span>`}
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-2.5 p-5">
+        ${GRADE10_WIREFRAME_RUBRIC.map(
+          (criterion, index) => `<label class="flex items-start gap-3 rounded-xl border border-slate-700 bg-slate-950/45 p-3.5 cursor-pointer hover:border-lime-400/40 transition-colors">
+            <input type="checkbox" data-wireframe-rubric="${criterion.id}" onchange="updateWireframeRubricPreview()" ${wireframeAssessment.criteria[criterion.id] === true ? "checked" : ""} class="mt-1 h-4 w-4 accent-lime-400 shrink-0" />
+            <span class="grid w-7 h-7 shrink-0 place-items-center rounded-lg bg-lime-400/10 text-lime-300 text-xs font-black">${index + 1}</span>
+            <span class="min-w-0 flex-1"><strong class="block text-sm text-white">${criterion.label}</strong><small class="block text-[11px] leading-relaxed text-slate-500 mt-1">${criterion.description}</small></span>
+            <b class="text-xs text-lime-300 shrink-0">+10</b>
+          </label>`,
+        ).join("")}
+      </div>
+      <div class="px-5 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p class="text-[10px] font-mono-tech text-slate-500"><i class="fas fa-clock mr-1"></i>${escHtml(wireframeUpdatedLabel)}</p>
+        <button id="saveWireframeRubricButton" type="button" onclick="saveWireframeAssessment()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-lime-300 hover:bg-lime-200 px-4 py-2.5 text-xs font-black text-slate-950 transition-colors">
+          <i class="fas fa-floppy-disk"></i> SAVE WIREFRAME SCORE
+        </button>
+      </div>
+    </section>
     <div class="grid sm:grid-cols-2 gap-2.5">
       ${steps
         .map(([key, label, score]) => {
@@ -255,10 +398,70 @@ function renderStudentLearningProgress(progress) {
   resetButton.disabled = !hasProgress;
 }
 
+function updateWireframeRubricPreview() {
+  const inputs = Array.from(
+    document.querySelectorAll("[data-wireframe-rubric]"),
+  );
+  const achieved = inputs.filter((input) => input.checked).length;
+  const scoreElement = document.getElementById("wireframeRubricScore");
+  const countElement = document.getElementById("wireframeRubricCount");
+  if (scoreElement) {
+    scoreElement.innerHTML = `${achieved * 10}<small class="text-sm text-slate-500">/70</small>`;
+  }
+  if (countElement) countElement.textContent = `${achieved}/7 CRITERIA`;
+}
+
+async function saveWireframeAssessment() {
+  const student = selectedLearningProgressStudent;
+  if (!student || getTeacherStudentGrade(student) !== 10) return;
+
+  const criteria = {};
+  GRADE10_WIREFRAME_RUBRIC.forEach((criterion) => {
+    criteria[criterion.id] = Boolean(
+      document.querySelector(
+        `[data-wireframe-rubric="${criterion.id}"]`,
+      )?.checked,
+    );
+  });
+  const achieved = Object.values(criteria).filter(Boolean).length;
+  const button = document.getElementById("saveWireframeRubricButton");
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> SAVING…';
+  }
+
+  const progressRef = db
+    .ref("learningProgress")
+    .child(student.id)
+    .child("grade10UiUx");
+  try {
+    await progressRef.child("teacherAssessment").child("wireframe").set({
+      assessed: true,
+      criteria,
+      score: achieved * 10,
+      updatedAt: Date.now(),
+    });
+    const snapshot = await progressRef.once("value");
+    renderStudentLearningProgress(snapshot.val() || {});
+    showAlert(
+      `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan: ${achieved * 10}/70.`,
+      "success",
+    );
+  } catch (error) {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+    showAlert("Gagal menyimpan nilai Wireframe: " + error.message, "danger");
+  }
+}
+
 function closeStudentLearningProgress() {
   document.getElementById("learningProgressModal")?.classList.add("hidden");
   document.body.style.overflow = "";
   selectedLearningProgressStudent = null;
+  selectedLearningProgressData = {};
 }
 
 async function resetStudentLearningProgress() {
@@ -274,12 +477,18 @@ async function resetStudentLearningProgress() {
   button.disabled = true;
   button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Mereset…';
   try {
-    await db
+    const progressRef = db
       .ref("learningProgress")
       .child(student.id)
-      .child("grade10UiUx")
-      .remove();
-    renderStudentLearningProgress({});
+      .child("grade10UiUx");
+    const teacherAssessment = selectedLearningProgressData.teacherAssessment;
+    if (teacherAssessment) {
+      await progressRef.set({ teacherAssessment });
+      renderStudentLearningProgress({ teacherAssessment });
+    } else {
+      await progressRef.remove();
+      renderStudentLearningProgress({});
+    }
     showAlert(
       `Progress UI/UX <strong>${escHtml(student.nama)}</strong> berhasil direset ke 0 XP.`,
       "success",
@@ -461,6 +670,25 @@ function listenToSiswaData() {
             needsMigration = true;
           }
 
+          for (let quarter = 1; quarter <= 4; quarter++) {
+            const autoFormativeFields = getStudentAutoFormativeFields(
+              val,
+              quarter,
+            );
+            Object.entries(autoFormativeFields).forEach(([field, score]) => {
+              const currentScore = val[field];
+              const alreadySynced =
+                currentScore !== "" &&
+                currentScore !== null &&
+                currentScore !== undefined &&
+                Number(currentScore) === Number(score);
+              if (!alreadySynced) {
+                updates[`${id}/${field}`] = score;
+                needsMigration = true;
+              }
+            });
+          }
+
           if (needsMigration) {
             madeChanges = true;
           } else {
@@ -470,7 +698,9 @@ function listenToSiswaData() {
 
         if (madeChanges) {
           siswaRef.update(updates).then(() => {
-            console.log("Auto-migrasi data lama ke Quarter 3 berhasil.");
+            console.log(
+              "Auto-migrasi dan sinkronisasi nilai formatif berhasil.",
+            );
           });
         } else {
           allSiswa.sort((a, b) => a.nama.localeCompare(b.nama, "id"));
@@ -551,10 +781,19 @@ function saveSiswaRow(id) {
       ? Number(sumatifEl.value.trim())
       : "";
 
+  const autoFormativeFields = getStudentAutoFormativeFields(
+    siswa,
+    activeQuarter,
+  );
   for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
+    const field = `q${activeQuarter}_f${i}`;
+    if (Object.prototype.hasOwnProperty.call(autoFormativeFields, field)) {
+      updated[field] = autoFormativeFields[field];
+      continue;
+    }
     const el = document.getElementById("r-f" + i + "-" + id);
     const v = el ? el.value.trim() : "";
-    updated[`q${activeQuarter}_f${i}`] = v !== "" ? Number(v) : "";
+    updated[field] = v !== "" ? Number(v) : "";
   }
 
   siswaRef
@@ -675,6 +914,10 @@ function renderTableBody(data) {
   tbody.innerHTML = filtered
     .map((s, idx) => {
       const kkm = getKKM(s.kelas);
+      const autoFormativeFields = getStudentAutoFormativeFields(
+        s,
+        activeQuarter,
+      );
       const fArr = [];
       for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
         fArr.push(
@@ -702,6 +945,11 @@ function renderTableBody(data) {
       let fInputs = "";
       for (let i = 0; i < numFormatif[activeQuarter]; i++) {
         const val = fArr[i];
+        const field = `q${activeQuarter}_f${i + 1}`;
+        const isAutoFilled = Object.prototype.hasOwnProperty.call(
+          autoFormativeFields,
+          field,
+        );
         const num =
           val !== "" && val !== null && val !== undefined ? Number(val) : "";
         const cls =
@@ -710,7 +958,7 @@ function renderTableBody(data) {
             : "table-input";
         fInputs += `
         <td class="px-2 py-3">
-          <input type="number" min="0" max="100" class="${cls}" id="r-f${i + 1}-${s.id}" value="${num}" placeholder="-" oninput="highlightScore(this,${kkm})" />
+          <input type="number" min="0" max="100" class="${cls}${isAutoFilled ? " cursor-not-allowed opacity-80" : ""}" id="r-f${i + 1}-${s.id}" value="${num}" placeholder="-" oninput="highlightScore(this,${kkm})" ${isAutoFilled ? 'readonly title="Terisi otomatis dari rubrik penilaian" aria-label="Nilai formatif otomatis dari rubrik"' : ""} />
         </td>`;
       }
 
