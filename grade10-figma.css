@@ -1805,11 +1805,70 @@
   }
 
   .figma-editor-sim {
-    min-width: 720px;
+    min-width: 0;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
   }
 
   .editor-map-layout {
-    overflow-x: auto;
+    overflow-x: visible;
+  }
+
+  .editor-toolbar {
+    grid-column: 1;
+    min-height: 88px;
+    flex-wrap: wrap;
+    gap: 0.65rem 1rem;
+    padding: 0.8rem;
+  }
+
+  .editor-toolbar > span {
+    width: 100%;
+  }
+
+  .editor-layers {
+    min-height: 230px;
+    border-right: 0 !important;
+    border-bottom: 1px solid #354452 !important;
+  }
+
+  .editor-canvas {
+    min-height: 330px;
+  }
+
+  .editor-inspector {
+    min-height: 230px;
+    border-top: 1px solid #354452 !important;
+    border-left: 0 !important;
+  }
+
+  .canvas-frame {
+    width: 74%;
+    min-height: 210px;
+  }
+
+  .foundation-title {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .foundation-title > strong {
+    grid-column: 2;
+    justify-self: start;
+    margin: 0.35rem 0 0;
+  }
+
+  .dashboard-side button,
+  .dashboard-files button,
+  .dashboard-bar button {
+    min-height: 44px;
+  }
+
+  .layer-row-control button {
+    width: 42px;
+    height: 42px;
   }
 
   .toolbar-buttons {
