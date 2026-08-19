@@ -142,6 +142,14 @@ function openGrade10TeacherPreview() {
 
 function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
   const grade = getTeacherStudentGrade(student);
+  if (grade === 10) {
+    if (Number(quarter) !== 1) return {};
+    const value = student?.q1_f1;
+    if (value === "" || value === null || value === undefined) return {};
+    const score = Number(value);
+    return Number.isFinite(score) ? { q1_f1: score } : {};
+  }
+
   if (
     ![8, 9].includes(grade) ||
     typeof dcBuildFormativeGradebookFields !== "function"
@@ -303,6 +311,32 @@ function formatTeacherProgressScore(value) {
   return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
 }
 
+function getGrade10FormativeOneGradebookScore(progress = {}) {
+  const score = calculateGrade10UiUxProgress(progress).formative1;
+  if (score === null || score === undefined || !Number.isFinite(Number(score))) {
+    return null;
+  }
+  return Math.round(Number(score) * 10) / 10;
+}
+
+async function syncGrade10FormativeOneToGradebook(student, progress = {}) {
+  if (!student || getTeacherStudentGrade(student) !== 10) return null;
+  const score = getGrade10FormativeOneGradebookScore(progress);
+  if (score === null) return null;
+  const currentScore = student.q1_f1;
+  if (
+    currentScore !== "" &&
+    currentScore !== null &&
+    currentScore !== undefined &&
+    Number(currentScore) === score
+  ) {
+    return score;
+  }
+  await siswaRef.child(student.id).child("q1_f1").set(score);
+  student.q1_f1 = score;
+  return score;
+}
+
 function findLatestProgressTimestamp(value) {
   if (!value || typeof value !== "object") return 0;
   return Object.entries(value).reduce((latest, [key, child]) => {
@@ -354,7 +388,13 @@ async function openStudentLearningProgress(studentId) {
       .child(student.id)
       .child("grade10UiUx")
       .once("value");
-    renderStudentLearningProgress(snapshot.val() || {});
+    const progress = snapshot.val() || {};
+    try {
+      await syncGrade10FormativeOneToGradebook(student, progress);
+    } catch (syncError) {
+      console.warn("Sinkronisasi Q1 F1 saat membuka progress gagal:", syncError);
+    }
+    renderStudentLearningProgress(progress);
   } catch (error) {
     body.innerHTML = `
       <div class="rounded-xl border border-rose-500/30 bg-rose-500/10 p-5 text-rose-200">
@@ -549,10 +589,23 @@ async function saveWireframeAssessment() {
       updatedAt: Date.now(),
     });
     const snapshot = await progressRef.once("value");
-    renderStudentLearningProgress(snapshot.val() || {});
+    const progress = snapshot.val() || {};
+    const formativeOneScore = getGrade10FormativeOneGradebookScore(progress);
+    let gradebookSyncError = null;
+    if (formativeOneScore !== null) {
+      try {
+        await syncGrade10FormativeOneToGradebook(student, progress);
+      } catch (syncError) {
+        gradebookSyncError = syncError;
+        console.warn("Sinkronisasi Q1 F1 setelah penilaian gagal:", syncError);
+      }
+    }
+    renderStudentLearningProgress(progress);
     showAlert(
-      `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_WIREFRAME_TOTAL_MAX}.`,
-      "success",
+      gradebookSyncError
+        ? `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan, tetapi buku nilai Q1 F1 belum berhasil disinkronkan.`
+        : `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_WIREFRAME_TOTAL_MAX}.${formativeOneScore !== null ? ` Buku nilai Q1 F1 diperbarui menjadi ${formatTeacherProgressScore(formativeOneScore)}.` : ""}`,
+      gradebookSyncError ? "warning" : "success",
     );
   } catch (error) {
     if (button) {

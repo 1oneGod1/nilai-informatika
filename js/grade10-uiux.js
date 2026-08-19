@@ -417,6 +417,11 @@ async function initializeUiUxLab() {
   try {
     const snapshot = await uiuxProgressRef.once("value");
     uiuxProgress = snapshot.val() || {};
+    try {
+      await syncUiUxFormativeOneToGradebook();
+    } catch (syncError) {
+      console.warn("Gradebook Q1 F1 sync on load failed:", syncError);
+    }
     hydrateSavedWork();
     renderProgressState();
   } catch (error) {
@@ -941,8 +946,21 @@ async function submitLockedQuiz(event, config) {
   try {
     const saved = await commitOneAttempt(config.key, payload);
     uiuxProgress[config.key] = saved.value;
+    let gradebookSyncError = null;
+    let gradebookScore = null;
+    if (config.key === "postTest") {
+      try {
+        gradebookScore = await syncUiUxFormativeOneToGradebook();
+      } catch (syncError) {
+        gradebookSyncError = syncError;
+        console.warn("Gradebook Q1 F1 sync after Post-test 1 failed:", syncError);
+      }
+    }
     renderProgressState();
-    showToast(saved.committed ? config.successMessage : "A locked result is already recorded for this student.", !saved.committed);
+    const message = gradebookSyncError
+      ? "Post-test 1 was recorded, but the Q1 F1 gradebook sync will be retried later."
+      : `${saved.committed ? config.successMessage : "A locked result is already recorded for this student."}${gradebookScore !== null ? ` Q1 F1 was updated to ${formatScore(gradebookScore)}.` : ""}`;
+    showToast(message, !saved.committed || Boolean(gradebookSyncError));
   } catch (error) {
     showToast("Submission failed and was not recorded. Check your connection and try again.", true);
   } finally {
@@ -962,6 +980,33 @@ async function commitOneAttempt(key, payload) {
   if (transaction.committed) return { committed: true, value: transaction.snapshot.val() };
   const latest = await uiuxProgressRef.child(key).once("value");
   return { committed: false, value: latest.val() };
+}
+
+function getUiUxFormativeOneGradebookScore() {
+  const wireframe = uiuxProgress.teacherAssessment?.wireframe || {};
+  const postTest = uiuxProgress.postTest || {};
+  if (
+    wireframe.assessed !== true ||
+    !Number.isFinite(Number(wireframe.score)) ||
+    !Number.isFinite(Number(postTest.score))
+  ) {
+    return null;
+  }
+  const productPoints = Math.min(70, Math.max(0, Number(wireframe.score)));
+  const quizPercent = Math.min(100, Math.max(0, Number(postTest.score)));
+  return Math.round(productPoints * 10 + quizPercent * 3) / 10;
+}
+
+async function syncUiUxFormativeOneToGradebook() {
+  if (!uiuxStudent || uiuxStudent.isLocalPreview) return null;
+  const score = getUiUxFormativeOneGradebookScore();
+  if (score === null) return null;
+  await db
+    .ref("siswa")
+    .child(uiuxStudent.id)
+    .child("q1_f1")
+    .set(score);
+  return score;
 }
 
 function bindSection3Interactions() {

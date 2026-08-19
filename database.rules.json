@@ -7,6 +7,10 @@
       ".write": "auth != null && (newData.exists() || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
       "$siswaId": {
         ".write": "auth != null",
+        "q1_f1": {
+          ".write": "auth != null || (root.child('learningProgress').child($siswaId).child('grade10UiUx').child('teacherAssessment').child('wireframe').child('assessed').val() === true && root.child('learningProgress').child($siswaId).child('grade10UiUx').child('teacherAssessment').child('wireframe').child('score').isNumber() && root.child('learningProgress').child($siswaId).child('grade10UiUx').child('postTest').child('score').isNumber() && newData.isNumber() && newData.val() === (root.child('learningProgress').child($siswaId).child('grade10UiUx').child('teacherAssessment').child('wireframe').child('score').val() * 10 + root.child('learningProgress').child($siswaId).child('grade10UiUx').child('postTest').child('score').val() * 3) / 10)",
+          ".validate": "!newData.exists() || (newData.isNumber() && newData.val() >= 0 && newData.val() <= 100)"
+        },
         "password": {
           ".write": true,
           ".validate": "newData.isString() && newData.val().length >= 6"
