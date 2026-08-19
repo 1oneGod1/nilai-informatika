@@ -59,19 +59,20 @@
             ".validate": "newData.hasChildren(['reference', 'structure', 'fidelity', 'journey']) && newData.child('reference').isBoolean() && newData.child('structure').isBoolean() && newData.child('fidelity').isBoolean() && newData.child('journey').isBoolean()"
           },
           "teacherAssessment": {
+            ".write": "auth != null && (root.child('guru').child(auth.uid).child('isVerified').val() === true || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
             "wireframe": {
-              ".validate": "newData.hasChildren(['assessed', 'criteria', 'score', 'updatedAt'])",
+              ".validate": "newData.hasChildren(['assessed', 'criteria', 'score', 'updatedAt']) && newData.child('score').val() === newData.child('criteria').child('reference').val() + newData.child('criteria').child('structure').val() + newData.child('criteria').child('hierarchy').val() + newData.child('criteria').child('navigation').val() + newData.child('criteria').child('spacing').val() + newData.child('criteria').child('fidelity').val() + newData.child('criteria').child('completeness').val()",
               "assessed": {
                 ".validate": "newData.isBoolean() && newData.val() === true"
               },
               "criteria": {
-                ".validate": "newData.hasChildren(['reference', 'structure', 'hierarchy', 'navigation', 'spacing', 'fidelity', 'completeness']) && newData.child('reference').isBoolean() && newData.child('structure').isBoolean() && newData.child('hierarchy').isBoolean() && newData.child('navigation').isBoolean() && newData.child('spacing').isBoolean() && newData.child('fidelity').isBoolean() && newData.child('completeness').isBoolean()",
+                ".validate": "newData.hasChildren(['reference', 'structure', 'hierarchy', 'navigation', 'spacing', 'fidelity', 'completeness']) && newData.child('reference').isNumber() && newData.child('reference').val() >= 0 && newData.child('reference').val() <= 10 && newData.child('structure').isNumber() && newData.child('structure').val() >= 0 && newData.child('structure').val() <= 10 && newData.child('hierarchy').isNumber() && newData.child('hierarchy').val() >= 0 && newData.child('hierarchy').val() <= 10 && newData.child('navigation').isNumber() && newData.child('navigation').val() >= 0 && newData.child('navigation').val() <= 10 && newData.child('spacing').isNumber() && newData.child('spacing').val() >= 0 && newData.child('spacing').val() <= 10 && newData.child('fidelity').isNumber() && newData.child('fidelity').val() >= 0 && newData.child('fidelity').val() <= 10 && newData.child('completeness').isNumber() && newData.child('completeness').val() >= 0 && newData.child('completeness').val() <= 10",
                 "$other": {
                   ".validate": false
                 }
               },
               "score": {
-                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 70 && newData.val() % 10 === 0"
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 70"
               },
               "updatedAt": {
                 ".validate": "newData.isNumber()"

@@ -1426,8 +1426,11 @@ function renderFormativeLedger(section1Complete, section4Complete) {
   ];
   const wireframeAssessed = wireframeAssessment.assessed === true;
   const product1 = wireframeAssessed
-    ? wireframeCriterionKeys.filter((key) => wireframeCriteria[key] === true)
-        .length * 10
+    ? wireframeCriterionKeys.reduce((total, key) => {
+        const value = wireframeCriteria[key];
+        const points = value === true ? 10 : Number(value || 0);
+        return total + Math.min(10, Math.max(0, Number.isFinite(points) ? points : 0));
+      }, 0)
     : 0;
   const product2 = section4Complete ? 70 : 0;
   const quiz1 = uiuxProgress.postTest ? safeNumber(uiuxProgress.postTest.score) * 0.3 : 0;

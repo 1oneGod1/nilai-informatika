@@ -250,6 +250,12 @@ const GRADE10_WIREFRAME_RUBRIC_KEYS = [
   "completeness",
 ];
 
+function getGrade10WireframeCriterionPoints(value) {
+  if (value === true) return 10;
+  const points = Number(value || 0);
+  return Math.min(10, Math.max(0, Number.isFinite(points) ? points : 0));
+}
+
 function grade10ReportChecksComplete(saved, keys) {
   return Boolean(saved) && keys.every((key) => saved[key] === true);
 }
@@ -304,9 +310,11 @@ function calculateGrade10ReportScores(progress = {}) {
   const wireframeCriteria = wireframeAssessment.criteria || {};
   const product1Complete = wireframeAssessment.assessed === true;
   const product1Points = product1Complete
-    ? GRADE10_WIREFRAME_RUBRIC_KEYS.filter(
-        (key) => wireframeCriteria[key] === true,
-      ).length * 10
+    ? GRADE10_WIREFRAME_RUBRIC_KEYS.reduce(
+        (total, key) =>
+          total + getGrade10WireframeCriterionPoints(wireframeCriteria[key]),
+        0,
+      )
     : 0;
   const product2Complete = grade10ReportSection4Complete(progress);
   const post1Complete = Boolean(progress.postTest);

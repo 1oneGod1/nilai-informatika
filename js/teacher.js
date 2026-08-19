@@ -48,6 +48,22 @@ const GRADE10_WIREFRAME_RUBRIC = [
   },
 ];
 
+const GRADE10_WIREFRAME_CRITERION_MAX = 10;
+const GRADE10_WIREFRAME_TOTAL_MAX =
+  GRADE10_WIREFRAME_RUBRIC.length * GRADE10_WIREFRAME_CRITERION_MAX;
+
+function normalizeWireframeCriterionPoints(value) {
+  if (value === true) return GRADE10_WIREFRAME_CRITERION_MAX;
+  if (value === false || value === null || value === undefined || value === "")
+    return 0;
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return 0;
+  return Math.min(
+    GRADE10_WIREFRAME_CRITERION_MAX,
+    Math.max(0, Math.round(numericValue)),
+  );
+}
+
 const GRADE10_UIUX_XP = {
   preTest: 80,
   section1: 120,
@@ -164,15 +180,23 @@ function teacherSection1DiscoveryComplete(discovery) {
 
 function getWireframeRubricAssessment(progress = {}) {
   const saved = progress.teacherAssessment?.wireframe || {};
-  const criteria = saved.criteria || {};
-  const achieved = GRADE10_WIREFRAME_RUBRIC.filter(
-    (criterion) => criteria[criterion.id] === true,
-  ).length;
+  const savedCriteria = saved.criteria || {};
+  const criteria = Object.fromEntries(
+    GRADE10_WIREFRAME_RUBRIC.map((criterion) => [
+      criterion.id,
+      normalizeWireframeCriterionPoints(savedCriteria[criterion.id]),
+    ]),
+  );
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const achieved = Object.values(criteria).filter((value) => value > 0).length;
   return {
     assessed: saved.assessed === true,
     criteria,
     achieved,
-    score: achieved * 10,
+    score,
     updatedAt: Number(saved.updatedAt || 0),
   };
 }
@@ -390,11 +414,11 @@ function renderStudentLearningProgress(progress) {
         <div>
           <span class="text-[10px] font-mono-tech tracking-[0.18em] text-lime-300 font-bold">FORMATIF 1 · WIREFRAME RUBRIC</span>
           <h3 class="text-lg font-black text-white mt-1">Nilai kesesuaian analisis dengan website acuan</h3>
-          <p class="text-xs text-slate-400 mt-1">Bandingkan gambar wireframe siswa dengan website pilihannya. Setiap kesesuaian bernilai 10 poin; warna dan dekorasi tidak dinilai.</p>
+          <p class="text-xs text-slate-400 mt-1">Bandingkan gambar wireframe siswa dengan website pilihannya. Atur 0–10 poin untuk setiap kriteria; warna dan dekorasi tidak dinilai.</p>
         </div>
         <div class="sm:text-right shrink-0">
-          <strong id="wireframeRubricScore" class="block text-3xl font-black text-lime-300">${wireframeAssessment.score}<small class="text-sm text-slate-500">/70</small></strong>
-          <span id="wireframeRubricCount" class="text-[10px] font-mono-tech text-slate-500">${wireframeAssessment.achieved}/7 CRITERIA</span>
+          <strong id="wireframeRubricScore" class="block text-3xl font-black text-lime-300">${wireframeAssessment.score}<small class="text-sm text-slate-500">/${GRADE10_WIREFRAME_TOTAL_MAX}</small></strong>
+          <span id="wireframeRubricCount" class="text-[10px] font-mono-tech text-slate-500">${wireframeAssessment.achieved}/${GRADE10_WIREFRAME_RUBRIC.length} KRITERIA TERISI</span>
         </div>
       </div>
       <div class="mx-5 mt-5 rounded-xl border border-cyan-400/20 bg-cyan-400/[0.05] p-4">
@@ -410,12 +434,18 @@ function renderStudentLearningProgress(progress) {
       </div>
       <div class="grid md:grid-cols-2 gap-2.5 p-5">
         ${GRADE10_WIREFRAME_RUBRIC.map(
-          (criterion, index) => `<label class="flex items-start gap-3 rounded-xl border border-slate-700 bg-slate-950/45 p-3.5 cursor-pointer hover:border-lime-400/40 transition-colors">
-            <input type="checkbox" data-wireframe-rubric="${criterion.id}" onchange="updateWireframeRubricPreview()" ${wireframeAssessment.criteria[criterion.id] === true ? "checked" : ""} class="mt-1 h-4 w-4 accent-lime-400 shrink-0" />
-            <span class="grid w-7 h-7 shrink-0 place-items-center rounded-lg bg-lime-400/10 text-lime-300 text-xs font-black">${index + 1}</span>
-            <span class="min-w-0 flex-1"><strong class="block text-sm text-white">${criterion.label}</strong><small class="block text-[11px] leading-relaxed text-slate-500 mt-1">${criterion.description}</small></span>
-            <b class="text-xs text-lime-300 shrink-0">+10</b>
-          </label>`,
+          (criterion, index) => `<article class="rounded-xl border border-slate-700 bg-slate-950/45 p-3.5 hover:border-lime-400/40 transition-colors">
+            <div class="flex items-start gap-3">
+              <input type="checkbox" data-wireframe-full="${criterion.id}" onchange="setWireframeCriterionFull('${criterion.id}', this.checked)" ${wireframeAssessment.criteria[criterion.id] === GRADE10_WIREFRAME_CRITERION_MAX ? "checked" : ""} class="mt-1 h-4 w-4 accent-lime-400 shrink-0" aria-label="Beri poin penuh untuk ${criterion.label}" />
+              <span class="grid w-7 h-7 shrink-0 place-items-center rounded-lg bg-lime-400/10 text-lime-300 text-xs font-black">${index + 1}</span>
+              <span class="min-w-0 flex-1"><strong class="block text-sm text-white">${criterion.label}</strong><small class="block text-[11px] leading-relaxed text-slate-500 mt-1">${criterion.description}</small></span>
+            </div>
+            <label class="mt-3 ml-14 flex items-center justify-end gap-2 text-[10px] font-mono-tech text-slate-500">
+              POIN
+              <input type="number" min="0" max="${GRADE10_WIREFRAME_CRITERION_MAX}" step="1" inputmode="numeric" data-wireframe-rubric="${criterion.id}" value="${wireframeAssessment.criteria[criterion.id]}" oninput="updateWireframeRubricPreview('${criterion.id}')" class="w-16 rounded-lg border border-slate-600 bg-slate-900 px-2 py-1.5 text-center text-sm font-black text-lime-300 outline-none focus:border-lime-400" aria-label="Poin ${criterion.label}" />
+              <b class="text-xs text-lime-300">/${GRADE10_WIREFRAME_CRITERION_MAX}</b>
+            </label>
+          </article>`,
         ).join("")}
       </div>
       <div class="px-5 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -446,17 +476,43 @@ function renderStudentLearningProgress(progress) {
   resetButton.disabled = !hasProgress;
 }
 
+function setWireframeCriterionFull(criterionId, isFull) {
+  const input = document.querySelector(
+    `[data-wireframe-rubric="${criterionId}"]`,
+  );
+  if (input) input.value = isFull ? GRADE10_WIREFRAME_CRITERION_MAX : 0;
+  updateWireframeRubricPreview();
+}
+
 function updateWireframeRubricPreview() {
   const inputs = Array.from(
     document.querySelectorAll("[data-wireframe-rubric]"),
   );
-  const achieved = inputs.filter((input) => input.checked).length;
+  const points = inputs.map((input) => {
+    const normalized = normalizeWireframeCriterionPoints(input.value);
+    if (input.value !== "" && Number(input.value) !== normalized) {
+      input.value = normalized;
+    }
+    const criterionId = input.dataset.wireframeRubric;
+    const fullCheckbox = document.querySelector(
+      `[data-wireframe-full="${criterionId}"]`,
+    );
+    if (fullCheckbox) {
+      fullCheckbox.checked =
+        normalized === GRADE10_WIREFRAME_CRITERION_MAX;
+    }
+    return normalized;
+  });
+  const score = points.reduce((total, value) => total + value, 0);
+  const achieved = points.filter((value) => value > 0).length;
   const scoreElement = document.getElementById("wireframeRubricScore");
   const countElement = document.getElementById("wireframeRubricCount");
   if (scoreElement) {
-    scoreElement.innerHTML = `${achieved * 10}<small class="text-sm text-slate-500">/70</small>`;
+    scoreElement.innerHTML = `${score}<small class="text-sm text-slate-500">/${GRADE10_WIREFRAME_TOTAL_MAX}</small>`;
   }
-  if (countElement) countElement.textContent = `${achieved}/7 CRITERIA`;
+  if (countElement) {
+    countElement.textContent = `${achieved}/${GRADE10_WIREFRAME_RUBRIC.length} KRITERIA TERISI`;
+  }
 }
 
 async function saveWireframeAssessment() {
@@ -465,13 +521,15 @@ async function saveWireframeAssessment() {
 
   const criteria = {};
   GRADE10_WIREFRAME_RUBRIC.forEach((criterion) => {
-    criteria[criterion.id] = Boolean(
-      document.querySelector(
-        `[data-wireframe-rubric="${criterion.id}"]`,
-      )?.checked,
+    criteria[criterion.id] = normalizeWireframeCriterionPoints(
+      document.querySelector(`[data-wireframe-rubric="${criterion.id}"]`)
+        ?.value,
     );
   });
-  const achieved = Object.values(criteria).filter(Boolean).length;
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
   const button = document.getElementById("saveWireframeRubricButton");
   const originalHtml = button?.innerHTML || "";
   if (button) {
@@ -487,13 +545,13 @@ async function saveWireframeAssessment() {
     await progressRef.child("teacherAssessment").child("wireframe").set({
       assessed: true,
       criteria,
-      score: achieved * 10,
+      score,
       updatedAt: Date.now(),
     });
     const snapshot = await progressRef.once("value");
     renderStudentLearningProgress(snapshot.val() || {});
     showAlert(
-      `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan: ${achieved * 10}/70.`,
+      `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_WIREFRAME_TOTAL_MAX}.`,
       "success",
     );
   } catch (error) {
@@ -501,7 +559,15 @@ async function saveWireframeAssessment() {
       button.disabled = false;
       button.innerHTML = originalHtml;
     }
-    showAlert("Gagal menyimpan nilai Wireframe: " + error.message, "danger");
+    const permissionDenied = /permission[_ -]?denied/i.test(
+      String(error?.code || error?.message || ""),
+    );
+    showAlert(
+      permissionDenied
+        ? "Izin Firebase ditolak. Pastikan akun guru sudah disetujui admin dan aturan database terbaru sudah diterapkan."
+        : "Gagal menyimpan nilai Wireframe: " + error.message,
+      "danger",
+    );
   }
 }
 
