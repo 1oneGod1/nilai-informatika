@@ -32,7 +32,7 @@ let allSiswa = [];
 let isTeacherLoggedIn = false;
 
 // KKM per kelas (numeric key)
-const KKM_MAP = { 7: 67, 8: 68, 9: 69, 10: 75, 11: 76, 12: 77 };
+const KKM_MAP = { 7: 72, 8: 73, 9: 74, 10: 75, 11: 76, 12: 77 };
 
 //
 // Utility: extract numeric grade from kelas string

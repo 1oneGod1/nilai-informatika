@@ -693,6 +693,14 @@ function setQuarter(q) {
 // G��G��G�� AUTHENTICATION CHECK G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
 document.addEventListener("DOMContentLoaded", () => {
   const progressModal = document.getElementById("learningProgressModal");
+  renderKkmSettingsInputs();
+  window.addEventListener("kkm-settings-changed", () => {
+    renderKkmSettingsInputs();
+    if (allSiswa.length > 0) {
+      renderTableBody(allSiswa);
+    }
+  });
+
   progressModal?.addEventListener("click", (event) => {
     if (event.target === progressModal) closeStudentLearningProgress();
   });
@@ -780,6 +788,74 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // G��G��G�� SETTINGS FORMATIF G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+function renderKkmSettingsInputs() {
+  const grades =
+    typeof KKM_GRADES !== "undefined" ? KKM_GRADES : [7, 8, 9, 10, 11, 12];
+  grades.forEach((grade) => {
+    const input = document.getElementById(`kkmGrade${grade}`);
+    if (input) input.value = getKKM(grade);
+  });
+  const status = document.getElementById("kkmSettingsStatus");
+  if (status) {
+    status.textContent = `AKTIF · ${grades
+      .map((grade) => `${grade}=${getKKM(grade)}`)
+      .join(" · ")}`;
+  }
+}
+
+async function saveKkmSettings() {
+  const grades =
+    typeof KKM_GRADES !== "undefined" ? KKM_GRADES : [7, 8, 9, 10, 11, 12];
+  const settings = {};
+  for (const grade of grades) {
+    const input = document.getElementById(`kkmGrade${grade}`);
+    const value = Number(input?.value);
+    if (!Number.isInteger(value) || value < 1 || value > 100) {
+      showAlert(
+        `KKM kelas ${grade} harus berupa bilangan bulat antara 1 dan 100.`,
+        "danger",
+      );
+      input?.focus();
+      return;
+    }
+    settings[grade] = value;
+  }
+
+  const button = document.getElementById("saveKkmSettingsButton");
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML =
+      '<i class="fas fa-circle-notch fa-spin text-xs"></i> Menyimpan...';
+  }
+
+  try {
+    await kkmRef.set(settings);
+    applyKKMSettings(settings);
+    renderKkmSettingsInputs();
+    renderTableBody(allSiswa);
+    showAlert(
+      `KKM berhasil disimpan: kelas 7 = ${settings[7]}, kelas 8 = ${settings[8]}, kelas 9 = ${settings[9]}.`,
+      "success",
+    );
+  } catch (error) {
+    const permissionDenied = /permission[_ -]?denied/i.test(
+      String(error?.code || error?.message || ""),
+    );
+    showAlert(
+      permissionDenied
+        ? "Izin menyimpan KKM ditolak. Pastikan akun guru sudah terverifikasi dan aturan Firebase terbaru sudah diterapkan."
+        : `Gagal menyimpan KKM: ${escHtml(error?.message || "Kesalahan tidak diketahui")}`,
+      "danger",
+    );
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+  }
+}
+
 function applySettings() {
   const val = parseInt(document.getElementById("numFormatif").value, 10);
   if (isNaN(val) || val < 1 || val > 10) {

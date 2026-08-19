@@ -23,6 +23,16 @@ function showStudentPasswordError(message) {
 document.addEventListener("DOMContentLoaded", () => {
   checkAuthOnStudentPage();
   listenToDataSiswa();
+  window.addEventListener("kkm-settings-changed", () => {
+    const detail = document.getElementById("studentDetail");
+    if (
+      selectedStudentForDetail &&
+      detail &&
+      !detail.classList.contains("hidden")
+    ) {
+      renderStudentDetail(selectedStudentForDetail.id);
+    }
+  });
 });
 
 // ─── AMBIL DATA SISWA ─────────────────────────────────────

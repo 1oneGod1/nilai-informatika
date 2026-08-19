@@ -22,6 +22,7 @@ const db = firebase.database();
 const auth = firebase.auth();
 const siswaRef = db.ref("siswa");
 const guruRef = db.ref("guru");
+const kkmRef = db.ref("settings/kkm");
 
 const ADMIN_EMAILS = ["andi.purba@sdh.or.id", "pandapotanandi@gmail.com"];
 
@@ -40,13 +41,55 @@ function isAdminEmail(email) {
   );
 }
 
-const KKM_MAP = { 7: 67, 8: 68, 9: 69, 10: 75, 11: 76, 12: 77 };
+const KKM_GRADES = Object.freeze([7, 8, 9, 10, 11, 12]);
+const KKM_DEFAULTS = Object.freeze({
+  7: 72,
+  8: 73,
+  9: 74,
+  10: 75,
+  11: 76,
+  12: 77,
+});
+const KKM_MAP = { ...KKM_DEFAULTS };
+
+function normalizeKKMValue(value, fallback) {
+  const numericValue = Number(value);
+  return Number.isInteger(numericValue) && numericValue >= 1 && numericValue <= 100
+    ? numericValue
+    : fallback;
+}
+
+function applyKKMSettings(settings = {}) {
+  KKM_GRADES.forEach((grade) => {
+    KKM_MAP[grade] = normalizeKKMValue(settings?.[grade], KKM_DEFAULTS[grade]);
+  });
+}
+
+function getKKMSettings() {
+  return Object.fromEntries(KKM_GRADES.map((grade) => [grade, KKM_MAP[grade]]));
+}
 
 function getKKM(kelasStr) {
   const match = String(kelasStr || "").match(/\d+/);
   if (!match) return 0;
   return KKM_MAP[parseInt(match[0], 10)] || 0;
 }
+
+kkmRef.on(
+  "value",
+  (snapshot) => {
+    applyKKMSettings(snapshot.val() || {});
+    window.dispatchEvent(
+      new CustomEvent("kkm-settings-changed", { detail: getKKMSettings() }),
+    );
+  },
+  (error) => {
+    console.warn(
+      "Pengaturan KKM tidak dapat dimuat; menggunakan nilai bawaan.",
+      error,
+    );
+  },
+);
 
 function escHtml(str) {
   return String(str)
