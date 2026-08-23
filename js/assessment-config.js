@@ -490,6 +490,497 @@ const G8_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING.map(
   }),
 );
 
+function dcWeightByTypeBudget(assessments, budgets = { Formatif: 40, Sumatif: 60 }) {
+  const jpTotals = assessments.reduce((totals, assessment) => {
+    totals[assessment.type] = (totals[assessment.type] || 0) + Number(assessment.jp || 0);
+    return totals;
+  }, {});
+  const lastIndexByType = assessments.reduce((indexes, assessment, index) => {
+    indexes[assessment.type] = index;
+    return indexes;
+  }, {});
+  const accumulated = {};
+
+  return assessments.map((assessment, index) => {
+    const typeBudget = Number(budgets[assessment.type] || 0);
+    const typeJp = Number(jpTotals[assessment.type] || 0);
+    const rawWeight = typeJp ? (Number(assessment.jp || 0) / typeJp) * typeBudget : 0;
+    const isLastOfType = lastIndexByType[assessment.type] === index;
+    const previous = Number(accumulated[assessment.type] || 0);
+    const weight = isLastOfType
+      ? Number((typeBudget - previous).toFixed(2))
+      : Number(rawWeight.toFixed(2));
+    accumulated[assessment.type] = Number((previous + weight).toFixed(2));
+    return { ...assessment, weight };
+  });
+}
+
+const G11_Q1_COLORS = {
+  voice: "#73d31d",
+  python: "#3aa0ff",
+  pythonProject: "#7c5ce5",
+  ai: "#f0b81b",
+  aiProject: "#ef6a54",
+};
+
+function g11ProjectCriteria(product, technicalFocus) {
+  return [
+    { id: "planning", label: `Planning ${product} jelas: tujuan, audiens/pengguna, flow, dan konten utama`, max: 20 },
+    { id: "functionality", label: `Fitur utama ${product} berjalan sesuai instruksi dan bisa didemonstrasikan`, max: 25 },
+    { id: "technical", label: `${technicalFocus} digunakan dengan benar, rapi, dan mudah dibaca`, max: 20 },
+    { id: "testing", label: "Ada bukti testing, debugging, revisi, atau perbaikan berdasarkan error", max: 20 },
+    { id: "reflection", label: "Refleksi menjelaskan proses, tantangan, kontribusi, dan rencana peningkatan", max: 15 },
+  ];
+}
+
+function g11PracticeCriteria(concept) {
+  return [
+    { id: "planning", label: `Target latihan ${concept} dan langkah penyelesaian ditulis singkat sebelum coding`, max: 15 },
+    { id: "concept", label: `Konsep ${concept} digunakan dengan benar dalam contoh program`, max: 25 },
+    { id: "implementation", label: "Kode berjalan, output sesuai, dan struktur program mudah diikuti", max: 25 },
+    { id: "debugging", label: "Error dicoba, diperbaiki, dan dicatat dengan jelas", max: 15 },
+    { id: "explanation", label: "Siswa dapat menjelaskan fungsi kode dengan kata-kata sendiri", max: 20 },
+  ];
+}
+
+function g11AiCriteria(focus) {
+  return [
+    { id: "planning", label: `Planning ${focus}: tujuan, input, output, dan batasan penggunaan ditentukan`, max: 20 },
+    { id: "concept", label: "Konsep AI, data, model, confidence, atau algoritma dijelaskan dengan akurat", max: 20 },
+    { id: "prototype", label: "Prototype atau coding project berjalan dan menghasilkan output yang dapat diuji", max: 25 },
+    { id: "testing", label: "Akurasi, edge case, error, atau keterbatasan diuji dan dicatat", max: 20 },
+    { id: "responsibility", label: "Refleksi menunjukkan penggunaan AI yang aman, etis, dan bertanggung jawab", max: 15 },
+  ];
+}
+
+function g11Task({
+  id,
+  number,
+  title,
+  subtitle,
+  unit,
+  type = "Formatif",
+  jp,
+  color,
+  brief,
+  criteria,
+}) {
+  return { id, number, title, subtitle, unit, type, jp, color, brief, criteria };
+}
+
+const G11_Q1_RAW_ASSESSMENTS = [
+  g11Task({
+    id: "g11Q1FavoriteWebsite",
+    number: "01",
+    title: "My Favorite Website",
+    subtitle: "HTML/CSS as a personal digital voice",
+    unit: "Code Is Your Voice",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.voice,
+    brief: "Students create a simple webpage that communicates their interests, identity, and safe digital expression through HTML and CSS.",
+    criteria: g11ProjectCriteria("favorite website", "HTML dan CSS"),
+  }),
+  g11Task({
+    id: "g11Q1TriviaGameMaker",
+    number: "02",
+    title: "Trivia Game Maker",
+    subtitle: "Questions, interaction, feedback, and score logic",
+    unit: "Code Is Your Voice",
+    type: "Sumatif",
+    jp: 2,
+    color: G11_Q1_COLORS.voice,
+    brief: "Students build a trivia game that uses original questions, JavaScript interaction, answer checking, feedback, and a visible final score.",
+    criteria: g11ProjectCriteria("trivia game", "HTML, CSS, dan JavaScript"),
+  }),
+  g11Task({
+    id: "g11Q1PythonVariablesComments",
+    number: "03",
+    title: "Python Variables and Comments",
+    subtitle: "Storing information and annotating code",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 1,
+    color: G11_Q1_COLORS.python,
+    brief: "Students practise variables and comments by creating short console programs with meaningful names and readable notes.",
+    criteria: g11PracticeCriteria("variables dan comments"),
+  }),
+  g11Task({
+    id: "g11Q1PythonDataTypes",
+    number: "04",
+    title: "Data Types",
+    subtitle: "String, number, boolean, and type conversion",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 1,
+    color: G11_Q1_COLORS.python,
+    brief: "Students identify and use Python data types through examples, outputs, and simple type conversion practice.",
+    criteria: g11PracticeCriteria("data types"),
+  }),
+  g11Task({
+    id: "g11Q1PythonOperators",
+    number: "05",
+    title: "Operators",
+    subtitle: "Arithmetic, comparison, and logical operators",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 1,
+    color: G11_Q1_COLORS.python,
+    brief: "Students practise operators to calculate values, compare conditions, and produce correct outputs.",
+    criteria: g11PracticeCriteria("operators"),
+  }),
+  g11Task({
+    id: "g11Q1PythonConditionals",
+    number: "06",
+    title: "Conditional Statements",
+    subtitle: "If, elif, else, and decision logic",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students write conditional programs that respond differently based on user input or program conditions.",
+    criteria: g11PracticeCriteria("conditional statements"),
+  }),
+  g11Task({
+    id: "g11Q1RockPaperScissors",
+    number: "07",
+    title: "Project 1: Rock, Paper, Scissors",
+    subtitle: "Console game with input, conditionals, and feedback",
+    unit: "Python 101",
+    type: "Sumatif",
+    jp: 2,
+    color: G11_Q1_COLORS.pythonProject,
+    brief: "Students create a playable Rock, Paper, Scissors game with input handling, decision rules, test cases, and clear feedback.",
+    criteria: g11ProjectCriteria("Rock, Paper, Scissors", "Python input, conditional logic, dan output"),
+  }),
+  g11Task({
+    id: "g11Q1PythonLoops",
+    number: "08",
+    title: "Loops",
+    subtitle: "For loop, while loop, and controlled repetition",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students use loops to repeat actions, process simple patterns, and avoid unnecessary repeated code.",
+    criteria: g11PracticeCriteria("loops"),
+  }),
+  g11Task({
+    id: "g11Q1CountdownTimer",
+    number: "09",
+    title: "Project 2: Countdown Timer",
+    subtitle: "Loop logic and step-by-step output",
+    unit: "Python 101",
+    type: "Sumatif",
+    jp: 2,
+    color: G11_Q1_COLORS.pythonProject,
+    brief: "Students create a countdown timer that uses loop logic, clear output, and evidence of testing different timer values.",
+    criteria: g11ProjectCriteria("Countdown Timer", "Python loop, timer logic, dan output"),
+  }),
+  g11Task({
+    id: "g11Q1PythonList",
+    number: "10",
+    title: "List",
+    subtitle: "Storing and editing collections of data",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students practise creating, accessing, updating, adding, and removing list items in Python.",
+    criteria: g11PracticeCriteria("list"),
+  }),
+  g11Task({
+    id: "g11Q1Python2DListNestedLoops",
+    number: "11",
+    title: "2D List and Nested Loops",
+    subtitle: "Grid data and repeated structures",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students use 2D lists and nested loops to process rows, columns, tables, or grid-like output.",
+    criteria: g11PracticeCriteria("2D list dan nested loops"),
+  }),
+  g11Task({
+    id: "g11Q1PythonFunction",
+    number: "12",
+    title: "Function",
+    subtitle: "Reusable code with parameters and return values",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students create and call functions to organise repeated logic and make programs easier to understand.",
+    criteria: g11PracticeCriteria("function"),
+  }),
+  g11Task({
+    id: "g11Q1PythonRecursiveFunctions",
+    number: "13",
+    title: "Recursive Functions",
+    subtitle: "Function calling itself with a base case",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students explore recursion by writing a function with a clear base case and recursive step.",
+    criteria: g11PracticeCriteria("recursive functions"),
+  }),
+  g11Task({
+    id: "g11Q1PythonTuples",
+    number: "14",
+    title: "Tuples",
+    subtitle: "Fixed data structure and simple grouping",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students practise tuples as fixed collections and explain when a tuple is more suitable than a list.",
+    criteria: g11PracticeCriteria("tuples"),
+  }),
+  g11Task({
+    id: "g11Q1PythonDictionary",
+    number: "15",
+    title: "Dictionary",
+    subtitle: "Key-value data and lookup",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students use dictionaries to store key-value data, retrieve values, update records, and explain their structure.",
+    criteria: g11PracticeCriteria("dictionary"),
+  }),
+  g11Task({
+    id: "g11Q1AgeCalculator",
+    number: "16",
+    title: "Project 3: Age Calculator",
+    subtitle: "Input, calculation, validation, and clear output",
+    unit: "Python 101",
+    type: "Sumatif",
+    jp: 4,
+    color: G11_Q1_COLORS.pythonProject,
+    brief: "Students create an age calculator with meaningful input, accurate calculation, validation, testing, and readable output.",
+    criteria: g11ProjectCriteria("Age Calculator", "Python input, calculation, validation, dan output"),
+  }),
+  g11Task({
+    id: "g11Q1PythonClass",
+    number: "17",
+    title: "Class",
+    subtitle: "Object, property, method, and instance",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students create a simple class, instantiate objects, and explain how properties and methods describe behaviour.",
+    criteria: g11PracticeCriteria("class"),
+  }),
+  g11Task({
+    id: "g11Q1PythonWebBrowser",
+    number: "18",
+    title: "Python in a Web Browser",
+    subtitle: "Running Python with PyScript/browser support",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students connect Python practice to a browser environment using PyScript or a suitable browser-based setup.",
+    criteria: g11PracticeCriteria("Python in a web browser"),
+  }),
+  g11Task({
+    id: "g11Q1StyleHtmlElements",
+    number: "19",
+    title: "Style HTML Elements",
+    subtitle: "Connecting output with readable visual design",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students style HTML elements so the web output is clear, readable, and personalised.",
+    criteria: g11PracticeCriteria("style HTML elements"),
+  }),
+  g11Task({
+    id: "g11Q1EventHandling",
+    number: "20",
+    title: "Event Handling",
+    subtitle: "Interactive input, buttons, and response",
+    unit: "Python 101",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.python,
+    brief: "Students create a simple interaction where a user action triggers visible program output or behaviour.",
+    criteria: g11PracticeCriteria("event handling"),
+  }),
+  g11Task({
+    id: "g11Q1TaskManagerWebApp",
+    number: "21",
+    title: "Project 4: Task Manager Web App",
+    subtitle: "Input, state, event, layout, and usability",
+    unit: "Python 101",
+    type: "Sumatif",
+    jp: 4,
+    color: G11_Q1_COLORS.pythonProject,
+    brief: "Students create a task manager web app with input, task display, event handling, styling, testing, and reflection.",
+    criteria: g11ProjectCriteria("Task Manager Web App", "Python/PyScript, HTML, CSS, event handling, dan state sederhana"),
+  }),
+  g11Task({
+    id: "g11Q1WebcamImageClassification",
+    number: "22",
+    title: "Webcam Image Classification",
+    subtitle: "Introducing real-time visual recognition",
+    unit: "Code the Future with AI",
+    type: "Formatif",
+    jp: 3,
+    color: G11_Q1_COLORS.ai,
+    brief: "Students investigate how a webcam classifier recognises categories and what affects prediction confidence.",
+    criteria: g11AiCriteria("webcam image classification"),
+  }),
+  g11Task({
+    id: "g11Q1CardSortingActivity",
+    number: "23",
+    title: "Card Sorting Activity",
+    subtitle: "Dataset categories, labels, and human judgement",
+    unit: "Code the Future with AI",
+    type: "Formatif",
+    jp: 3,
+    color: G11_Q1_COLORS.ai,
+    brief: "Students sort examples into categories, justify labels, and connect the activity to training data and classification.",
+    criteria: g11AiCriteria("card sorting activity"),
+  }),
+  g11Task({
+    id: "g11Q1MachineLearningImageClassification",
+    number: "24",
+    title: "Machine Learning - Image Classification",
+    subtitle: "Model, label, training, prediction, and confidence",
+    unit: "Code the Future with AI",
+    type: "Formatif",
+    jp: 4,
+    color: G11_Q1_COLORS.ai,
+    brief: "Students train or inspect an image classification model and record labels, examples, prediction results, and limitations.",
+    criteria: g11AiCriteria("machine learning image classification"),
+  }),
+  g11Task({
+    id: "g11Q1ImageUploadClassifierProject",
+    number: "25",
+    title: "Image Upload Classifier - Coding Project",
+    subtitle: "Upload image, classify, and show results",
+    unit: "Code the Future with AI",
+    type: "Sumatif",
+    jp: 4,
+    color: G11_Q1_COLORS.aiProject,
+    brief: "Students build a web project where users upload an image and receive a visible classification result with confidence/testing evidence.",
+    criteria: g11AiCriteria("image upload classifier"),
+  }),
+  g11Task({
+    id: "g11Q1WebcamLiveClassifier",
+    number: "26",
+    title: "Webcam Live Classifier",
+    subtitle: "Live prediction and confidence changes",
+    unit: "Code the Future with AI",
+    type: "Formatif",
+    jp: 4,
+    color: G11_Q1_COLORS.ai,
+    brief: "Students test a live webcam classifier and explain how lighting, background, and examples affect prediction quality.",
+    criteria: g11AiCriteria("webcam live classifier"),
+  }),
+  g11Task({
+    id: "g11Q1WebcamLiveClassifierProject",
+    number: "27",
+    title: "Webcam Live Classifier - Coding Project",
+    subtitle: "Integrating live camera classification into a webpage",
+    unit: "Code the Future with AI",
+    type: "Sumatif",
+    jp: 4,
+    color: G11_Q1_COLORS.aiProject,
+    brief: "Students code a responsive live classifier page and demonstrate camera input, prediction output, and debugging results.",
+    criteria: g11AiCriteria("webcam live classifier coding project"),
+  }),
+  g11Task({
+    id: "g11Q1AdjustableAccuracyWebcamClassifier",
+    number: "28",
+    title: "Adjustable Accuracy Webcam Classifier",
+    subtitle: "Threshold, confidence, and prediction control",
+    unit: "Code the Future with AI",
+    type: "Sumatif",
+    jp: 4,
+    color: G11_Q1_COLORS.aiProject,
+    brief: "Students add or test an adjustable confidence threshold and explain how it changes classification behaviour.",
+    criteria: g11AiCriteria("adjustable accuracy webcam classifier"),
+  }),
+  g11Task({
+    id: "g11Q1ResponsiveInstrument",
+    number: "29",
+    title: "Responsive Instrument",
+    subtitle: "Turning input or prediction into sound/visual response",
+    unit: "Code the Future with AI",
+    type: "Sumatif",
+    jp: 3,
+    color: G11_Q1_COLORS.aiProject,
+    brief: "Students create a responsive instrument where input, gesture, or prediction triggers a meaningful sound or visual response.",
+    criteria: g11AiCriteria("responsive instrument"),
+  }),
+  g11Task({
+    id: "g11Q1MusicGenerator",
+    number: "30",
+    title: "Music Generator",
+    subtitle: "AI-assisted creativity and generated output",
+    unit: "Code the Future with AI",
+    type: "Sumatif",
+    jp: 3,
+    color: G11_Q1_COLORS.aiProject,
+    brief: "Students create or customise a music generator, record output examples, and reflect on creativity, control, and limitations.",
+    criteria: g11AiCriteria("music generator"),
+  }),
+  g11Task({
+    id: "g11Q1AiDigitalAssistant",
+    number: "31",
+    title: "AI Digital Assistant",
+    subtitle: "Assistant flow, prompt, response, and safety boundaries",
+    unit: "Code the Future with AI",
+    type: "Sumatif",
+    jp: 2,
+    color: G11_Q1_COLORS.aiProject,
+    brief: "Students design and prototype a digital assistant with sample conversation, clear task scope, and responsible-use notes.",
+    criteria: g11AiCriteria("AI digital assistant"),
+  }),
+  g11Task({
+    id: "g11Q1AiNavigationAlgorithm",
+    number: "32",
+    title: "AI - Navigation Algorithm",
+    subtitle: "Decision path and step-by-step route logic",
+    unit: "Code the Future with AI",
+    type: "Formatif",
+    jp: 2,
+    color: G11_Q1_COLORS.ai,
+    brief: "Students plan an AI-style navigation algorithm using pseudocode, conditionals, and clear decision points.",
+    criteria: g11AiCriteria("navigation algorithm"),
+  }),
+  g11Task({
+    id: "g11Q1AiAutoNavigation",
+    number: "33",
+    title: "AI - Auto Navigation",
+    subtitle: "Applying route logic to movement or simulation",
+    unit: "Code the Future with AI",
+    type: "Sumatif",
+    jp: 2,
+    color: G11_Q1_COLORS.aiProject,
+    brief: "Students implement auto navigation logic, test routes, and explain how the algorithm responds to conditions.",
+    criteria: g11AiCriteria("auto navigation"),
+  }),
+  g11Task({
+    id: "g11Q1AiFindFinishLine",
+    number: "34",
+    title: "AI - Find the Finish Line",
+    subtitle: "Final navigation challenge and problem solving",
+    unit: "Code the Future with AI",
+    type: "Sumatif",
+    jp: 2,
+    color: G11_Q1_COLORS.aiProject,
+    brief: "Students complete the finish-line challenge by testing paths, improving decisions, and documenting final performance.",
+    criteria: g11AiCriteria("find the finish line"),
+  }),
+];
+
+const G11_Q1_ASSESSMENTS = dcWeightByTypeBudget(G11_Q1_RAW_ASSESSMENTS);
+
 const G12_Q1_ASSESSMENTS = [
   {
     id: "favoriteWebsite",
@@ -1401,6 +1892,20 @@ const G8_COURSES = {
   },
 };
 
+const G11_COURSES = {
+  1: {
+    id: "codePythonAiQ1",
+    grade: 11,
+    quarter: 1,
+    title: "Assessment Code, Python, and AI Projects",
+    shortTitle: "Code, Python, and AI",
+    description:
+      "Grade 11 | Q1 | Code Is Your Voice, Python 101, and Code the Future with AI | Formatif 40% dan sumatif 60%.",
+    assessments: G11_Q1_ASSESSMENTS,
+    finalQuiz: null,
+  },
+};
+
 const G12_COURSES = {
   1: {
     id: "web3BlockchainNft",
@@ -1447,6 +1952,7 @@ const G12_COURSES = {
 const DC_COURSES_BY_GRADE = {
   8: G8_COURSES,
   9: DC_COURSES,
+  11: G11_COURSES,
   12: G12_COURSES,
 };
 
@@ -1761,6 +2267,8 @@ window.DC_Q2_ASSESSMENTS = DC_Q2_ASSESSMENTS;
 window.DC_Q3_ASSESSMENTS = DC_Q3_ASSESSMENTS;
 window.DC_Q4_ASSESSMENTS = DC_Q4_ASSESSMENTS;
 window.DC_COURSES = DC_COURSES;
+window.G11_Q1_ASSESSMENTS = G11_Q1_ASSESSMENTS;
+window.G11_COURSES = G11_COURSES;
 window.G12_Q1_ASSESSMENTS = G12_Q1_ASSESSMENTS;
 window.G12_Q2_ASSESSMENTS = G12_Q2_ASSESSMENTS;
 window.G12_Q3_ASSESSMENTS = G12_Q3_ASSESSMENTS;
