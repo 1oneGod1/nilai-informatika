@@ -96,6 +96,12 @@ function changeDcAssessmentGrade(grade) {
     if (firstQuarter) setQuarter(firstQuarter);
   }
 
+  if (typeof ensureFormativeColumnCountForGrade === "function") {
+    ensureFormativeColumnCountForGrade(
+      dcTeacherState.grade,
+      dcTeacherState.quarter,
+    );
+  }
   refreshAssessmentStudentOptions();
 }
 
@@ -116,6 +122,12 @@ function syncAssessmentQuarter(quarter) {
   const select = document.getElementById("dcAssessmentPeriod");
   if (select) select.value = String(dcTeacherState.quarter);
   if (!dcTeacherState.dirty) loadDcAssessmentDraft();
+  if (typeof ensureFormativeColumnCountForGrade === "function") {
+    ensureFormativeColumnCountForGrade(
+      dcTeacherState.grade,
+      dcTeacherState.quarter,
+    );
+  }
 }
 
 function refreshAssessmentStudentOptions() {
@@ -280,13 +292,11 @@ async function saveDcAssessment() {
       auth.currentUser?.email || "",
       dcTeacherState.grade,
     );
-    const formativeGradebookFields = [8, 9].includes(dcTeacherState.grade)
-      ? dcBuildFormativeGradebookFields(
-          record,
-          dcTeacherState.quarter,
-          dcTeacherState.grade,
-        )
-      : {};
+    const formativeGradebookFields = dcBuildFormativeGradebookFields(
+      record,
+      dcTeacherState.quarter,
+      dcTeacherState.grade,
+    );
     await siswaRef.child(student.id).update({
       [`digitalCitizenshipAssessment/q${dcTeacherState.quarter}`]: record,
       ...formativeGradebookFields,
@@ -300,6 +310,12 @@ async function saveDcAssessment() {
     dcTeacherState.dirty = false;
     updateDcSaveState();
     renderTableBody(allSiswa);
+    if (typeof ensureFormativeColumnCountForGrade === "function") {
+      ensureFormativeColumnCountForGrade(
+        dcTeacherState.grade,
+        dcTeacherState.quarter,
+      );
+    }
     const syncedCount = Object.keys(formativeGradebookFields).length;
     showAlert(
       `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.${syncedCount ? ` Nilai F1–F${syncedCount} otomatis masuk ke buku nilai.` : ""}`,

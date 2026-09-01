@@ -6,7 +6,7 @@
 
 let allSiswa = [];
 let activeQuarter = 4; // Default ke Q4 untuk Sense, Decide, and Deliver with VEX IQ
-let numFormatif = { 1: 3, 2: 3, 3: 3, 4: 3 }; // Grade 8–9 use three formative projects per quarter
+let numFormatif = { 1: 3, 2: 3, 3: 3, 4: 3 }; // Assessment workspace expands this when a course has more formative rubrics
 let selectedLearningProgressStudent = null;
 let selectedLearningProgressData = {};
 
@@ -150,10 +150,7 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
     return Number.isFinite(score) ? { q1_f1: score } : {};
   }
 
-  if (
-    ![8, 9].includes(grade) ||
-    typeof dcBuildFormativeGradebookFields !== "function"
-  ) {
+  if (typeof dcBuildFormativeGradebookFields !== "function") {
     return {};
   }
 
@@ -162,6 +159,38 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
   return storedRecord
     ? dcBuildFormativeGradebookFields(storedRecord, quarter, grade)
     : {};
+}
+
+function getConfiguredFormativeCount(grade, quarter = activeQuarter) {
+  if (typeof dcGetCourseConfig !== "function") return 0;
+  const course = dcGetCourseConfig(Number(quarter), Number(grade));
+  if (!course || !Array.isArray(course.assessments)) return 0;
+  return course.assessments.filter(
+    (assessment) => assessment.type === "Formatif",
+  ).length;
+}
+
+function ensureFormativeColumnCountForGrade(grade, quarter = activeQuarter) {
+  const normalizedQuarter = Number(quarter);
+  const requiredCount = getConfiguredFormativeCount(grade, normalizedQuarter);
+  if (
+    !requiredCount ||
+    requiredCount <= Number(numFormatif[normalizedQuarter] || 0)
+  ) {
+    return requiredCount;
+  }
+
+  numFormatif[normalizedQuarter] = requiredCount;
+  if (normalizedQuarter === Number(activeQuarter)) {
+    const input = document.getElementById("numFormatif");
+    if (input) input.value = requiredCount;
+    renderFormFormatifInputs();
+    renderTableHead();
+    if (Array.isArray(allSiswa)) {
+      renderTableBody(allSiswa);
+    }
+  }
+  return requiredCount;
 }
 
 function getSafeReferenceUrl(value) {
@@ -858,8 +887,8 @@ async function saveKkmSettings() {
 
 function applySettings() {
   const val = parseInt(document.getElementById("numFormatif").value, 10);
-  if (isNaN(val) || val < 1 || val > 10) {
-    showAlert("Jumlah formatif harus antara 1 dan 10.", "danger");
+  if (isNaN(val) || val < 1 || val > 50) {
+    showAlert("Jumlah formatif harus antara 1 dan 50.", "danger");
     return;
   }
   numFormatif[activeQuarter] = val;
