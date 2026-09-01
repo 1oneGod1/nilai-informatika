@@ -297,14 +297,25 @@ async function saveDcAssessment() {
       dcTeacherState.quarter,
       dcTeacherState.grade,
     );
-    await siswaRef.child(student.id).update({
+    const obsoleteFormativeFields =
+      typeof getObsoleteFormativeFields === "function"
+        ? getObsoleteFormativeFields(student, dcTeacherState.quarter)
+        : [];
+    const studentUpdate = {
       [`digitalCitizenshipAssessment/q${dcTeacherState.quarter}`]: record,
       ...formativeGradebookFields,
+    };
+    obsoleteFormativeFields.forEach((field) => {
+      studentUpdate[field] = null;
     });
+    await siswaRef.child(student.id).update(studentUpdate);
 
     if (!student.digitalCitizenshipAssessment) {
       student.digitalCitizenshipAssessment = {};
     }
+    obsoleteFormativeFields.forEach((field) => {
+      delete student[field];
+    });
     student.digitalCitizenshipAssessment[`q${dcTeacherState.quarter}`] = record;
     Object.assign(student, formativeGradebookFields);
     dcTeacherState.dirty = false;

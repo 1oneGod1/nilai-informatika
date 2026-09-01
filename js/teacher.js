@@ -162,6 +162,9 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
 }
 
 function getConfiguredFormativeCount(grade, quarter = activeQuarter) {
+  if (typeof dcGetFormativeGradebookFieldCount === "function") {
+    return dcGetFormativeGradebookFieldCount(Number(quarter), Number(grade));
+  }
   if (typeof dcGetCourseConfig !== "function") return 0;
   const course = dcGetCourseConfig(Number(quarter), Number(grade));
   if (!course || !Array.isArray(course.assessments)) return 0;
@@ -175,7 +178,7 @@ function ensureFormativeColumnCountForGrade(grade, quarter = activeQuarter) {
   const requiredCount = getConfiguredFormativeCount(grade, normalizedQuarter);
   if (
     !requiredCount ||
-    requiredCount <= Number(numFormatif[normalizedQuarter] || 0)
+    requiredCount === Number(numFormatif[normalizedQuarter] || 0)
   ) {
     return requiredCount;
   }
@@ -191,6 +194,18 @@ function ensureFormativeColumnCountForGrade(grade, quarter = activeQuarter) {
     }
   }
   return requiredCount;
+}
+
+function getObsoleteFormativeFields(student, quarter = activeQuarter) {
+  if (getTeacherStudentGrade(student) !== 12) return [];
+  const normalizedQuarter = Number(quarter);
+  const maximumField = getConfiguredFormativeCount(12, normalizedQuarter);
+  if (!maximumField) return [];
+  const pattern = new RegExp(`^q${normalizedQuarter}_f(\\d+)$`);
+  return Object.keys(student || {}).filter((field) => {
+    const match = field.match(pattern);
+    return match && Number(match[1]) > maximumField;
+  });
 }
 
 function getSafeReferenceUrl(value) {
@@ -958,6 +973,10 @@ function listenToSiswaData() {
                 updates[`${id}/${field}`] = score;
                 needsMigration = true;
               }
+            });
+            getObsoleteFormativeFields(val, quarter).forEach((field) => {
+              updates[`${id}/${field}`] = null;
+              needsMigration = true;
             });
           }
 

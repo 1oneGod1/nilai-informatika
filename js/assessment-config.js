@@ -2100,6 +2100,42 @@ function dcBuildStoredRecord(draft, quarter, updatedBy, grade = 9) {
   return record;
 }
 
+function dcGetFormativeAssessments(quarter, grade = 9) {
+  const course = dcGetCourseConfig(quarter, grade);
+  return (
+    course?.assessments?.filter(
+      (assessment) => assessment.type === "Formatif",
+    ) || []
+  );
+}
+
+function dcGroupSequentialAssessments(assessments, maximumGroups = 3) {
+  const items = Array.isArray(assessments) ? assessments : [];
+  const groupCount = Math.min(
+    Math.max(1, Number(maximumGroups) || 1),
+    items.length,
+  );
+  if (!groupCount) return [];
+  const baseSize = Math.floor(items.length / groupCount);
+  const remainder = items.length % groupCount;
+  let cursor = 0;
+  return Array.from({ length: groupCount }, (_, index) => {
+    const size = baseSize + (index < remainder ? 1 : 0);
+    const group = items.slice(cursor, cursor + size);
+    cursor += size;
+    return group;
+  });
+}
+
+function dcGetFormativeAssessmentCount(quarter, grade = 9) {
+  return dcGetFormativeAssessments(quarter, grade).length;
+}
+
+function dcGetFormativeGradebookFieldCount(quarter, grade = 9) {
+  const assessmentCount = dcGetFormativeAssessmentCount(quarter, grade);
+  return Number(grade) === 12 ? Math.min(3, assessmentCount) : assessmentCount;
+}
+
 function dcBuildFormativeGradebookFields(
   storedRecord,
   quarter,
@@ -2119,17 +2155,28 @@ function dcBuildFormativeGradebookFields(
       : {};
   const fields = {};
 
-  course.assessments
-    .filter((assessment) => assessment.type === "Formatif")
-    .forEach((assessment, index) => {
+  const formativeAssessments = dcGetFormativeAssessments(quarter, grade);
+  const groupedAssessments =
+    Number(grade) === 12
+      ? dcGroupSequentialAssessments(formativeAssessments, 3)
+      : formativeAssessments.map((assessment) => [assessment]);
+
+  groupedAssessments.forEach((assessmentGroup, index) => {
+    const groupScores = assessmentGroup.map((assessment) => {
       const savedRaw = rawScores[assessment.id];
-      const sourceScore = Number.isFinite(Number(savedRaw))
+      return Number.isFinite(Number(savedRaw))
         ? Number(savedRaw)
         : recalculatedSummary.rawScores[assessment.id];
-      fields[`q${Number(quarter)}_f${index + 1}`] = Number(
-        dcClampScore(sourceScore, 100).toFixed(2),
-      );
     });
+    const average =
+      groupScores.reduce(
+        (total, score) => total + dcClampScore(score, 100),
+        0,
+      ) / assessmentGroup.length;
+    fields[`q${Number(quarter)}_f${index + 1}`] = Number(
+      average.toFixed(2),
+    );
+  });
 
   return fields;
 }
@@ -2283,6 +2330,11 @@ window.dcCalculateSummary = dcCalculateSummary;
 window.dcFormatOneDecimal = dcFormatOneDecimal;
 window.dcBuildStoredRecord = dcBuildStoredRecord;
 window.dcBuildStudentAssessmentHtml = dcBuildStudentAssessmentHtml;
+window.dcGetFormativeAssessments = dcGetFormativeAssessments;
+window.dcGroupSequentialAssessments = dcGroupSequentialAssessments;
+window.dcGetFormativeAssessmentCount = dcGetFormativeAssessmentCount;
+window.dcGetFormativeGradebookFieldCount = dcGetFormativeGradebookFieldCount;
+window.dcBuildFormativeGradebookFields = dcBuildFormativeGradebookFields;
 window.dcIsGradeNine = dcIsGradeNine;
 window.dcGetGradeLevel = dcGetGradeLevel;
 window.dcIsAssessmentGrade = dcIsAssessmentGrade;
