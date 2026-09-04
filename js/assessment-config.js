@@ -491,24 +491,48 @@ const G8_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING.map(
 );
 
 function dcWeightByTypeBudget(assessments, budgets = { Formatif: 40, Sumatif: 60 }) {
-  const jpTotals = assessments.reduce((totals, assessment) => {
-    totals[assessment.type] = (totals[assessment.type] || 0) + Number(assessment.jp || 0);
+  const totalsByType = assessments.reduce((totals, assessment) => {
+    const bucket = totals[assessment.type] || { fixedWeight: 0, variableJp: 0 };
+    const explicitWeight = Number(assessment.weight);
+    if (Number.isFinite(explicitWeight)) {
+      bucket.fixedWeight += explicitWeight;
+    } else {
+      bucket.variableJp += Number(assessment.jp || 0);
+    }
+    totals[assessment.type] = bucket;
     return totals;
   }, {});
-  const lastIndexByType = assessments.reduce((indexes, assessment, index) => {
-    indexes[assessment.type] = index;
-    return indexes;
-  }, {});
+  const lastVariableIndexByType = assessments.reduce(
+    (indexes, assessment, index) => {
+      if (!Number.isFinite(Number(assessment.weight))) {
+        indexes[assessment.type] = index;
+      }
+      return indexes;
+    },
+    {},
+  );
   const accumulated = {};
 
   return assessments.map((assessment, index) => {
+    const explicitWeight = Number(assessment.weight);
+    if (Number.isFinite(explicitWeight)) {
+      return { ...assessment, weight: Number(explicitWeight.toFixed(2)) };
+    }
+
     const typeBudget = Number(budgets[assessment.type] || 0);
-    const typeJp = Number(jpTotals[assessment.type] || 0);
-    const rawWeight = typeJp ? (Number(assessment.jp || 0) / typeJp) * typeBudget : 0;
-    const isLastOfType = lastIndexByType[assessment.type] === index;
+    const totals = totalsByType[assessment.type] || {};
+    const variableBudget = Math.max(
+      0,
+      typeBudget - Number(totals.fixedWeight || 0),
+    );
+    const typeJp = Number(totals.variableJp || 0);
+    const rawWeight = typeJp
+      ? (Number(assessment.jp || 0) / typeJp) * variableBudget
+      : 0;
+    const isLastOfType = lastVariableIndexByType[assessment.type] === index;
     const previous = Number(accumulated[assessment.type] || 0);
     const weight = isLastOfType
-      ? Number((typeBudget - previous).toFixed(2))
+      ? Number((variableBudget - previous).toFixed(2))
       : Number(rawWeight.toFixed(2));
     accumulated[assessment.type] = Number((previous + weight).toFixed(2));
     return { ...assessment, weight };
@@ -564,11 +588,30 @@ function g11Task({
   color,
   brief,
   criteria,
+  weight,
+  starterCode,
+  scoreCapWithoutBonus,
+  bonusCriterionId,
 }) {
-  return { id, number, title, subtitle, unit, type, jp, color, brief, criteria };
+  return {
+    id,
+    number,
+    title,
+    subtitle,
+    unit,
+    type,
+    jp,
+    color,
+    brief,
+    criteria,
+    weight,
+    starterCode,
+    scoreCapWithoutBonus,
+    bonusCriterionId,
+  };
 }
 
-const G11_Q1_RAW_ASSESSMENTS = [
+const G11_ALL_RAW_ASSESSMENTS = [
   g11Task({
     id: "g11Q1FavoriteWebsite",
     number: "01",
@@ -640,6 +683,31 @@ const G11_Q1_RAW_ASSESSMENTS = [
     color: G11_Q1_COLORS.python,
     brief: "Students write conditional programs that respond differently based on user input or program conditions.",
     criteria: g11PracticeCriteria("conditional statements"),
+  }),
+  g11Task({
+    id: "g11Q1ConditionalCalculatorSprint",
+    number: "07",
+    title: "15-Minute Conditional Calculator",
+    subtitle: "Input, operator, conditional logic, output, and reflection",
+    unit: "Python 101",
+    type: "Formatif",
+    weight: 10,
+    jp: 1,
+    color: G11_Q1_COLORS.python,
+    brief: "Selesaikan dalam 15 menit. Buat kalkulator sederhana dengan dua input angka, satu input operator, conditional statement untuk +, -, *, dan /, lalu tampilkan hasil dengan print.",
+    criteria: [
+      { id: "time", label: "Selesai dalam waktu 15 menit", max: 10 },
+      { id: "firstNumber", label: "Membuat variabel berupa input angka 1", max: 15 },
+      { id: "operator", label: "Membuat variabel untuk input operator", max: 10 },
+      { id: "secondNumber", label: "Membuat variabel untuk input angka 2", max: 15 },
+      { id: "calculation", label: "Menggunakan conditional statement untuk perhitungan sederhana dengan -, +, *, dan /", max: 30 },
+      { id: "output", label: "Menggunakan function print untuk menampilkan hasil", max: 10 },
+      {
+        id: "reflection",
+        label: "Refleksi: 1. Bagian mana dari program yang paling mudah kamu kerjakan? 2. Bagian mana yang paling sulit atau membingungkan? 3. Setelah aktivitas ini, seberapa yakin kamu menggunakan conditional statement?",
+        max: 10,
+      },
+    ],
   }),
   g11Task({
     id: "g11Q1RockPaperScissors",
@@ -748,6 +816,95 @@ const G11_Q1_RAW_ASSESSMENTS = [
     color: G11_Q1_COLORS.python,
     brief: "Students use dictionaries to store key-value data, retrieve values, update records, and explain their structure.",
     criteria: g11PracticeCriteria("dictionary"),
+  }),
+  g11Task({
+    id: "g11Q1TimeAtSph",
+    number: "17",
+    title: "How Long Have You Been at SPH?",
+    subtitle: "Datetime, conditionals, and elapsed-time calculation",
+    unit: "Python 101",
+    type: "Formatif",
+    weight: 10,
+    jp: 1,
+    color: G11_Q1_COLORS.python,
+    brief: "Total dasar 90 poin dengan bonus 10 poin jika selesai di bawah 20 menit. Jika selesai setelah 20 menit dengan notebook, nilai task dibatasi maksimal 85.",
+    scoreCapWithoutBonus: 85,
+    bonusCriterionId: "timeBonus",
+    starterCode: String.raw`import datetime
+
+today = datetime.date.today()
+print("Today's date:", today)
+
+# 1. Enter the date when you first joined SPH [10 points]
+joinDate = datetime.date(____, ____, ____)
+print("I joined SPH on:", joinDate)
+
+monthList = [31, 28, 31, 30, 31, 30,
+             31, 31, 30, 31, 30, 31]
+
+# 2. Find the number of days in the joining month [10 points]
+daysInMonth = __________________________
+
+
+def findTimeAtSPH(startDate):
+    print("Year joined:", startDate.year)
+    print("Month joined:", startDate.month)
+    print("Day joined:", startDate.day)
+
+    # 3. Calculate the difference in years [10 points]
+    yearDiff = __________________________
+
+    # 4. Check whether a full year has passed [15 points]
+    if _________________________________:
+        _________________________________
+    elif _______________________________:
+        if ______________________________:
+            _____________________________
+    else:
+        pass
+
+    # 5. Calculate the difference in months [10 points]
+    monthDiff = _________________________
+
+    # 6. Calculate the difference in days [10 points]
+    dayDiff = ___________________________
+
+    # 7. Adjust the month and day [10 points]
+
+    # check if current day is before the joining day
+    if _________________________________:
+        _________________________________
+        _________________________________
+
+    # check if month difference is negative
+    if _________________________________:
+        _________________________________
+
+    # convert numbers into strings
+    yearStr = str(yearDiff)
+    monthStr = str(monthDiff)
+    dayStr = str(dayDiff)
+
+    # 8. Display the final result [10 points]
+    print("I have been studying at SPH for...")
+    print(___________________________________)
+
+
+findTimeAtSPH(joinDate)
+
+# 9. Program runs successfully without errors [5 points]`,
+    criteria: [
+      { id: "timeBonus", label: "Bonus selesai di bawah 20 menit", max: 10 },
+      { id: "joinDate", label: "Memasukkan tanggal pertama bergabung di SPH", max: 10 },
+      { id: "daysInMonth", label: "Menentukan jumlah hari pada bulan bergabung", max: 10 },
+      { id: "yearDiff", label: "Menghitung selisih tahun", max: 10 },
+      { id: "fullYear", label: "Memeriksa apakah satu tahun penuh sudah terlewati", max: 15 },
+      { id: "monthDiff", label: "Menghitung selisih bulan", max: 10 },
+      { id: "dayDiff", label: "Menghitung selisih hari", max: 10 },
+      { id: "adjustDate", label: "Menyesuaikan nilai bulan dan hari", max: 10 },
+      { id: "display", label: "Menampilkan hasil akhir masa belajar di SPH", max: 10 },
+      { id: "runs", label: "Program berjalan tanpa error", max: 5 },
+    ],
   }),
   g11Task({
     id: "g11Q1AgeCalculator",
@@ -979,7 +1136,27 @@ const G11_Q1_RAW_ASSESSMENTS = [
   }),
 ];
 
+const G11_Q1_PROJECT_4_INDEX = G11_ALL_RAW_ASSESSMENTS.findIndex(
+  (assessment) => assessment.id === "g11Q1TaskManagerWebApp",
+);
+
+const G11_Q1_RAW_ASSESSMENTS = G11_ALL_RAW_ASSESSMENTS.slice(
+  0,
+  G11_Q1_PROJECT_4_INDEX + 1,
+).map((assessment, index) => ({
+  ...assessment,
+  number: String(index + 1).padStart(2, "0"),
+}));
+const G11_Q2_RAW_ASSESSMENTS = G11_ALL_RAW_ASSESSMENTS.slice(
+  G11_Q1_PROJECT_4_INDEX + 1,
+).map((assessment, index) => ({
+  ...assessment,
+  id: assessment.id.replace(/^g11Q1/, "g11Q2"),
+  number: String(index + 1).padStart(2, "0"),
+}));
+
 const G11_Q1_ASSESSMENTS = dcWeightByTypeBudget(G11_Q1_RAW_ASSESSMENTS);
+const G11_Q2_ASSESSMENTS = dcWeightByTypeBudget(G11_Q2_RAW_ASSESSMENTS);
 
 const G12_Q1_ASSESSMENTS = [
   {
@@ -1897,11 +2074,22 @@ const G11_COURSES = {
     id: "codePythonAiQ1",
     grade: 11,
     quarter: 1,
-    title: "Assessment Code, Python, and AI Projects",
-    shortTitle: "Code, Python, and AI",
+    title: "Assessment Code and Python Projects",
+    shortTitle: "Code and Python",
     description:
-      "Grade 11 | Q1 | Code Is Your Voice, Python 101, and Code the Future with AI | Formatif 40% dan sumatif 60%.",
+      "Grade 11 | Q1 | Code Is Your Voice dan Python 101 sampai Project 4 | tiga nilai formatif masuk ke gradebook.",
     assessments: G11_Q1_ASSESSMENTS,
+    finalQuiz: null,
+  },
+  2: {
+    id: "codeFutureAiQ2",
+    grade: 11,
+    quarter: 2,
+    title: "Assessment Code the Future with AI",
+    shortTitle: "Code the Future with AI",
+    description:
+      "Grade 11 | Q2 | Seluruh aktivitas setelah Project 4 | tiga nilai formatif masuk ke gradebook.",
+    assessments: G11_Q2_ASSESSMENTS,
     finalQuiz: null,
   },
 };
@@ -2041,11 +2229,24 @@ function dcCalculateSummary(draft, quarter = 1, grade = 9) {
 
   course.assessments.forEach((assessment) => {
     const assessmentDraft = draft.rubricScores?.[assessment.id] || {};
-    const raw = assessment.criteria.reduce(
+    const rawBeforePolicy = assessment.criteria.reduce(
       (total, criterion) =>
         total + dcClampScore(assessmentDraft.criteria?.[criterion.id], criterion.max),
       0,
     );
+    const bonusScore = assessment.bonusCriterionId
+      ? dcClampScore(
+          assessmentDraft.criteria?.[assessment.bonusCriterionId],
+          assessment.criteria.find(
+            (criterion) => criterion.id === assessment.bonusCriterionId,
+          )?.max || 0,
+        )
+      : 0;
+    const scoreCap = Number(assessment.scoreCapWithoutBonus);
+    const raw =
+      Number.isFinite(scoreCap) && bonusScore === 0
+        ? Math.min(rawBeforePolicy, scoreCap)
+        : rawBeforePolicy;
     const contribution = (raw * assessment.weight) / 100;
     rawScores[assessment.id] = raw;
     contributions[assessment.id] = contribution;
@@ -2131,9 +2332,15 @@ function dcGetFormativeAssessmentCount(quarter, grade = 9) {
   return dcGetFormativeAssessments(quarter, grade).length;
 }
 
+function dcUsesGroupedFormativeGradebook(grade) {
+  return [11, 12].includes(Number(grade));
+}
+
 function dcGetFormativeGradebookFieldCount(quarter, grade = 9) {
   const assessmentCount = dcGetFormativeAssessmentCount(quarter, grade);
-  return Number(grade) === 12 ? Math.min(3, assessmentCount) : assessmentCount;
+  return dcUsesGroupedFormativeGradebook(grade)
+    ? Math.min(3, assessmentCount)
+    : assessmentCount;
 }
 
 function dcBuildFormativeGradebookFields(
@@ -2157,7 +2364,7 @@ function dcBuildFormativeGradebookFields(
 
   const formativeAssessments = dcGetFormativeAssessments(quarter, grade);
   const groupedAssessments =
-    Number(grade) === 12
+    dcUsesGroupedFormativeGradebook(grade)
       ? dcGroupSequentialAssessments(formativeAssessments, 3)
       : formativeAssessments.map((assessment) => [assessment]);
 
@@ -2315,6 +2522,7 @@ window.DC_Q3_ASSESSMENTS = DC_Q3_ASSESSMENTS;
 window.DC_Q4_ASSESSMENTS = DC_Q4_ASSESSMENTS;
 window.DC_COURSES = DC_COURSES;
 window.G11_Q1_ASSESSMENTS = G11_Q1_ASSESSMENTS;
+window.G11_Q2_ASSESSMENTS = G11_Q2_ASSESSMENTS;
 window.G11_COURSES = G11_COURSES;
 window.G12_Q1_ASSESSMENTS = G12_Q1_ASSESSMENTS;
 window.G12_Q2_ASSESSMENTS = G12_Q2_ASSESSMENTS;

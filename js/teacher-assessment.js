@@ -433,6 +433,9 @@ function renderDcAssessmentPanel() {
   const briefHtml = assessment.brief
     ? `<div class="dc-assessment-brief"><span><i class="fas fa-clipboard-list"></i> Ketentuan tugas</span><p>${escHtml(assessment.brief)}</p></div>`
     : "";
+  const starterCodeHtml = assessment.starterCode
+    ? `<div class="dc-starter-code"><span><i class="fas fa-code"></i> Starter code siswa</span><pre><code>${escHtml(assessment.starterCode)}</code></pre></div>`
+    : "";
 
   content.innerHTML = `
     <section class="dc-rubric-panel" style="--dc-accent:${assessment.color}">
@@ -444,6 +447,7 @@ function renderDcAssessmentPanel() {
         <div class="dc-unit-score"><span>Nilai proyek</span><strong>${raw}</strong><small>${completed}/${assessment.criteria.length} kriteria tuntas</small></div>
       </div>
       ${briefHtml}
+      ${starterCodeHtml}
       <div class="dc-rubric-guide"><span><i class="fas fa-check-square"></i> Centang untuk poin penuh</span><span><i class="fas fa-keyboard"></i> Isi poin untuk nilai parsial</span><span><i class="fas fa-user-pen"></i> Versi siswa dan kalimat lengkap wajib</span></div>
       <div class="dc-criteria-list">${criteriaHtml}</div>
       <label class="dc-teacher-note"><span>Catatan guru</span><textarea oninput="dcSetAssessmentNote('${assessment.id}',this.value)" placeholder="Kekuatan, hal yang perlu diperbaiki, atau tindak lanjut…">${escHtml(assessmentDraft.note || "")}</textarea></label>

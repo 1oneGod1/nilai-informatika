@@ -197,9 +197,10 @@ function ensureFormativeColumnCountForGrade(grade, quarter = activeQuarter) {
 }
 
 function getObsoleteFormativeFields(student, quarter = activeQuarter) {
-  if (getTeacherStudentGrade(student) !== 12) return [];
+  const grade = getTeacherStudentGrade(student);
+  if (![11, 12].includes(grade)) return [];
   const normalizedQuarter = Number(quarter);
-  const maximumField = getConfiguredFormativeCount(12, normalizedQuarter);
+  const maximumField = getConfiguredFormativeCount(grade, normalizedQuarter);
   if (!maximumField) return [];
   const pattern = new RegExp(`^q${normalizedQuarter}_f(\\d+)$`);
   return Object.keys(student || {}).filter((field) => {
@@ -215,6 +216,35 @@ function getSafeReferenceUrl(value) {
   } catch (error) {
     return "";
   }
+}
+
+function buildGrade10FigmaSubmissionCard(plan, sectionLabel, title, roleKey) {
+  const submission = plan && typeof plan === "object" ? plan : {};
+  const submittedUrl = String(submission.figmaUrl || "").trim();
+  const figmaUrl = getSafeReferenceUrl(submittedUrl);
+  const savedAt = Number(submission.savedAt || 0);
+  const savedLabel = savedAt
+    ? new Date(savedAt).toLocaleString("id-ID")
+    : "Waktu kirim belum tersedia";
+  const role = submission[roleKey] || submission.role || submission.studentRole;
+
+  return `<article class="rounded-xl border ${figmaUrl ? "border-violet-400/30 bg-violet-400/[0.06]" : "border-slate-700 bg-slate-900/45"} p-4">
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+      <div class="min-w-0">
+        <span class="text-[9px] font-mono-tech tracking-widest ${figmaUrl ? "text-violet-300" : "text-slate-500"}">${escHtml(sectionLabel)}</span>
+        <h4 class="text-sm font-black text-white mt-1">${escHtml(title)}</h4>
+        <p class="text-xs text-slate-400 mt-2">Grup: <strong class="text-slate-200">${escHtml(submission.groupName || "Belum diisi")}</strong></p>
+        <p class="text-xs text-slate-400 mt-1">Peran: <strong class="text-slate-200">${escHtml(role || "Belum diisi")}</strong></p>
+        <p class="break-all text-[10px] font-mono-tech ${figmaUrl ? "text-violet-200" : "text-slate-600"} mt-3">${escHtml(submittedUrl || "Belum ada tautan Figma")}</p>
+        <small class="block text-[10px] font-mono-tech text-slate-500 mt-2"><i class="fas fa-clock mr-1"></i>${escHtml(savedLabel)}</small>
+      </div>
+      ${
+        figmaUrl
+          ? `<a href="${escHtml(figmaUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-lg border border-violet-400/35 bg-violet-400/10 px-3.5 py-2.5 text-xs font-black text-violet-200 hover:bg-violet-400/20 shrink-0">BUKA FIGMA <i class="fas fa-arrow-up-right-from-square"></i></a>`
+          : `<span class="text-[10px] font-mono-tech ${submittedUrl ? "text-rose-400" : "text-amber-400"}">${submittedUrl ? "TAUTAN TIDAK VALID" : "BELUM DIKIRIM"}</span>`
+      }
+    </div>
+  </article>`;
 }
 
 function teacherChecksComplete(saved, keys) {
@@ -467,6 +497,8 @@ function renderStudentLearningProgress(progress) {
     : "Belum pernah disimpan";
   const websitePlan = progress.websitePlan || {};
   const referenceUrl = getSafeReferenceUrl(websitePlan.websiteUrl);
+  const groupPlan = progress.groupPlan || {};
+  const figmaFoundationPlan = progress.figmaFoundationPlan || {};
   const steps = [
     ["preTest", "Pre-test 1", progress.preTest?.score],
     ["section1", "Section 1 · Wireframe"],
@@ -493,6 +525,17 @@ function renderStudentLearningProgress(progress) {
         <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">RAPORT Q1 · FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="block text-slate-500 mt-1">Produk ${summary.formative2Breakdown.product}/70 + Post-test ${formatTeacherProgressScore(summary.formative2Breakdown.postTest)}/30</small></div>
       </article>
     </div>
+    <section class="mb-5 rounded-2xl border border-violet-400/25 bg-gradient-to-br from-violet-500/[0.08] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
+      <div class="border-b border-slate-700/60 p-5">
+        <span class="text-[10px] font-mono-tech tracking-[0.18em] text-violet-300 font-bold">FIGMA ASSIGNMENT SUBMISSIONS</span>
+        <h3 class="text-lg font-black text-white mt-1">Tautan Figma yang dikirim siswa</h3>
+        <p class="text-xs text-slate-400 mt-1">Buka file langsung dari submission Section 2 atau Section 4.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-3 p-5">
+        ${buildGrade10FigmaSubmissionCard(groupPlan, "SECTION 2 · PROJECT SETUP", "Shared Figma file", "studentRole")}
+        ${buildGrade10FigmaSubmissionCard(figmaFoundationPlan, "SECTION 4 · GROUP EVIDENCE", "Figma product evidence", "role")}
+      </div>
+    </section>
     <section class="mb-5 rounded-2xl border border-lime-400/25 bg-gradient-to-br from-lime-400/[0.07] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
       <div class="p-5 border-b border-slate-700/60 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
