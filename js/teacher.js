@@ -52,6 +52,49 @@ const GRADE10_WIREFRAME_CRITERION_MAX = 10;
 const GRADE10_WIREFRAME_TOTAL_MAX =
   GRADE10_WIREFRAME_RUBRIC.length * GRADE10_WIREFRAME_CRITERION_MAX;
 
+const GRADE10_FIGMA_SIMILARITY_RUBRIC = [
+  {
+    id: "layout",
+    label: "Struktur dan urutan section",
+    description: "Header, navigasi, hero, konten, CTA, dan footer tersusun sesuai website acuan.",
+  },
+  {
+    id: "proportion",
+    label: "Proporsi, ukuran, dan grid",
+    description: "Lebar, tinggi, skala, kolom, serta posisi elemen mendekati proporsi pada website.",
+  },
+  {
+    id: "spacing",
+    label: "Spacing dan alignment",
+    description: "Margin, padding, jarak antar-elemen, alignment, dan whitespace konsisten dengan acuan.",
+  },
+  {
+    id: "typography",
+    label: "Tipografi dan hierarchy",
+    description: "Jenis, ukuran, ketebalan, line-height, dan hierarchy teks terlihat serupa.",
+  },
+  {
+    id: "color",
+    label: "Warna dan visual styling",
+    description: "Warna, background, border, radius, dan shadow mendekati tampilan website acuan.",
+  },
+  {
+    id: "assets",
+    label: "Gambar, ikon, dan komponen",
+    description: "Aset visual, tombol, kartu, input, dan komponen penting dibuat serta ditempatkan dengan tepat.",
+  },
+  {
+    id: "fidelity",
+    label: "Kemiripan dan kelengkapan keseluruhan",
+    description: "Desain Figma lengkap, mudah dikenali sebagai halaman acuan, dan tidak menghilangkan bagian penting.",
+  },
+];
+
+const GRADE10_FIGMA_SIMILARITY_CRITERION_MAX = 10;
+const GRADE10_FIGMA_SIMILARITY_TOTAL_MAX =
+  GRADE10_FIGMA_SIMILARITY_RUBRIC.length *
+  GRADE10_FIGMA_SIMILARITY_CRITERION_MAX;
+
 function normalizeWireframeCriterionPoints(value) {
   if (value === true) return GRADE10_WIREFRAME_CRITERION_MAX;
   if (value === false || value === null || value === undefined || value === "")
@@ -62,6 +105,10 @@ function normalizeWireframeCriterionPoints(value) {
     GRADE10_WIREFRAME_CRITERION_MAX,
     Math.max(0, Math.round(numericValue)),
   );
+}
+
+function normalizeFigmaSimilarityCriterionPoints(value) {
+  return normalizeWireframeCriterionPoints(value);
 }
 
 const GRADE10_UIUX_XP = {
@@ -144,10 +191,16 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
   const grade = getTeacherStudentGrade(student);
   if (grade === 10) {
     if (Number(quarter) !== 1) return {};
-    const value = student?.q1_f1;
-    if (value === "" || value === null || value === undefined) return {};
-    const score = Number(value);
-    return Number.isFinite(score) ? { q1_f1: score } : {};
+    return [1, 2].reduce((fields, index) => {
+      const field = `q1_f${index}`;
+      const value = student?.[field];
+      if (value === "" || value === null || value === undefined) {
+        return fields;
+      }
+      const score = Number(value);
+      if (Number.isFinite(score)) fields[field] = score;
+      return fields;
+    }, {});
   }
 
   if (typeof dcBuildFormativeGradebookFields !== "function") {
@@ -283,6 +336,29 @@ function getWireframeRubricAssessment(progress = {}) {
   };
 }
 
+function getFigmaSimilarityRubricAssessment(progress = {}) {
+  const saved = progress.teacherAssessment?.figmaSimilarity || {};
+  const savedCriteria = saved.criteria || {};
+  const criteria = Object.fromEntries(
+    GRADE10_FIGMA_SIMILARITY_RUBRIC.map((criterion) => [
+      criterion.id,
+      normalizeFigmaSimilarityCriterionPoints(savedCriteria[criterion.id]),
+    ]),
+  );
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const achieved = Object.values(criteria).filter((value) => value > 0).length;
+  return {
+    assessed: saved.assessed === true,
+    criteria,
+    achieved,
+    score,
+    updatedAt: Number(saved.updatedAt || 0),
+  };
+}
+
 function calculateGrade10UiUxProgress(progress = {}) {
   const section1 =
     teacherSection1DiscoveryComplete(progress.section1Discovery) &&
@@ -349,10 +425,14 @@ function calculateGrade10UiUxProgress(progress = {}) {
   );
 
   const wireframeAssessment = getWireframeRubricAssessment(progress);
+  const figmaSimilarityAssessment =
+    getFigmaSimilarityRubricAssessment(progress);
   const section1Product = wireframeAssessment.assessed
     ? wireframeAssessment.score
     : 0;
-  const section4Product = section4 ? 70 : 0;
+  const section4Product = figmaSimilarityAssessment.assessed
+    ? figmaSimilarityAssessment.score
+    : 0;
   const post1Points = progress.postTest
     ? Number(progress.postTest.score || 0) * 0.3
     : 0;
@@ -369,13 +449,19 @@ function calculateGrade10UiUxProgress(progress = {}) {
         ? section1Product + post1Points
         : null,
     formative2:
-      section4 && states.postTest2 ? section4Product + post2Points : null,
+      figmaSimilarityAssessment.assessed && states.postTest2
+        ? section4Product + post2Points
+        : null,
     formative1Breakdown: {
       product: section1Product,
       productAssessed: wireframeAssessment.assessed,
       postTest: post1Points,
     },
-    formative2Breakdown: { product: section4Product, postTest: post2Points },
+    formative2Breakdown: {
+      product: section4Product,
+      productAssessed: figmaSimilarityAssessment.assessed,
+      postTest: post2Points,
+    },
   };
 }
 
@@ -408,6 +494,32 @@ async function syncGrade10FormativeOneToGradebook(student, progress = {}) {
   }
   await siswaRef.child(student.id).child("q1_f1").set(score);
   student.q1_f1 = score;
+  return score;
+}
+
+function getGrade10FormativeTwoGradebookScore(progress = {}) {
+  const score = calculateGrade10UiUxProgress(progress).formative2;
+  if (score === null || score === undefined || !Number.isFinite(Number(score))) {
+    return null;
+  }
+  return Math.round(Number(score) * 10) / 10;
+}
+
+async function syncGrade10FormativeTwoToGradebook(student, progress = {}) {
+  if (!student || getTeacherStudentGrade(student) !== 10) return null;
+  const score = getGrade10FormativeTwoGradebookScore(progress);
+  if (score === null) return null;
+  const currentScore = student.q1_f2;
+  if (
+    currentScore !== "" &&
+    currentScore !== null &&
+    currentScore !== undefined &&
+    Number(currentScore) === score
+  ) {
+    return score;
+  }
+  await siswaRef.child(student.id).child("q1_f2").set(score);
+  student.q1_f2 = score;
   return score;
 }
 
@@ -464,9 +576,12 @@ async function openStudentLearningProgress(studentId) {
       .once("value");
     const progress = snapshot.val() || {};
     try {
-      await syncGrade10FormativeOneToGradebook(student, progress);
+      await Promise.all([
+        syncGrade10FormativeOneToGradebook(student, progress),
+        syncGrade10FormativeTwoToGradebook(student, progress),
+      ]);
     } catch (syncError) {
-      console.warn("Sinkronisasi Q1 F1 saat membuka progress gagal:", syncError);
+      console.warn("Sinkronisasi Q1 F1/F2 saat membuka progress gagal:", syncError);
     }
     renderStudentLearningProgress(progress);
   } catch (error) {
@@ -495,10 +610,18 @@ function renderStudentLearningProgress(progress) {
   const wireframeUpdatedLabel = wireframeAssessment.updatedAt
     ? new Date(wireframeAssessment.updatedAt).toLocaleString("id-ID")
     : "Belum pernah disimpan";
+  const figmaSimilarityAssessment =
+    getFigmaSimilarityRubricAssessment(progress);
+  const figmaSimilarityUpdatedLabel = figmaSimilarityAssessment.updatedAt
+    ? new Date(figmaSimilarityAssessment.updatedAt).toLocaleString("id-ID")
+    : "Belum pernah disimpan";
   const websitePlan = progress.websitePlan || {};
   const referenceUrl = getSafeReferenceUrl(websitePlan.websiteUrl);
   const groupPlan = progress.groupPlan || {};
   const figmaFoundationPlan = progress.figmaFoundationPlan || {};
+  const figmaAssessmentUrl = getSafeReferenceUrl(
+    figmaFoundationPlan.figmaUrl || groupPlan.figmaUrl,
+  );
   const steps = [
     ["preTest", "Pre-test 1", progress.preTest?.score],
     ["section1", "Section 1 · Wireframe"],
@@ -522,7 +645,7 @@ function renderStudentLearningProgress(progress) {
       </article>
       <article class="grid grid-cols-2 gap-3">
         <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">RAPORT Q1 · FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="block text-slate-500 mt-1">${summary.formative1Breakdown.productAssessed ? `Rubrik ${summary.formative1Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative1Breakdown.postTest)}/30</small></div>
-        <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">RAPORT Q1 · FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="block text-slate-500 mt-1">Produk ${summary.formative2Breakdown.product}/70 + Post-test ${formatTeacherProgressScore(summary.formative2Breakdown.postTest)}/30</small></div>
+        <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">RAPORT Q1 · FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="block text-slate-500 mt-1">${summary.formative2Breakdown.productAssessed ? `Rubrik ${summary.formative2Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative2Breakdown.postTest)}/30</small></div>
       </article>
     </div>
     <section class="mb-5 rounded-2xl border border-violet-400/25 bg-gradient-to-br from-violet-500/[0.08] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
@@ -534,6 +657,56 @@ function renderStudentLearningProgress(progress) {
       <div class="grid md:grid-cols-2 gap-3 p-5">
         ${buildGrade10FigmaSubmissionCard(groupPlan, "SECTION 2 · PROJECT SETUP", "Shared Figma file", "studentRole")}
         ${buildGrade10FigmaSubmissionCard(figmaFoundationPlan, "SECTION 4 · GROUP EVIDENCE", "Figma product evidence", "role")}
+      </div>
+    </section>
+    <section class="mb-5 rounded-2xl border border-violet-400/30 bg-gradient-to-br from-violet-500/[0.09] via-slate-900/65 to-fuchsia-400/[0.04] overflow-hidden">
+      <div class="p-5 border-b border-slate-700/60 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div>
+          <span class="text-[10px] font-mono-tech tracking-[0.18em] text-violet-300 font-bold">FORMATIF 2 · FIGMA SIMILARITY RUBRIC</span>
+          <h3 class="text-lg font-black text-white mt-1">Kemiripan website acuan dengan desain Figma</h3>
+          <p class="text-xs text-slate-400 mt-1">Bandingkan kedua tampilan pada ukuran viewport yang sama. Nilai setiap kriteria 0–10 poin.</p>
+        </div>
+        <div class="sm:text-right shrink-0">
+          <strong id="figmaSimilarityRubricScore" class="block text-3xl font-black text-violet-300">${figmaSimilarityAssessment.score}<small class="text-sm text-slate-500">/${GRADE10_FIGMA_SIMILARITY_TOTAL_MAX}</small></strong>
+          <span id="figmaSimilarityRubricCount" class="text-[10px] font-mono-tech text-slate-500">${figmaSimilarityAssessment.achieved}/${GRADE10_FIGMA_SIMILARITY_RUBRIC.length} KRITERIA TERISI</span>
+        </div>
+      </div>
+      <div class="mx-5 mt-5 grid sm:grid-cols-2 gap-3">
+        <article class="rounded-xl border border-cyan-400/20 bg-cyan-400/[0.05] p-4">
+          <span class="text-[9px] font-mono-tech tracking-widest text-cyan-300">WEBSITE ACUAN</span>
+          <h4 class="text-sm font-black text-white mt-1">${escHtml(websitePlan.websiteName || "Website belum dipilih")}</h4>
+          ${referenceUrl ? `<a href="${escHtml(referenceUrl)}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 text-xs font-black text-cyan-200 hover:text-cyan-100">BUKA WEBSITE <i class="fas fa-arrow-up-right-from-square"></i></a>` : `<p class="mt-3 text-[10px] font-mono-tech text-amber-400">URL BELUM TERSEDIA</p>`}
+        </article>
+        <article class="rounded-xl border border-violet-400/25 bg-violet-400/[0.06] p-4">
+          <span class="text-[9px] font-mono-tech tracking-widest text-violet-300">DESAIN FIGMA SISWA</span>
+          <h4 class="text-sm font-black text-white mt-1">${escHtml(figmaFoundationPlan.groupName || groupPlan.groupName || "Submission belum tersedia")}</h4>
+          ${figmaAssessmentUrl ? `<a href="${escHtml(figmaAssessmentUrl)}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 text-xs font-black text-violet-200 hover:text-violet-100">BUKA FIGMA <i class="fas fa-arrow-up-right-from-square"></i></a>` : `<p class="mt-3 text-[10px] font-mono-tech text-amber-400">FIGMA BELUM DIKIRIM</p>`}
+        </article>
+      </div>
+      <div class="mx-5 mt-3 rounded-xl border border-slate-700 bg-slate-950/45 p-3 text-[10px] font-mono-tech text-slate-400">
+        <strong class="text-slate-200 mr-2">PANDUAN:</strong> 9–10 sangat mirip · 7–8 sebagian besar mirip · 5–6 cukup mirip · 1–4 masih jauh · 0 belum tersedia
+      </div>
+      <div class="grid md:grid-cols-2 gap-2.5 p-5">
+        ${GRADE10_FIGMA_SIMILARITY_RUBRIC.map(
+          (criterion, index) => `<article class="rounded-xl border border-slate-700 bg-slate-950/45 p-3.5 hover:border-violet-400/45 transition-colors">
+            <div class="flex items-start gap-3">
+              <input type="checkbox" data-figma-similarity-full="${criterion.id}" onchange="setFigmaSimilarityCriterionFull('${criterion.id}', this.checked)" ${figmaSimilarityAssessment.criteria[criterion.id] === GRADE10_FIGMA_SIMILARITY_CRITERION_MAX ? "checked" : ""} class="mt-1 h-4 w-4 accent-violet-400 shrink-0" aria-label="Beri poin penuh untuk ${criterion.label}" />
+              <span class="grid w-7 h-7 shrink-0 place-items-center rounded-lg bg-violet-400/10 text-violet-300 text-xs font-black">${index + 1}</span>
+              <span class="min-w-0 flex-1"><strong class="block text-sm text-white">${criterion.label}</strong><small class="block text-[11px] leading-relaxed text-slate-500 mt-1">${criterion.description}</small></span>
+            </div>
+            <label class="mt-3 ml-14 flex items-center justify-end gap-2 text-[10px] font-mono-tech text-slate-500">
+              POIN
+              <input type="number" min="0" max="${GRADE10_FIGMA_SIMILARITY_CRITERION_MAX}" step="1" inputmode="numeric" data-figma-similarity-rubric="${criterion.id}" value="${figmaSimilarityAssessment.criteria[criterion.id]}" oninput="updateFigmaSimilarityRubricPreview()" class="w-16 rounded-lg border border-slate-600 bg-slate-900 px-2 py-1.5 text-center text-sm font-black text-violet-300 outline-none focus:border-violet-400" aria-label="Poin ${criterion.label}" />
+              <b class="text-xs text-violet-300">/${GRADE10_FIGMA_SIMILARITY_CRITERION_MAX}</b>
+            </label>
+          </article>`,
+        ).join("")}
+      </div>
+      <div class="px-5 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p class="text-[10px] font-mono-tech text-slate-500"><i class="fas fa-clock mr-1"></i>${escHtml(figmaSimilarityUpdatedLabel)}</p>
+        <button id="saveFigmaSimilarityRubricButton" type="button" onclick="saveFigmaSimilarityAssessment()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-violet-300 hover:bg-violet-200 px-4 py-2.5 text-xs font-black text-slate-950 transition-colors">
+          <i class="fas fa-floppy-disk"></i> SAVE FIGMA SCORE
+        </button>
       </div>
     </section>
     <section class="mb-5 rounded-2xl border border-lime-400/25 bg-gradient-to-br from-lime-400/[0.07] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
@@ -601,6 +774,120 @@ function renderStudentLearningProgress(progress) {
         : `<div class="mt-5 rounded-xl border border-dashed border-slate-600 p-4 text-center text-sm text-slate-500">Siswa belum memulai kegiatan UI/UX.</div>`
     }`;
   resetButton.disabled = !hasProgress;
+}
+
+function setFigmaSimilarityCriterionFull(criterionId, isFull) {
+  const input = document.querySelector(
+    `[data-figma-similarity-rubric="${criterionId}"]`,
+  );
+  if (input) {
+    input.value = isFull ? GRADE10_FIGMA_SIMILARITY_CRITERION_MAX : 0;
+  }
+  updateFigmaSimilarityRubricPreview();
+}
+
+function updateFigmaSimilarityRubricPreview() {
+  const inputs = Array.from(
+    document.querySelectorAll("[data-figma-similarity-rubric]"),
+  );
+  const points = inputs.map((input) => {
+    const normalized = normalizeFigmaSimilarityCriterionPoints(input.value);
+    if (input.value !== "" && Number(input.value) !== normalized) {
+      input.value = normalized;
+    }
+    const criterionId = input.dataset.figmaSimilarityRubric;
+    const fullCheckbox = document.querySelector(
+      `[data-figma-similarity-full="${criterionId}"]`,
+    );
+    if (fullCheckbox) {
+      fullCheckbox.checked =
+        normalized === GRADE10_FIGMA_SIMILARITY_CRITERION_MAX;
+    }
+    return normalized;
+  });
+  const score = points.reduce((total, value) => total + value, 0);
+  const achieved = points.filter((value) => value > 0).length;
+  const scoreElement = document.getElementById("figmaSimilarityRubricScore");
+  const countElement = document.getElementById("figmaSimilarityRubricCount");
+  if (scoreElement) {
+    scoreElement.innerHTML = `${score}<small class="text-sm text-slate-500">/${GRADE10_FIGMA_SIMILARITY_TOTAL_MAX}</small>`;
+  }
+  if (countElement) {
+    countElement.textContent = `${achieved}/${GRADE10_FIGMA_SIMILARITY_RUBRIC.length} KRITERIA TERISI`;
+  }
+}
+
+async function saveFigmaSimilarityAssessment() {
+  const student = selectedLearningProgressStudent;
+  if (!student || getTeacherStudentGrade(student) !== 10) return;
+
+  const criteria = {};
+  GRADE10_FIGMA_SIMILARITY_RUBRIC.forEach((criterion) => {
+    criteria[criterion.id] = normalizeFigmaSimilarityCriterionPoints(
+      document.querySelector(
+        `[data-figma-similarity-rubric="${criterion.id}"]`,
+      )?.value,
+    );
+  });
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const button = document.getElementById("saveFigmaSimilarityRubricButton");
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> SAVING…';
+  }
+
+  const progressRef = db
+    .ref("learningProgress")
+    .child(student.id)
+    .child("grade10UiUx");
+  try {
+    await progressRef
+      .child("teacherAssessment")
+      .child("figmaSimilarity")
+      .set({
+        assessed: true,
+        criteria,
+        score,
+        updatedAt: Date.now(),
+      });
+    const snapshot = await progressRef.once("value");
+    const progress = snapshot.val() || {};
+    const formativeTwoScore = getGrade10FormativeTwoGradebookScore(progress);
+    let gradebookSyncError = null;
+    if (formativeTwoScore !== null) {
+      try {
+        await syncGrade10FormativeTwoToGradebook(student, progress);
+      } catch (syncError) {
+        gradebookSyncError = syncError;
+        console.warn("Sinkronisasi Q1 F2 setelah penilaian gagal:", syncError);
+      }
+    }
+    renderStudentLearningProgress(progress);
+    showAlert(
+      gradebookSyncError
+        ? `Nilai kemiripan Figma <strong>${escHtml(student.nama)}</strong> tersimpan, tetapi buku nilai Q1 F2 belum berhasil disinkronkan.`
+        : `Nilai kemiripan Figma <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_FIGMA_SIMILARITY_TOTAL_MAX}.${formativeTwoScore !== null ? ` Buku nilai Q1 F2 diperbarui menjadi ${formatTeacherProgressScore(formativeTwoScore)}.` : " Formatif 2 menunggu Post-test 2."}`,
+      gradebookSyncError ? "warning" : "success",
+    );
+  } catch (error) {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+    const permissionDenied = /permission[_ -]?denied/i.test(
+      String(error?.code || error?.message || ""),
+    );
+    showAlert(
+      permissionDenied
+        ? "Izin Firebase ditolak. Terapkan database rules terbaru sebelum menyimpan rubrik Figma."
+        : "Gagal menyimpan nilai kemiripan Figma: " + error.message,
+      "danger",
+    );
+  }
 }
 
 function setWireframeCriterionFull(criterionId, isFull) {

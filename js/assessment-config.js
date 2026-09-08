@@ -1165,7 +1165,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "My Favorite Website",
     subtitle: "HTML, CSS, dan tiga bagian favorit",
     type: "Formatif",
-    weight: 3,
+    weight: 2,
     jp: 2,
     color: "#73d31d",
     criteria: [
@@ -1182,7 +1182,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Trivia Game Maker",
     subtitle: "Pertanyaan interaktif dan logika skor JavaScript",
     type: "Formatif",
-    weight: 4,
+    weight: 3,
     jp: 2,
     color: "#11bfb6",
     criteria: [
@@ -1200,7 +1200,7 @@ const G12_Q1_ASSESSMENTS = [
     subtitle: "Infografik atau mind map hubungan Web3, blockchain, cryptocurrency, dan NFT",
     brief: "Produk akhir: satu infografik atau mind map digital. Wajib memuat definisi dalam kalimat lengkap, panah hubungan konsep, contoh nyata, risiko atau etika digital, refleksi pribadi, sumber, serta bukti proses berupa draft dan screenshot pengerjaan.",
     type: "Formatif",
-    weight: 3,
+    weight: 5,
     jp: 2,
     color: "#3e95e8",
     criteria: [
@@ -1217,7 +1217,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Room Decorator",
     subtitle: "Pembelian furnitur dengan cryptocurrency simulasi",
     type: "Formatif",
-    weight: 2,
+    weight: 1,
     jp: 2,
     color: "#f0b81b",
     criteria: [
@@ -1234,7 +1234,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Start a New Cryptocurrency",
     subtitle: "Identitas, logo, dan tujuan cryptocurrency",
     type: "Formatif",
-    weight: 2,
+    weight: 1,
     jp: 1,
     color: "#ef6a54",
     criteria: [
@@ -1251,7 +1251,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "My Cryptocurrency Website",
     subtitle: "Website promosi cryptocurrency fiktif",
     type: "Formatif",
-    weight: 4,
+    weight: 3,
     jp: 2,
     color: "#8b6cf0",
     criteria: [
@@ -1268,7 +1268,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Web3 Blockchain Simulator",
     subtitle: "Representasi visual transaksi dan rantai blok",
     type: "Formatif",
-    weight: 4,
+    weight: 5,
     jp: 2,
     color: "#2f9ee5",
     criteria: [
@@ -1285,7 +1285,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "NFT Pixel Art Maker",
     subtitle: "Tiga karya pixel-art orisinal",
     type: "Formatif",
-    weight: 2,
+    weight: 1,
     jp: 1,
     color: "#e45da9",
     criteria: [
@@ -1319,7 +1319,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Hashing Algorithms: SHA-256",
     subtitle: "Eksperimen input, hash, dan avalanche effect",
     type: "Formatif",
-    weight: 2,
+    weight: 5,
     jp: 1,
     color: "#f49d37",
     criteria: [

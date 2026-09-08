@@ -260,7 +260,17 @@ const GRADE10_WIREFRAME_RUBRIC_KEYS = [
   "completeness",
 ];
 
-function getGrade10WireframeCriterionPoints(value) {
+const GRADE10_FIGMA_SIMILARITY_RUBRIC_KEYS = [
+  "layout",
+  "proportion",
+  "spacing",
+  "typography",
+  "color",
+  "assets",
+  "fidelity",
+];
+
+function getGrade10RubricCriterionPoints(value) {
   if (value === true) return 10;
   const points = Number(value || 0);
   return Math.min(10, Math.max(0, Number.isFinite(points) ? points : 0));
@@ -322,11 +332,21 @@ function calculateGrade10ReportScores(progress = {}) {
   const product1Points = product1Complete
     ? GRADE10_WIREFRAME_RUBRIC_KEYS.reduce(
         (total, key) =>
-          total + getGrade10WireframeCriterionPoints(wireframeCriteria[key]),
+          total + getGrade10RubricCriterionPoints(wireframeCriteria[key]),
         0,
       )
     : 0;
-  const product2Complete = grade10ReportSection4Complete(progress);
+  const figmaSimilarityAssessment =
+    progress.teacherAssessment?.figmaSimilarity || {};
+  const figmaSimilarityCriteria = figmaSimilarityAssessment.criteria || {};
+  const product2Complete = figmaSimilarityAssessment.assessed === true;
+  const product2Points = product2Complete
+    ? GRADE10_FIGMA_SIMILARITY_RUBRIC_KEYS.reduce(
+        (total, key) =>
+          total + getGrade10RubricCriterionPoints(figmaSimilarityCriteria[key]),
+        0,
+      )
+    : 0;
   const post1Complete = Boolean(progress.postTest);
   const post2Complete = Boolean(progress.postTest2);
   const post1Score = post1Complete ? Number(progress.postTest.score || 0) : 0;
@@ -348,9 +368,12 @@ function calculateGrade10ReportScores(progress = {}) {
     formative2: {
       productComplete: product2Complete,
       postComplete: post2Complete,
-      productPoints: product2Complete ? 70 : 0,
+      productPoints: product2Points,
       postPoints: post2Points,
-      score: product2Complete && post2Complete ? 70 + post2Points : null,
+      score:
+        product2Complete && post2Complete
+          ? product2Points + post2Points
+          : null,
     },
   };
 }
@@ -388,7 +411,7 @@ async function loadGrade10ReportScores(studentId, kkm) {
     const scores = calculateGrade10ReportScores(snapshot.val() || {});
     const assessments = [
       ["Formatif 1", "Wireframe analysis accuracy", "Post-test 1", scores.formative1, "cyan"],
-      ["Formatif 2", "Figma product", "Post-test 2", scores.formative2, "violet"],
+      ["Formatif 2", "Figma similarity rubric", "Post-test 2", scores.formative2, "violet"],
     ];
 
     container.innerHTML = `

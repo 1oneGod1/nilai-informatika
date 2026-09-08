@@ -134,6 +134,48 @@
                 ".validate": false
               }
             },
+            "figmaSimilarity": {
+              ".validate": "newData.hasChildren(['assessed', 'criteria', 'score', 'updatedAt']) && newData.child('score').val() === newData.child('criteria').child('layout').val() + newData.child('criteria').child('proportion').val() + newData.child('criteria').child('spacing').val() + newData.child('criteria').child('typography').val() + newData.child('criteria').child('color').val() + newData.child('criteria').child('assets').val() + newData.child('criteria').child('fidelity').val()",
+              "assessed": {
+                ".validate": "newData.isBoolean() && newData.val() === true"
+              },
+              "criteria": {
+                ".validate": "newData.hasChildren(['layout', 'proportion', 'spacing', 'typography', 'color', 'assets', 'fidelity'])",
+                "layout": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+                },
+                "proportion": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+                },
+                "spacing": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+                },
+                "typography": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+                },
+                "color": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+                },
+                "assets": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+                },
+                "fidelity": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "score": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 70"
+              },
+              "updatedAt": {
+                ".validate": "newData.isNumber()"
+              },
+              "$other": {
+                ".validate": false
+              }
+            },
             "$other": {
               ".validate": false
             }
