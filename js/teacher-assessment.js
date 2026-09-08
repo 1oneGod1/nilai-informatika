@@ -477,13 +477,21 @@ function renderDcAssessmentNav(summary) {
 function renderDcSummary(summary, student) {
   const area = document.getElementById("dcAssessmentSummary");
   if (!area) return;
+  const course = getCurrentDcCourse();
+  const weightTotals = dcGetCourseWeightTotals(course);
   const studentLabel = student
     ? `${escHtml(student.nama)} · ${escHtml(student.kelas || "-")}`
     : "Belum ada siswa dipilih";
+  const formativeCard = weightTotals.formative
+    ? `<div class="dc-summary-card"><span>Formatif</span><strong>${dcFormatOneDecimal(summary.formative)}<small>/${dcFormatCourseWeight(weightTotals.formative)}</small></strong></div>`
+    : "";
+  const summativeCard = weightTotals.summative
+    ? `<div class="dc-summary-card"><span>Sumatif</span><strong>${dcFormatOneDecimal(summary.summative)}<small>/${dcFormatCourseWeight(weightTotals.summative)}</small></strong></div>`
+    : "";
   area.innerHTML = `
     <div class="dc-selected-student"><span>SISWA TERPILIH</span><strong>${studentLabel}</strong><small>Periode Q${dcTeacherState.quarter}</small></div>
-    <div class="dc-summary-card"><span>Formatif</span><strong>${dcFormatOneDecimal(summary.formative)}<small>/40</small></strong></div>
-    <div class="dc-summary-card"><span>Sumatif</span><strong>${dcFormatOneDecimal(summary.summative)}<small>/60</small></strong></div>
+    ${formativeCard}
+    ${summativeCard}
     <div class="dc-summary-card dc-summary-final"><span>Nilai akhir</span><strong>${dcFormatOneDecimal(summary.finalScore)}</strong></div>`;
 }
 

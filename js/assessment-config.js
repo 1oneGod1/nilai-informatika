@@ -1165,7 +1165,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "My Favorite Website",
     subtitle: "HTML, CSS, dan tiga bagian favorit",
     type: "Formatif",
-    weight: 2,
+    weight: 4,
     jp: 2,
     color: "#73d31d",
     criteria: [
@@ -1182,7 +1182,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Trivia Game Maker",
     subtitle: "Pertanyaan interaktif dan logika skor JavaScript",
     type: "Formatif",
-    weight: 3,
+    weight: 4,
     jp: 2,
     color: "#11bfb6",
     criteria: [
@@ -1200,7 +1200,7 @@ const G12_Q1_ASSESSMENTS = [
     subtitle: "Infografik atau mind map hubungan Web3, blockchain, cryptocurrency, dan NFT",
     brief: "Produk akhir: satu infografik atau mind map digital. Wajib memuat definisi dalam kalimat lengkap, panah hubungan konsep, contoh nyata, risiko atau etika digital, refleksi pribadi, sumber, serta bukti proses berupa draft dan screenshot pengerjaan.",
     type: "Formatif",
-    weight: 5,
+    weight: 12,
     jp: 2,
     color: "#3e95e8",
     criteria: [
@@ -1217,7 +1217,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Room Decorator",
     subtitle: "Pembelian furnitur dengan cryptocurrency simulasi",
     type: "Formatif",
-    weight: 1,
+    weight: 3,
     jp: 2,
     color: "#f0b81b",
     criteria: [
@@ -1234,7 +1234,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Start a New Cryptocurrency",
     subtitle: "Identitas, logo, dan tujuan cryptocurrency",
     type: "Formatif",
-    weight: 1,
+    weight: 3,
     jp: 1,
     color: "#ef6a54",
     criteria: [
@@ -1251,7 +1251,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "My Cryptocurrency Website",
     subtitle: "Website promosi cryptocurrency fiktif",
     type: "Formatif",
-    weight: 3,
+    weight: 5,
     jp: 2,
     color: "#8b6cf0",
     criteria: [
@@ -1268,7 +1268,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Web3 Blockchain Simulator",
     subtitle: "Representasi visual transaksi dan rantai blok",
     type: "Formatif",
-    weight: 5,
+    weight: 14,
     jp: 2,
     color: "#2f9ee5",
     criteria: [
@@ -1285,7 +1285,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "NFT Pixel Art Maker",
     subtitle: "Tiga karya pixel-art orisinal",
     type: "Formatif",
-    weight: 1,
+    weight: 12,
     jp: 1,
     color: "#e45da9",
     criteria: [
@@ -1302,7 +1302,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Introduction to Blockchain Tech",
     subtitle: "Transaction, block, node, hash, dan chain",
     type: "Formatif",
-    weight: 2,
+    weight: 4,
     jp: 1,
     color: "#70d6a9",
     criteria: [
@@ -1319,7 +1319,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Hashing Algorithms: SHA-256",
     subtitle: "Eksperimen input, hash, dan avalanche effect",
     type: "Formatif",
-    weight: 5,
+    weight: 14,
     jp: 1,
     color: "#f49d37",
     criteria: [
@@ -1336,7 +1336,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "JavaScript: Classes and Objects",
     subtitle: "Class Block, constructor, method, dan object",
     type: "Formatif",
-    weight: 4,
+    weight: 7,
     jp: 2,
     color: "#ffd166",
     criteria: [
@@ -1353,7 +1353,7 @@ const G12_Q1_ASSESSMENTS = [
     title: "Advanced Blockchain Simulator",
     subtitle: "Genesis block, validation, dan tampering detection",
     type: "Formatif",
-    weight: 4,
+    weight: 14,
     jp: 2,
     color: "#06d6a0",
     criteria: [
@@ -1379,24 +1379,6 @@ const G12_Q1_ASSESSMENTS = [
       { id: "validation", label: "Program memvalidasi jumlah dan saldo transaksi", max: 20 },
       { id: "history", label: "Riwayat transaksi dapat ditampilkan", max: 20 },
       { id: "ownership", label: "Kode merupakan versi siswa, dijelaskan dengan kalimat lengkap, dan tidak memakai kredensial nyata", max: 20 },
-    ],
-  },
-  {
-    id: "nftArtGallery",
-    number: "13",
-    title: "Summative: NFT Art Gallery",
-    subtitle: "Galeri NFT, simulated minting, blockchain, dan wallet",
-    type: "Sumatif",
-    weight: 60,
-    jp: 2,
-    color: "#c77dff",
-    criteria: [
-      { id: "function", label: "Website galeri dan integrasi fitur utama berfungsi", max: 25 },
-      { id: "concept", label: "Konsep Web3, blockchain, hash, wallet, dan NFT diterapkan dengan tepat", max: 20 },
-      { id: "code", label: "Struktur dan kualitas kode mendukung produk yang stabil", max: 17 },
-      { id: "design", label: "Desain visual rapi, konsisten, dan mudah digunakan", max: 13 },
-      { id: "original", label: "Minimal tiga karya, isi, dan pengembangan produk merupakan versi siswa sendiri", max: 13 },
-      { id: "documentation", label: "Metadata, sumber, refleksi, dan presentasi ditulis dengan kalimat lengkap", max: 12 },
     ],
   },
 ];
@@ -2101,7 +2083,8 @@ const G12_COURSES = {
     quarter: 1,
     title: "Assessment Web3, Blockchain, and NFT",
     shortTitle: "Web3, Blockchain, and NFT",
-    description: "Kelas 12 | 22 JP | 11 pertemuan | Formatif 40% dan sumatif 60%.",
+    description: "Kelas 12 | Q1 | 13 proyek formatif dengan total bobot 100% dan tiga nilai formatif masuk ke gradebook.",
+    weightedFormativeGroups: true,
     assessments: G12_Q1_ASSESSMENTS,
     finalQuiz: null,
   },
@@ -2160,6 +2143,33 @@ function dcGetAssessmentItems(quarter, grade = 9) {
     : [...course.assessments];
 }
 
+function dcGetCourseWeightTotals(course) {
+  const totals = { formative: 0, summative: 0 };
+  (course?.assessments || []).forEach((assessment) => {
+    const bucket = assessment.type === "Formatif" ? "formative" : "summative";
+    totals[bucket] += Number(assessment.weight || 0);
+  });
+  totals.summative += Number(course?.finalQuiz?.weight || 0);
+  return {
+    formative: Number(totals.formative.toFixed(2)),
+    summative: Number(totals.summative.toFixed(2)),
+  };
+}
+
+function dcFormatCourseWeight(value) {
+  const number = Number(value || 0);
+  return Number.isInteger(number) ? String(number) : dcFormatOneDecimal(number);
+}
+
+function dcDescribeCourseWeights(course) {
+  const totals = dcGetCourseWeightTotals(course);
+  return [
+    totals.formative ? `Formatif ${dcFormatCourseWeight(totals.formative)}%` : "",
+    totals.summative ? `Sumatif ${dcFormatCourseWeight(totals.summative)}%` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
 function dcClampScore(value, maximum) {
   const number = Number(value);
   if (!Number.isFinite(number)) return 0;
@@ -2369,17 +2379,27 @@ function dcBuildFormativeGradebookFields(
       : formativeAssessments.map((assessment) => [assessment]);
 
   groupedAssessments.forEach((assessmentGroup, index) => {
-    const groupScores = assessmentGroup.map((assessment) => {
-      const savedRaw = rawScores[assessment.id];
-      return Number.isFinite(Number(savedRaw))
-        ? Number(savedRaw)
-        : recalculatedSummary.rawScores[assessment.id];
-    });
+    const groupTotals = assessmentGroup.reduce(
+      (totals, assessment) => {
+        const savedRaw = rawScores[assessment.id];
+        const score = dcClampScore(
+          Number.isFinite(Number(savedRaw))
+            ? Number(savedRaw)
+            : recalculatedSummary.rawScores[assessment.id],
+          100,
+        );
+        const weight = Number(assessment.weight || 0);
+        totals.unweighted += score;
+        totals.weighted += score * weight;
+        totals.weight += weight;
+        return totals;
+      },
+      { unweighted: 0, weighted: 0, weight: 0 },
+    );
     const average =
-      groupScores.reduce(
-        (total, score) => total + dcClampScore(score, 100),
-        0,
-      ) / assessmentGroup.length;
+      course.weightedFormativeGroups && groupTotals.weight
+        ? groupTotals.weighted / groupTotals.weight
+        : groupTotals.unweighted / assessmentGroup.length;
     fields[`q${Number(quarter)}_f${index + 1}`] = Number(
       average.toFixed(2),
     );
@@ -2478,10 +2498,17 @@ function dcBuildStudentAssessmentHtml(student, kkm) {
       const stored = records[`q${quarter}`];
       const draft = dcDraftFromStored(stored, quarter, grade);
       const summary = dcCalculateSummary(draft, quarter, grade);
+      const weightTotals = dcGetCourseWeightTotals(course);
       const status = dcScoreStatus(summary.finalScore, kkm);
       const assessmentCards = course.assessments
         .map((assessment) => dcBuildStudentRubricCard(assessment, draft, summary))
         .join("");
+      const formativeSummary = weightTotals.formative
+        ? `<div><span>Formatif</span><strong>${dcFormatOneDecimal(summary.formative)}<small>/${dcFormatCourseWeight(weightTotals.formative)}</small></strong></div>`
+        : "";
+      const summativeSummary = weightTotals.summative
+        ? `<div><span>Sumatif</span><strong>${dcFormatOneDecimal(summary.summative)}<small>/${dcFormatCourseWeight(weightTotals.summative)}</small></strong></div>`
+        : "";
       const thirdSummary = course.finalQuiz
         ? `<div><span>Tes akhir</span><strong>${summary.quizCorrect}<small>/25 benar</small></strong></div>`
         : `<div><span>Rubrik</span><strong>${course.assessments.length}<small>komponen</small></strong></div>`;
@@ -2492,8 +2519,8 @@ function dcBuildStudentAssessmentHtml(student, kkm) {
             <div class="dc-student-final ${status === "Tuntas" ? "is-complete" : ""}"><small>Nilai akhir</small><strong>${dcFormatOneDecimal(summary.finalScore)}</strong><span>${status}</span></div>
           </div>
           <div class="dc-student-summary-grid">
-            <div><span>Formatif</span><strong>${dcFormatOneDecimal(summary.formative)}<small>/40</small></strong></div>
-            <div><span>Sumatif</span><strong>${dcFormatOneDecimal(summary.summative)}<small>/60</small></strong></div>
+            ${formativeSummary}
+            ${summativeSummary}
             ${thirdSummary}
           </div>
           <div class="dc-student-score-list">
@@ -2505,11 +2532,14 @@ function dcBuildStudentAssessmentHtml(student, kkm) {
     .join("");
 
   const onlyCourse = quarters.length === 1 ? dcGetCourseConfig(quarters[0], grade) : null;
+  const weightDescription = onlyCourse
+    ? dcDescribeCourseWeights(onlyCourse)
+    : "Bobot mengikuti konfigurasi setiap periode";
   return `
     <div class="dc-student-assessment">
       <div class="dc-student-assessment-title">
         <div><i class="fas fa-clipboard-check"></i></div>
-        <div><span>DETAIL PENILAIAN KELAS ${grade}</span><h3>${escHtml(onlyCourse?.title || `Assessment Grade ${grade}`)}</h3><p>Formatif 40% · Sumatif 60%</p></div>
+        <div><span>DETAIL PENILAIAN KELAS ${grade}</span><h3>${escHtml(onlyCourse?.title || `Assessment Grade ${grade}`)}</h3><p>${escHtml(weightDescription)}</p></div>
       </div>
       ${quarterHtml}
     </div>`;
@@ -2532,6 +2562,9 @@ window.G12_COURSES = G12_COURSES;
 window.DC_COURSES_BY_GRADE = DC_COURSES_BY_GRADE;
 window.dcGetCourseConfig = dcGetCourseConfig;
 window.dcGetAssessmentItems = dcGetAssessmentItems;
+window.dcGetCourseWeightTotals = dcGetCourseWeightTotals;
+window.dcFormatCourseWeight = dcFormatCourseWeight;
+window.dcDescribeCourseWeights = dcDescribeCourseWeights;
 window.dcCreateEmptyDraft = dcCreateEmptyDraft;
 window.dcDraftFromStored = dcDraftFromStored;
 window.dcCalculateSummary = dcCalculateSummary;
