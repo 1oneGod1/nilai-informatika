@@ -6,6 +6,18 @@
 const UIUX_COURSE_ID = "grade10UiUx";
 const UIUX_SESSION_KEY = "csReportGrade10Session";
 const UIUX_SESSION_MAX_AGE = 12 * 60 * 60 * 1000;
+const UIUX_XP = {
+  preTest: 80,
+  section1: 120,
+  section2: 100,
+  postTest1: 100,
+  figmaPreTest: 80,
+  section3: 120,
+  section4: 180,
+  postTest2: 100,
+  summative: 120,
+};
+const UIUX_TOTAL_XP = Object.values(UIUX_XP).reduce((total, value) => total + value, 0);
 
 const PRE_TEST_QUESTIONS = [
   {
@@ -554,6 +566,7 @@ function openPanelFromHash() {
     "section-3",
     "section-4",
     "post-test-2",
+    "summative",
   ];
   openPanel(valid.includes(requested) ? requested : "overview", false);
 }
@@ -566,6 +579,7 @@ function openPanel(panelName, updateHash = true) {
     "section-3",
     "section-4",
     "post-test-2",
+    "summative",
   ].includes(panelName);
   if (
     uiuxStudent?.isTeacherPreview !== true &&
@@ -584,7 +598,7 @@ function openPanel(panelName, updateHash = true) {
     updateHash = true;
     showToast("Complete Post-test 1 before opening Section 2.", true);
   }
-  const figmaPreTestRequired = ["section-3", "section-4", "post-test-2"].includes(panelName);
+  const figmaPreTestRequired = ["section-3", "section-4", "post-test-2", "summative"].includes(panelName);
   if (
     uiuxStudent?.isTeacherPreview !== true &&
     figmaPreTestRequired &&
@@ -593,6 +607,16 @@ function openPanel(panelName, updateHash = true) {
     panelName = "pre-test-2";
     updateHash = true;
     showToast("Complete the one-attempt Figma Pre-test before opening Section 3.", true);
+  }
+  const postTest2Required = panelName === "summative";
+  if (
+    uiuxStudent?.isTeacherPreview !== true &&
+    postTest2Required &&
+    !uiuxProgress.postTest2
+  ) {
+    panelName = "post-test-2";
+    updateHash = true;
+    showToast("Complete Post-test 2 before opening the Summative Mission.", true);
   }
   const target = document.querySelector(`[data-panel="${panelName}"]`);
   if (!target) return;
@@ -614,6 +638,7 @@ function bindForms() {
   document.getElementById("websitePlanForm").addEventListener("submit", saveWebsitePlan);
   document.getElementById("groupPlanForm").addEventListener("submit", saveGroupPlan);
   document.getElementById("figmaFoundationForm").addEventListener("submit", saveFigmaFoundationPlan);
+  document.getElementById("summativeRedesignForm").addEventListener("submit", saveSummativeRedesignPlan);
 }
 
 function bindWireframeDetective() {
@@ -803,6 +828,32 @@ async function saveFigmaFoundationPlan(event) {
     return;
   }
   await saveFormRecord(event.submitter, "figmaFoundationPlan", plan, "Section 4 group evidence saved.", "Section 4 evidence could not be saved.");
+}
+
+async function saveSummativeRedesignPlan(event) {
+  event.preventDefault();
+  const plan = {
+    appName: document.getElementById("summativeAppName").value.trim(),
+    referenceUrl: document.getElementById("summativeReferenceUrl").value.trim(),
+    userProblem: document.getElementById("summativeUserProblem").value.trim(),
+    figmaUrl: document.getElementById("summativeFigmaUrl").value.trim(),
+    savedAt: Date.now(),
+  };
+  if (!plan.appName || !plan.referenceUrl || !plan.userProblem || !plan.figmaUrl) {
+    showToast("Complete every Summative Mission field before saving.", true);
+    return;
+  }
+  if (!isValidHttpUrl(plan.referenceUrl) || !isValidHttpUrl(plan.figmaUrl)) {
+    showToast("Use valid links that begin with http:// or https://.", true);
+    return;
+  }
+  await saveFormRecord(
+    event.submitter,
+    "summativeRedesign",
+    plan,
+    "Summative redesign evidence saved.",
+    "Summative redesign evidence could not be saved.",
+  );
 }
 
 async function saveFormRecord(button, key, payload, successMessage, errorMessage) {
@@ -1308,6 +1359,12 @@ function hydrateSavedWork() {
   document.getElementById("foundationRole").value = foundationPlan.role || "";
   document.getElementById("foundationFigmaUrl").value = foundationPlan.figmaUrl || "";
 
+  const summativePlan = uiuxProgress.summativeRedesign || {};
+  document.getElementById("summativeAppName").value = summativePlan.appName || "";
+  document.getElementById("summativeReferenceUrl").value = summativePlan.referenceUrl || "";
+  document.getElementById("summativeUserProblem").value = summativePlan.userProblem || "";
+  document.getElementById("summativeFigmaUrl").value = summativePlan.figmaUrl || "";
+
   hydrateChecklist("section1Checklist", uiuxProgress.section1Checklist || {});
   hydrateChecklist("section2Checklist", uiuxProgress.section2Checklist || {});
   hydrateChecklist("section4Checklist", uiuxProgress.section4Checklist || {});
@@ -1331,6 +1388,7 @@ function renderProgressState() {
   const section4Complete = isSection4Complete();
   const postComplete = Boolean(uiuxProgress.postTest);
   const post2Complete = Boolean(uiuxProgress.postTest2);
+  const summativeComplete = Boolean(uiuxProgress.summativeRedesign);
 
   setStatus("preTestStatus", preComplete);
   setStatus("section1Status", section1Complete);
@@ -1340,20 +1398,22 @@ function renderProgressState() {
   setStatus("section3Status", section3Complete);
   setStatus("section4Status", section4Complete);
   setStatus("postTest2Status", post2Complete);
+  setStatus("summativeStatus", summativeComplete);
 
   const xp =
-    (preComplete ? 80 : 0) +
-    (section1Complete ? 120 : 0) +
-    (section2Complete ? 100 : 0) +
-    (postComplete ? 100 : 0) +
-    (figmaPreComplete ? 80 : 0) +
-    (section3Complete ? 120 : 0) +
-    (section4Complete ? 180 : 0) +
-    (post2Complete ? 100 : 0);
-  const percent = Math.round((xp / 880) * 100);
+    (preComplete ? UIUX_XP.preTest : 0) +
+    (section1Complete ? UIUX_XP.section1 : 0) +
+    (section2Complete ? UIUX_XP.section2 : 0) +
+    (postComplete ? UIUX_XP.postTest1 : 0) +
+    (figmaPreComplete ? UIUX_XP.figmaPreTest : 0) +
+    (section3Complete ? UIUX_XP.section3 : 0) +
+    (section4Complete ? UIUX_XP.section4 : 0) +
+    (post2Complete ? UIUX_XP.postTest2 : 0) +
+    (summativeComplete ? UIUX_XP.summative : 0);
+  const percent = Math.round((xp / UIUX_TOTAL_XP) * 100);
   document.getElementById("progressPercent").textContent = `${percent}%`;
   document.getElementById("progressBar").style.width = `${percent}%`;
-  document.getElementById("xpLabel").textContent = `${xp} / 880 XP`;
+  document.getElementById("xpLabel").textContent = `${xp} / ${UIUX_TOTAL_XP} XP`;
   document.getElementById("mobileProgressLabel").textContent = `${percent}% complete`;
   document.getElementById("mobileProgressBar").style.width = `${percent}%`;
 
@@ -1579,6 +1639,15 @@ function formatScore(value) {
 function safeNumber(value, fallback = 0) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function isValidHttpUrl(value) {
+  try {
+    const parsed = new URL(String(value || ""));
+    return ["http:", "https:"].includes(parsed.protocol);
+  } catch (error) {
+    return false;
+  }
 }
 
 function setButtonBusy(button, busy, busyLabel = "Saving...") {

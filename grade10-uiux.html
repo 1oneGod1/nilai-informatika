@@ -18,7 +18,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       rel="stylesheet"
     />
-    <link href="grade10-uiux.css?v=20260818a" rel="stylesheet" />
+    <link href="grade10-uiux.css?v=20260909a" rel="stylesheet" />
     <link href="grade10-figma.css?v=20260818d" rel="stylesheet" />
   </head>
   <body>
@@ -148,12 +148,17 @@
               <span><strong>Post-test 2</strong><small>Figma foundations</small></span>
               <span class="status-dot is-locked" id="postTest2Status"><i class="fas fa-lock"></i></span>
             </button>
+            <button class="mission-link" data-panel-target="summative">
+              <span class="mission-number">S</span>
+              <span><strong>Summative</strong><small>Individual redesign</small></span>
+              <span class="status-dot" id="summativeStatus"></span>
+            </button>
           </nav>
 
           <div class="xp-card">
             <div><span>MISSION PROGRESS</span><strong id="progressPercent">0%</strong></div>
             <div class="progress-track"><span id="progressBar"></span></div>
-            <p><i class="fas fa-bolt"></i> <span id="xpLabel">0 / 880 XP</span></p>
+            <p><i class="fas fa-bolt"></i> <span id="xpLabel">0 / 1000 XP</span></p>
           </div>
         </aside>
 
@@ -164,9 +169,10 @@
                 <p class="eyebrow"><span class="live-dot"></span> DIGITAL DESIGN MISSION</p>
                 <h1>See the structure.<br /><em>Rebuild the experience.</em></h1>
                 <p class="hero-lead">
-                  Across four focused sections, you will reverse-engineer a real
-                  website, learn the Figma environment and toolbar, then rebuild
-                  an interface with your assigned group.
+                  Across four focused sections and one summative mission, you will
+                  reverse-engineer a real website, learn the Figma environment and
+                  toolbar, rebuild an interface with your assigned group, then create
+                  an individual redesign in Figma.
                 </p>
                 <div class="hero-actions">
                   <button class="primary-button" data-go-to="pre-test">
@@ -205,6 +211,12 @@
                 <p>Explore the editor regions, frame presets, tools, inspector properties, and layer order through interactive missions.</p>
                 <div><i class="fab fa-figma"></i> Foundations + group lab</div>
               </article>
+              <article class="brief-card rose">
+                <span>SUMMATIVE</span>
+                <h3>Redesign with intention</h3>
+                <p>Choose one app or website, identify a real user problem, and submit your individual Figma redesign evidence.</p>
+                <div><i class="fas fa-user-pen"></i> Individual project</div>
+              </article>
             </div>
 
             <section class="formative-ledger" aria-labelledby="formativeLedgerTitle">
@@ -226,7 +238,7 @@
                   <small id="formative2State">Complete Section 4 and Post-test 2.</small>
                 </article>
               </div>
-              <p class="ledger-note"><i class="fas fa-circle-info"></i> Formative 1 uses your teacher's accuracy rubric. The teacher compares your wireframe with the selected webpage; visual decoration is not graded.</p>
+              <p class="ledger-note"><i class="fas fa-circle-info"></i> Formative 1 uses your teacher's accuracy rubric. The teacher compares your wireframe with the selected webpage; visual decoration is not graded. The Summative Mission is submitted separately as an individual redesign project.</p>
             </section>
 
             <div class="protocol-card">
@@ -661,6 +673,94 @@
               <button type="submit" form="post2TestForm" class="danger-button">Submit final answers <i class="fas fa-lock"></i></button>
               <span class="quiet-text">One successful submission only</span>
             </div>
+
+            <div class="section-complete-strip summative-strip">
+              <div><span>SUMMATIVE READY</span><strong>After Post-test 2, continue to your individual redesign mission.</strong></div>
+              <button type="button" class="primary-button" data-go-to="summative">Open Summative Mission <i class="fas fa-arrow-right"></i></button>
+            </div>
+          </section>
+
+          <section class="learning-panel summative-panel" data-panel="summative">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">SUMMATIVE MISSION · INDIVIDUAL</p>
+                <h1>Redesign one app or website.</h1>
+                <p>Choose a real app or website, analyse one meaningful user problem, then create a clearer and more usable redesign in Figma. Your goal is not only to make it look different; your redesign must improve the experience.</p>
+              </div>
+              <div class="score-orbit"><span><i class="fas fa-user-pen"></i></span><small>solo</small></div>
+            </div>
+
+            <div class="summative-hero-card">
+              <div>
+                <p class="eyebrow">YOUR FINAL DESIGN CHALLENGE</p>
+                <h2>From matching an interface to improving one.</h2>
+                <p>
+                  In the formative tasks, you investigated and recreated what already exists.
+                  In this summative task, you make a design argument: what should be improved,
+                  why it matters for the user, and how your Figma redesign solves it.
+                </p>
+              </div>
+              <ul>
+                <li><i class="fas fa-link"></i><span>Submit the reference app or website link.</span></li>
+                <li><i class="fab fa-figma"></i><span>Submit your individual Figma redesign link.</span></li>
+                <li><i class="fas fa-lightbulb"></i><span>Explain the user problem your redesign improves.</span></li>
+              </ul>
+            </div>
+
+            <div class="summative-roadmap">
+              <article>
+                <span>01</span>
+                <h3>Choose</h3>
+                <p>Select one app or website with a clear purpose, target user, and screen or page that can be improved.</p>
+              </article>
+              <article>
+                <span>02</span>
+                <h3>Analyse</h3>
+                <p>Identify what makes the current experience confusing, slow, unclear, crowded, or difficult to use.</p>
+              </article>
+              <article>
+                <span>03</span>
+                <h3>Redesign</h3>
+                <p>Create your improved version in Figma using better layout, hierarchy, spacing, navigation, and visual clarity.</p>
+              </article>
+              <article>
+                <span>04</span>
+                <h3>Justify</h3>
+                <p>Prepare to explain how your decisions help the end user complete the task more easily.</p>
+              </article>
+            </div>
+
+            <form id="summativeRedesignForm" class="planning-form summative-redesign-form" novalidate>
+              <div class="form-title"><span>SUMMATIVE EVIDENCE</span><strong>Save your individual redesign links</strong></div>
+              <label>
+                <span>App or website name</span>
+                <input id="summativeAppName" type="text" placeholder="Example: Duolingo, Spotify, school website" autocomplete="off" />
+              </label>
+              <label>
+                <span>Reference app / website link</span>
+                <input id="summativeReferenceUrl" type="url" placeholder="https://..." autocomplete="off" />
+              </label>
+              <label class="wide">
+                <span>What user problem will you improve?</span>
+                <textarea id="summativeUserProblem" placeholder="Explain the current pain point, confusing flow, missing information, accessibility issue, or visual hierarchy problem."></textarea>
+              </label>
+              <label class="wide">
+                <span>Your individual Figma redesign link</span>
+                <input id="summativeFigmaUrl" type="url" placeholder="https://www.figma.com/design/..." autocomplete="off" />
+              </label>
+              <button type="submit" class="primary-button">Save summative evidence <i class="fas fa-floppy-disk"></i></button>
+            </form>
+
+            <div class="checkpoint-card summative-rubric-card">
+              <h2>What your teacher will look for</h2>
+              <div class="summative-rubric-grid">
+                <article><b>20%</b><span>Problem clarity</span><p>The chosen issue is specific and connected to a real user need.</p></article>
+                <article><b>25%</b><span>UX improvement</span><p>The redesign improves flow, clarity, navigation, accessibility, or decision-making.</p></article>
+                <article><b>25%</b><span>UI quality in Figma</span><p>Layout, spacing, typography, hierarchy, and visual style are intentional and consistent.</p></article>
+                <article><b>20%</b><span>Design explanation</span><p>The student can justify before-and-after decisions using evidence.</p></article>
+                <article><b>10%</b><span>Individual completeness</span><p>All required links and redesign evidence are submitted clearly.</p></article>
+              </div>
+            </div>
           </section>
         </main>
       </div>
@@ -705,6 +805,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
     <script src="js/firebase-init.js?v=20260819d"></script>
     <script src="js/wireframe-detective-section.js?v=20260812d"></script>
-    <script src="js/grade10-uiux.js?v=20260819b"></script>
+    <script src="js/grade10-uiux.js?v=20260909a"></script>
   </body>
 </html>

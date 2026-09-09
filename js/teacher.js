@@ -9,6 +9,9 @@ let activeQuarter = 4; // Default ke Q4 untuk Sense, Decide, and Deliver with VE
 let numFormatif = { 1: 3, 2: 3, 3: 3, 4: 3 }; // Assessment workspace expands this when a course has more formative rubrics
 let selectedLearningProgressStudent = null;
 let selectedLearningProgressData = {};
+let grade10UiUxProgressByStudent = {};
+let learningProgressListenerAttached = false;
+let grade10AutoSyncInFlight = false;
 
 const GRADE10_WIREFRAME_RUBRIC = [
   {
@@ -120,6 +123,7 @@ const GRADE10_UIUX_XP = {
   section3: 120,
   section4: 180,
   postTest2: 100,
+  summative: 120,
 };
 
 const GRADE10_UIUX_TOTAL_XP = Object.values(GRADE10_UIUX_XP).reduce(
@@ -143,6 +147,35 @@ function getTeacherStudentGrade(student) {
   return match ? Number(match[0]) : 0;
 }
 
+function normalizeAutoFormativeScore(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const score = Number(value);
+  if (!Number.isFinite(score)) return null;
+  const clamped = Math.max(0, Math.min(100, score));
+  return Number(clamped.toFixed(2));
+}
+
+function buildGrade10AutoFormativeFields(progress, quarter = 1) {
+  if (
+    Number(quarter) !== 1 ||
+    !progress ||
+    typeof progress !== "object" ||
+    typeof calculateGrade10UiUxProgress !== "function"
+  ) {
+    return {};
+  }
+
+  const summary = calculateGrade10UiUxProgress(progress);
+  const fields = {};
+  const formative1 = normalizeAutoFormativeScore(summary.formative1);
+  const formative2 = normalizeAutoFormativeScore(summary.formative2);
+
+  if (formative1 !== null) fields.q1_f1 = formative1;
+  if (formative2 !== null) fields.q1_f2 = formative2;
+
+  return fields;
+}
+
 function openGrade10TeacherPreview() {
   const teacher = auth.currentUser;
   if (!teacher) {
@@ -164,6 +197,7 @@ function openGrade10TeacherPreview() {
     "section-3",
     "section-4",
     "post-test-2",
+    "summative",
   ];
   const section = validSections.includes(requestedSection)
     ? requestedSection
@@ -191,7 +225,7 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
   const grade = getTeacherStudentGrade(student);
   if (grade === 10) {
     if (Number(quarter) !== 1) return {};
-    return [1, 2].reduce((fields, index) => {
+    const savedFields = [1, 2].reduce((fields, index) => {
       const field = `q1_f${index}`;
       const value = student?.[field];
       if (value === "" || value === null || value === undefined) {
@@ -201,6 +235,11 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
       if (Number.isFinite(score)) fields[field] = score;
       return fields;
     }, {});
+    const progressFields = buildGrade10AutoFormativeFields(
+      grade10UiUxProgressByStudent[String(student?.id || "")],
+      quarter,
+    );
+    return { ...savedFields, ...progressFields };
   }
 
   if (typeof dcBuildFormativeGradebookFields !== "function") {
@@ -260,6 +299,74 @@ function getObsoleteFormativeFields(student, quarter = activeQuarter) {
     const match = field.match(pattern);
     return match && Number(match[1]) > maximumField;
   });
+}
+
+async function syncGrade10AutoFormativeFields() {
+  if (grade10AutoSyncInFlight || !allSiswa.length) return;
+
+  const updates = {};
+  allSiswa.forEach((student) => {
+    if (getTeacherStudentGrade(student) !== 10) return;
+    const fields = getStudentAutoFormativeFields(student, 1);
+    Object.entries(fields).forEach(([field, score]) => {
+      const currentScore = student[field];
+      const alreadySynced =
+        currentScore !== "" &&
+        currentScore !== null &&
+        currentScore !== undefined &&
+        Number(currentScore) === Number(score);
+      if (!alreadySynced) {
+        updates[`${student.id}/${field}`] = score;
+        student[field] = score;
+      }
+    });
+  });
+
+  if (!Object.keys(updates).length) return;
+
+  grade10AutoSyncInFlight = true;
+  try {
+    await siswaRef.update(updates);
+    console.log("Auto-sinkronisasi Formatif Grade 10 UI/UX berhasil.");
+  } catch (error) {
+    console.warn("Auto-sinkronisasi Formatif Grade 10 UI/UX gagal:", error);
+  } finally {
+    grade10AutoSyncInFlight = false;
+  }
+}
+
+function listenToLearningProgressData() {
+  if (learningProgressListenerAttached) return;
+  learningProgressListenerAttached = true;
+
+  db.ref("learningProgress").on(
+    "value",
+    (snap) => {
+      const data = snap.val() || {};
+      grade10UiUxProgressByStudent = {};
+      Object.entries(data).forEach(([studentId, progress]) => {
+        if (progress?.grade10UiUx) {
+          grade10UiUxProgressByStudent[String(studentId)] = progress.grade10UiUx;
+        }
+      });
+
+      syncGrade10AutoFormativeFields().then(() => renderTableBody(allSiswa));
+
+      const modal = document.getElementById("learningProgressModal");
+      if (
+        selectedLearningProgressStudent &&
+        getTeacherStudentGrade(selectedLearningProgressStudent) === 10 &&
+        !modal?.classList.contains("hidden")
+      ) {
+        renderStudentLearningProgress(
+          grade10UiUxProgressByStudent[selectedLearningProgressStudent.id] || {},
+        );
+      }
+    },
+    (error) => {
+      console.warn("Gagal memuat learning progress:", error);
+    },
+  );
 }
 
 function getSafeReferenceUrl(value) {
@@ -418,6 +525,7 @@ function calculateGrade10UiUxProgress(progress = {}) {
     section3,
     section4,
     postTest2: Boolean(progress.postTest2),
+    summative: Boolean(progress.summativeRedesign),
   };
   const xp = Object.entries(GRADE10_UIUX_XP).reduce(
     (total, [key, points]) => total + (states[key] ? points : 0),
@@ -622,6 +730,9 @@ function renderStudentLearningProgress(progress) {
   const figmaAssessmentUrl = getSafeReferenceUrl(
     figmaFoundationPlan.figmaUrl || groupPlan.figmaUrl,
   );
+  const summativePlan = progress.summativeRedesign || {};
+  const summativeReferenceUrl = getSafeReferenceUrl(summativePlan.referenceUrl);
+  const summativeFigmaUrl = getSafeReferenceUrl(summativePlan.figmaUrl);
   const steps = [
     ["preTest", "Pre-test 1", progress.preTest?.score],
     ["section1", "Section 1 · Wireframe"],
@@ -631,6 +742,7 @@ function renderStudentLearningProgress(progress) {
     ["section3", "Section 3 · Figma Basics"],
     ["section4", "Section 4 · Toolbar Lab"],
     ["postTest2", "Post-test 2", progress.postTest2?.score],
+    ["summative", "Summative · Individual Redesign"],
   ];
 
   body.innerHTML = `
@@ -707,6 +819,27 @@ function renderStudentLearningProgress(progress) {
         <button id="saveFigmaSimilarityRubricButton" type="button" onclick="saveFigmaSimilarityAssessment()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-violet-300 hover:bg-violet-200 px-4 py-2.5 text-xs font-black text-slate-950 transition-colors">
           <i class="fas fa-floppy-disk"></i> SAVE FIGMA SCORE
         </button>
+      </div>
+    </section>
+    <section class="mb-5 rounded-2xl border border-pink-400/25 bg-pink-400/[0.05] p-5">
+      <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+        <div class="min-w-0">
+          <span class="text-[10px] font-mono-tech tracking-[0.18em] text-pink-300 font-bold">SUMMATIVE · INDIVIDUAL REDESIGN</span>
+          <h3 class="text-lg font-black text-white mt-1">${escHtml(summativePlan.appName || "Belum mengisi summative evidence")}</h3>
+          <p class="text-xs leading-relaxed text-slate-400 mt-2">${escHtml(summativePlan.userProblem || "Siswa belum menulis user problem yang akan diperbaiki.")}</p>
+        </div>
+        <div class="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
+          ${
+            summativeReferenceUrl
+              ? `<a href="${escHtml(summativeReferenceUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-lg border border-pink-400/30 bg-pink-400/10 px-3.5 py-2.5 text-xs font-bold text-pink-200 hover:bg-pink-400/20">BUKA APP/WEB ACUAN <i class="fas fa-arrow-up-right-from-square"></i></a>`
+              : `<span class="text-[10px] font-mono-tech text-amber-400">LINK APP/WEB BELUM ADA</span>`
+          }
+          ${
+            summativeFigmaUrl
+              ? `<a href="${escHtml(summativeFigmaUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-lg border border-violet-400/30 bg-violet-400/10 px-3.5 py-2.5 text-xs font-bold text-violet-200 hover:bg-violet-400/20">BUKA FIGMA REDESIGN <i class="fab fa-figma"></i></a>`
+              : `<span class="text-[10px] font-mono-tech text-amber-400">LINK FIGMA BELUM ADA</span>`
+          }
+        </div>
       </div>
     </section>
     <section class="mb-5 rounded-2xl border border-lime-400/25 bg-gradient-to-br from-lime-400/[0.07] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
@@ -964,6 +1097,7 @@ async function saveWireframeAssessment() {
     });
     const snapshot = await progressRef.once("value");
     const progress = snapshot.val() || {};
+    grade10UiUxProgressByStudent[student.id] = progress;
     const formativeOneScore = getGrade10FormativeOneGradebookScore(progress);
     let gradebookSyncError = null;
     if (formativeOneScore !== null) {
@@ -974,6 +1108,7 @@ async function saveWireframeAssessment() {
         console.warn("Sinkronisasi Q1 F1 setelah penilaian gagal:", syncError);
       }
     }
+    renderTableBody(allSiswa);
     renderStudentLearningProgress(progress);
     showAlert(
       gradebookSyncError
@@ -1156,6 +1291,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Mulai fitur Dashboard
         renderFormFormatifInputs();
         renderTableHead();
+        listenToLearningProgressData();
         listenToSiswaData();
       });
   });
@@ -1272,6 +1408,7 @@ function listenToSiswaData() {
 
       if (data) {
         Object.entries(data).forEach(([id, val]) => {
+          const studentRecord = { id, ...val };
           // Cek migrasi data lama ke Q3
           let needsMigration = false;
           for (let i = 1; i <= 10; i++) {
@@ -1289,7 +1426,7 @@ function listenToSiswaData() {
 
           for (let quarter = 1; quarter <= 4; quarter++) {
             const autoFormativeFields = getStudentAutoFormativeFields(
-              val,
+              studentRecord,
               quarter,
             );
             Object.entries(autoFormativeFields).forEach(([field, score]) => {
@@ -1301,6 +1438,7 @@ function listenToSiswaData() {
                 Number(currentScore) === Number(score);
               if (!alreadySynced) {
                 updates[`${id}/${field}`] = score;
+                studentRecord[field] = score;
                 needsMigration = true;
               }
             });
@@ -1310,21 +1448,17 @@ function listenToSiswaData() {
             });
           }
 
-          if (needsMigration) {
-            madeChanges = true;
-          } else {
-            allSiswa.push({ id, ...val }); // Hanya simpan ke array local kalau gak sedang dimigrasi
-          }
+          if (needsMigration) madeChanges = true;
+          allSiswa.push(studentRecord);
         });
 
+        allSiswa.sort((a, b) => a.nama.localeCompare(b.nama, "id"));
         if (madeChanges) {
           siswaRef.update(updates).then(() => {
             console.log(
               "Auto-migrasi dan sinkronisasi nilai formatif berhasil.",
             );
           });
-        } else {
-          allSiswa.sort((a, b) => a.nama.localeCompare(b.nama, "id"));
         }
       }
       renderTableBody(allSiswa);

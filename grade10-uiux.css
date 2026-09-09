@@ -727,7 +727,7 @@ wireframe-detective-section {
 
 .brief-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -760,6 +760,7 @@ wireframe-detective-section {
 .brief-card.lime { color: var(--lime); }
 .brief-card.violet { color: var(--violet); }
 .brief-card.cyan { color: var(--cyan); }
+.brief-card.rose { color: #ff77a8; }
 .brief-card > span { font-family: var(--mono); font-size: .6rem; font-weight: 800; letter-spacing: .13em; }
 .brief-card h3 { margin: 1.05rem 0 .55rem; color: white; font-size: 1.25rem; }
 .brief-card p { margin: 0; color: var(--muted); font-size: .84rem; line-height: 1.55; }
@@ -774,7 +775,9 @@ wireframe-detective-section {
 .checkpoint-card,
 .figma-crash-course,
 .fidelity-rule,
-.summative-preview {
+.summative-preview,
+.summative-hero-card,
+.summative-rubric-card {
   margin-top: 1rem;
   border: 1px solid var(--line);
   border-radius: 20px;
@@ -1118,6 +1121,178 @@ textarea::placeholder { color: #526174; }
 .summative-preview h2 { margin: 0; }
 .summative-preview p { margin: .4rem 0 0; color: var(--muted); font-size: .78rem; line-height: 1.55; }
 
+.summative-panel .panel-heading {
+  border-bottom-color: rgba(255, 119, 168, .22);
+}
+
+.summative-panel .score-orbit {
+  border-color: rgba(255, 119, 168, .36);
+  background: radial-gradient(circle, rgba(255,119,168,.13), transparent 68%);
+}
+
+.summative-panel .score-orbit span {
+  color: #ff77a8;
+}
+
+.summative-hero-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(250px, .8fr);
+  gap: 1.2rem;
+  padding: 1.55rem;
+  overflow: hidden;
+  border-color: rgba(255,119,168,.22);
+  background:
+    radial-gradient(circle at top right, rgba(255,119,168,.15), transparent 34%),
+    linear-gradient(135deg, rgba(53,225,232,.07), rgba(169,139,255,.06));
+}
+
+.summative-hero-card h2 {
+  margin: .2rem 0 .6rem;
+  font-size: clamp(1.45rem, 3vw, 2.1rem);
+}
+
+.summative-hero-card p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.summative-hero-card ul {
+  display: grid;
+  gap: .75rem;
+  align-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summative-hero-card li {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: .75rem;
+  align-items: center;
+  padding: .85rem;
+  color: #dbe7f3;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  background: rgba(3, 10, 16, .34);
+  font-size: .78rem;
+  line-height: 1.45;
+}
+
+.summative-hero-card li i {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: #ff77a8;
+  border: 1px solid rgba(255,119,168,.28);
+  border-radius: 10px;
+  background: rgba(255,119,168,.08);
+}
+
+.summative-roadmap {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .85rem;
+  margin-top: 1rem;
+}
+
+.summative-roadmap article {
+  min-height: 190px;
+  padding: 1.15rem;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  background: linear-gradient(155deg, rgba(17,31,45,.92), rgba(8,18,27,.92));
+}
+
+.summative-roadmap span {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  color: var(--ink);
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--cyan), #ff77a8);
+  font-family: var(--mono);
+  font-size: .62rem;
+  font-weight: 800;
+}
+
+.summative-roadmap h3 {
+  margin: 1rem 0 .4rem;
+  color: white;
+}
+
+.summative-roadmap p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .74rem;
+  line-height: 1.5;
+}
+
+.summative-redesign-form {
+  border-color: rgba(255,119,168,.2);
+  background: linear-gradient(145deg, rgba(255,119,168,.05), rgba(9,19,28,.94));
+}
+
+.summative-redesign-form .form-title span,
+.summative-rubric-grid b {
+  color: #ff77a8;
+}
+
+.summative-rubric-card {
+  padding: 1.5rem;
+  border-color: rgba(255,119,168,.2);
+}
+
+.summative-rubric-card h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.summative-rubric-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: .7rem;
+}
+
+.summative-rubric-grid article {
+  min-height: 150px;
+  padding: .95rem;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 13px;
+  background: rgba(255,255,255,.018);
+}
+
+.summative-rubric-grid b {
+  display: block;
+  margin-bottom: .8rem;
+  font-family: var(--mono);
+  font-size: .75rem;
+}
+
+.summative-rubric-grid span {
+  display: block;
+  color: white;
+  font-weight: 800;
+  font-size: .82rem;
+}
+
+.summative-rubric-grid p {
+  margin: .35rem 0 0;
+  color: var(--muted);
+  font-size: .68rem;
+  line-height: 1.45;
+}
+
+.summative-strip {
+  border-color: rgba(255,119,168,.28);
+  background: linear-gradient(120deg, rgba(255,119,168,.08), rgba(53,225,232,.04));
+}
+
 .one-attempt-warning { display: flex; gap: 1rem; align-items: flex-start; margin-top: 1rem; padding: 1.15rem; border: 1px solid rgba(255,119,109,.42); border-radius: 14px; background: rgba(255,119,109,.08); }
 .one-attempt-warning > i { color: var(--danger); font-size: 1.3rem; }
 .one-attempt-warning strong { color: #ffb7b2; }
@@ -1169,12 +1344,14 @@ textarea::placeholder { color: #526174; }
   .hero-panel { grid-template-columns: 1fr; }
   .wireframe-window { width: min(520px, 100%); }
   .brief-grid { grid-template-columns: 1fr 1fr; }
-  .brief-card:last-child { grid-column: 1 / -1; min-height: 180px; }
   .mission-steps { grid-template-columns: repeat(2, 1fr); }
   .mission-steps article:nth-child(2) { border-right: 0; }
   .mission-steps article:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
   .figma-crash-course { grid-template-columns: 1fr; }
   .accuracy-grid { grid-template-columns: repeat(2, 1fr); }
+  .summative-hero-card { grid-template-columns: 1fr; }
+  .summative-roadmap,
+  .summative-rubric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 700px) {
@@ -1195,8 +1372,9 @@ textarea::placeholder { color: #526174; }
   .two-column,
   .planning-form,
   .figma-crash-course,
-  .summative-preview { grid-template-columns: 1fr; }
-  .brief-card:last-child,
+  .summative-preview,
+  .summative-roadmap,
+  .summative-rubric-grid { grid-template-columns: 1fr; }
   .planning-form label.wide,
   .form-title { grid-column: auto; }
   .protocol-card { gap: 1.25rem; }
