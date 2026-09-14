@@ -483,6 +483,12 @@ const DC_Q4_ASSESSMENTS_WITH_PLANNING = dcAddPlanningConsistency(
   DC_Q4_ASSESSMENTS,
 );
 
+// Grade 9 Q1 has five assessment components, each worth an equal 20%.
+// Keep this separate because Grade 8 reuses the original Q1 rubric weights.
+const G9_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING.map(
+  (assessment) => ({ ...assessment, weight: 20 }),
+);
+
 const G8_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING.map(
   (assessment) => ({
     ...assessment,
@@ -2001,8 +2007,8 @@ const DC_COURSES = {
     quarter: 1,
     title: "Assessment Technology and Me",
     shortTitle: "Technology and Me",
-    description: "Digital Citizenship · Formatif 40% dan sumatif 60%.",
-    assessments: DC_Q1_ASSESSMENTS_WITH_PLANNING,
+    description: "Digital Citizenship · Lima komponen penilaian, masing-masing berbobot 20%.",
+    assessments: G9_Q1_ASSESSMENTS,
     finalQuiz: DC_Q1_FINAL_QUIZ,
   },
   2: {
@@ -2128,7 +2134,7 @@ const DC_COURSES_BY_GRADE = {
 };
 
 // Alias lama dipertahankan agar data dan kode Q1 tetap kompatibel.
-const DC_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING;
+const DC_ASSESSMENTS = G9_Q1_ASSESSMENTS;
 const DC_FINAL_QUIZ = DC_Q1_FINAL_QUIZ;
 
 function dcGetCourseConfig(quarter, grade = 9) {
@@ -2408,6 +2414,34 @@ function dcBuildFormativeGradebookFields(
   return fields;
 }
 
+function dcBuildGradebookFields(storedRecord, quarter, grade = 9) {
+  const normalizedQuarter = Number(quarter);
+  const normalizedGrade = Number(grade);
+  const fields = dcBuildFormativeGradebookFields(
+    storedRecord,
+    normalizedQuarter,
+    normalizedGrade,
+  );
+
+  // Grade 9 Q1 uses the calculated final assessment score in the Sumatif
+  // gradebook column, across all five equally weighted components.
+  if (normalizedGrade === 9 && normalizedQuarter === 1 && storedRecord) {
+    const draft = dcDraftFromStored(
+      storedRecord,
+      normalizedQuarter,
+      normalizedGrade,
+    );
+    const summary = dcCalculateSummary(
+      draft,
+      normalizedQuarter,
+      normalizedGrade,
+    );
+    fields.q1_sumatif = summary.finalScore;
+  }
+
+  return fields;
+}
+
 function dcScoreStatus(score, kkm) {
   if (!Number.isFinite(Number(score))) return "Belum dinilai";
   return Number(score) >= Number(kkm || 0) ? "Tuntas" : "Perlu tindak lanjut";
@@ -2576,6 +2610,7 @@ window.dcGroupSequentialAssessments = dcGroupSequentialAssessments;
 window.dcGetFormativeAssessmentCount = dcGetFormativeAssessmentCount;
 window.dcGetFormativeGradebookFieldCount = dcGetFormativeGradebookFieldCount;
 window.dcBuildFormativeGradebookFields = dcBuildFormativeGradebookFields;
+window.dcBuildGradebookFields = dcBuildGradebookFields;
 window.dcIsGradeNine = dcIsGradeNine;
 window.dcGetGradeLevel = dcGetGradeLevel;
 window.dcIsAssessmentGrade = dcIsAssessmentGrade;

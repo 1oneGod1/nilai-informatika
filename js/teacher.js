@@ -242,14 +242,14 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
     return { ...savedFields, ...progressFields };
   }
 
-  if (typeof dcBuildFormativeGradebookFields !== "function") {
+  if (typeof dcBuildGradebookFields !== "function") {
     return {};
   }
 
   const storedRecord =
     student?.digitalCitizenshipAssessment?.[`q${Number(quarter)}`];
   return storedRecord
-    ? dcBuildFormativeGradebookFields(storedRecord, quarter, grade)
+    ? dcBuildGradebookFields(storedRecord, quarter, grade)
     : {};
 }
 
@@ -1687,8 +1687,17 @@ function renderTableBody(data) {
         ? fArr.reduce((a, b) => a + Number(b || 0), 0) /
           fArr.filter((v) => v !== "").length
         : 0;
-      const sumatifValue = s[`q${activeQuarter}_sumatif`];
-      const finalScore = avgF * 0.4 + Number(sumatifValue || 0) * 0.6;
+      const sumatifField = `q${activeQuarter}_sumatif`;
+      const isAutoSummative = Object.prototype.hasOwnProperty.call(
+        autoFormativeFields,
+        sumatifField,
+      );
+      const sumatifValue = isAutoSummative
+        ? autoFormativeFields[sumatifField]
+        : s[sumatifField];
+      const finalScore = isAutoSummative
+        ? Number(sumatifValue || 0)
+        : avgF * 0.4 + Number(sumatifValue || 0) * 0.6;
       let status = finalScore >= kkm ? "Tuntas" : "Remedial";
       if (
         fArr.every((v) => v === "") &&
@@ -1787,7 +1796,7 @@ function renderTableBody(data) {
         <td class="px-3 py-3">${passwordHTML}</td>
         ${fInputs}
         <td class="px-2 py-3">
-          <input type="number" min="0" max="100" class="${sCls}" id="r-s-${s.id}" value="${sumatifVal}" placeholder="-" oninput="highlightScore(this,${kkm})" />
+          <input type="number" min="0" max="100" class="${sCls}${isAutoSummative ? " cursor-not-allowed opacity-80" : ""}" id="r-s-${s.id}" value="${sumatifVal}" placeholder="-" oninput="highlightScore(this,${kkm})" ${isAutoSummative ? 'readonly title="Nilai akhir otomatis dari kalkulasi assessment" aria-label="Nilai akhir assessment otomatis"' : ""} />
         </td>
         <td class="px-3 py-3 text-center">${statusChip}</td>
         <td class="px-4 py-3">
@@ -2041,6 +2050,15 @@ function exportExcel() {
   const rows = filteredSiswa.map((s, idx) => {
     const row = [idx + 1, s.nis || "", s.nama, s.kelas, s.password || ""];
     const kkm = getKKM(s.kelas);
+    const autoGradebookFields = getStudentAutoFormativeFields(
+      s,
+      activeQuarter,
+    );
+    const sumatifField = `q${activeQuarter}_sumatif`;
+    const isAutoSummative = Object.prototype.hasOwnProperty.call(
+      autoGradebookFields,
+      sumatifField,
+    );
 
     let fCount = 0;
     let fSum = 0;
@@ -2056,7 +2074,9 @@ function exportExcel() {
         row.push("");
       }
     }
-    const sVal = s[`q${activeQuarter}_sumatif`];
+    const sVal = isAutoSummative
+      ? autoGradebookFields[sumatifField]
+      : s[sumatifField];
     if (sVal !== "" && sVal !== null && sVal !== undefined) {
       row.push(Number(sVal));
       allEmpty = false;
@@ -2067,7 +2087,9 @@ function exportExcel() {
     let status = "Susulan";
     if (!allEmpty) {
       const avgF = fCount > 0 ? fSum / fCount : 0;
-      const finalScore = avgF * 0.4 + Number(sVal || 0) * 0.6;
+      const finalScore = isAutoSummative
+        ? Number(sVal || 0)
+        : avgF * 0.4 + Number(sVal || 0) * 0.6;
       status = finalScore >= kkm ? "Tuntas" : "Remedial";
     }
     row.push(status);

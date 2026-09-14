@@ -292,10 +292,20 @@ async function saveDcAssessment() {
       auth.currentUser?.email || "",
       dcTeacherState.grade,
     );
-    const formativeGradebookFields = dcBuildFormativeGradebookFields(
+    const gradebookFields = dcBuildGradebookFields(
       record,
       dcTeacherState.quarter,
       dcTeacherState.grade,
+    );
+    const formativeGradebookFields = Object.fromEntries(
+      Object.entries(gradebookFields).filter(([field]) =>
+        /^q\d+_f\d+$/.test(field),
+      ),
+    );
+    const summativeField = `q${dcTeacherState.quarter}_sumatif`;
+    const syncedFinalScore = Object.prototype.hasOwnProperty.call(
+      gradebookFields,
+      summativeField,
     );
     const obsoleteFormativeFields =
       typeof getObsoleteFormativeFields === "function"
@@ -303,7 +313,7 @@ async function saveDcAssessment() {
         : [];
     const studentUpdate = {
       [`digitalCitizenshipAssessment/q${dcTeacherState.quarter}`]: record,
-      ...formativeGradebookFields,
+      ...gradebookFields,
     };
     obsoleteFormativeFields.forEach((field) => {
       studentUpdate[field] = null;
@@ -317,7 +327,7 @@ async function saveDcAssessment() {
       delete student[field];
     });
     student.digitalCitizenshipAssessment[`q${dcTeacherState.quarter}`] = record;
-    Object.assign(student, formativeGradebookFields);
+    Object.assign(student, gradebookFields);
     dcTeacherState.dirty = false;
     updateDcSaveState();
     renderTableBody(allSiswa);
@@ -329,7 +339,7 @@ async function saveDcAssessment() {
     }
     const syncedCount = Object.keys(formativeGradebookFields).length;
     showAlert(
-      `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.${syncedCount ? ` Nilai F1–F${syncedCount} otomatis masuk ke buku nilai.` : ""}`,
+      `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.${syncedCount ? ` Nilai F1–F${syncedCount} otomatis masuk ke buku nilai.` : ""}${syncedFinalScore ? " Nilai akhir otomatis masuk ke kolom Sumatif." : ""}`,
       "success",
     );
   } catch (error) {

@@ -574,9 +574,24 @@ function renderStudentDetail(id) {
   let allTuntas = true;
 
   for (let q = 1; q <= 4; q++) {
+    const assessmentRecord = s.digitalCitizenshipAssessment?.[`q${q}`];
+    const autoGradebookFields =
+      assessmentRecord && typeof dcBuildGradebookFields === "function"
+        ? dcBuildGradebookFields(assessmentRecord, q, getStudentGrade(s))
+        : {};
+    const sumatifField = `q${q}_sumatif`;
+    const usesCalculatedFinal = Object.prototype.hasOwnProperty.call(
+      autoGradebookFields,
+      sumatifField,
+    );
     quartersData[q] = {
       fmt: {},
-      sum: s[`q${q}_sumatif`] !== undefined ? s[`q${q}_sumatif`] : "",
+      sum: usesCalculatedFinal
+        ? autoGradebookFields[sumatifField]
+        : s[sumatifField] !== undefined
+          ? s[sumatifField]
+          : "",
+      usesCalculatedFinal,
     };
 
     let fKeys = Object.keys(s).filter((k) => k.startsWith(`q${q}_f`));
@@ -597,7 +612,9 @@ function renderStudentDetail(id) {
       let sumF = fArr.reduce((a, b) => a + Number(b), 0);
       let avgF = qHasFmt ? sumF / fArr.length : 0;
       let sumVal = Number(quartersData[q].sum || 0);
-      let qScore = avgF * 0.4 + sumVal * 0.6;
+      let qScore = quartersData[q].usesCalculatedFinal
+        ? sumVal
+        : avgF * 0.4 + sumVal * 0.6;
       if (qScore < kkm) allTuntas = false;
     }
   }
