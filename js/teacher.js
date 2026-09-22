@@ -1456,7 +1456,7 @@ function listenToSiswaData() {
         if (madeChanges) {
           siswaRef.update(updates).then(() => {
             console.log(
-              "Auto-migrasi dan sinkronisasi nilai formatif berhasil.",
+              "Auto-migrasi dan sinkronisasi nilai gradebook berhasil.",
             );
           });
         }
@@ -1531,15 +1531,19 @@ function saveSiswaRow(id) {
     updatedAt: Date.now(),
   };
 
-  updated[`q${activeQuarter}_sumatif`] =
-    sumatifEl && sumatifEl.value.trim() !== ""
-      ? Number(sumatifEl.value.trim())
-      : "";
-
   const autoFormativeFields = getStudentAutoFormativeFields(
     siswa,
     activeQuarter,
   );
+  const sumatifField = `q${activeQuarter}_sumatif`;
+  updated[sumatifField] = Object.prototype.hasOwnProperty.call(
+    autoFormativeFields,
+    sumatifField,
+  )
+    ? autoFormativeFields[sumatifField]
+    : sumatifEl && sumatifEl.value.trim() !== ""
+      ? Number(sumatifEl.value.trim())
+      : "";
   for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
     const field = `q${activeQuarter}_f${i}`;
     if (Object.prototype.hasOwnProperty.call(autoFormativeFields, field)) {
@@ -1695,7 +1699,11 @@ function renderTableBody(data) {
       const sumatifValue = isAutoSummative
         ? autoFormativeFields[sumatifField]
         : s[sumatifField];
-      const finalScore = isAutoSummative
+      const isAutoFinalScore =
+        isAutoSummative &&
+        getTeacherStudentGrade(s) === 9 &&
+        Number(activeQuarter) === 1;
+      const finalScore = isAutoFinalScore
         ? Number(sumatifValue || 0)
         : avgF * 0.4 + Number(sumatifValue || 0) * 0.6;
       let status = finalScore >= kkm ? "Tuntas" : "Remedial";
@@ -1736,6 +1744,9 @@ function renderTableBody(data) {
         sumatifVal !== "" && sumatifVal < kkm
           ? "table-input input-remedial"
           : "table-input";
+      const autoSummativeLabel = isAutoFinalScore
+        ? "Nilai akhir otomatis dari kalkulasi assessment"
+        : "Nilai Sumatif otomatis dari rubrik assessment";
 
       // NIS Editable
       const nisEditable = `<input type="text" class="table-input" style="width:100%; text-align:left;" id="r-nis-${s.id}" value="${escHtml(s.nis || "")}" placeholder="NIS" />`;
@@ -1796,7 +1807,7 @@ function renderTableBody(data) {
         <td class="px-3 py-3">${passwordHTML}</td>
         ${fInputs}
         <td class="px-2 py-3">
-          <input type="number" min="0" max="100" class="${sCls}${isAutoSummative ? " cursor-not-allowed opacity-80" : ""}" id="r-s-${s.id}" value="${sumatifVal}" placeholder="-" oninput="highlightScore(this,${kkm})" ${isAutoSummative ? 'readonly title="Nilai akhir otomatis dari kalkulasi assessment" aria-label="Nilai akhir assessment otomatis"' : ""} />
+          <input type="number" min="0" max="100" class="${sCls}${isAutoSummative ? " cursor-not-allowed opacity-80" : ""}" id="r-s-${s.id}" value="${sumatifVal}" placeholder="-" oninput="highlightScore(this,${kkm})" ${isAutoSummative ? `readonly title="${autoSummativeLabel}" aria-label="${autoSummativeLabel}"` : ""} />
         </td>
         <td class="px-3 py-3 text-center">${statusChip}</td>
         <td class="px-4 py-3">
@@ -2059,6 +2070,10 @@ function exportExcel() {
       autoGradebookFields,
       sumatifField,
     );
+    const isAutoFinalScore =
+      isAutoSummative &&
+      getTeacherStudentGrade(s) === 9 &&
+      Number(activeQuarter) === 1;
 
     let fCount = 0;
     let fSum = 0;
@@ -2087,7 +2102,7 @@ function exportExcel() {
     let status = "Susulan";
     if (!allEmpty) {
       const avgF = fCount > 0 ? fSum / fCount : 0;
-      const finalScore = isAutoSummative
+      const finalScore = isAutoFinalScore
         ? Number(sVal || 0)
         : avgF * 0.4 + Number(sVal || 0) * 0.6;
       status = finalScore >= kkm ? "Tuntas" : "Remedial";

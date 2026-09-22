@@ -303,7 +303,7 @@ async function saveDcAssessment() {
       ),
     );
     const summativeField = `q${dcTeacherState.quarter}_sumatif`;
-    const syncedFinalScore = Object.prototype.hasOwnProperty.call(
+    const syncedSummativeScore = Object.prototype.hasOwnProperty.call(
       gradebookFields,
       summativeField,
     );
@@ -339,7 +339,7 @@ async function saveDcAssessment() {
     }
     const syncedCount = Object.keys(formativeGradebookFields).length;
     showAlert(
-      `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.${syncedCount ? ` Nilai F1–F${syncedCount} otomatis masuk ke buku nilai.` : ""}${syncedFinalScore ? " Nilai akhir otomatis masuk ke kolom Sumatif." : ""}`,
+      `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.${syncedCount ? ` Nilai F1–F${syncedCount} otomatis masuk ke buku nilai.` : ""}${syncedSummativeScore ? " Nilai Sumatif otomatis masuk ke buku nilai." : ""}`,
       "success",
     );
   } catch (error) {

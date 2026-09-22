@@ -2414,6 +2414,64 @@ function dcBuildFormativeGradebookFields(
   return fields;
 }
 
+function dcBuildSummativeGradebookField(
+  storedRecord,
+  quarter,
+  grade = 9,
+) {
+  const normalizedGrade = Number(grade);
+  const normalizedQuarter = Number(quarter);
+  if (
+    normalizedGrade !== 12 ||
+    !storedRecord ||
+    typeof storedRecord !== "object"
+  ) {
+    return {};
+  }
+
+  const course = dcGetCourseConfig(normalizedQuarter, normalizedGrade);
+  const weightTotals = dcGetCourseWeightTotals(course);
+  if (!course || weightTotals.summative <= 0) return {};
+
+  const summativeAssessments = course.assessments.filter(
+    (assessment) => assessment.type === "Sumatif",
+  );
+  const hasRubricEvidence = summativeAssessments.some((assessment) => {
+    const savedAssessment = storedRecord.rubricScores?.[assessment.id] || {};
+    const hasCriterionScore = assessment.criteria.some(
+      (criterion) =>
+        Number(savedAssessment.criteria?.[criterion.id] || 0) > 0,
+    );
+    return hasCriterionScore || String(savedAssessment.note || "").trim();
+  });
+  const hasQuizEvidence = Boolean(
+    course.finalQuiz &&
+      ((Array.isArray(storedRecord.quizAnswers) &&
+        storedRecord.quizAnswers.some(Boolean)) ||
+        String(storedRecord.quizNote || "").trim()),
+  );
+  const hasStoredSummary = Number(storedRecord.summativeScore || 0) > 0;
+  if (!hasRubricEvidence && !hasQuizEvidence && !hasStoredSummary) return {};
+
+  const recalculatedSummary = dcCalculateSummary(
+    dcDraftFromStored(storedRecord, normalizedQuarter, normalizedGrade),
+    normalizedQuarter,
+    normalizedGrade,
+  );
+  const summativeContribution =
+    hasRubricEvidence || hasQuizEvidence
+      ? recalculatedSummary.summative
+      : Number(storedRecord.summativeScore || 0);
+  const gradebookScore = dcClampScore(
+    (summativeContribution / weightTotals.summative) * 100,
+    100,
+  );
+
+  return {
+    [`q${normalizedQuarter}_sumatif`]: Number(gradebookScore.toFixed(2)),
+  };
+}
+
 function dcBuildGradebookFields(storedRecord, quarter, grade = 9) {
   const normalizedQuarter = Number(quarter);
   const normalizedGrade = Number(grade);
@@ -2421,6 +2479,14 @@ function dcBuildGradebookFields(storedRecord, quarter, grade = 9) {
     storedRecord,
     normalizedQuarter,
     normalizedGrade,
+  );
+  Object.assign(
+    fields,
+    dcBuildSummativeGradebookField(
+      storedRecord,
+      normalizedQuarter,
+      normalizedGrade,
+    ),
   );
 
   // Grade 9 Q1 uses the calculated final assessment score in the Sumatif
@@ -2610,6 +2676,7 @@ window.dcGroupSequentialAssessments = dcGroupSequentialAssessments;
 window.dcGetFormativeAssessmentCount = dcGetFormativeAssessmentCount;
 window.dcGetFormativeGradebookFieldCount = dcGetFormativeGradebookFieldCount;
 window.dcBuildFormativeGradebookFields = dcBuildFormativeGradebookFields;
+window.dcBuildSummativeGradebookField = dcBuildSummativeGradebookField;
 window.dcBuildGradebookFields = dcBuildGradebookFields;
 window.dcIsGradeNine = dcIsGradeNine;
 window.dcGetGradeLevel = dcGetGradeLevel;
