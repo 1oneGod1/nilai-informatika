@@ -1164,6 +1164,14 @@ const G11_Q2_RAW_ASSESSMENTS = G11_ALL_RAW_ASSESSMENTS.slice(
 const G11_Q1_ASSESSMENTS = dcWeightByTypeBudget(G11_Q1_RAW_ASSESSMENTS);
 const G11_Q2_ASSESSMENTS = dcWeightByTypeBudget(G11_Q2_RAW_ASSESSMENTS);
 
+const G12_Q1_SUMMATIVE_ASSESSMENT_IDS = [
+  "web3EcosystemMap",
+  "web3BlockchainSimulator",
+  "nftPixelArt",
+  "sha256Experiment",
+  "advancedBlockchainSimulator",
+];
+
 const G12_Q1_ASSESSMENTS = [
   {
     id: "favoriteWebsite",
@@ -2089,8 +2097,9 @@ const G12_COURSES = {
     quarter: 1,
     title: "Assessment Web3, Blockchain, and NFT",
     shortTitle: "Web3, Blockchain, and NFT",
-    description: "Kelas 12 | Q1 | 13 proyek formatif dengan total bobot 100% dan tiga nilai formatif masuk ke gradebook.",
+    description: "Kelas 12 | Q1 | 13 proyek formatif, tiga nilai Formatif, dan Sumatif otomatis dari lima tugas inti.",
     weightedFormativeGroups: true,
+    summativeAssessmentIds: G12_Q1_SUMMATIVE_ASSESSMENT_IDS,
     assessments: G12_Q1_ASSESSMENTS,
     finalQuiz: null,
   },
@@ -2431,11 +2440,25 @@ function dcBuildSummativeGradebookField(
 
   const course = dcGetCourseConfig(normalizedQuarter, normalizedGrade);
   const weightTotals = dcGetCourseWeightTotals(course);
-  if (!course || weightTotals.summative <= 0) return {};
+  if (!course) return {};
 
-  const summativeAssessments = course.assessments.filter(
-    (assessment) => assessment.type === "Sumatif",
-  );
+  const derivedSummativeIds = Array.isArray(course.summativeAssessmentIds)
+    ? new Set(course.summativeAssessmentIds)
+    : null;
+  const summativeAssessments = derivedSummativeIds
+    ? course.assessments.filter((assessment) =>
+        derivedSummativeIds.has(assessment.id),
+      )
+    : course.assessments.filter(
+        (assessment) => assessment.type === "Sumatif",
+      );
+  if (
+    !summativeAssessments.length ||
+    (!derivedSummativeIds && weightTotals.summative <= 0)
+  ) {
+    return {};
+  }
+
   const hasRubricEvidence = summativeAssessments.some((assessment) => {
     const savedAssessment = storedRecord.rubricScores?.[assessment.id] || {};
     const hasCriterionScore = assessment.criteria.some(
@@ -2444,6 +2467,9 @@ function dcBuildSummativeGradebookField(
     );
     return hasCriterionScore || String(savedAssessment.note || "").trim();
   });
+  const hasStoredRawEvidence = summativeAssessments.some(
+    (assessment) => Number(storedRecord.rawScores?.[assessment.id] || 0) > 0,
+  );
   const hasQuizEvidence = Boolean(
     course.finalQuiz &&
       ((Array.isArray(storedRecord.quizAnswers) &&
@@ -2451,13 +2477,46 @@ function dcBuildSummativeGradebookField(
         String(storedRecord.quizNote || "").trim()),
   );
   const hasStoredSummary = Number(storedRecord.summativeScore || 0) > 0;
-  if (!hasRubricEvidence && !hasQuizEvidence && !hasStoredSummary) return {};
+  if (
+    !hasRubricEvidence &&
+    !hasStoredRawEvidence &&
+    !hasQuizEvidence &&
+    !hasStoredSummary
+  ) {
+    return {};
+  }
 
   const recalculatedSummary = dcCalculateSummary(
     dcDraftFromStored(storedRecord, normalizedQuarter, normalizedGrade),
     normalizedQuarter,
     normalizedGrade,
   );
+
+  if (derivedSummativeIds) {
+    const totals = summativeAssessments.reduce(
+      (result, assessment) => {
+        const storedRaw = Number(storedRecord.rawScores?.[assessment.id]);
+        const rawScore = Number.isFinite(storedRaw)
+          ? dcClampScore(storedRaw, 100)
+          : dcClampScore(
+              recalculatedSummary.rawScores[assessment.id] || 0,
+              100,
+            );
+        const weight = Number(assessment.weight || 0);
+        result.score += rawScore * weight;
+        result.weight += weight;
+        return result;
+      },
+      { score: 0, weight: 0 },
+    );
+    if (!totals.weight) return {};
+    return {
+      [`q${normalizedQuarter}_sumatif`]: Number(
+        (totals.score / totals.weight).toFixed(2),
+      ),
+    };
+  }
+
   const summativeContribution =
     hasRubricEvidence || hasQuizEvidence
       ? recalculatedSummary.summative
@@ -2654,6 +2713,7 @@ window.DC_COURSES = DC_COURSES;
 window.G11_Q1_ASSESSMENTS = G11_Q1_ASSESSMENTS;
 window.G11_Q2_ASSESSMENTS = G11_Q2_ASSESSMENTS;
 window.G11_COURSES = G11_COURSES;
+window.G12_Q1_SUMMATIVE_ASSESSMENT_IDS = G12_Q1_SUMMATIVE_ASSESSMENT_IDS;
 window.G12_Q1_ASSESSMENTS = G12_Q1_ASSESSMENTS;
 window.G12_Q2_ASSESSMENTS = G12_Q2_ASSESSMENTS;
 window.G12_Q3_ASSESSMENTS = G12_Q3_ASSESSMENTS;
