@@ -218,7 +218,22 @@
           },
           "summativeRedesign": {
             ".write": true,
-            ".validate": "newData.hasChildren(['appName', 'referenceUrl', 'userProblem', 'figmaUrl', 'savedAt']) && newData.child('appName').isString() && newData.child('appName').val().length > 0 && newData.child('appName').val().length <= 100 && newData.child('referenceUrl').isString() && newData.child('referenceUrl').val().length > 0 && newData.child('referenceUrl').val().length <= 500 && newData.child('userProblem').isString() && newData.child('userProblem').val().length > 0 && newData.child('userProblem').val().length <= 1200 && newData.child('figmaUrl').isString() && newData.child('figmaUrl').val().length > 0 && newData.child('figmaUrl').val().length <= 500 && newData.child('savedAt').isNumber()",
+            ".validate": "newData.hasChildren(['appName', 'referenceUrl', 'userProblem', 'figmaUrl', 'savedAt'])",
+            "appName": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+            },
+            "referenceUrl": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 500"
+            },
+            "userProblem": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1200"
+            },
+            "figmaUrl": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 500"
+            },
+            "savedAt": {
+              ".validate": "newData.isNumber()"
+            },
             "$other": {
               ".validate": false
             }
