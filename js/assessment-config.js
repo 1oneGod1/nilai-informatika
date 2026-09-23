@@ -483,8 +483,12 @@ const DC_Q4_ASSESSMENTS_WITH_PLANNING = dcAddPlanningConsistency(
   DC_Q4_ASSESSMENTS,
 );
 
-// Grade 9 Q1 has five assessment components, each worth an equal 20%.
-// Keep this separate because Grade 8 reuses the original Q1 rubric weights.
+// Grade 7 and Grade 9 Q1 each have five assessment components worth 20%.
+// Keep these separate because Grade 8 reuses the original Q1 rubric weights.
+const G7_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING.map(
+  (assessment) => ({ ...assessment, weight: 20 }),
+);
+
 const G9_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING.map(
   (assessment) => ({ ...assessment, weight: 20 }),
 );
@@ -2051,6 +2055,21 @@ const DC_COURSES = {
   },
 };
 
+const G7_COURSES = {
+  1: {
+    id: "digitalCitizenshipGrade7",
+    grade: 7,
+    quarter: 1,
+    title: "Assessment Digital Citizenship",
+    shortTitle: "Digital Citizenship",
+    description:
+      "Grade 7 | Q1 | Lima komponen penilaian, masing-masing berbobot 20%, dan nilai overall otomatis masuk ke Sumatif.",
+    gradebookSummativeMode: "overall",
+    assessments: G7_Q1_ASSESSMENTS,
+    finalQuiz: DC_Q1_FINAL_QUIZ,
+  },
+};
+
 const G8_COURSES = {
   1: {
     id: "digitalCitizenshipFoundations",
@@ -2137,6 +2156,7 @@ const G12_COURSES = {
 };
 
 const DC_COURSES_BY_GRADE = {
+  7: G7_COURSES,
   8: G8_COURSES,
   9: DC_COURSES,
   11: G11_COURSES,
@@ -2736,6 +2756,8 @@ window.DC_Q2_ASSESSMENTS = DC_Q2_ASSESSMENTS;
 window.DC_Q3_ASSESSMENTS = DC_Q3_ASSESSMENTS;
 window.DC_Q4_ASSESSMENTS = DC_Q4_ASSESSMENTS;
 window.DC_COURSES = DC_COURSES;
+window.G7_Q1_ASSESSMENTS = G7_Q1_ASSESSMENTS;
+window.G7_COURSES = G7_COURSES;
 window.G11_Q1_ASSESSMENTS = G11_Q1_ASSESSMENTS;
 window.G11_Q2_ASSESSMENTS = G11_Q2_ASSESSMENTS;
 window.G11_COURSES = G11_COURSES;
