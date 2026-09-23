@@ -851,8 +851,8 @@ async function saveSummativeRedesignPlan(event) {
     event.submitter,
     "summativeRedesign",
     plan,
-    "Summative redesign evidence saved.",
-    "Summative redesign evidence could not be saved.",
+    "Summative redesign evidence submitted. Your teacher can now review it.",
+    "Summative redesign evidence could not be submitted.",
   );
 }
 
@@ -1584,6 +1584,7 @@ function isSection4Complete() {
 }
 
 async function saveProgressRecord(key, payload, errorMessage, showError = true) {
+  const previousPayload = uiuxProgress[key];
   uiuxProgress[key] = payload;
   renderProgressState();
   if (uiuxStudent.isLocalPreview) return;
@@ -1594,6 +1595,11 @@ async function saveProgressRecord(key, payload, errorMessage, showError = true) 
   try {
     await write;
   } catch (error) {
+    if (uiuxProgress[key] === payload) {
+      if (previousPayload === undefined) delete uiuxProgress[key];
+      else uiuxProgress[key] = previousPayload;
+      renderProgressState();
+    }
     if (showError) showToast(`${errorMessage} Please try again.`, true);
     throw error;
   }

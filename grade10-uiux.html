@@ -734,21 +734,21 @@
               <div class="form-title"><span>SUMMATIVE EVIDENCE</span><strong>Save your individual redesign links</strong></div>
               <label>
                 <span>App or website name</span>
-                <input id="summativeAppName" type="text" placeholder="Example: Duolingo, Spotify, school website" autocomplete="off" />
+                <input id="summativeAppName" type="text" maxlength="100" placeholder="Example: Duolingo, Spotify, school website" autocomplete="off" />
               </label>
               <label>
                 <span>Reference app / website link</span>
-                <input id="summativeReferenceUrl" type="url" placeholder="https://..." autocomplete="off" />
+                <input id="summativeReferenceUrl" type="url" maxlength="500" placeholder="https://..." autocomplete="off" />
               </label>
               <label class="wide">
                 <span>What user problem will you improve?</span>
-                <textarea id="summativeUserProblem" placeholder="Explain the current pain point, confusing flow, missing information, accessibility issue, or visual hierarchy problem."></textarea>
+                <textarea id="summativeUserProblem" maxlength="1200" placeholder="Explain the current pain point, confusing flow, missing information, accessibility issue, or visual hierarchy problem."></textarea>
               </label>
               <label class="wide">
                 <span>Your individual Figma redesign link</span>
-                <input id="summativeFigmaUrl" type="url" placeholder="https://www.figma.com/design/..." autocomplete="off" />
+                <input id="summativeFigmaUrl" type="url" maxlength="500" placeholder="https://www.figma.com/design/..." autocomplete="off" />
               </label>
-              <button type="submit" class="primary-button">Save summative evidence <i class="fas fa-floppy-disk"></i></button>
+              <button type="submit" class="primary-button">Submit summative evidence <i class="fas fa-paper-plane"></i></button>
             </form>
 
             <div class="checkpoint-card summative-rubric-card">
@@ -805,6 +805,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
     <script src="js/firebase-init.js?v=20260819d"></script>
     <script src="js/wireframe-detective-section.js?v=20260812d"></script>
-    <script src="js/grade10-uiux.js?v=20260909a"></script>
+    <script src="js/grade10-uiux.js?v=20260923d"></script>
   </body>
 </html>

@@ -9,6 +9,7 @@ let activeQuarter = 4; // Default ke Q4 untuk Sense, Decide, and Deliver with VE
 let numFormatif = { 1: 3, 2: 3, 3: 3, 4: 3 }; // Assessment workspace expands this when a course has more formative rubrics
 let selectedLearningProgressStudent = null;
 let selectedLearningProgressData = {};
+let selectedLearningProgressFocus = "";
 let grade10UiUxProgressByStudent = {};
 let learningProgressListenerAttached = false;
 let grade10AutoSyncInFlight = false;
@@ -391,6 +392,16 @@ function getSafeReferenceUrl(value) {
   }
 }
 
+function hasGrade10SummativeSubmission(progress) {
+  const submission = progress?.summativeRedesign;
+  return Boolean(
+    submission?.appName &&
+      submission?.userProblem &&
+      getSafeReferenceUrl(submission.referenceUrl) &&
+      getSafeReferenceUrl(submission.figmaUrl),
+  );
+}
+
 function buildGrade10FigmaSubmissionCard(plan, sectionLabel, title, roleKey) {
   const submission = plan && typeof plan === "object" ? plan : {};
   const submittedUrl = String(submission.figmaUrl || "").trim();
@@ -657,7 +668,7 @@ function findLatestProgressTimestamp(value) {
   }, 0);
 }
 
-async function openStudentLearningProgress(studentId) {
+async function openStudentLearningProgress(studentId, focusSection = "") {
   const student = allSiswa.find((item) => item.id === studentId);
   if (!student) {
     showAlert("Data siswa tidak ditemukan.", "danger");
@@ -665,6 +676,7 @@ async function openStudentLearningProgress(studentId) {
   }
 
   selectedLearningProgressStudent = student;
+  selectedLearningProgressFocus = focusSection;
   const modal = document.getElementById("learningProgressModal");
   const body = document.getElementById("learningProgressBody");
   const resetButton = document.getElementById("resetLearningProgressButton");
@@ -704,7 +716,7 @@ async function openStudentLearningProgress(studentId) {
     } catch (syncError) {
       console.warn("Sinkronisasi Q1 F1/F2 saat membuka progress gagal:", syncError);
     }
-    renderStudentLearningProgress(progress);
+    renderStudentLearningProgress(progress, focusSection);
   } catch (error) {
     body.innerHTML = `
       <div class="rounded-xl border border-rose-500/30 bg-rose-500/10 p-5 text-rose-200">
@@ -714,7 +726,7 @@ async function openStudentLearningProgress(studentId) {
   }
 }
 
-function renderStudentLearningProgress(progress) {
+function renderStudentLearningProgress(progress, focusSection = selectedLearningProgressFocus) {
   const body = document.getElementById("learningProgressBody");
   const resetButton = document.getElementById("resetLearningProgressButton");
   selectedLearningProgressData = progress || {};
@@ -746,6 +758,11 @@ function renderStudentLearningProgress(progress) {
   const summativePlan = progress.summativeRedesign || {};
   const summativeReferenceUrl = getSafeReferenceUrl(summativePlan.referenceUrl);
   const summativeFigmaUrl = getSafeReferenceUrl(summativePlan.figmaUrl);
+  const hasSummativeSubmission = hasGrade10SummativeSubmission(progress);
+  const summativeSubmittedAt = Number(summativePlan.savedAt || 0);
+  const summativeSubmittedLabel = summativeSubmittedAt
+    ? new Date(summativeSubmittedAt).toLocaleString("id-ID")
+    : "Belum pernah dikirim";
   const steps = [
     ["preTest", "Pre-test 1", progress.preTest?.score],
     ["section1", "Section 1 · Wireframe"],
@@ -834,12 +851,19 @@ function renderStudentLearningProgress(progress) {
         </button>
       </div>
     </section>
-    <section class="mb-5 rounded-2xl border border-pink-400/25 bg-pink-400/[0.05] p-5">
+    <section id="grade10SummativeSubmissionCard" class="mb-5 scroll-mt-5 rounded-2xl border border-pink-400/25 bg-pink-400/[0.05] p-5">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-pink-400/15 pb-3">
+        <strong class="text-xs text-white">Submission Summative Grade 10</strong>
+        <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-bold font-mono-tech tracking-wider ${hasSummativeSubmission ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : "border-amber-400/30 bg-amber-400/10 text-amber-300"}">
+          <i class="fas ${hasSummativeSubmission ? "fa-circle-check" : "fa-clock"}"></i>${hasSummativeSubmission ? "TERKIRIM" : "BELUM DIKIRIM"}
+        </span>
+      </div>
       <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
         <div class="min-w-0">
           <span class="text-[10px] font-mono-tech tracking-[0.18em] text-pink-300 font-bold">SUMMATIVE · INDIVIDUAL REDESIGN</span>
           <h3 class="text-lg font-black text-white mt-1">${escHtml(summativePlan.appName || "Belum mengisi summative evidence")}</h3>
           <p class="text-xs leading-relaxed text-slate-400 mt-2">${escHtml(summativePlan.userProblem || "Siswa belum menulis user problem yang akan diperbaiki.")}</p>
+          <small class="mt-3 block text-[10px] font-mono-tech text-slate-500"><i class="fas fa-clock mr-1"></i>${escHtml(summativeSubmittedLabel)}</small>
         </div>
         <div class="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
           ${
@@ -920,6 +944,14 @@ function renderStudentLearningProgress(progress) {
         : `<div class="mt-5 rounded-xl border border-dashed border-slate-600 p-4 text-center text-sm text-slate-500">Siswa belum memulai kegiatan UI/UX.</div>`
     }`;
   resetButton.disabled = !hasProgress;
+  if (focusSection === "summative") {
+    requestAnimationFrame(() => {
+      document
+        .getElementById("grade10SummativeSubmissionCard")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      selectedLearningProgressFocus = "";
+    });
+  }
 }
 
 function setFigmaSimilarityCriterionFull(criterionId, isFull) {
@@ -1151,6 +1183,7 @@ function closeStudentLearningProgress() {
   document.body.style.overflow = "";
   selectedLearningProgressStudent = null;
   selectedLearningProgressData = {};
+  selectedLearningProgressFocus = "";
 }
 
 async function resetStudentLearningProgress() {
@@ -1803,12 +1836,21 @@ function renderTableBody(data) {
           "inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider";
       }
       const statusChip = `<span class="${chipCls}"><span class="w-1.5 h-1.5 rounded-full ${dotCls} flex-shrink-0 ${animateDot}"></span>${chipLabel}</span>`;
+      const grade10Progress =
+        grade10UiUxProgressByStudent[String(s.id || "")] || {};
+      const hasSummativeSubmission =
+        hasGrade10SummativeSubmission(grade10Progress);
       const studentNameCell =
         getTeacherStudentGrade(s) === 10
-          ? `<button type="button" onclick="openStudentLearningProgress('${escHtml(s.id)}')" class="group/name text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-cyan-500/10 transition-colors" title="Lihat dan reset progress UI/UX">
-              <strong class="block text-slate-200 group-hover/name:text-cyan-300 transition-colors">${escHtml(s.nama)}</strong>
-              <small class="block text-[9px] text-cyan-500/70 font-mono-tech mt-0.5"><i class="fas fa-chart-line mr-1"></i>LIHAT PROGRESS</small>
-            </button>`
+          ? `<div class="flex flex-col items-start gap-1">
+              <button type="button" onclick="openStudentLearningProgress('${escHtml(s.id)}')" class="group/name text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-cyan-500/10 transition-colors" title="Lihat dan reset progress UI/UX">
+                <strong class="block text-slate-200 group-hover/name:text-cyan-300 transition-colors">${escHtml(s.nama)}</strong>
+                <small class="block text-[9px] text-cyan-500/70 font-mono-tech mt-0.5"><i class="fas fa-chart-line mr-1"></i>LIHAT PROGRESS</small>
+              </button>
+              <button type="button" onclick="openStudentLearningProgress('${escHtml(s.id)}', 'summative')" class="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[8px] font-bold font-mono-tech tracking-wide transition-colors ${hasSummativeSubmission ? "border-pink-400/35 bg-pink-400/10 text-pink-300 hover:bg-pink-400/20" : "border-amber-400/25 bg-amber-400/[0.07] text-amber-400/80 hover:bg-amber-400/15"}" title="Buka submission Summative Grade 10">
+                <i class="fas ${hasSummativeSubmission ? "fa-circle-check" : "fa-clock"}"></i>${hasSummativeSubmission ? "SUMMATIVE TERKIRIM" : "SUMMATIVE BELUM DIKIRIM"}
+              </button>
+            </div>`
           : `<span class="font-bold text-slate-200">${escHtml(s.nama)}</span>`;
 
       return `
