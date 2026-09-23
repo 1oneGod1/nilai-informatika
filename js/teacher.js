@@ -253,6 +253,19 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
     : {};
 }
 
+function usesOverallAssessmentAsSummative(grade, quarter) {
+  const normalizedGrade = Number(grade);
+  const normalizedQuarter = Number(quarter);
+  const course =
+    typeof dcGetCourseConfig === "function"
+      ? dcGetCourseConfig(normalizedQuarter, normalizedGrade)
+      : null;
+  return (
+    course?.gradebookSummativeMode === "overall" ||
+    (normalizedGrade === 9 && normalizedQuarter === 1)
+  );
+}
+
 function getConfiguredFormativeCount(grade, quarter = activeQuarter) {
   if (typeof dcGetFormativeGradebookFieldCount === "function") {
     return dcGetFormativeGradebookFieldCount(Number(quarter), Number(grade));
@@ -1701,8 +1714,10 @@ function renderTableBody(data) {
         : s[sumatifField];
       const isAutoFinalScore =
         isAutoSummative &&
-        getTeacherStudentGrade(s) === 9 &&
-        Number(activeQuarter) === 1;
+        usesOverallAssessmentAsSummative(
+          getTeacherStudentGrade(s),
+          activeQuarter,
+        );
       const finalScore = isAutoFinalScore
         ? Number(sumatifValue || 0)
         : avgF * 0.4 + Number(sumatifValue || 0) * 0.6;
@@ -2072,8 +2087,10 @@ function exportExcel() {
     );
     const isAutoFinalScore =
       isAutoSummative &&
-      getTeacherStudentGrade(s) === 9 &&
-      Number(activeQuarter) === 1;
+      usesOverallAssessmentAsSummative(
+        getTeacherStudentGrade(s),
+        activeQuarter,
+      );
 
     let fCount = 0;
     let fSum = 0;

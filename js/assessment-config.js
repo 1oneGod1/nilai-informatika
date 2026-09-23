@@ -2073,7 +2073,8 @@ const G11_COURSES = {
     title: "Assessment Code and Python Projects",
     shortTitle: "Code and Python",
     description:
-      "Grade 11 | Q1 | Code Is Your Voice dan Python 101 sampai Project 4 | tiga nilai formatif masuk ke gradebook.",
+      "Grade 11 | Q1 | Code Is Your Voice dan Python 101 sampai Project 4 | tiga nilai formatif dan Sumatif overall masuk ke gradebook.",
+    gradebookSummativeMode: "overall",
     assessments: G11_Q1_ASSESSMENTS,
     finalQuiz: null,
   },
@@ -2430,17 +2431,42 @@ function dcBuildSummativeGradebookField(
 ) {
   const normalizedGrade = Number(grade);
   const normalizedQuarter = Number(quarter);
-  if (
-    normalizedGrade !== 12 ||
-    !storedRecord ||
-    typeof storedRecord !== "object"
-  ) {
+  if (!storedRecord || typeof storedRecord !== "object") {
     return {};
   }
 
   const course = dcGetCourseConfig(normalizedQuarter, normalizedGrade);
-  const weightTotals = dcGetCourseWeightTotals(course);
   if (!course) return {};
+
+  if (course.gradebookSummativeMode === "overall") {
+    const hasAssessmentEvidence = course.assessments.some((assessment) => {
+      const savedAssessment = storedRecord.rubricScores?.[assessment.id] || {};
+      return (
+        assessment.criteria.some(
+          (criterion) =>
+            Number(savedAssessment.criteria?.[criterion.id] || 0) > 0,
+        ) || String(savedAssessment.note || "").trim()
+      );
+    });
+    const hasStoredEvidence =
+      Object.values(storedRecord.rawScores || {}).some(
+        (score) => Number(score || 0) > 0,
+      ) || Number(storedRecord.finalScore || 0) > 0;
+    if (!hasAssessmentEvidence && !hasStoredEvidence) return {};
+
+    const summary = dcCalculateSummary(
+      dcDraftFromStored(storedRecord, normalizedQuarter, normalizedGrade),
+      normalizedQuarter,
+      normalizedGrade,
+    );
+    return {
+      [`q${normalizedQuarter}_sumatif`]: summary.finalScore,
+    };
+  }
+
+  if (normalizedGrade !== 12) return {};
+
+  const weightTotals = dcGetCourseWeightTotals(course);
 
   const derivedSummativeIds = Array.isArray(course.summativeAssessmentIds)
     ? new Set(course.summativeAssessmentIds)
