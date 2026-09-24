@@ -1168,7 +1168,7 @@ const G11_Q2_RAW_ASSESSMENTS = G11_ALL_RAW_ASSESSMENTS.slice(
 
 const G11_Q1_ASSESSMENTS = dcWeightByTypeBudget(G11_Q1_RAW_ASSESSMENTS, {
   Formatif: 40,
-  Sumatif: 30,
+  Sumatif: 45,
 });
 const G11_Q2_ASSESSMENTS = dcWeightByTypeBudget(G11_Q2_RAW_ASSESSMENTS);
 
@@ -1178,7 +1178,7 @@ const G11_Q1_FINAL_QUIZ = {
   title: "Python 101 Multiple-Choice Assessment",
   subtitle: "25 soal pilihan ganda Python 101",
   type: "Sumatif",
-  weight: 30,
+  weight: 15,
   color: G11_Q1_COLORS.pythonProject,
 };
 
@@ -2107,7 +2107,7 @@ const G11_COURSES = {
     title: "Assessment Code and Python Projects",
     shortTitle: "Code and Python",
     description:
-      "Grade 11 | Q1 | Formatif 40%, proyek sumatif 30%, dan Python 101 Multiple-Choice Assessment 30% | nilai overall otomatis masuk ke gradebook.",
+      "Grade 11 | Q1 | Formatif 40%, proyek sumatif 45%, dan Python 101 Multiple-Choice Assessment 15% | nilai overall otomatis masuk ke gradebook.",
     gradebookSummativeMode: "overall",
     assessments: G11_Q1_ASSESSMENTS,
     finalQuiz: G11_Q1_FINAL_QUIZ,
