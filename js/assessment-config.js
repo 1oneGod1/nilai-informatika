@@ -496,6 +496,7 @@ const G9_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING.map(
 const G8_Q1_ASSESSMENTS = DC_Q1_ASSESSMENTS_WITH_PLANNING.map(
   (assessment) => ({
     ...assessment,
+    weight: 20,
     brief: G8_Q1_BRIEFS[assessment.id] || "",
   }),
 );
@@ -2078,7 +2079,8 @@ const G8_COURSES = {
     title: "Digital Citizenship Foundations",
     shortTitle: "Digital Citizenship",
     description:
-      "Grade 8 | Q1 | Personal information, online safety, digital footprint, and evaluating information | Formatif 40% dan sumatif 60%.",
+      "Grade 8 | Q1 | Lima komponen Digital Citizenship, masing-masing berbobot 20%, dan nilai overall otomatis masuk ke Sumatif.",
+    gradebookSummativeMode: "overall",
     assessments: G8_Q1_ASSESSMENTS,
     finalQuiz: G8_Q1_FINAL_QUIZ,
   },
