@@ -70,6 +70,7 @@
       }
     },
     "learningProgress": {
+      ".read": "auth != null && (root.child('guru').child(auth.uid).child('isVerified').val() === true || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
       "$studentId": {
         "grade10UiUx": {
           ".read": true,
@@ -168,6 +169,42 @@
               },
               "score": {
                 ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 70"
+              },
+              "updatedAt": {
+                ".validate": "newData.isNumber()"
+              },
+              "$other": {
+                ".validate": false
+              }
+            },
+            "summativeRedesign": {
+              ".validate": "newData.hasChildren(['assessed', 'criteria', 'score', 'updatedAt']) && newData.child('score').val() === newData.child('criteria').child('problemClarity').val() + newData.child('criteria').child('uxImprovement').val() + newData.child('criteria').child('uiQuality').val() + newData.child('criteria').child('designExplanation').val() + newData.child('criteria').child('completeness').val()",
+              "assessed": {
+                ".validate": "newData.isBoolean() && newData.val() === true"
+              },
+              "criteria": {
+                ".validate": "newData.hasChildren(['problemClarity', 'uxImprovement', 'uiQuality', 'designExplanation', 'completeness'])",
+                "problemClarity": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 20"
+                },
+                "uxImprovement": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 25"
+                },
+                "uiQuality": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 25"
+                },
+                "designExplanation": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 20"
+                },
+                "completeness": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "score": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
               },
               "updatedAt": {
                 ".validate": "newData.isNumber()"

@@ -99,6 +99,49 @@ const GRADE10_FIGMA_SIMILARITY_TOTAL_MAX =
   GRADE10_FIGMA_SIMILARITY_RUBRIC.length *
   GRADE10_FIGMA_SIMILARITY_CRITERION_MAX;
 
+const GRADE10_SUMMATIVE_RUBRIC = [
+  {
+    id: "problemClarity",
+    label: "Kejelasan masalah",
+    description:
+      "Masalah yang dipilih spesifik dan terhubung dengan kebutuhan pengguna yang nyata.",
+    max: 20,
+  },
+  {
+    id: "uxImprovement",
+    label: "Peningkatan UX",
+    description:
+      "Redesign memperbaiki alur, kejelasan, navigasi, aksesibilitas, atau pengambilan keputusan.",
+    max: 25,
+  },
+  {
+    id: "uiQuality",
+    label: "Kualitas UI di Figma",
+    description:
+      "Layout, spacing, tipografi, hierarchy, dan visual style dibuat dengan sengaja dan konsisten.",
+    max: 25,
+  },
+  {
+    id: "designExplanation",
+    label: "Penjelasan desain",
+    description:
+      "Siswa dapat menjelaskan keputusan sebelum dan sesudah redesign menggunakan bukti.",
+    max: 20,
+  },
+  {
+    id: "completeness",
+    label: "Kelengkapan individu",
+    description:
+      "Semua tautan dan bukti redesign yang diwajibkan dikirim dengan jelas.",
+    max: 10,
+  },
+];
+
+const GRADE10_SUMMATIVE_TOTAL_MAX = GRADE10_SUMMATIVE_RUBRIC.reduce(
+  (total, criterion) => total + criterion.max,
+  0,
+);
+
 function normalizeWireframeCriterionPoints(value) {
   if (value === true) return GRADE10_WIREFRAME_CRITERION_MAX;
   if (value === false || value === null || value === undefined || value === "")
@@ -113,6 +156,13 @@ function normalizeWireframeCriterionPoints(value) {
 
 function normalizeFigmaSimilarityCriterionPoints(value) {
   return normalizeWireframeCriterionPoints(value);
+}
+
+function normalizeGrade10SummativeCriterionPoints(value, maximum) {
+  if (value === null || value === undefined || value === "") return 0;
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return 0;
+  return Math.min(maximum, Math.max(0, Math.round(numericValue)));
 }
 
 const GRADE10_UIUX_XP = {
@@ -156,7 +206,7 @@ function normalizeAutoFormativeScore(value) {
   return Number(clamped.toFixed(2));
 }
 
-function buildGrade10AutoFormativeFields(progress, quarter = 1) {
+function buildGrade10AutoGradebookFields(progress, quarter = 1) {
   if (
     Number(quarter) !== 1 ||
     !progress ||
@@ -170,9 +220,11 @@ function buildGrade10AutoFormativeFields(progress, quarter = 1) {
   const fields = {};
   const formative1 = normalizeAutoFormativeScore(summary.formative1);
   const formative2 = normalizeAutoFormativeScore(summary.formative2);
+  const summative = normalizeAutoFormativeScore(summary.summative);
 
   if (formative1 !== null) fields.q1_f1 = formative1;
   if (formative2 !== null) fields.q1_f2 = formative2;
+  if (summative !== null) fields.q1_sumatif = summative;
 
   return fields;
 }
@@ -236,7 +288,7 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
       if (Number.isFinite(score)) fields[field] = score;
       return fields;
     }, {});
-    const progressFields = buildGrade10AutoFormativeFields(
+    const progressFields = buildGrade10AutoGradebookFields(
       grade10UiUxProgressByStudent[String(student?.id || "")],
       quarter,
     );
@@ -315,7 +367,7 @@ function getObsoleteFormativeFields(student, quarter = activeQuarter) {
   });
 }
 
-async function syncGrade10AutoFormativeFields() {
+async function syncGrade10AutoGradebookFields() {
   if (grade10AutoSyncInFlight || !allSiswa.length) return;
 
   const updates = {};
@@ -341,9 +393,9 @@ async function syncGrade10AutoFormativeFields() {
   grade10AutoSyncInFlight = true;
   try {
     await siswaRef.update(updates);
-    console.log("Auto-sinkronisasi Formatif Grade 10 UI/UX berhasil.");
+    console.log("Auto-sinkronisasi nilai Grade 10 UI/UX berhasil.");
   } catch (error) {
-    console.warn("Auto-sinkronisasi Formatif Grade 10 UI/UX gagal:", error);
+    console.warn("Auto-sinkronisasi nilai Grade 10 UI/UX gagal:", error);
   } finally {
     grade10AutoSyncInFlight = false;
   }
@@ -364,7 +416,7 @@ function listenToLearningProgressData() {
         }
       });
 
-      syncGrade10AutoFormativeFields().then(() => renderTableBody(allSiswa));
+      syncGrade10AutoGradebookFields().then(() => renderTableBody(allSiswa));
 
       const modal = document.getElementById("learningProgressModal");
       if (
@@ -490,6 +542,32 @@ function getFigmaSimilarityRubricAssessment(progress = {}) {
   };
 }
 
+function getGrade10SummativeRubricAssessment(progress = {}) {
+  const saved = progress.teacherAssessment?.summativeRedesign || {};
+  const savedCriteria = saved.criteria || {};
+  const criteria = Object.fromEntries(
+    GRADE10_SUMMATIVE_RUBRIC.map((criterion) => [
+      criterion.id,
+      normalizeGrade10SummativeCriterionPoints(
+        savedCriteria[criterion.id],
+        criterion.max,
+      ),
+    ]),
+  );
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const achieved = Object.values(criteria).filter((value) => value > 0).length;
+  return {
+    assessed: saved.assessed === true,
+    criteria,
+    achieved,
+    score,
+    updatedAt: Number(saved.updatedAt || 0),
+  };
+}
+
 function calculateGrade10UiUxProgress(progress = {}) {
   const section1 =
     teacherSection1DiscoveryComplete(progress.section1Discovery) &&
@@ -559,6 +637,7 @@ function calculateGrade10UiUxProgress(progress = {}) {
   const wireframeAssessment = getWireframeRubricAssessment(progress);
   const figmaSimilarityAssessment =
     getFigmaSimilarityRubricAssessment(progress);
+  const summativeAssessment = getGrade10SummativeRubricAssessment(progress);
   const section1Product = wireframeAssessment.assessed
     ? wireframeAssessment.score
     : 0;
@@ -584,6 +663,9 @@ function calculateGrade10UiUxProgress(progress = {}) {
       figmaSimilarityAssessment.assessed && states.postTest2
         ? section4Product + post2Points
         : null,
+    summative: summativeAssessment.assessed
+      ? summativeAssessment.score
+      : null,
     formative1Breakdown: {
       product: section1Product,
       productAssessed: wireframeAssessment.assessed,
@@ -652,6 +734,32 @@ async function syncGrade10FormativeTwoToGradebook(student, progress = {}) {
   }
   await siswaRef.child(student.id).child("q1_f2").set(score);
   student.q1_f2 = score;
+  return score;
+}
+
+function getGrade10SummativeGradebookScore(progress = {}) {
+  const score = calculateGrade10UiUxProgress(progress).summative;
+  if (score === null || score === undefined || !Number.isFinite(Number(score))) {
+    return null;
+  }
+  return Math.round(Number(score) * 10) / 10;
+}
+
+async function syncGrade10SummativeToGradebook(student, progress = {}) {
+  if (!student || getTeacherStudentGrade(student) !== 10) return null;
+  const score = getGrade10SummativeGradebookScore(progress);
+  if (score === null) return null;
+  const currentScore = student.q1_sumatif;
+  if (
+    currentScore !== "" &&
+    currentScore !== null &&
+    currentScore !== undefined &&
+    Number(currentScore) === score
+  ) {
+    return score;
+  }
+  await siswaRef.child(student.id).child("q1_sumatif").set(score);
+  student.q1_sumatif = score;
   return score;
 }
 
@@ -748,6 +856,10 @@ function renderStudentLearningProgress(progress, focusSection = selectedLearning
   const figmaSimilarityUpdatedLabel = figmaSimilarityAssessment.updatedAt
     ? new Date(figmaSimilarityAssessment.updatedAt).toLocaleString("id-ID")
     : "Belum pernah disimpan";
+  const summativeAssessment = getGrade10SummativeRubricAssessment(progress);
+  const summativeAssessmentUpdatedLabel = summativeAssessment.updatedAt
+    ? new Date(summativeAssessment.updatedAt).toLocaleString("id-ID")
+    : "Belum pernah dinilai";
   const websitePlan = progress.websitePlan || {};
   const referenceUrl = getSafeReferenceUrl(websitePlan.websiteUrl);
   const groupPlan = progress.groupPlan || {};
@@ -785,9 +897,10 @@ function renderStudentLearningProgress(progress, focusSection = selectedLearning
         <div class="h-2 rounded-full bg-slate-800 overflow-hidden"><span class="block h-full rounded-full bg-gradient-to-r from-cyan-400 via-violet-400 to-lime-300" style="width:${summary.percent}%"></span></div>
         <p class="text-[11px] text-slate-500 font-mono-tech mt-3"><i class="fas fa-clock mr-1"></i> Aktivitas terakhir: ${escHtml(latestLabel)}</p>
       </article>
-      <article class="grid grid-cols-2 gap-3">
+      <article class="grid sm:grid-cols-3 gap-3">
         <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">RAPORT Q1 · FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="block text-slate-500 mt-1">${summary.formative1Breakdown.productAssessed ? `Rubrik ${summary.formative1Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative1Breakdown.postTest)}/30</small></div>
         <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">RAPORT Q1 · FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="block text-slate-500 mt-1">${summary.formative2Breakdown.productAssessed ? `Rubrik ${summary.formative2Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative2Breakdown.postTest)}/30</small></div>
+        <div class="rounded-xl border border-pink-500/25 bg-pink-500/5 p-4"><span class="text-[9px] text-pink-300 font-mono-tech">RAPORT Q1 · SUMATIF</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.summative)}</strong><small class="block text-slate-500 mt-1">${summativeAssessment.assessed ? `Rubrik redesign ${summativeAssessment.score}/${GRADE10_SUMMATIVE_TOTAL_MAX}` : "Rubrik belum dinilai"}</small></div>
       </article>
     </div>
     <section class="mb-5 rounded-2xl border border-violet-400/25 bg-gradient-to-br from-violet-500/[0.08] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
@@ -877,6 +990,42 @@ function renderStudentLearningProgress(progress, focusSection = selectedLearning
               : `<span class="text-[10px] font-mono-tech text-amber-400">LINK FIGMA BELUM ADA</span>`
           }
         </div>
+      </div>
+      <div class="mt-5 border-t border-pink-400/15 pt-5">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+          <div>
+            <span class="text-[10px] font-mono-tech tracking-[0.18em] text-pink-300 font-bold">RUBRIK SUMATIF · 100 POIN</span>
+            <h4 class="text-base font-black text-white mt-1">Nilai individual redesign siswa</h4>
+            <p class="text-xs text-slate-400 mt-1">Nilai ini otomatis mengisi kolom Sumatif Q1.</p>
+          </div>
+          <div class="sm:text-right shrink-0">
+            <strong id="grade10SummativeRubricScore" class="block text-3xl font-black text-pink-300">${summativeAssessment.score}<small class="text-sm text-slate-500">/${GRADE10_SUMMATIVE_TOTAL_MAX}</small></strong>
+            <span id="grade10SummativeRubricCount" class="text-[10px] font-mono-tech text-slate-500">${summativeAssessment.achieved}/${GRADE10_SUMMATIVE_RUBRIC.length} KRITERIA TERISI</span>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-2.5 mt-4">
+          ${GRADE10_SUMMATIVE_RUBRIC.map(
+            (criterion, index) => `<article class="rounded-xl border border-slate-700 bg-slate-950/45 p-3.5 hover:border-pink-400/40 transition-colors">
+              <div class="flex items-start gap-3">
+                <input type="checkbox" data-grade10-summative-full="${criterion.id}" onchange="setGrade10SummativeCriterionFull('${criterion.id}', this.checked)" ${summativeAssessment.criteria[criterion.id] === criterion.max ? "checked" : ""} ${hasSummativeSubmission ? "" : "disabled"} class="mt-1 h-4 w-4 accent-pink-400 shrink-0 disabled:opacity-40" aria-label="Beri poin penuh untuk ${criterion.label}" />
+                <span class="grid w-7 h-7 shrink-0 place-items-center rounded-lg bg-pink-400/10 text-pink-300 text-xs font-black">${index + 1}</span>
+                <span class="min-w-0 flex-1"><strong class="block text-sm text-white">${criterion.label}</strong><small class="block text-[11px] leading-relaxed text-slate-500 mt-1">${criterion.description}</small></span>
+              </div>
+              <label class="mt-3 ml-14 flex items-center justify-end gap-2 text-[10px] font-mono-tech text-slate-500">
+                POIN
+                <input type="number" min="0" max="${criterion.max}" step="1" inputmode="numeric" data-grade10-summative-rubric="${criterion.id}" value="${summativeAssessment.criteria[criterion.id]}" oninput="updateGrade10SummativeRubricPreview()" ${hasSummativeSubmission ? "" : "disabled"} class="w-16 rounded-lg border border-slate-600 bg-slate-900 px-2 py-1.5 text-center text-sm font-black text-pink-300 outline-none focus:border-pink-400 disabled:opacity-40" aria-label="Poin ${criterion.label}" />
+                <b class="text-xs text-pink-300">/${criterion.max}</b>
+              </label>
+            </article>`,
+          ).join("")}
+        </div>
+        <div class="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <p class="text-[10px] font-mono-tech text-slate-500"><i class="fas fa-clock mr-1"></i>${escHtml(summativeAssessmentUpdatedLabel)}</p>
+          <button id="saveGrade10SummativeRubricButton" type="button" onclick="saveGrade10SummativeAssessment()" ${hasSummativeSubmission ? "" : "disabled"} class="inline-flex items-center justify-center gap-2 rounded-lg bg-pink-300 hover:bg-pink-200 px-4 py-2.5 text-xs font-black text-slate-950 transition-colors disabled:cursor-not-allowed disabled:opacity-40">
+            <i class="fas fa-floppy-disk"></i> SAVE SUMMATIVE SCORE
+          </button>
+        </div>
+        ${hasSummativeSubmission ? "" : '<p class="mt-3 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] p-3 text-[10px] font-mono-tech text-amber-300">RUBRIK AKAN AKTIF SETELAH SISWA MENGIRIM SEMUA EVIDENCE SUMATIF.</p>'}
       </div>
     </section>
     <section class="mb-5 rounded-2xl border border-lime-400/25 bg-gradient-to-br from-lime-400/[0.07] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
@@ -992,6 +1141,131 @@ function updateFigmaSimilarityRubricPreview() {
   }
   if (countElement) {
     countElement.textContent = `${achieved}/${GRADE10_FIGMA_SIMILARITY_RUBRIC.length} KRITERIA TERISI`;
+  }
+}
+
+function setGrade10SummativeCriterionFull(criterionId, isFull) {
+  const criterion = GRADE10_SUMMATIVE_RUBRIC.find(
+    (item) => item.id === criterionId,
+  );
+  const input = document.querySelector(
+    `[data-grade10-summative-rubric="${criterionId}"]`,
+  );
+  if (criterion && input) {
+    input.value = isFull ? criterion.max : 0;
+  }
+  updateGrade10SummativeRubricPreview();
+}
+
+function updateGrade10SummativeRubricPreview() {
+  const points = GRADE10_SUMMATIVE_RUBRIC.map((criterion) => {
+    const input = document.querySelector(
+      `[data-grade10-summative-rubric="${criterion.id}"]`,
+    );
+    const normalized = normalizeGrade10SummativeCriterionPoints(
+      input?.value,
+      criterion.max,
+    );
+    if (input && input.value !== "" && Number(input.value) !== normalized) {
+      input.value = normalized;
+    }
+    const fullCheckbox = document.querySelector(
+      `[data-grade10-summative-full="${criterion.id}"]`,
+    );
+    if (fullCheckbox) fullCheckbox.checked = normalized === criterion.max;
+    return normalized;
+  });
+  const score = points.reduce((total, value) => total + value, 0);
+  const achieved = points.filter((value) => value > 0).length;
+  const scoreElement = document.getElementById("grade10SummativeRubricScore");
+  const countElement = document.getElementById("grade10SummativeRubricCount");
+  if (scoreElement) {
+    scoreElement.innerHTML = `${score}<small class="text-sm text-slate-500">/${GRADE10_SUMMATIVE_TOTAL_MAX}</small>`;
+  }
+  if (countElement) {
+    countElement.textContent = `${achieved}/${GRADE10_SUMMATIVE_RUBRIC.length} KRITERIA TERISI`;
+  }
+}
+
+async function saveGrade10SummativeAssessment() {
+  const student = selectedLearningProgressStudent;
+  if (!student || getTeacherStudentGrade(student) !== 10) return;
+  if (!hasGrade10SummativeSubmission(selectedLearningProgressData)) {
+    showAlert(
+      "Rubrik belum dapat disimpan karena submission Summative siswa belum lengkap.",
+      "warning",
+    );
+    return;
+  }
+
+  const criteria = Object.fromEntries(
+    GRADE10_SUMMATIVE_RUBRIC.map((criterion) => [
+      criterion.id,
+      normalizeGrade10SummativeCriterionPoints(
+        document.querySelector(
+          `[data-grade10-summative-rubric="${criterion.id}"]`,
+        )?.value,
+        criterion.max,
+      ),
+    ]),
+  );
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const button = document.getElementById("saveGrade10SummativeRubricButton");
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> SAVING…';
+  }
+
+  const progressRef = db
+    .ref("learningProgress")
+    .child(student.id)
+    .child("grade10UiUx");
+  try {
+    await progressRef
+      .child("teacherAssessment")
+      .child("summativeRedesign")
+      .set({
+        assessed: true,
+        criteria,
+        score,
+        updatedAt: Date.now(),
+      });
+    const snapshot = await progressRef.once("value");
+    const progress = snapshot.val() || {};
+    grade10UiUxProgressByStudent[student.id] = progress;
+    let gradebookSyncError = null;
+    try {
+      await syncGrade10SummativeToGradebook(student, progress);
+    } catch (syncError) {
+      gradebookSyncError = syncError;
+      console.warn("Sinkronisasi Q1 Sumatif Grade 10 gagal:", syncError);
+    }
+    renderTableBody(allSiswa);
+    renderStudentLearningProgress(progress);
+    showAlert(
+      gradebookSyncError
+        ? `Rubrik Sumatif <strong>${escHtml(student.nama)}</strong> tersimpan, tetapi kolom Sumatif Q1 belum berhasil disinkronkan.`
+        : `Rubrik Sumatif <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_SUMMATIVE_TOTAL_MAX}. Kolom Sumatif Q1 otomatis diperbarui.`,
+      gradebookSyncError ? "warning" : "success",
+    );
+  } catch (error) {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+    const permissionDenied = /permission[_ -]?denied/i.test(
+      String(error?.code || error?.message || ""),
+    );
+    showAlert(
+      permissionDenied
+        ? "Izin Firebase ditolak. Terapkan database rules terbaru sebelum menyimpan rubrik Sumatif."
+        : "Gagal menyimpan rubrik Sumatif: " + error.message,
+      "danger",
+    );
   }
 }
 

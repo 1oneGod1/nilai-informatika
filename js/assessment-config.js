@@ -2335,6 +2335,7 @@ function dcBuildStoredRecord(draft, quarter, updatedBy, grade = 9) {
     contributions: summary.contributions,
     formativeScore: summary.formative,
     summativeScore: summary.summative,
+    overallScore: summary.finalScore,
     finalScore: summary.finalScore,
     updatedAt: Date.now(),
     updatedBy: String(updatedBy || ""),
@@ -2444,6 +2445,22 @@ function dcBuildFormativeGradebookFields(
   return fields;
 }
 
+function dcGetStoredOverallScore(storedRecord) {
+  if (!storedRecord || typeof storedRecord !== "object") return null;
+
+  const candidateFields = ["overallScore", "finalScore", "overall"];
+  for (const field of candidateFields) {
+    const value = storedRecord[field];
+    if (value === "" || value === null || value === undefined) continue;
+    const numericValue = Number(value);
+    if (Number.isFinite(numericValue)) {
+      return Number(dcClampScore(numericValue, 100).toFixed(2));
+    }
+  }
+
+  return null;
+}
+
 function dcBuildSummativeGradebookField(
   storedRecord,
   quarter,
@@ -2459,6 +2476,7 @@ function dcBuildSummativeGradebookField(
   if (!course) return {};
 
   if (course.gradebookSummativeMode === "overall") {
+    const storedOverallScore = dcGetStoredOverallScore(storedRecord);
     const hasAssessmentEvidence = course.assessments.some((assessment) => {
       const savedAssessment = storedRecord.rubricScores?.[assessment.id] || {};
       return (
@@ -2471,7 +2489,7 @@ function dcBuildSummativeGradebookField(
     const hasStoredEvidence =
       Object.values(storedRecord.rawScores || {}).some(
         (score) => Number(score || 0) > 0,
-      ) || Number(storedRecord.finalScore || 0) > 0;
+      ) || storedOverallScore !== null;
     if (!hasAssessmentEvidence && !hasStoredEvidence) return {};
 
     const summary = dcCalculateSummary(
@@ -2479,8 +2497,15 @@ function dcBuildSummativeGradebookField(
       normalizedQuarter,
       normalizedGrade,
     );
+    const recalculatedOverallScore = Number(summary.finalScore);
+    const overallScore = hasAssessmentEvidence
+      ? recalculatedOverallScore
+      : storedOverallScore;
+    if (!Number.isFinite(overallScore)) return {};
     return {
-      [`q${normalizedQuarter}_sumatif`]: summary.finalScore,
+      [`q${normalizedQuarter}_sumatif`]: Number(
+        dcClampScore(overallScore, 100).toFixed(2),
+      ),
     };
   }
 
