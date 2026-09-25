@@ -650,31 +650,58 @@ function calculateGrade10UiUxProgress(progress = {}) {
   const post2Points = progress.postTest2
     ? Number(progress.postTest2.score || 0) * 0.3
     : 0;
+  const formative1 = wireframeAssessment.assessed
+    ? Number((section1Product + post1Points).toFixed(1))
+    : null;
+  const formative2 = figmaSimilarityAssessment.assessed
+    ? Number((section4Product + post2Points).toFixed(1))
+    : null;
+  const formativeAverage = Number(
+    (
+      ((formative1 === null ? 0 : formative1) +
+        (formative2 === null ? 0 : formative2)) /
+      2
+    ).toFixed(2),
+  );
+  const formativeContribution = Number((formativeAverage * 0.3).toFixed(2));
+  const summativeContribution = Number(
+    (summativeAssessment.score * 0.7).toFixed(2),
+  );
+  const overallSummative = Number(
+    (formativeContribution + summativeContribution).toFixed(1),
+  );
 
   return {
     states,
     xp,
     percent: Math.round((xp / GRADE10_UIUX_TOTAL_XP) * 100),
-    formative1:
-      wireframeAssessment.assessed && states.postTest1
-        ? section1Product + post1Points
-        : null,
-    formative2:
-      figmaSimilarityAssessment.assessed && states.postTest2
-        ? section4Product + post2Points
-        : null,
+    formative1,
+    formative2,
     summative: summativeAssessment.assessed
-      ? summativeAssessment.score
+      ? overallSummative
       : null,
     formative1Breakdown: {
       product: section1Product,
       productAssessed: wireframeAssessment.assessed,
       postTest: post1Points,
+      complete: wireframeAssessment.assessed && states.postTest1,
     },
     formative2Breakdown: {
       product: section4Product,
       productAssessed: figmaSimilarityAssessment.assessed,
       postTest: post2Points,
+      complete: figmaSimilarityAssessment.assessed && states.postTest2,
+    },
+    summativeBreakdown: {
+      formativeAverage,
+      formativeContribution,
+      formativeComplete:
+        wireframeAssessment.assessed &&
+        states.postTest1 &&
+        figmaSimilarityAssessment.assessed &&
+        states.postTest2,
+      assessment: summativeAssessment.score,
+      assessmentContribution: summativeContribution,
     },
   };
 }
@@ -898,9 +925,9 @@ function renderStudentLearningProgress(progress, focusSection = selectedLearning
         <p class="text-[11px] text-slate-500 font-mono-tech mt-3"><i class="fas fa-clock mr-1"></i> Aktivitas terakhir: ${escHtml(latestLabel)}</p>
       </article>
       <article class="grid sm:grid-cols-3 gap-3">
-        <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">RAPORT Q1 · FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="block text-slate-500 mt-1">${summary.formative1Breakdown.productAssessed ? `Rubrik ${summary.formative1Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative1Breakdown.postTest)}/30</small></div>
-        <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">RAPORT Q1 · FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="block text-slate-500 mt-1">${summary.formative2Breakdown.productAssessed ? `Rubrik ${summary.formative2Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative2Breakdown.postTest)}/30</small></div>
-        <div class="rounded-xl border border-pink-500/25 bg-pink-500/5 p-4"><span class="text-[9px] text-pink-300 font-mono-tech">RAPORT Q1 · SUMATIF</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.summative)}</strong><small class="block text-slate-500 mt-1">${summativeAssessment.assessed ? `Rubrik redesign ${summativeAssessment.score}/${GRADE10_SUMMATIVE_TOTAL_MAX}` : "Rubrik belum dinilai"}</small></div>
+        <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">RAPORT Q1 · FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="block text-slate-500 mt-1">${summary.formative1Breakdown.productAssessed ? `Rubrik ${summary.formative1Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative1Breakdown.postTest)}/30</small>${summary.formative1 !== null && !summary.formative1Breakdown.complete ? '<small class="block text-amber-400 mt-2"><i class="fas fa-clock mr-1"></i>Nilai sementara · Post-test 1 belum dikerjakan</small>' : ""}</div>
+        <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">RAPORT Q1 · FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="block text-slate-500 mt-1">${summary.formative2Breakdown.productAssessed ? `Rubrik ${summary.formative2Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative2Breakdown.postTest)}/30</small>${summary.formative2 !== null && !summary.formative2Breakdown.complete ? '<small class="block text-amber-400 mt-2"><i class="fas fa-clock mr-1"></i>Nilai sementara · Post-test 2 belum dikerjakan</small>' : ""}</div>
+        <div class="rounded-xl border border-pink-500/25 bg-pink-500/5 p-4"><span class="text-[9px] text-pink-300 font-mono-tech">RAPORT Q1 · OVERALL SUMMATIVE</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.summative)}</strong><small class="block text-slate-500 mt-1">${summativeAssessment.assessed ? `Formatif ${formatTeacherProgressScore(summary.summativeBreakdown.formativeAverage)} × 30% + Rubrik ${summativeAssessment.score} × 70%` : "Rubrik belum dinilai"}</small>${summary.summative !== null && !summary.summativeBreakdown.formativeComplete ? '<small class="block text-amber-400 mt-2"><i class="fas fa-triangle-exclamation mr-1"></i>Sementara · komponen formatif belum lengkap</small>' : ""}</div>
       </article>
     </div>
     <section class="mb-5 rounded-2xl border border-violet-400/25 bg-gradient-to-br from-violet-500/[0.08] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
@@ -1238,8 +1265,9 @@ async function saveGrade10SummativeAssessment() {
     const progress = snapshot.val() || {};
     grade10UiUxProgressByStudent[student.id] = progress;
     let gradebookSyncError = null;
+    let overallSummativeScore = null;
     try {
-      await syncGrade10SummativeToGradebook(student, progress);
+      overallSummativeScore = await syncGrade10SummativeToGradebook(student, progress);
     } catch (syncError) {
       gradebookSyncError = syncError;
       console.warn("Sinkronisasi Q1 Sumatif Grade 10 gagal:", syncError);
@@ -1249,7 +1277,7 @@ async function saveGrade10SummativeAssessment() {
     showAlert(
       gradebookSyncError
         ? `Rubrik Sumatif <strong>${escHtml(student.nama)}</strong> tersimpan, tetapi kolom Sumatif Q1 belum berhasil disinkronkan.`
-        : `Rubrik Sumatif <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_SUMMATIVE_TOTAL_MAX}. Kolom Sumatif Q1 otomatis diperbarui.`,
+        : `Rubrik Sumatif <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_SUMMATIVE_TOTAL_MAX}. Overall Summative Q1 diperbarui menjadi ${formatTeacherProgressScore(overallSummativeScore)} (Formatif 30% + Sumatif 70%).`,
       gradebookSyncError ? "warning" : "success",
     );
   } catch (error) {
@@ -1322,7 +1350,7 @@ async function saveFigmaSimilarityAssessment() {
     showAlert(
       gradebookSyncError
         ? `Nilai kemiripan Figma <strong>${escHtml(student.nama)}</strong> tersimpan, tetapi buku nilai Q1 F2 belum berhasil disinkronkan.`
-        : `Nilai kemiripan Figma <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_FIGMA_SIMILARITY_TOTAL_MAX}.${formativeTwoScore !== null ? ` Buku nilai Q1 F2 diperbarui menjadi ${formatTeacherProgressScore(formativeTwoScore)}.` : " Formatif 2 menunggu Post-test 2."}`,
+        : `Nilai kemiripan Figma <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_FIGMA_SIMILARITY_TOTAL_MAX}.${formativeTwoScore !== null ? ` Buku nilai Q1 F2 diperbarui menjadi ${formatTeacherProgressScore(formativeTwoScore)}${progress.postTest2 ? "." : " sebagai nilai sementara; Post-test 2 belum dikerjakan."}` : ""}`,
       gradebookSyncError ? "warning" : "success",
     );
   } catch (error) {
@@ -1432,7 +1460,7 @@ async function saveWireframeAssessment() {
     showAlert(
       gradebookSyncError
         ? `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan, tetapi buku nilai Q1 F1 belum berhasil disinkronkan.`
-        : `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_WIREFRAME_TOTAL_MAX}.${formativeOneScore !== null ? ` Buku nilai Q1 F1 diperbarui menjadi ${formatTeacherProgressScore(formativeOneScore)}.` : ""}`,
+        : `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_WIREFRAME_TOTAL_MAX}.${formativeOneScore !== null ? ` Buku nilai Q1 F1 diperbarui menjadi ${formatTeacherProgressScore(formativeOneScore)}${progress.postTest ? "." : " sebagai nilai sementara; Post-test 1 belum dikerjakan."}` : ""}`,
       gradebookSyncError ? "warning" : "success",
     );
   } catch (error) {

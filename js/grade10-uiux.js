@@ -430,9 +430,9 @@ async function initializeUiUxLab() {
     const snapshot = await uiuxProgressRef.once("value");
     uiuxProgress = snapshot.val() || {};
     try {
-      await syncUiUxFormativeOneToGradebook();
+      await syncUiUxScoresToGradebook();
     } catch (syncError) {
-      console.warn("Gradebook Q1 F1 sync on load failed:", syncError);
+      console.warn("Gradebook Q1 score sync on load failed:", syncError);
     }
     hydrateSavedWork();
     renderProgressState();
@@ -999,18 +999,26 @@ async function submitLockedQuiz(event, config) {
     uiuxProgress[config.key] = saved.value;
     let gradebookSyncError = null;
     let gradebookScore = null;
-    if (config.key === "postTest") {
+    let gradebookField = "";
+    if (config.key === "postTest" || config.key === "postTest2") {
       try {
-        gradebookScore = await syncUiUxFormativeOneToGradebook();
+        if (config.key === "postTest") {
+          gradebookScore = await syncUiUxFormativeOneToGradebook();
+          gradebookField = "Q1 F1";
+        } else {
+          gradebookScore = await syncUiUxFormativeTwoToGradebook();
+          gradebookField = "Q1 F2";
+        }
+        await syncUiUxOverallSummativeToGradebook();
       } catch (syncError) {
         gradebookSyncError = syncError;
-        console.warn("Gradebook Q1 F1 sync after Post-test 1 failed:", syncError);
+        console.warn(`Gradebook sync after ${config.key} failed:`, syncError);
       }
     }
     renderProgressState();
     const message = gradebookSyncError
-      ? "Post-test 1 was recorded, but the Q1 F1 gradebook sync will be retried later."
-      : `${saved.committed ? config.successMessage : "A locked result is already recorded for this student."}${gradebookScore !== null ? ` Q1 F1 was updated to ${formatScore(gradebookScore)}.` : ""}`;
+      ? "Post-test was recorded, but the gradebook sync will be retried later."
+      : `${saved.committed ? config.successMessage : "A locked result is already recorded for this student."}${gradebookScore !== null ? ` ${gradebookField} was updated to ${formatScore(gradebookScore)}.` : ""}`;
     showToast(message, !saved.committed || Boolean(gradebookSyncError));
   } catch (error) {
     showToast("Submission failed and was not recorded. Check your connection and try again.", true);
@@ -1038,14 +1046,53 @@ function getUiUxFormativeOneGradebookScore() {
   const postTest = uiuxProgress.postTest || {};
   if (
     wireframe.assessed !== true ||
-    !Number.isFinite(Number(wireframe.score)) ||
-    !Number.isFinite(Number(postTest.score))
+    !Number.isFinite(Number(wireframe.score))
   ) {
     return null;
   }
   const productPoints = Math.min(70, Math.max(0, Number(wireframe.score)));
-  const quizPercent = Math.min(100, Math.max(0, Number(postTest.score)));
+  const quizPercent = Number.isFinite(Number(postTest.score))
+    ? Math.min(100, Math.max(0, Number(postTest.score)))
+    : 0;
   return Math.round(productPoints * 10 + quizPercent * 3) / 10;
+}
+
+function getUiUxFormativeTwoGradebookScore() {
+  const figmaSimilarity =
+    uiuxProgress.teacherAssessment?.figmaSimilarity || {};
+  const postTest = uiuxProgress.postTest2 || {};
+  if (
+    figmaSimilarity.assessed !== true ||
+    !Number.isFinite(Number(figmaSimilarity.score))
+  ) {
+    return null;
+  }
+  const productPoints = Math.min(
+    70,
+    Math.max(0, Number(figmaSimilarity.score)),
+  );
+  const quizPercent = Number.isFinite(Number(postTest.score))
+    ? Math.min(100, Math.max(0, Number(postTest.score)))
+    : 0;
+  return Math.round(productPoints * 10 + quizPercent * 3) / 10;
+}
+
+function getUiUxOverallSummativeGradebookScore() {
+  const assessment =
+    uiuxProgress.teacherAssessment?.summativeRedesign || {};
+  if (
+    assessment.assessed !== true ||
+    !Number.isFinite(Number(assessment.score))
+  ) {
+    return null;
+  }
+  const formative1 = getUiUxFormativeOneGradebookScore() || 0;
+  const formative2 = getUiUxFormativeTwoGradebookScore() || 0;
+  const formativeAverage = (formative1 + formative2) / 2;
+  const assessmentScore = Math.min(100, Math.max(0, Number(assessment.score)));
+  return Number(
+    (formativeAverage * 0.3 + assessmentScore * 0.7).toFixed(1),
+  );
 }
 
 async function syncUiUxFormativeOneToGradebook() {
@@ -1058,6 +1105,36 @@ async function syncUiUxFormativeOneToGradebook() {
     .child("q1_f1")
     .set(score);
   return score;
+}
+
+async function syncUiUxFormativeTwoToGradebook() {
+  if (!uiuxStudent || uiuxStudent.isLocalPreview) return null;
+  const score = getUiUxFormativeTwoGradebookScore();
+  if (score === null) return null;
+  await db
+    .ref("siswa")
+    .child(uiuxStudent.id)
+    .child("q1_f2")
+    .set(score);
+  return score;
+}
+
+async function syncUiUxOverallSummativeToGradebook() {
+  if (!uiuxStudent || uiuxStudent.isLocalPreview) return null;
+  const score = getUiUxOverallSummativeGradebookScore();
+  if (score === null) return null;
+  await db
+    .ref("siswa")
+    .child(uiuxStudent.id)
+    .child("q1_sumatif")
+    .set(score);
+  return score;
+}
+
+async function syncUiUxScoresToGradebook() {
+  await syncUiUxFormativeOneToGradebook();
+  await syncUiUxFormativeTwoToGradebook();
+  await syncUiUxOverallSummativeToGradebook();
 }
 
 function bindSection3Interactions() {
@@ -1537,33 +1614,55 @@ function renderFormativeLedger(section1Complete, section4Complete) {
         return total + Math.min(10, Math.max(0, Number.isFinite(points) ? points : 0));
       }, 0)
     : 0;
-  const product2 = section4Complete ? 70 : 0;
+  const figmaSimilarityAssessment =
+    uiuxProgress.teacherAssessment?.figmaSimilarity || {};
+  const figmaSimilarityCriteria = figmaSimilarityAssessment.criteria || {};
+  const figmaSimilarityCriterionKeys = [
+    "layout",
+    "proportion",
+    "spacing",
+    "typography",
+    "color",
+    "assets",
+    "fidelity",
+  ];
+  const figmaSimilarityAssessed = figmaSimilarityAssessment.assessed === true;
+  const product2 = figmaSimilarityAssessed
+    ? figmaSimilarityCriterionKeys.reduce((total, key) => {
+        const value = Number(figmaSimilarityCriteria[key] || 0);
+        return total + Math.min(10, Math.max(0, Number.isFinite(value) ? value : 0));
+      }, 0)
+    : 0;
   const quiz1 = uiuxProgress.postTest ? safeNumber(uiuxProgress.postTest.score) * 0.3 : 0;
   const quiz2 = uiuxProgress.postTest2 ? safeNumber(uiuxProgress.postTest2.score) * 0.3 : 0;
-  const total1 = wireframeAssessed && uiuxProgress.postTest
-    ? product1 + quiz1
-    : null;
-  const total2 = product2 + quiz2;
+  const total1 = wireframeAssessed ? product1 + quiz1 : null;
+  const total2 = figmaSimilarityAssessed ? product2 + quiz2 : null;
   document.getElementById("formative1Score").textContent =
     total1 === null ? "—" : formatScore(total1);
   document.getElementById("formative1Product").textContent =
     wireframeAssessed ? `${product1} / 70` : "— / 70";
   document.getElementById("formative1Quiz").textContent = `${formatScore(quiz1)} / 30`;
   document.getElementById("formative1State").textContent =
-    total1 !== null
+    total1 !== null && uiuxProgress.postTest
       ? "Recorded from the teacher's wireframe accuracy rubric and Post-test 1."
       : !section1Complete
         ? "Complete the website investigation and your wireframe."
         : !wireframeAssessed
           ? "Investigation complete · waiting for the teacher's accuracy rubric."
-          : "Teacher rubric recorded · complete Post-test 1.";
-  document.getElementById("formative2Score").textContent = formatScore(total2);
-  document.getElementById("formative2Product").textContent = `${product2} / 70`;
+          : "Nilai sementara · belum final karena Post-test 1 belum dikerjakan.";
+  document.getElementById("formative2Score").textContent =
+    total2 === null ? "—" : formatScore(total2);
+  document.getElementById("formative2Product").textContent =
+    figmaSimilarityAssessed ? `${product2} / 70` : "— / 70";
   document.getElementById("formative2Quiz").textContent = `${formatScore(quiz2)} / 30`;
   document.getElementById("formative2State").textContent =
-    section4Complete && uiuxProgress.postTest2
-      ? "Provisional total complete · awaiting teacher product review."
-      : "Complete Section 4 and Post-test 2.";
+    total2 !== null && uiuxProgress.postTest2
+      ? "Recorded from the teacher's Figma similarity rubric and Post-test 2."
+      : !section4Complete
+        ? "Complete Section 4 and submit your Figma evidence."
+        : !figmaSimilarityAssessed
+          ? "Section 4 complete · waiting for the teacher's similarity rubric."
+          : "Nilai sementara · belum final karena Post-test 2 belum dikerjakan.";
 }
 
 function isSection3Complete() {

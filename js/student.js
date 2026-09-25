@@ -358,22 +358,18 @@ function calculateGrade10ReportScores(progress = {}) {
     formative1: {
       productComplete: product1Complete,
       postComplete: post1Complete,
+      complete: product1Complete && post1Complete,
       productPoints: product1Points,
       postPoints: post1Points,
-      score:
-        product1Complete && post1Complete
-          ? product1Points + post1Points
-          : null,
+      score: product1Complete ? product1Points + post1Points : null,
     },
     formative2: {
       productComplete: product2Complete,
       postComplete: post2Complete,
+      complete: product2Complete && post2Complete,
       productPoints: product2Points,
       postPoints: post2Points,
-      score:
-        product2Complete && post2Complete
-          ? product2Points + post2Points
-          : null,
+      score: product2Complete ? product2Points + post2Points : null,
     },
   };
 }
@@ -419,6 +415,7 @@ async function loadGrade10ReportScores(studentId, kkm) {
         ${assessments
           .map(([label, productLabel, postLabel, result, accent]) => {
             const recorded = result.score !== null;
+            const temporary = recorded && !result.complete;
             const score = formatGrade10ReportScore(result.score);
             const belowKkm = recorded && Number(result.score) < Number(kkm);
             const scoreClass = !recorded
@@ -435,12 +432,13 @@ async function loadGrade10ReportScores(studentId, kkm) {
                 <div class="flex items-center justify-between gap-3 rounded-lg bg-white/[0.035] px-3 py-2"><span class="text-slate-400">${productLabel} · 70%</span><b class="${result.productComplete ? "text-white" : "text-slate-600"}">${result.productComplete ? `${formatGrade10ReportScore(result.productPoints)} / 70` : "Waiting for teacher"}</b></div>
                 <div class="flex items-center justify-between gap-3 rounded-lg bg-white/[0.035] px-3 py-2"><span class="text-slate-400">${postLabel} · 30%</span><b class="${result.postComplete ? "text-white" : "text-slate-600"}">${result.postComplete ? `${formatGrade10ReportScore(result.postPoints)} / 30` : "Incomplete"}</b></div>
               </div>
-              <p class="mt-3 text-[10px] font-mono-tech ${recorded ? "text-emerald-400" : "text-amber-400"}"><i class="fas ${recorded ? "fa-circle-check" : "fa-clock"} mr-1"></i>${recorded ? "RECORDED IN Q1 REPORT" : "WAITING FOR BOTH COMPONENTS"}</p>
+              <p class="mt-3 text-[10px] font-mono-tech ${temporary || !recorded ? "text-amber-400" : "text-emerald-400"}"><i class="fas ${temporary || !recorded ? "fa-triangle-exclamation" : "fa-circle-check"} mr-1"></i>${temporary ? `NILAI SEMENTARA · ${postLabel.toUpperCase()} BELUM DIKERJAKAN` : recorded ? "RECORDED IN Q1 REPORT" : "WAITING FOR TEACHER RUBRIC"}</p>
+              ${temporary ? `<div class="mt-3 rounded-lg border border-amber-400/25 bg-amber-400/[0.08] px-3 py-2 text-[11px] leading-relaxed text-amber-200"><i class="fas fa-circle-info mr-1"></i>Nilai ini belum sempurna/final karena ${postLabel} belum dikerjakan. Selesaikan post-test untuk memperoleh tambahan hingga 30 poin.</div>` : ""}
             </article>`;
           })
           .join("")}
       </div>
-      <p class="mt-4 text-[11px] text-slate-500 leading-relaxed"><i class="fas fa-circle-info text-cyan-400 mr-1"></i>Pre-tests and XP do not affect the report score. Each formative score is recorded only after its product and related post-test are complete.</p>`;
+      <p class="mt-4 text-[11px] text-slate-500 leading-relaxed"><i class="fas fa-circle-info text-cyan-400 mr-1"></i>Pre-tests and XP do not affect the report score. Nilai formatif dari rubrik guru langsung tercatat; nilai akan bertambah otomatis setelah post-test terkait dikerjakan.</p>`;
   } catch (error) {
     container.innerHTML = `<div class="rounded-xl border border-rose-500/25 bg-rose-500/10 p-4 text-rose-300"><i class="fas fa-triangle-exclamation mr-2"></i>Raport UI/UX gagal dimuat. Silakan coba kembali.</div>`;
   }
