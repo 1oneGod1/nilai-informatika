@@ -1337,7 +1337,7 @@ textarea::placeholder { color: #526174; }
   .course-rail { position: static; min-height: auto; padding: .65rem; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
   .rail-heading,
   .xp-card { display: none; }
-  .mission-nav { min-width: 680px; grid-template-columns: repeat(5, 1fr); }
+  .mission-nav { min-width: 0; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 210px; }
   .mission-link { grid-template-columns: 30px 1fr auto; padding: .58rem; }
   .mission-number { width: 30px; height: 30px; }
   .mobile-progress { display: block; padding: .55rem 1rem .35rem; border-bottom: 1px solid var(--line); background: rgba(7,16,25,.9); }
@@ -1404,6 +1404,24 @@ textarea::placeholder { color: #526174; }
   .answer-letter { width: 26px; height: 26px; }
   .summative-preview { gap: .8rem; }
   .warning-modal { padding: 1.4rem; }
+  .workspace > *, .course-rail, .mission-link > *, .planning-form > * { min-width: 0; }
+  .course-rail { max-width: 100%; scroll-snap-type: x proximity; }
+  .mission-link { scroll-snap-align: start; }
+  .topbar { gap: .5rem; }
+  #courseExitLink { min-width: 44px; min-height: 44px; }
+  .panel-heading { flex-wrap: wrap; gap: 1rem; }
+  .panel-heading > div:first-child { min-width: 0; flex: 1 1 12rem; }
+  .score-orbit { flex-shrink: 0; }
+  .hero-copy h1 { font-size: clamp(1.9rem, 8vw, 2.6rem); overflow-wrap: anywhere; }
+  .planning-form, .checkpoint-card, .summative-hero-card { padding: 1.1rem; }
+  .planning-form input, .planning-form textarea, .planning-form select { width: 100%; min-width: 0; font-size: 16px; }
+  .primary-button, .secondary-button, .danger-button { min-height: 44px; white-space: normal; text-align: center; }
+  .planning-form > button, .form-actions > button { width: 100%; }
+  .form-title { flex-wrap: wrap; }
+  .summative-rubric-grid article { min-width: 0; }
+  .gate-card { padding: 1.4rem; }
+  .modal-backdrop { padding: 1rem; overflow-y: auto; }
+  .warning-modal { max-height: calc(100dvh - 2rem); overflow-y: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

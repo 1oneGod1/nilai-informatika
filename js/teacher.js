@@ -2116,7 +2116,7 @@ function renderTableBody(data) {
             ? "table-input input-remedial"
             : "table-input";
         fInputs += `
-        <td class="px-2 py-3">
+        <td class="px-2 py-3" data-label="Q${activeQuarter} - F${i + 1}">
           <input type="number" min="0" max="100" class="${cls}${isAutoFilled ? " cursor-not-allowed opacity-80" : ""}" id="r-f${i + 1}-${s.id}" value="${num}" placeholder="-" oninput="highlightScore(this,${kkm})" ${isAutoFilled ? 'readonly title="Terisi otomatis dari rubrik penilaian" aria-label="Nilai formatif otomatis dari rubrik"' : ""} />
         </td>`;
       }
@@ -2194,19 +2194,19 @@ function renderTableBody(data) {
 
       return `
       <tr id="row-${s.id}" class="hover:bg-slate-800/50 transition-colors group">
-        <td class="px-3 py-3 text-center text-slate-500 font-mono-tech text-sm">${idx + 1}</td>
-        <td class="px-3 py-3 font-mono-tech text-sm w-[120px]">${nisEditable}</td>
-        <td class="px-3 py-3 whitespace-nowrap">${studentNameCell}</td>
-        <td class="px-3 py-3 text-center">
+        <td class="student-row-number px-3 py-3 text-center text-slate-500 font-mono-tech text-sm">${idx + 1}</td>
+        <td class="px-3 py-3 font-mono-tech text-sm w-[120px]" data-label="NIS">${nisEditable}</td>
+        <td class="student-row-name px-3 py-3 whitespace-nowrap" data-label="Nama siswa">${studentNameCell}</td>
+        <td class="px-3 py-3 text-center" data-label="Kelas">
           <span class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs font-mono-tech text-slate-300">${escHtml(s.kelas)}</span>
         </td>
-        <td class="px-3 py-3">${passwordHTML}</td>
+        <td class="px-3 py-3" data-label="Password / Akun">${passwordHTML}</td>
         ${fInputs}
-        <td class="px-2 py-3">
+        <td class="px-2 py-3" data-label="Sumatif Q${activeQuarter}">
           <input type="number" min="0" max="100" class="${sCls}${isAutoSummative ? " cursor-not-allowed opacity-80" : ""}" id="r-s-${s.id}" value="${sumatifVal}" placeholder="-" oninput="highlightScore(this,${kkm})" ${isAutoSummative ? `readonly title="${autoSummativeLabel}" aria-label="${autoSummativeLabel}"` : ""} />
         </td>
-        <td class="px-3 py-3 text-center">${statusChip}</td>
-        <td class="px-4 py-3">
+        <td class="px-3 py-3 text-center" data-label="Status Q${activeQuarter}">${statusChip}</td>
+        <td class="student-row-actions px-4 py-3" data-label="Simpan / Hapus">
           <div class="flex items-center justify-center gap-2">
             <button title="Simpan NIS, Password & Nilai" onclick="saveSiswaRow('${s.id}')"
               class="w-8 h-8 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-colors flex items-center justify-center">
