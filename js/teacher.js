@@ -101,39 +101,67 @@ const GRADE10_FIGMA_SIMILARITY_TOTAL_MAX =
 
 const GRADE10_SUMMATIVE_RUBRIC = [
   {
-    id: "problemClarity",
-    label: "Kejelasan masalah",
+    id: "userProblem",
+    label: "Identifikasi masalah pengguna",
     description:
       "Masalah yang dipilih spesifik dan terhubung dengan kebutuhan pengguna yang nyata.",
-    max: 20,
+    max: 15,
+    legacyId: "problemClarity",
+    legacyScale: 0.75,
   },
   {
-    id: "uxImprovement",
-    label: "Peningkatan UX",
+    id: "referenceAnalysis",
+    label: "Analisis website atau aplikasi acuan",
     description:
-      "Redesign memperbaiki alur, kejelasan, navigasi, aksesibilitas, atau pengambilan keputusan.",
-    max: 25,
-  },
-  {
-    id: "uiQuality",
-    label: "Kualitas UI di Figma",
-    description:
-      "Layout, spacing, tipografi, hierarchy, dan visual style dibuat dengan sengaja dan konsisten.",
-    max: 25,
-  },
-  {
-    id: "designExplanation",
-    label: "Penjelasan desain",
-    description:
-      "Siswa dapat menjelaskan keputusan sebelum dan sesudah redesign menggunakan bukti.",
-    max: 20,
-  },
-  {
-    id: "completeness",
-    label: "Kelengkapan individu",
-    description:
-      "Semua tautan dan bukti redesign yang diwajibkan dikirim dengan jelas.",
+      "Siswa menunjukkan bagian acuan yang dipertahankan, diperbaiki, atau dihilangkan beserta alasannya.",
     max: 10,
+    legacyId: "problemClarity",
+    legacyScale: 0.5,
+  },
+  {
+    id: "webStructure",
+    label: "Kelengkapan struktur web",
+    description:
+      "Header, navigasi, hero atau pembuka, konten utama, CTA, dan footer tersedia serta tersusun jelas.",
+    max: 15,
+    legacyId: "uiQuality",
+    legacyScale: 0.6,
+  },
+  {
+    id: "uxSolution",
+    label: "Kualitas solusi UX",
+    description:
+      "Redesign mempermudah alur, navigasi, aksesibilitas, kejelasan, atau pengambilan keputusan pengguna.",
+    max: 20,
+    legacyId: "uxImprovement",
+    legacyScale: 0.8,
+  },
+  {
+    id: "visualConsistency",
+    label: "Visual hierarchy dan konsistensi UI",
+    description:
+      "Tipografi, warna, spacing, alignment, komponen, dan penekanan informasi dibuat konsisten.",
+    max: 15,
+    legacyId: "uiQuality",
+    legacyScale: 0.6,
+  },
+  {
+    id: "figmaSkills",
+    label: "Kemampuan menggunakan Figma",
+    description:
+      "Frame, layout, komponen, alignment, dan prototype atau interaksi digunakan dengan tepat.",
+    max: 15,
+    legacyId: "completeness",
+    legacyScale: 1.5,
+  },
+  {
+    id: "designRationale",
+    label: "Penjelasan keputusan desain",
+    description:
+      "Siswa menjelaskan perubahan sebelum dan sesudah redesign serta alasan keputusan pentingnya.",
+    max: 10,
+    legacyId: "designExplanation",
+    legacyScale: 0.5,
   },
 ];
 
@@ -546,13 +574,22 @@ function getGrade10SummativeRubricAssessment(progress = {}) {
   const saved = progress.teacherAssessment?.summativeRedesign || {};
   const savedCriteria = saved.criteria || {};
   const criteria = Object.fromEntries(
-    GRADE10_SUMMATIVE_RUBRIC.map((criterion) => [
-      criterion.id,
-      normalizeGrade10SummativeCriterionPoints(
-        savedCriteria[criterion.id],
-        criterion.max,
-      ),
-    ]),
+    GRADE10_SUMMATIVE_RUBRIC.map((criterion) => {
+      const hasCurrentScore = Object.prototype.hasOwnProperty.call(
+        savedCriteria,
+        criterion.id,
+      );
+      const legacyScore = Number(savedCriteria[criterion.legacyId]);
+      const score = hasCurrentScore
+        ? savedCriteria[criterion.id]
+        : Number.isFinite(legacyScore)
+          ? legacyScore * criterion.legacyScale
+          : 0;
+      return [
+        criterion.id,
+        normalizeGrade10SummativeCriterionPoints(score, criterion.max),
+      ];
+    }),
   );
   const score = Object.values(criteria).reduce(
     (total, value) => total + value,
