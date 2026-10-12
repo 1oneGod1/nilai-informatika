@@ -70,8 +70,17 @@ belum disinkronkan ke Firebase. Kuis latihan dan kalkulator tidak menulis nilai
 resmi atau mengubah field nilai quarter yang sudah ada. Unduh catatan untuk
 cadangan atau dibagikan kepada guru.
 
+Beranda memuat tujuan utama, gambaran materi, tahap perjalanan, dan tugas akhir.
+Setiap pertemuan memiliki brief tujuan, ringkasan, tugas, bukti, kriteria
+keberhasilan, WKA dengan sumber ayat, serta teks pengantar guru. Rute
+`#brief/1` hingga `#brief/9` menampilkan brief untuk pembukaan kelas,
+dengan navigasi, cetak, dan unduhan teks. Panduan guru menyediakan unduhan
+semua brief. Pengantar memakai 2–3 menit dari slot pembuka yang sudah ada;
+diagnostik pertemuan 1 tetap dikerjakan sebelum penjelasan ringkasan.
+
 File utama: `grade9-vr/index.html`, `grade9-vr/access.js`, `grade9-vr/app.js`,
-`grade9-vr/data.js`, dan `grade9-vr/style.css`; kartu portal ada di `js/student.js`.
+`grade9-vr/data.js`, `grade9-vr/style.css`, dan `grade9-vr/brief.css`;
+kartu portal ada di `js/student.js`.
 Pratinjau lokal dapat dibuka dengan `?preview=1` hanya pada localhost/127.0.0.1.
 Flag tersebut tidak membuka akses pada domain produksi.
 

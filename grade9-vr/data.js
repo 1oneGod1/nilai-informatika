@@ -1,9 +1,54 @@
-// Materi pendamping kelas, diselaraskan dengan bagian inti BSD; soal disusun guru.
+// Materi pendamping kelas; WKA berupa penerapan prinsip Alkitab dalam kegiatan belajar.
 const CONFIG = {
   "gradebookUrl": "../index.html",
   "bsdUrl": "https://app.bsd.education/",
   "teacher": "Andi Purba",
-  "course": "Construct a VR World"
+  "course": "Construct a VR World",
+  "courseBrief": {
+    "mainGoal": "Merancang, membangun, dan menguji diorama virtual sederhana yang memiliki tema, interaksi, serta manfaat yang dapat dijelaskan kepada pengunjung.",
+    "overview": "Kita mulai dari scene dan bentuk 3D, lalu memberi tekstur, cahaya, model, dan interaksi gaze. Setelah itu, kamu merancang diorama sendiri, menguji bersama teman, memperbaiki masalah, dan menjelaskan keputusanmu.",
+    "outcomes": [
+      "Menyusun objek 3D dan mengatur posisi, rotasi, serta ukurannya.",
+      "Memilih tekstur dan cahaya yang sesuai tema dan tetap mudah dilihat.",
+      "Membuat satu interaksi sederhana dan menguji pengalaman pengunjung.",
+      "Menjelaskan kode, mencatat sumber aset, dan menunjukkan bukti revisi."
+    ],
+    "finalTask": "Satu diorama bertema jelas, disertai rancangan, catatan sumber jika memakai aset pihak ketiga, hasil pengujian, dan bukti revisi. Setiap siswa menjelaskan kode dan melakukan modifikasi kecil, termasuk jika karya dibuat berkelompok.",
+    "stages": [
+      [
+        "1–2",
+        "Fondasi",
+        "Scene, atribut, bentuk, koordinat, dan kelompok objek."
+      ],
+      [
+        "3–5",
+        "Tampilan & interaksi",
+        "Tekstur, cahaya, model impor, dan respons gaze."
+      ],
+      [
+        "6–9",
+        "Karya mandiri",
+        "Rancang, bangun, uji, revisi, lalu demonstrasikan diorama."
+      ]
+    ],
+    "wka": {
+      "principle": "Kemampuan berkarya dipakai dengan tanggung jawab dan kepedulian kepada sesama.",
+      "reference": "Kejadian 1:27; Filipi 2:4",
+      "url": "https://www.bible.com/id/bible/306/GEN.1.27.TB",
+      "practice": "Pilih pengalaman yang membantu pengunjung, gunakan aset secara jujur, dan dengarkan masukan.",
+      "question": "Siapa yang akan terbantu oleh karya virtualmu?",
+      "sources": [
+        {
+          "reference": "Kejadian 1:27",
+          "url": "https://www.bible.com/id/bible/306/GEN.1.27.TB"
+        },
+        {
+          "reference": "Filipi 2:4",
+          "url": "https://www.bible.com/id/bible/306/PHP.2.4.TB"
+        }
+      ]
+    }
+  }
 };
 const LESSONS = [
   {
@@ -162,7 +207,33 @@ const LESSONS = [
     "minimumTarget": "Dua objek tampil; siswa menunjuk scene, elemen, dan atribut warna.",
     "support": "Jika tag/atribut belum dikuasai, gunakan scene awal dan latihan mengganti satu atribut. Jika variabel/event belum siap, beri pengantar 5–10 menit pada sesi praktik dan scaffold pada pertemuan 5.",
     "exitQuestion": "Tuliskan elemen yang menjadi wadah dunia, lalu satu atribut yang kamu ubah dan dampaknya.",
-    "exitExpected": "Menyebut a-scene; menghubungkan atribut yang benar (mis. color/position) dengan perubahan yang diamati."
+    "exitExpected": "Menyebut a-scene; menghubungkan atribut yang benar (mis. color/position) dengan perubahan yang diamati.",
+    "brief": {
+      "mainGoal": "Membuat scene A-Frame sederhana dan menjelaskan hubungan antara scene, objek, dan atribut.",
+      "material": [
+        "VR menghadirkan ruang tiga dimensi yang bisa dijelajahi. Dalam A-Frame, scene adalah wadah ruangnya, elemen membentuk objek, dan atribut mengatur sifat objek seperti warna atau posisi.",
+        "Hari ini kita memuat library sesuai instruksi BSD, membuat scene, lalu menambahkan dua objek. Fokusnya mengenali bagian kode dan melihat dampak satu perubahan."
+      ],
+      "why": "Scene pertama menjadi dasar yang akan kamu gunakan kembali saat membuat diorama akhir.",
+      "tasks": [
+        "Kerjakan diagnostik pembuka agar guru mengetahui bantuan yang kamu butuhkan.",
+        "Ikuti latihan scene di BSD, lalu tambahkan objek kedua dengan warna berbeda.",
+        "Ubah satu atribut, uji tampilannya, kemudian kerjakan kuis dan exit ticket."
+      ],
+      "success": [
+        "Dua objek terlihat di dalam scene.",
+        "Kamu dapat menunjuk elemen scene, objek, dan satu atribut pada kode.",
+        "Kamu dapat menjelaskan perubahan tampilan akibat atribut yang diubah."
+      ],
+      "wka": {
+        "principle": "Manusia diciptakan menurut gambar Allah; setiap pengguna perlu diperlakukan dengan hormat.",
+        "reference": "Kejadian 1:27",
+        "url": "https://www.bible.com/id/bible/306/GEN.1.27.TB",
+        "practice": "Pilih ide dunia virtual yang bermanfaat dan menghargai orang yang akan mengunjunginya.",
+        "question": "Pengalaman baik apa yang ingin kamu berikan kepada pengunjung?"
+      },
+      "teacherScript": "Hari ini kita mulai membuat dunia virtual dari dua objek sederhana. Kita akan mengenali scene, elemen, dan atribut, lalu melihat bagaimana perubahan kode mengubah tampilan. Tugas kalian adalah menambahkan objek kedua dan menjelaskan satu perubahan. Saya mengharapkan kalian bisa menunjukkan kode serta hasilnya. Sejak awal, pikirkan pengalaman yang baik bagi pengunjung karya kalian."
+    }
   },
   {
     "id": 2,
@@ -295,7 +366,33 @@ const LESSONS = [
     "minimumTarget": "Satu objek gabungan; siswa memindahkan atau memutar lewat induk dan memprediksi hasilnya.",
     "support": "Sediakan dua bentuk siap pakai; ubah X/Y dahulu, lalu rotation. Pengayaan: tambahkan bagian tanpa merusak kelompok.",
     "exitQuestion": "Jika induk dipindahkan dua satuan pada X, bagaimana bagian anak ikut berubah? Sebut asumsi yang kamu pakai.",
-    "exitExpected": "Anak ikut bergeser bersama induk. Untuk contoh tanpa rotasi/skala tambahan, posisi dunia X bertambah dua."
+    "exitExpected": "Anak ikut bergeser bersama induk. Untuk contoh tanpa rotasi/skala tambahan, posisi dunia X bertambah dua.",
+    "brief": {
+      "mainGoal": "Menyusun satu model dari beberapa bentuk dan mengubah seluruh model melalui objek induknya.",
+      "material": [
+        "Sebuah meja, pohon, atau kursi dapat dibuat dari gabungan bentuk sederhana. Atribut position memakai urutan X, Y, Z; rotation mengatur orientasi objek.",
+        "Bagian model dapat dikelompokkan dalam satu objek induk. Posisi anak relatif terhadap induknya, sehingga kelompok dapat dipindahkan atau diputar bersama."
+      ],
+      "why": "Model buatan sendiri menunjukkan bahwa kamu dapat menerapkan konsep di luar contoh tutorial.",
+      "tasks": [
+        "Prediksi perubahan koordinat sebelum mengubah angka pada latihan modeling BSD.",
+        "Buat pohon, kursi, atau meja dari beberapa bentuk dalam satu induk.",
+        "Pindahkan atau putar induknya, demonstrasikan hasilnya, lalu jawab kuis dan exit ticket."
+      ],
+      "success": [
+        "Bentuk-bentuk tersusun menjadi satu objek yang dapat dikenali.",
+        "Perubahan pada induk memengaruhi seluruh bagian model.",
+        "Kamu dapat menjelaskan perbedaan position dan rotation serta urutan X, Y, Z."
+      ],
+      "wka": {
+        "principle": "Bekerja dengan sepenuh hati menjadi sikap dalam menggunakan kemampuan yang dipercayakan kepada kita.",
+        "reference": "Kolose 3:23",
+        "url": "https://www.bible.com/id/bible/306/col.3.23-25.tb",
+        "practice": "Susun bagian model dengan teliti dan periksa hasil setelah mengubah induknya.",
+        "question": "Bagian mana yang perlu kamu rapikan agar modelmu dapat dipahami?"
+      },
+      "teacherScript": "Hari ini kita membuat sebuah objek dari beberapa bentuk. Kita akan memakai koordinat untuk menempatkan bagian, rotasi untuk mengubah orientasi, dan satu induk agar bagian-bagiannya bergerak bersama. Tugas kalian membuat model sederhana lalu mendemonstrasikan satu perubahan pada induk. Saya mengharapkan kalian memprediksi dan menjelaskan hasilnya. Ketelitian dalam menyusun serta menguji adalah bagian dari bekerja dengan sepenuh hati."
+    }
   },
   {
     "id": 3,
@@ -433,7 +530,33 @@ const LESSONS = [
     "minimumTarget": "Satu permukaan bertekstur dan dua versi cahaya yang dapat dibandingkan; siswa memberi alasan pilihan.",
     "support": "Berikan alamat aset, jangan meminta siswa mencari gambar saat kelas. Jika lambat, guru mendemonstrasikan cahaya dan siswa memodifikasi satu intensitas.",
     "exitQuestion": "Scene bertema malam tetapi target sulit dilihat. Perubahan cahaya apa yang kamu uji, dan apa bukti bahwa hasilnya membantu?",
-    "exitExpected": "Mengusulkan penyesuaian cahaya yang menjaga tema; memeriksa apakah pengguna lebih mudah melihat/menemukan target."
+    "exitExpected": "Mengusulkan penyesuaian cahaya yang menjaga tema; memeriksa apakah pengguna lebih mudah melihat/menemukan target.",
+    "brief": {
+      "mainGoal": "Menggunakan tekstur dan cahaya untuk membangun suasana yang sesuai tema dan tetap mudah dilihat.",
+      "material": [
+        "Tekstur adalah gambar yang memberi tampilan pada permukaan objek. Alamat gambar harus dapat dimuat; pada latihan BSD, permukaan bertekstur memakai wireframe false.",
+        "Cahaya memengaruhi suasana dan keterlihatan. Kita memakai pencahayaan dasar untuk membandingkan dua versi scene; fog dan pengaturan lanjutan dapat dikerjakan sebagai pengayaan."
+      ],
+      "why": "Pengunjung perlu memahami suasana sekaligus menemukan objek penting di duniamu.",
+      "tasks": [
+        "Terapkan satu tekstur pada scene awal dengan aset yang disiapkan.",
+        "Ubah pencahayaan untuk menghasilkan dua suasana dan simpan tangkapan layar keduanya.",
+        "Pilih versi yang sesuai tema, jelaskan alasannya, lalu selesaikan kuis dan exit ticket."
+      ],
+      "success": [
+        "Satu permukaan bertekstur berhasil terlihat.",
+        "Dua versi pencahayaan dapat dibandingkan melalui tangkapan layar.",
+        "Kamu dapat menjelaskan pilihan suasana dan menunjukkan bahwa objek penting masih terlihat."
+      ],
+      "wka": {
+        "principle": "Memperhatikan kebutuhan orang lain membimbing keputusan kita, termasuk saat mendesain tampilan.",
+        "reference": "Filipi 2:4",
+        "url": "https://www.bible.com/id/bible/306/PHP.2.4.TB",
+        "practice": "Uji apakah teman dapat melihat objek penting sebelum memilih versi visual akhir.",
+        "question": "Apakah pilihan cahayamu membantu pengunjung memahami scene?"
+      },
+      "teacherScript": "Hari ini kita memberi suasana pada scene melalui tekstur dan cahaya. Kalian akan menerapkan satu gambar pada permukaan, lalu membandingkan dua pencahayaan. Tugasnya menyimpan dua versi dan menjelaskan pilihan yang sesuai tema. Saya mengharapkan objek penting tetap terlihat. Saat mendesain, kita memperhatikan kebutuhan pengunjung dan memeriksa apakah pilihan kita membantu mereka."
+    }
   },
   {
     "id": 4,
@@ -570,7 +693,33 @@ const LESSONS = [
     "minimumTarget": "Satu model tampil, proporsinya sesuai scene, sumber dan ketentuannya dicatat.",
     "support": "Jika aset gagal, pakai model guru yang sudah diuji. Periksa src/id dahulu, kemudian posisi, skala, dan kamera.",
     "exitQuestion": "Aset room sudah dimuat tetapi tidak terlihat. Tuliskan elemen untuk menampilkannya dan dua pemeriksaan berikutnya.",
-    "exitExpected": "Menggunakan a-gltf-model src=\"#room\"; memeriksa kecocokan id/alamat, posisi, skala atau kamera dengan alasan."
+    "exitExpected": "Menggunakan a-gltf-model src=\"#room\"; memeriksa kecocokan id/alamat, posisi, skala atau kamera dengan alasan.",
+    "brief": {
+      "mainGoal": "Menampilkan satu model pihak ketiga, menyesuaikan proporsinya, dan mencatat sumber serta ketentuan penggunaannya.",
+      "material": [
+        "Model 3D dapat dimuat lebih dahulu dalam a-assets melalui a-asset-item yang memiliki id. Elemen a-gltf-model kemudian menampilkan model dengan merujuk id tersebut.",
+        "Model yang telah dimuat belum otomatis terlihat. Kita perlu memeriksa referensi aset, kamera, posisi, dan skala. scale mengubah ukuran, sedangkan position mengubah lokasi."
+      ],
+      "why": "Memakai aset yang sudah tersedia membantu pengembangan, tetapi pemilihan, penempatan, dan penggunaan sumber tetap menjadi tanggung jawabmu.",
+      "tasks": [
+        "Gunakan model contoh BSD atau aset guru yang telah diuji; muat dan tampilkan dalam scene.",
+        "Sesuaikan skala dan posisi agar proporsinya masuk akal, kemudian uji tampilan.",
+        "Catat judul aset, pembuat jika tersedia, tautan sumber, dan ketentuan penggunaan; jelaskan satu pemeriksaan yang kamu lakukan."
+      ],
+      "success": [
+        "Model tampil dalam scene dengan proporsi yang sesuai.",
+        "Kamu dapat membedakan cara memuat aset dan cara menampilkan model.",
+        "Sumber dan ketentuan penggunaan dicatat tanpa mengklaim aset orang lain sebagai buatan sendiri."
+      ],
+      "wka": {
+        "principle": "Kejujuran dalam perkataan juga membentuk cara kita menjelaskan asal sebuah karya.",
+        "reference": "Efesus 4:25",
+        "url": "https://www.bible.com/id/bible/306/EPH.4.25.TB",
+        "practice": "Sebutkan pembuat dan sumber aset; jelaskan bagian yang kamu buat atau adaptasi sendiri.",
+        "question": "Bagaimana catatan sumbermu menunjukkan kejujuran kepada pengunjung?"
+      },
+      "teacherScript": "Hari ini kita membawa model yang sudah tersedia ke scene kita. Kita akan membedakan memuat aset dan menampilkan model, lalu mengatur ukuran serta posisinya. Tugas kalian menampilkan satu model, menyesuaikan proporsi, dan mencatat sumbernya. Saya mengharapkan kalian dapat menjelaskan satu pemeriksaan ketika model bermasalah. Kita juga belajar jujur tentang bagian karya yang berasal dari orang lain."
+    }
   },
   {
     "id": 5,
@@ -601,10 +750,6 @@ const LESSONS = [
       [
         "Uji tanpa memberi jawaban",
         "Minta teman mencoba sendiri terlebih dahulu. Amati bagian yang membingungkan, lalu perbaiki target, petunjuk, atau respons."
-      ],
-      [
-        "Cursor dan listener saling terhubung",
-        "Camera memuat cursor fuse. Komponen pada target memasang click listener; fungsi yang dipanggil menentukan respons. Pelajari struktur dasar ini memakai kode awal guru."
       ],
       [
         "Cursor dan listener saling terhubung",
@@ -715,7 +860,33 @@ const LESSONS = [
     "minimumTarget": "Tatapan memicu satu perubahan yang terlihat; siswa menjelaskan listener dan mengubah respons sendiri.",
     "support": "Jangan meminta pemula menulis seluruh 14 langkah dari nol. Jika event/variabel belum siap, baca kode bersama dan siswa mengganti warna respons dengan penjelasan.",
     "exitQuestion": "Pada interaksimu, sebut pemicu, fungsi yang dipanggil, respons, dan cara teman membuktikan respons itu berjalan.",
-    "exitExpected": "Menghubungkan gaze/fuse → click listener → fungsi respons → perubahan tampilan yang dapat diamati."
+    "exitExpected": "Menghubungkan gaze/fuse → click listener → fungsi respons → perubahan tampilan yang dapat diamati.",
+    "brief": {
+      "mainGoal": "Membuat satu interaksi gaze dengan respons yang terlihat dan mengujinya bersama pengguna lain.",
+      "material": [
+        "Interaksi mempunyai pemicu dan respons. Pada gaze, cursor di dalam kamera dapat mengaktifkan target setelah tatapan bertahan selama durasi fuse.",
+        "Komponen JavaScript pada target memasang event listener. Listener menghubungkan kejadian dengan fungsi respons, misalnya perubahan warna. Guru menyediakan kode awal; kamu mempelajari alurnya lalu memodifikasi respons."
+      ],
+      "why": "Dunia virtual yang merespons memberi pengunjung sesuatu untuk dilakukan, sehingga target dan petunjuknya harus dapat dipahami.",
+      "tasks": [
+        "Jalankan kamera, cursor, target, dan komponen awal yang disiapkan guru.",
+        "Modifikasi satu respons, lalu jelaskan hubungan pemicu, listener, dan fungsi responsnya.",
+        "Minta teman mencoba tanpa petunjuk lisan; catat satu kesulitan dan lakukan satu perbaikan."
+      ],
+      "success": [
+        "Tatapan pada target memicu perubahan tampilan yang terlihat.",
+        "Kamu dapat menjelaskan alur pemicu → listener → fungsi → respons.",
+        "Teman dapat menemukan/menggunakan target; ada catatan temuan dan perbaikan."
+      ],
+      "wka": {
+        "principle": "Kepedulian kepada sesama mengajak kita memperhatikan pengalaman orang yang memakai karya kita.",
+        "reference": "Filipi 2:4",
+        "url": "https://www.bible.com/id/bible/306/PHP.2.4.TB",
+        "practice": "Perjelas target dan petunjuk berdasarkan kesulitan teman saat menguji.",
+        "question": "Apa yang perlu kamu ubah agar interaksi lebih mudah digunakan orang lain?"
+      },
+      "teacherScript": "Hari ini scene kita mulai merespons pengguna. Kita akan mempelajari pemicu gaze, event listener, dan fungsi respons melalui kode awal. Tugas kalian mengubah satu respons, lalu meminta teman mencoba tanpa bantuan lisan. Saya mengharapkan kalian dapat menunjukkan alur interaksi dan satu perbaikan. Kepedulian kepada sesama terlihat ketika kita membuat target serta petunjuk yang mudah digunakan."
+    }
   },
   {
     "id": 6,
@@ -857,7 +1028,33 @@ const LESSONS = [
     "minimumTarget": "Sketsa, tujuan pengunjung, daftar fitur minimum, dan scene awal tersimpan.",
     "support": "Kurangi fitur yang tidak mendukung tujuan. Jika bekerja berkelompok, catat kontribusi dan pemahaman tiap siswa.",
     "exitQuestion": "Sebut satu tindakan pengunjung, fitur minimum yang mendukungnya, dan fitur tambahan yang kamu tunda.",
-    "exitExpected": "Tujuan dan fitur minimum saling terkait; tambahan ditunda dengan alasan waktu/kelayakan."
+    "exitExpected": "Tujuan dan fitur minimum saling terkait; tambahan ditunda dengan alasan waktu/kelayakan.",
+    "brief": {
+      "mainGoal": "Merancang diorama bertema jelas dengan fitur minimum yang realistis dan memulai scene di Sandbox.",
+      "material": [
+        "Diorama adalah dunia kecil yang menyampaikan tema atau pengalaman tertentu. Rancangan dimulai dari pengunjung: apa yang akan mereka lihat atau lakukan?",
+        "Sketsa membantu memilih objek, tata letak, dan interaksi. Versi minimum memuat objek gabungan buatan sendiri, tekstur, cahaya, dan satu interaksi; tambahan dikerjakan setelah fungsi utama berjalan."
+      ],
+      "why": "Rancangan yang terarah membantu menyelesaikan karya dalam waktu kelas yang tersedia.",
+      "tasks": [
+        "Tuliskan tema, pengunjung, dan satu pengalaman utama yang ingin diberikan.",
+        "Buat sketsa, daftar fitur minimum, dan rencana sumber aset; periksa kelayakan dengan guru.",
+        "Mulai scene di Sandbox dan tetapkan target pembangunan pertemuan berikutnya."
+      ],
+      "success": [
+        "Tema dan tindakan pengunjung dituliskan dengan jelas.",
+        "Sketsa serta daftar fitur mendukung tujuan dan dapat dikerjakan dalam waktu yang tersedia.",
+        "Scene awal tersimpan; fitur tambahan yang ditunda dan target berikutnya disebutkan."
+      ],
+      "wka": {
+        "principle": "Panggilan mengusahakan dan memelihara ciptaan memberi arah untuk menggunakan sumber daya dengan bertanggung jawab.",
+        "reference": "Kejadian 2:15",
+        "url": "https://www.bible.com/id/bible/306/GEN.2.15.TB",
+        "practice": "Pilih tema yang menghargai ciptaan dan rencanakan penggunaan waktu serta aset secara bertanggung jawab.",
+        "question": "Apa yang ingin kamu ajak pengunjung pahami atau pedulikan lewat tema diorama?"
+      },
+      "teacherScript": "Hari ini kalian mulai merancang diorama sendiri. Tentukan tema, siapa pengunjungnya, dan apa yang mereka lakukan, lalu pilih fitur yang mendukung pengalaman itu. Tugas kalian membuat sketsa, menyepakati fitur minimum dengan saya, dan memulai scene di Sandbox. Saya mengharapkan rancangan yang dapat selesai. Prinsip pemeliharaan ciptaan membantu kita memilih tema serta menggunakan waktu dan aset secara bertanggung jawab."
+    }
   },
   {
     "id": 7,
@@ -991,7 +1188,33 @@ const LESSONS = [
     "minimumTarget": "Prototipe yang bisa diuji, satu log debugging, dan penjelasan satu bagian kode.",
     "support": "Tangani kendala yang menghalangi fungsi utama dahulu. Mulai pengambilan bukti demonstrasi agar tidak menumpuk pada pertemuan 9.",
     "exitQuestion": "Catat satu masalah: harapan, yang terjadi, dugaan, satu perubahan, dan hasil uji.",
-    "exitExpected": "Log menyebut masalah spesifik, dugaan yang dapat diuji, perubahan dan hasil yang berkaitan."
+    "exitExpected": "Log menyebut masalah spesifik, dugaan yang dapat diuji, perubahan dan hasil yang berkaitan.",
+    "brief": {
+      "mainGoal": "Mengembangkan prototipe diorama dan menyelesaikan satu kendala dengan pengujian yang terarah.",
+      "material": [
+        "Debugging dimulai dengan membandingkan hasil yang diharapkan dan yang terjadi. Perubahan terakhir dan pesan kesalahan membantu menyusun dugaan penyebab.",
+        "Uji satu perubahan terlebih dahulu, amati hasilnya, dan catat proses. Sesi ini juga memulai pemeriksaan individual: kamu menjelaskan kode serta melakukan modifikasi kecil."
+      ],
+      "why": "Karya berkembang melalui pengujian, dan catatan proses membantu kamu menjelaskan keputusanmu.",
+      "tasks": [
+        "Bangun fitur minimum sesuai rancangan yang disetujui.",
+        "Pilih satu masalah, tulis dugaan, uji satu perubahan, lalu catat hasilnya.",
+        "Tunjukkan prototipe serta satu bagian kode kepada guru; lakukan modifikasi kecil saat diminta."
+      ],
+      "success": [
+        "Prototipe tersimpan dan fitur utamanya dapat diuji.",
+        "Ada catatan masalah, dugaan, satu perubahan, dan hasil pengujian.",
+        "Kamu dapat menjelaskan bagian kode yang dipakai serta dampak modifikasinya."
+      ],
+      "wka": {
+        "principle": "Bekerja dengan sepenuh hati mencakup ketekunan dalam menjalankan tanggung jawab.",
+        "reference": "Kolose 3:23",
+        "url": "https://www.bible.com/id/bible/306/col.3.23-25.tb",
+        "practice": "Telusuri satu kendala dengan teliti dan catat bantuan yang kamu gunakan.",
+        "question": "Tindakan apa yang menunjukkan ketekunan saat kode belum berjalan?"
+      },
+      "teacherScript": "Hari ini kita membangun fitur utama diorama dan menelusuri kendalanya. Tugas kalian memilih satu masalah, menguji satu dugaan, dan mencatat apa yang berubah. Saya juga akan meminta sebagian siswa menjelaskan kode serta melakukan modifikasi kecil. Saya mengharapkan prototipe yang dapat diuji dan catatan yang spesifik. Ketekunan terlihat ketika kita memeriksa masalah dengan teliti dan bertanggung jawab atas prosesnya."
+    }
   },
   {
     "id": 8,
@@ -1128,7 +1351,33 @@ const LESSONS = [
     "minimumTarget": "Versi final, satu temuan pengguna, perubahan dan uji ulang yang terdokumentasi.",
     "support": "Batasi revisi pada masalah utama. Jika jadwal individual penuh, kumpulkan penjelasan kode singkat sebagai rekaman lalu verifikasi modifikasi langsung.",
     "exitQuestion": "Apa temuan penguji, perubahan yang kamu pilih, dan hasil tugas yang sama setelah diuji ulang?",
-    "exitExpected": "Menghubungkan masalah yang diamati, revisi terarah, dan dampak uji ulang."
+    "exitExpected": "Menghubungkan masalah yang diamati, revisi terarah, dan dampak uji ulang.",
+    "brief": {
+      "mainGoal": "Memperbaiki diorama berdasarkan pengamatan pengguna dan membuktikan dampak revisinya melalui uji ulang.",
+      "material": [
+        "Pengujian memerlukan tugas yang jelas, misalnya menemukan target dan mengaktifkan interaksi. Amati teman mencoba sebelum memberi bantuan.",
+        "Umpan balik yang berguna menyebut kejadian, dampak, dan saran. Dahulukan masalah pada fungsi utama, lakukan revisi, lalu uji kembali dengan tugas yang sama."
+      ],
+      "why": "Pengujian oleh orang lain menunjukkan masalah yang mungkin terlewat oleh pembuatnya.",
+      "tasks": [
+        "Minta teman menjalankan tugas penggunaan dan catat apa yang benar-benar terjadi.",
+        "Pilih satu masalah penting, lakukan revisi, dan simpan bukti sebelum/sesudah.",
+        "Uji ulang dengan tugas yang sama, simpan versi akhir, dan lanjutkan demonstrasi individual."
+      ],
+      "success": [
+        "Catatan memuat temuan pengguna yang spesifik.",
+        "Revisi berkaitan langsung dengan masalah yang dipilih.",
+        "Hasil uji ulang menunjukkan dampak perubahan; versi akhir dan bukti tersimpan."
+      ],
+      "wka": {
+        "principle": "Kesediaan mendengar dan menahan reaksi membantu kita menerima orang lain dengan baik.",
+        "reference": "Yakobus 1:19",
+        "url": "https://www.bible.com/id/bible/306/JAS.1.19.TB",
+        "practice": "Dengarkan masukan sampai selesai, tanyakan bukti, lalu pilih revisi yang membantu pengguna.",
+        "question": "Bagaimana kamu menanggapi masukan yang berbeda dari pendapatmu?"
+      },
+      "teacherScript": "Hari ini kita melihat diorama dari sudut pandang pengguna. Berikan teman satu tugas yang jelas, amati kesulitannya, lalu pilih perbaikan yang paling membantu. Tugas kalian menyimpan bukti sebelum-sesudah dan menguji ulang. Saya mengharapkan alasan revisi serta bukti dampaknya. Kita berlatih mendengar masukan dengan tenang dan menanggapi teman dengan hormat."
+    }
   },
   {
     "id": 9,
@@ -1332,7 +1581,33 @@ const LESSONS = [
     "minimumTarget": "Karya dan proses dikumpulkan; setiap siswa memberi penjelasan/modifikasi; tes konsep diberikan guru.",
     "support": "Total slot demonstrasi pertemuan 7–9 adalah 80 menit: sekitar 26 siswa bila 3 menit/orang. Untuk kelas lebih besar, ambil rekaman penjelasan sebelumnya dan cek modifikasi langsung singkat; jangan memaksakan semua presentasi di pertemuan 9.",
     "exitQuestion": "Pilih satu keputusan desain dan tunjukkan konsep A-Frame yang kamu gunakan. Bukti apa yang menunjukkan keputusan itu berhasil?",
-    "exitExpected": "Menghubungkan keputusan, bagian kode/konsep yang tepat, dan bukti pengujian/karya; bukan sekadar mengatakan selesai."
+    "exitExpected": "Menghubungkan keputusan, bagian kode/konsep yang tepat, dan bukti pengujian/karya; bukan sekadar mengatakan selesai.",
+    "brief": {
+      "mainGoal": "Menunjukkan penguasaan melalui diorama final, penjelasan dan modifikasi individual, serta tes konsep dari guru.",
+      "material": [
+        "Demonstrasi menyampaikan tema, fitur yang bekerja, bagian kode penting, dan satu revisi beserta alasannya. Setiap siswa menunjukkan pemahaman sendiri, termasuk jika karya dibuat bersama.",
+        "Penilaian memakai diorama dan proses 70%, demonstrasi individual 20%, serta tes konsep 10%. Kuis terbuka website merupakan latihan sebelum pertemuan ini; tes resmi diberikan guru dengan soal berbeda."
+      ],
+      "why": "Hasil akhir dan penjelasan proses bersama-sama menunjukkan perkembangan belajar selama course.",
+      "tasks": [
+        "Kumpulkan karya final, rancangan, catatan sumber, hasil uji, dan bukti revisi.",
+        "Lakukan demonstrasi sesuai jadwal, jelaskan satu bagian kode, dan modifikasi saat diminta guru.",
+        "Kerjakan tes konsep resmi serta tuliskan refleksi tentang kemampuan dan langkah belajar berikutnya."
+      ],
+      "success": [
+        "Fitur utama diorama berjalan dan dokumen proses dapat diperiksa.",
+        "Kamu dapat menjelaskan keputusan/kode serta melakukan modifikasi secara individual.",
+        "Sumber dan kontribusi dijelaskan dengan jujur; tes konsep serta refleksi selesai."
+      ],
+      "wka": {
+        "principle": "Berkata benar membentuk cara kita mempertanggungjawabkan hasil dan proses belajar.",
+        "reference": "Efesus 4:25",
+        "url": "https://www.bible.com/id/bible/306/EPH.4.25.TB",
+        "practice": "Jelaskan kontribusi sendiri, bantuan yang dipakai, dan sumber aset secara jujur saat demonstrasi.",
+        "question": "Bagian apa yang kamu pahami sendiri, dan bantuan apa yang perlu kamu akui?"
+      },
+      "teacherScript": "Hari ini kalian menunjukkan hasil dan pemahaman dari seluruh perjalanan belajar. Kumpulkan diorama beserta prosesnya, lalu demonstrasikan sesuai jadwal dan kerjakan tes konsep dari saya. Saya mengharapkan kalian dapat menjelaskan kode, alasan desain, dan satu revisi, kemudian melakukan modifikasi kecil. Saat mempresentasikan karya, sebutkan kontribusi, sumber, dan bantuan dengan jujur. Akhiri dengan refleksi tentang perkembangan kalian."
+    }
   }
 ];
 const RUBRIC = [

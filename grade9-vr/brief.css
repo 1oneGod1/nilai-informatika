@@ -1,0 +1,41 @@
+.course-overview{margin:0 0 36px;padding:28px;border:1px solid var(--line);border-radius:15px;background:#fff}
+.course-overview-text{max-width:850px;color:var(--muted)}
+.brief-goal{padding:20px 23px;background:var(--ink);color:#fff;border-radius:11px;margin-bottom:22px}
+.brief-goal .mini-label{color:var(--green);font-size:11px;text-transform:uppercase;letter-spacing:1.4px}
+.brief-goal p{margin:9px 0 0;font-size:20px;font-weight:600;line-height:1.45}
+.course-stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0}
+.course-stages>div{border-left:3px solid var(--teal);background:var(--soft);padding:17px 19px;border-radius:0 8px 8px 0}
+.course-stages span{font-size:11px;font-weight:700;color:var(--teal)}
+.course-stages h3{font-size:18px;margin:7px 0 9px}
+.course-stages p{font-size:13px;margin:0}
+.brief-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:22px}
+.brief-card{padding:20px;border:1px solid var(--line);border-radius:10px;min-width:0;background:#fff}
+.brief-card h3{font-size:18px;letter-spacing:-.3px;line-height:1.3;margin-bottom:14px}
+.brief-card p,.brief-card li{font-size:14px;line-height:1.65;overflow-wrap:anywhere}
+.brief-card p:last-child{margin-bottom:0}
+.brief-card ol,.brief-card ul{padding-left:21px;margin:0}
+.brief-card li+li{margin-top:9px}
+.brief-why{padding-top:14px;border-top:1px solid var(--line);font-size:12px!important;color:var(--muted)}
+.brief-success{list-style-type:'✓  '}
+.brief-success li::marker{color:var(--teal);font-weight:700}
+.brief-evidence{padding:14px;background:var(--soft);border-radius:8px;margin-top:18px}
+.brief-evidence b{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--teal)}
+.brief-evidence p{margin:7px 0 0;font-size:13px}
+.wka-card{background:#f8f4e9;border-color:#e8dfc7}
+.wka-card .eyebrow{font-size:9px;letter-spacing:1.2px;line-height:1.5;margin-bottom:12px}
+.wka-question{font-weight:600;border-left:2px solid #b9a46b;padding-left:12px}
+.wka-references{font-size:11px;color:#71613d;line-height:1.8}
+.wka-references a{text-underline-offset:3px}
+.brief-toolbar{margin-bottom:22px}
+.brief-page{max-width:1040px;margin:auto}
+.brief-page-heading h1{font-size:clamp(30px,3.5vw,44px);letter-spacing:-1.2px}
+.brief-page-heading>p{color:var(--muted)}
+.brief-page .brief-goal p{font-size:24px}
+.brief-page .brief-card p,.brief-page .brief-card li{font-size:15px}
+.brief-page .brief-script p{font-size:16px;line-height:1.8}
+.brief-script{margin-bottom:25px}
+.brief-navigation{margin-top:24px}
+.brief-table-link{font-size:11px;display:inline-block;margin-top:9px;color:var(--teal)}
+.class-brief-guide{margin-bottom:26px}
+@media(max-width:760px){.brief-grid,.course-stages{grid-template-columns:1fr}.course-overview{padding:20px}.brief-goal{padding:18px}.brief-goal p,.brief-page .brief-goal p{font-size:18px}.brief-card{padding:17px}.brief-page .brief-card p,.brief-page .brief-card li{font-size:14px}.brief-toolbar .small{display:block;width:100%}}
+@media print{.brief-grid{display:block}.brief-card,.brief-goal,.course-stages>div{break-inside:avoid;margin-bottom:16px}.brief-goal{color:#000;background:#fff;border:1px solid #aaa}.brief-goal .mini-label{color:#000}.brief-page-heading h1{font-size:26px}.brief-page .brief-goal p{font-size:18px}.brief-page .brief-card p,.brief-page .brief-card li{font-size:12px}.brief-page-heading .small,.brief-page>.teacher-note{display:none}}
