@@ -445,6 +445,15 @@ async function loadGrade10ReportScores(studentId, kkm) {
 }
 
 function rememberVerifiedStudent(student) {
+  if (student && getStudentGrade(student) === 12) {
+    sessionStorage.setItem("csReportGrade12Session", JSON.stringify({
+      id: String(student.id),
+      name: String(student.nama || "Siswa Kelas 12"),
+      className: String(student.kelas || "12"),
+      verifiedAt: Date.now(),
+    }));
+    return;
+  }
   if (student && getStudentGrade(student) === 9) {
     sessionStorage.setItem("csReportGrade9Session", JSON.stringify({
       id: String(student.id),
@@ -495,6 +504,40 @@ function openGrade9Materials() {
     return;
   }
   window.location.href = "grade9-vr/index.html";
+}
+
+function openGrade12Materials() {
+  const student = selectedStudentForDetail;
+  if (!student || getStudentGrade(student) !== 12) {
+    showAlert("Sustainable Web Studio tersedia untuk siswa kelas 12.", "warning");
+    return;
+  }
+  let session;
+  try { session = JSON.parse(sessionStorage.getItem("csReportGrade12Session") || "null"); } catch {}
+  const age = Date.now() - Number(session?.verifiedAt);
+  if (!session || session.id !== String(student.id) || !Number.isFinite(age)
+    || age < 0 || age > 12 * 60 * 60 * 1000) {
+    requestPasswordForStudent(student.id);
+    return;
+  }
+  window.location.href = "grade12-sustainable/index.html";
+}
+
+function buildGrade12MaterialsCard(student) {
+  if (getStudentGrade(student) !== 12) return "";
+  return `
+    <section id="grade12SustainableMaterials" class="mb-6 rounded-2xl border border-emerald-400/25 bg-gradient-to-br from-emerald-500/10 via-slate-900/70 to-cyan-500/10 overflow-hidden">
+      <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center text-emerald-300 text-xl shrink-0"><i class="fas fa-code"></i></div>
+        <div class="flex-1">
+          <div class="flex flex-wrap items-center gap-2 mb-2"><span class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold">MATERI KELAS</span><span class="text-[10px] font-mono-tech text-cyan-200 bg-cyan-500/10 border border-cyan-400/20 px-2 py-0.5 rounded-full">KELAS 12 · BSD COURSE 3</span></div>
+          <h3 class="text-xl font-black text-white">Sustainable Web Studio</h3>
+          <p class="text-sm text-slate-300 mt-1 max-w-2xl">Programming as a tool to sustainable development. Tujuan, ringkasan, WKA, tugas, kuis, dan panduan e-commerce dalam Indonesia–English.</p>
+          <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech"><span class="text-emerald-300">Rencana 26 × 90 menit</span><span class="text-cyan-300">78 soal latihan & diagnostik</span><span class="text-lime-300">3 assignment</span></div>
+        </div>
+        <button type="button" onclick="openGrade12Materials()" class="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black font-mono-tech text-xs px-5 py-3 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0">BUKA SUSTAINABLE WEB STUDIO <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </section>`;
 }
 
 function buildGrade9MaterialsCard(student) {
@@ -717,6 +760,7 @@ function renderStudentDetail(id) {
       ? dcBuildStudentAssessmentHtml(s, kkm)
       : "";
   const grade9MaterialsHtml = buildGrade9MaterialsCard(s);
+  const grade12MaterialsHtml = buildGrade12MaterialsCard(s);
   const grade10MaterialsHtml = buildGrade10MaterialsCard(s);
   const grade10ReportHtml =
     getStudentGrade(s) === 10 ? buildGrade10ReportCard() : "";
@@ -772,6 +816,7 @@ function renderStudentDetail(id) {
       </div>
 
       ${grade9MaterialsHtml}
+      ${grade12MaterialsHtml}
       ${grade10MaterialsHtml}
 
       ${grade10ReportHtml}

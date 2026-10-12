@@ -320,6 +320,23 @@ function openGrade9TeacherPreview() {
   window.location.href = "grade9-vr/index.html?teacherPreview=1#teacher";
 }
 
+function openGrade12TeacherPreview() {
+  const teacher = auth.currentUser;
+  if (!teacher) {
+    showAlert("Sesi guru tidak ditemukan. Silakan masuk kembali.", "warning");
+    return;
+  }
+  sessionStorage.setItem("csReportGrade12Session", JSON.stringify({
+    id: `teacher-preview-${teacher.uid}`,
+    name: "Review Guru",
+    className: "12 · Review guru",
+    verifiedAt: Date.now(),
+    teacherUid: teacher.uid,
+    isTeacherPreview: true,
+  }));
+  window.location.href = "grade12-sustainable/index.html?teacherPreview=1#teacher";
+}
+
 function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
   const grade = getTeacherStudentGrade(student);
   if (grade === 10) {
