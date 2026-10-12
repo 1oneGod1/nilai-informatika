@@ -81,6 +81,11 @@ diagnostik pertemuan 1 tetap dikerjakan sebelum penjelasan ringkasan.
 File utama: `grade9-vr/index.html`, `grade9-vr/access.js`, `grade9-vr/app.js`,
 `grade9-vr/data.js`, `grade9-vr/style.css`, dan `grade9-vr/brief.css`;
 kartu portal ada di `js/student.js`.
+Setelah mengubah `data.js` atau `app.js`, jalankan
+`node scripts/prepare-grade9-assets.mjs` sebelum commit/deploy.
+Halaman memakai salinan dengan sidik konten pada nama file agar cache CDN
+tidak mencampur data lama dengan tampilan baru. File sumber tetap `data.js`
+dan `app.js`; salinan yang dihasilkan harus ikut diterbitkan.
 Pratinjau lokal dapat dibuka dengan `?preview=1` hanya pada localhost/127.0.0.1.
 Flag tersebut tidak membuka akses pada domain produksi.
 
