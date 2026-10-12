@@ -55,8 +55,16 @@ berlaku selama 12 jam, dan tidak membutuhkan akun ChatGPT. Guru dapat membuka
 **Review VR Studio** dari dashboard; akses review tetap memeriksa sesi guru yang
 terverifikasi.
 
-Materi mencakup 9 pertemuan, simulasi konsep A-Frame, 34 soal latihan dengan
-pembahasan, refleksi, brief diorama, dan kalkulator rubrik 70–20–10. Catatan,
+Materi mencakup 9 pertemuan (masing-masing 80 menit), 29 soal pembuka
+(5 diagnostik HTML/JavaScript dan 3 cek kesiapan pada pertemuan 2–9),
+34 soal latihan dengan pembahasan, 9 exit ticket, refleksi, brief diorama,
+dan kalkulator rubrik 70–20–10. Hasil pembuka pertama disimpan terpisah
+dari skor latihan terbaik; mengulang latihan tidak mengubah kondisi awal.
+Agenda memuat waktu kuis, target minimum, bagian BSD yang dipilih,
+persiapan serta bantuan guru. Gaze memakai komponen/event dasar dengan
+kode awal; rangkaian animasi lengkap menjadi pengayaan. Kuis terbuka
+pertemuan 9 adalah persiapan sebelum tes resmi dengan soal berbeda dari guru.
+Catatan,
 skor latihan, dan tanda selesai tersimpan **per identitas siswa pada browser**;
 belum disinkronkan ke Firebase. Kuis latihan dan kalkulator tidak menulis nilai
 resmi atau mengubah field nilai quarter yang sudah ada. Unduh catatan untuk
