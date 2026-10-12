@@ -46,6 +46,27 @@ Aplikasi dapat diakses di:
 
 ## Teknologi yang Digunakan
 
+### Materi Kelas 9: VR Studio
+
+VR Studio tersedia di `grade9-vr/index.html` dalam domain CS.Report. Alur siswa:
+**cari nama/NIS → verifikasi password siswa → Buka VR Studio** pada kartu kelas 9.
+Kartu tidak ditampilkan untuk kelas lain. Materi memakai sesi kelas 9 dari portal,
+berlaku selama 12 jam, dan tidak membutuhkan akun ChatGPT. Guru dapat membuka
+**Review VR Studio** dari dashboard; akses review tetap memeriksa sesi guru yang
+terverifikasi.
+
+Materi mencakup 9 pertemuan, simulasi konsep A-Frame, 34 soal latihan dengan
+pembahasan, refleksi, brief diorama, dan kalkulator rubrik 70–20–10. Catatan,
+skor latihan, dan tanda selesai tersimpan **per identitas siswa pada browser**;
+belum disinkronkan ke Firebase. Kuis latihan dan kalkulator tidak menulis nilai
+resmi atau mengubah field nilai quarter yang sudah ada. Unduh catatan untuk
+cadangan atau dibagikan kepada guru.
+
+File utama: `grade9-vr/index.html`, `grade9-vr/access.js`, `grade9-vr/app.js`,
+`grade9-vr/data.js`, dan `grade9-vr/style.css`; kartu portal ada di `js/student.js`.
+Pratinjau lokal dapat dibuka dengan `?preview=1` hanya pada localhost/127.0.0.1.
+Flag tersebut tidak membuka akses pada domain produksi.
+
 ### Frontend
 
 | Teknologi    | Keterangan                 |

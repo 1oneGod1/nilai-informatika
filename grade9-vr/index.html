@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Belajar membuat dunia virtual bersama: 9 pertemuan BSD, konsep interaktif, kuis formatif, dan proyek diorama untuk kelas 9.">
+  <meta name="theme-color" content="#142f35"><title>VR Studio — Kelas 9 · CS.Report</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css">
+  <script defer src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
+  <script defer src="../js/firebase-init.js?v=20260819d"></script>
+  <script defer src="data.js?v=20261013a"></script><script defer src="access.js?v=20261013a"></script><script defer src="app.js?v=20261013a"></script>
+</head>
+<body>
+  <section id="access-gate" class="vr-access-gate"><div class="vr-gate-card"><div class="brand-icon">◇</div><p class="eyebrow">CS.Report · Kelas 9</p><h1>Buka materi dari halaman nilaimu.</h1><p id="gate-copy">Cari nama atau NIS di CS.Report, masukkan password siswa, lalu pilih <b>Buka VR Studio</b> pada halaman nilai kelas 9.</p><a class="btn" href="../index.html">Cari nama di CS.Report →</a></div></section>
+  <div id="learning-app" hidden>
+  <a class="skip" href="#main">Langsung ke materi</a>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="#home" aria-label="VR Studio, beranda"><span class="brand-icon">◇</span><span>VR <b>Studio</b><small>KELAS 9 · CODING</small></span></a>
+    <nav aria-label="Navigasi utama"><a href="#home" data-nav="home">Pertemuan</a><a href="#project" data-nav="project">Proyek akhir</a><a href="#teacher" data-nav="teacher">Panduan guru</a></nav>
+    <a class="book-link" id="book-link" href="#connection">Buku nilai <span aria-hidden="true">↗</span></a>
+  </div></header>
+  <div class="learner-bar"><div><span id="learner-name"></span><small id="learner-class"></small></div><a id="portal-back" href="../index.html">← Kembali ke CS.Report</a></div>
+  <div id="review-banner" class="review-banner" hidden>Mode review guru. Catatan latihan tersimpan terpisah dari siswa; nilai resmi tidak diubah.</div>
+  <main id="main" tabindex="-1"></main>
+  <footer><div><b>VR Studio</b><span>Pendamping kelas untuk BSD Construct a VR World.</span></div><p>9 pertemuan · 2 JP per pertemuan · Explore, Learn & Create</p><small>Progres dan catatan latihan tersimpan per siswa pada browser ini. Nilai resmi dicatat di buku nilai guru.</small></footer>
+  <div id="toast" role="status" aria-live="polite"></div>
+  </div>
+</body></html>

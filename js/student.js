@@ -445,6 +445,15 @@ async function loadGrade10ReportScores(studentId, kkm) {
 }
 
 function rememberVerifiedStudent(student) {
+  if (student && getStudentGrade(student) === 9) {
+    sessionStorage.setItem("csReportGrade9Session", JSON.stringify({
+      id: String(student.id),
+      name: String(student.nama || "Siswa Kelas 9"),
+      className: String(student.kelas || "9"),
+      verifiedAt: Date.now(),
+    }));
+    return;
+  }
   if (!student || getStudentGrade(student) !== 10) return;
 
   const learningSession = {
@@ -469,6 +478,40 @@ function openGrade10Materials() {
 
   rememberVerifiedStudent(selectedStudentForDetail);
   window.location.href = "grade10-uiux.html";
+}
+
+function openGrade9Materials() {
+  const student = selectedStudentForDetail;
+  if (!student || getStudentGrade(student) !== 9) {
+    showAlert("Materi VR Studio tersedia untuk siswa kelas 9.", "warning");
+    return;
+  }
+  let session;
+  try { session = JSON.parse(sessionStorage.getItem("csReportGrade9Session") || "null"); } catch {}
+  const age = Date.now() - Number(session?.verifiedAt);
+  if (!session || session.id !== String(student.id) || !Number.isFinite(age)
+    || age < 0 || age > 12 * 60 * 60 * 1000) {
+    requestPasswordForStudent(student.id);
+    return;
+  }
+  window.location.href = "grade9-vr/index.html";
+}
+
+function buildGrade9MaterialsCard(student) {
+  if (getStudentGrade(student) !== 9) return "";
+  return `
+    <section id="grade9VrMaterials" class="mb-6 rounded-2xl border border-emerald-400/25 bg-gradient-to-br from-emerald-500/10 via-slate-900/70 to-cyan-500/10 overflow-hidden">
+      <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center text-emerald-300 text-xl shrink-0"><i class="fas fa-cubes"></i></div>
+        <div class="flex-1">
+          <div class="flex flex-wrap items-center gap-2 mb-2"><span class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold">MATERI KELAS</span><span class="text-[10px] font-mono-tech text-cyan-200 bg-cyan-500/10 border border-cyan-400/20 px-2 py-0.5 rounded-full">KELAS 9</span></div>
+          <h3 class="text-xl font-black text-white">VR Studio: Construct a VR World</h3>
+          <p class="text-sm text-slate-300 mt-1 max-w-2xl">Buka 9 pertemuan, simulasi konsep A-Frame, kuis latihan, refleksi, dan panduan proyek diorama langsung dari CS.Report.</p>
+          <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech"><span class="text-emerald-300">9 × 2 JP</span><span class="text-cyan-300">34 soal latihan</span><span class="text-lime-300">Proyek diorama</span></div>
+        </div>
+        <button type="button" onclick="openGrade9Materials()" class="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black font-mono-tech text-xs px-5 py-3 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0">BUKA VR STUDIO <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </section>`;
 }
 
 function buildGrade10MaterialsCard(student) {
@@ -673,6 +716,7 @@ function renderStudentDetail(id) {
     typeof dcBuildStudentAssessmentHtml === "function"
       ? dcBuildStudentAssessmentHtml(s, kkm)
       : "";
+  const grade9MaterialsHtml = buildGrade9MaterialsCard(s);
   const grade10MaterialsHtml = buildGrade10MaterialsCard(s);
   const grade10ReportHtml =
     getStudentGrade(s) === 10 ? buildGrade10ReportCard() : "";
@@ -727,6 +771,7 @@ function renderStudentDetail(id) {
         </div>
       </div>
 
+      ${grade9MaterialsHtml}
       ${grade10MaterialsHtml}
 
       ${grade10ReportHtml}
