@@ -37,5 +37,7 @@
 .brief-navigation{margin-top:24px}
 .brief-table-link{font-size:11px;display:inline-block;margin-top:9px;color:var(--teal)}
 .class-brief-guide{margin-bottom:26px}
+.language-bar{max-width:1260px;margin:auto;padding:8px 32px;display:flex;justify-content:flex-end;font-size:12px;color:var(--muted)}.language-bar label{display:flex;align-items:center;gap:10px}.language-bar select{padding:6px 10px;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:7px}
+@media print{.language-bar{display:none}}
 @media(max-width:760px){.brief-grid,.course-stages{grid-template-columns:1fr}.course-overview{padding:20px}.brief-goal{padding:18px}.brief-goal p,.brief-page .brief-goal p{font-size:18px}.brief-card{padding:17px}.brief-page .brief-card p,.brief-page .brief-card li{font-size:14px}.brief-toolbar .small{display:block;width:100%}}
 @media print{.brief-grid{display:block}.brief-card,.brief-goal,.course-stages>div{break-inside:avoid;margin-bottom:16px}.brief-goal{color:#000;background:#fff;border:1px solid #aaa}.brief-goal .mini-label{color:#000}.brief-page-heading h1{font-size:26px}.brief-page .brief-goal p{font-size:18px}.brief-page .brief-card p,.brief-page .brief-card li{font-size:12px}.brief-page-heading .small,.brief-page>.teacher-note{display:none}}

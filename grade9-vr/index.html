@@ -4,15 +4,16 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="VR Studio kelas 9: tujuan belajar, ringkasan materi, tugas, WKA, kuis, dan brief awal kelas untuk 9 pertemuan BSD.">
   <meta name="theme-color" content="#142f35"><title>VR Studio — Kelas 9 · CS.Report</title>
-  <link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css?v=20261013c"><link rel="stylesheet" href="brief.css?v=20261013c">
+  <link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css?v=20261013d"><link rel="stylesheet" href="brief.css?v=20261013d">
   <script defer src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
   <script defer src="../js/firebase-init.js?v=20260819d"></script>
-  <script defer src="data.ba1039dacc19.js"></script><script defer src="access.js?v=20261013c"></script><script defer src="app.53a79e9ad9d9.js"></script>
+  <script defer src="language.760a61bd3adc.js"></script>
 </head>
 <body>
-  <section id="access-gate" class="vr-access-gate"><div class="vr-gate-card"><div class="brand-icon">◇</div><p class="eyebrow">CS.Report · Kelas 9</p><h1>Buka materi dari halaman nilaimu.</h1><p id="gate-copy">Cari nama atau NIS di CS.Report, masukkan password siswa, lalu pilih <b>Buka VR Studio</b> pada halaman nilai kelas 9.</p><a class="btn" href="../index.html">Cari nama di CS.Report →</a></div></section>
+  <div class="language-bar"><label for="vr-language">Bahasa / Language <select id="vr-language"><option value="id">Indonesia</option><option value="en">English</option></select></label></div>
+  <section id="access-gate" class="vr-access-gate"><div class="vr-gate-card"><div class="brand-icon">◇</div><p class="eyebrow">CS.Report · Kelas 9</p><h1 id="gate-title">Buka materi dari halaman nilaimu.</h1><p id="gate-copy">Cari nama atau NIS di CS.Report, masukkan password siswa, lalu pilih <b>Buka VR Studio</b> pada halaman nilai kelas 9.</p><a id="gate-link" class="btn" href="../index.html">Cari nama di CS.Report →</a></div></section>
   <div id="learning-app" hidden>
   <a class="skip" href="#main">Langsung ke materi</a>
   <header class="site-header"><div class="header-inner">
@@ -23,7 +24,7 @@
   <div class="learner-bar"><div><span id="learner-name"></span><small id="learner-class"></small></div><a id="portal-back" href="../index.html">← Kembali ke CS.Report</a></div>
   <div id="review-banner" class="review-banner" hidden>Mode review guru. Catatan latihan tersimpan terpisah dari siswa; nilai resmi tidak diubah.</div>
   <main id="main" tabindex="-1"></main>
-  <footer><div><b>VR Studio</b><span>Pendamping kelas untuk BSD Construct a VR World.</span></div><p>9 pertemuan · 2 JP per pertemuan · Explore, Learn & Create</p><small>Progres dan catatan latihan tersimpan per siswa pada browser ini. Nilai resmi dicatat di buku nilai guru.</small></footer>
+  <footer><div><b>VR Studio</b><span id="footer-companion">Pendamping kelas untuk BSD Construct a VR World.</span></div><p id="footer-schedule">9 pertemuan · 2 JP per pertemuan · Explore, Learn & Create</p><small id="footer-storage">Progres dan catatan latihan tersimpan per siswa pada browser ini. Nilai resmi dicatat di buku nilai guru.</small></footer>
   <div id="toast" role="status" aria-live="polite"></div>
   </div>
 </body></html>

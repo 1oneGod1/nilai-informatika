@@ -81,11 +81,25 @@ diagnostik pertemuan 1 tetap dikerjakan sebelum penjelasan ringkasan.
 File utama: `grade9-vr/index.html`, `grade9-vr/access.js`, `grade9-vr/app.js`,
 `grade9-vr/data.js`, `grade9-vr/style.css`, dan `grade9-vr/brief.css`;
 kartu portal ada di `js/student.js`.
-Setelah mengubah `data.js` atau `app.js`, jalankan
+Materi kelas 9 tersedia dalam Indonesia dan English. Pilih bahasa pada
+kontrol **Bahasa / Language**, atau gunakan `?lang=en` / `?lang=id`.
+Pilihan disimpan pada browser. Kedua bahasa memakai ID pertemuan/soal,
+kunci jawaban, bobot penilaian, dan penyimpanan latihan yang sama.
+Catatan yang ditulis siswa tidak diterjemahkan atau ditimpa. Jawaban
+kuis dan nilai kalkulator sementara dipertahankan saat beralih bahasa.
+Rujukan WKA pada versi English memakai ayat yang sama dalam NIV.
+
+Sumber materi: `data.js` (Indonesia) dan `data-en.js` (English).
+`scripts/english-ui.json` menerjemahkan antarmuka ke `app-en.js` dan
+pesan akses ke `access-en.js`; logika autentikasi tetap sama.
+Setelah mengubah sumber antarmuka, jalankan
+`node scripts/prepare-grade9-english.mjs`, lalu
 `node scripts/prepare-grade9-assets.mjs` sebelum commit/deploy.
 Halaman memakai salinan dengan sidik konten pada nama file agar cache CDN
 tidak mencampur data lama dengan tampilan baru. File sumber tetap `data.js`
-dan `app.js`; salinan yang dihasilkan harus ikut diterbitkan.
+dan `app.js` untuk Indonesia serta `data-en.js` dan `app-en.js` untuk
+English. `language.js` memilih bahasa dan memuat data/akses/aplikasi
+secara berurutan; salinan yang dihasilkan harus ikut diterbitkan.
 Pratinjau lokal dapat dibuka dengan `?preview=1` hanya pada localhost/127.0.0.1.
 Flag tersebut tidak membuka akses pada domain produksi.
 
