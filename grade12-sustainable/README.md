@@ -1,27 +1,21 @@
 # Sustainable Web Studio — Grade 12
 
-Bilingual classroom companion for BSD Connect2Work Course 3, integrated into CS.Report's existing student verification and teacher dashboard. The working timetable is 26 × 90 minutes; approximately 30 meetings are suggested for 80-minute periods. This is a teaching estimate, adjustable after diagnostics.
+Bilingual classroom companion for BSD Connect2Work Course 3, integrated into CS.Report’s existing verification and teacher dashboard. Core plan: 26 × 90 minutes plus two reserve workshops; initially 30–32 meetings for 80-minute sessions. Adjust after diagnostics.
 
-## Content and behaviour
+## Content and review
 
-- 26 lesson briefs, each with a main goal, material summary, three tasks, three success criteria, BSD pointers, a practical Biblical Christian Worldview connection, a read-aloud introduction, and a 90-minute agenda.
-- 26 opening diagnostic questions, 52 post-practice questions, explanations after an attempt, 26 opening discussion prompts, and 26 exit tickets.
-- Assignment 1 organization website, Assignment 2 database news website, and e-commerce checkpoints through testing, revision, and final demonstration.
-- The six final rubric criteria match the existing Grade 12 Q2 configuration. Official quarter placement, assessment IDs, weights, and student grades are unchanged.
-- Practice notes are browser-local, scoped by student ID. Language changes share the same records and preserve quiz drafts. First diagnostic scores and best practice scores are stored separately.
-- Official submissions follow current teacher instructions. Legacy dates, Moodle submission instructions, and percentages from BSD assignment briefs are not adopted as current policy.
-- Teacher review validates the current Firebase user and teacher status. `?preview=1` only works on localhost/127.0.0.1 and uses a synthetic identity. Production preview parameters do not bypass access.
+- 26 briefs with main goals, material summaries, tasks, success criteria, read-aloud introductions, agendas, and BCW connections.
+- 110 original companion questions: 26 diagnostics and 84 practice questions with ID/EN explanations. 32 source concept checks point to inspected steps/pages.
+- 30 guided project definitions + one student template (833 source steps) and the 10-page introduction were inspected. Checkout’s empty step 48 is excluded from learning targets.
+- Product collection key allProducts is distinct from product.id; checkout includes shipping/reset; New Product includes delete; News seed has no dates until supplied in a working copy.
+- Official BSD understanding sets (17 questions in five sets) have not been inspected individually. This bank is not an official quiz answer key. Classroom extensions and BCW are labelled separately.
+- Teacher guide provides source mapping and limitations; Markdown downloads contain brief/source references and optional keys.
+- Practice storage v2 archives v1 quiz results and retains notes/links/reflections. Students attempt the revised bank before marking completion. Records remain browser-local and student-scoped; ID/EN shares the same records.
+- Rubric criteria and official Q2 assessment IDs, weights, quarter placement, and grades remain unchanged.
+- Production access uses the existing student/verified teacher flow. Local-only preview uses a test identity; query parameters do not bypass production access.
 
 ## Editing and publishing
 
-Edit canonical `data.js`, `access.js`, `app.js`, or `style.css`, then run:
+Edit canonical data.js, sources.js, audit.js, access.js, app.js, or style.css; run node scripts/prepare-grade12-assets.mjs. Keep already published fingerprinted files for existing pages. Original BSD source downloads are kept outside the hosted repository.
 
-```text
-node scripts/prepare-grade12-assets.mjs
-```
-
-The helper produces fingerprinted lesson assets and student/teacher portal scripts and updates the HTML entries. Keep published fingerprinted assets for existing open pages. No server or database schema change is required.
-
-Student flow: name/NIS search → existing password verification → Grade 12 Sustainable Web Studio card. Teacher flow: existing verified dashboard → Review Sustainable Web Studio.
-
-Coding activities are completed in BSD; this companion supplies classroom orientation, practice, reflection, and assessment guidance. The final testing and presentation checkpoints are teacher-designed additions aligned with CS.Report.
+Student flow: name/NIS search → existing password verification → Grade 12 studio card. Teacher flow: verified dashboard → studio review. Coding takes place in BSD; official submissions follow current teacher instructions.
