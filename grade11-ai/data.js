@@ -1,5 +1,8 @@
 'use strict';
-const CONFIG={gradebookUrl:'../index.html',bsdUrl:'https://app.bsd.education/'};
+const CONFIG={
+  "gradebookUrl": "../index.html",
+  "bsdUrl": "https://app.bsd.education/"
+};
 const BSD_SOURCES=[
   {
     "name": "tn-webcam-image-classification",
@@ -124,7 +127,6 @@ const BSD_SOURCES=[
 ];
 const COURSE={
   "title": "Code the Future with AI",
-  "meetings": 14,
   "minutes": 80,
   "startingPoint": [
     "Lanjutan setelah Webcam Live Classifier. Bagian awal menjadi referensi; tidak perlu diulang dari nol.",
@@ -132,24 +134,24 @@ const COURSE={
   ],
   "checkpoints": [
     {
-      "meeting": 1,
       "name": "F1",
+      "guide": 1,
       "focus": [
         "Perbaiki data dan bandingkan 6 hasil uji.",
         "Improve data and compare 6 test results."
       ]
     },
     {
-      "meeting": 4,
       "name": "F2",
+      "guide": 4,
       "focus": [
         "Bandingkan K=1/3/5 pada input uji tetap.",
         "Compare K=1/3/5 on fixed test inputs."
       ]
     },
     {
-      "meeting": 13,
       "name": "F3",
+      "guide": 13,
       "focus": [
         "Modifikasi navigasi: finish, jalan buntu, retry.",
         "Modify navigation: finish, dead end, retry."
@@ -212,7 +214,9 @@ const COURSE={
         "Ethical reflection, sources, and limitations."
       ]
     }
-  ]
+  ],
+  "mode": "self-paced",
+  "sessions": 14
 };
 const LESSONS=[
   {
@@ -320,24 +324,6 @@ const LESSONS=[
       }
     ],
     "kind": "F1",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Kejujuran: laporkan hasil benar dan gagal tanpa memilih bukti yang menguntungkan saja (Amsal 12:22).",
       "Honesty: report successes and failures without selecting only favorable evidence (Proverbs 12:22)."
@@ -448,24 +434,6 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Tanggung jawab: periksa bukti sebelum menyimpulkan dan jelaskan keterbatasan teknologi (Amsal 18:13).",
       "Responsibility: examine evidence before concluding and explain technological limitations (Proverbs 18:13)."
@@ -576,24 +544,6 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Tanggung jawab: periksa bukti sebelum menyimpulkan dan jelaskan keterbatasan teknologi (Amsal 18:13).",
       "Responsibility: examine evidence before concluding and explain technological limitations (Proverbs 18:13)."
@@ -704,24 +654,6 @@ const LESSONS=[
       }
     ],
     "kind": "F2",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Kejujuran: laporkan hasil benar dan gagal tanpa memilih bukti yang menguntungkan saja (Amsal 12:22).",
       "Honesty: report successes and failures without selecting only favorable evidence (Proverbs 12:22)."
@@ -773,8 +705,8 @@ const LESSONS=[
       "An interface and a three-class → three-sound plan."
     ],
     "prep": [
-      "Siapkan checkpoint UI langkah 12 untuk pertemuan berikutnya. Periksa audio dan izin mikrofon.",
-      "Prepare a step-12 UI checkpoint for the next meeting. Check audio and microphone permissions."
+      "Siapkan checkpoint UI langkah 12 untuk langkah berikutnya. Periksa audio dan izin mikrofon.",
+      "Prepare a step-12 UI checkpoint for the next stage. Check audio and microphone permissions."
     ],
     "oral": [
       "Apa inputnya? Bagian mana menentukan suara yang diputar?",
@@ -833,24 +765,6 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Melayani: gunakan kemampuan untuk membantu orang lain; periksa apakah fitur benar-benar berguna (1 Petrus 4:10).",
       "Service: use your abilities to help others; check whether a feature is useful (1 Peter 4:10)."
@@ -961,24 +875,6 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Melayani: gunakan kemampuan untuk membantu orang lain; periksa apakah fitur benar-benar berguna (1 Petrus 4:10).",
       "Service: use your abilities to help others; check whether a feature is useful (1 Peter 4:10)."
@@ -1089,24 +985,6 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Tanggung jawab: periksa bukti sebelum menyimpulkan dan jelaskan keterbatasan teknologi (Amsal 18:13).",
       "Responsibility: examine evidence before concluding and explain technological limitations (Proverbs 18:13)."
@@ -1157,8 +1035,8 @@ const LESSONS=[
       "A depth-1/2 comparison: move, time, and one limitation."
     ],
     "prep": [
-      "Sediakan papan legal berjalan dari pertemuan 7. Jika lambat, batasi depth 1 dan 2.",
-      "Use the working legal board from meeting 7. If slow, limit depth to 1 and 2."
+      "Sediakan papan legal berjalan dari panduan papan chess. Jika lambat, batasi depth 1 dan 2.",
+      "Use the working legal board from the chess board guide. If slow, limit depth to 1 and 2."
     ],
     "oral": [
       "Mengapa undo diperlukan? Apa biaya menelusuri lebih banyak kemungkinan?",
@@ -1217,24 +1095,6 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Tanggung jawab: periksa bukti sebelum menyimpulkan dan jelaskan keterbatasan teknologi (Amsal 18:13).",
       "Responsibility: examine evidence before concluding and explain technological limitations (Proverbs 18:13)."
@@ -1345,24 +1205,6 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Melayani: gunakan kemampuan untuk membantu orang lain; periksa apakah fitur benar-benar berguna (1 Petrus 4:10).",
       "Service: use your abilities to help others; check whether a feature is useful (1 Peter 4:10)."
@@ -1473,24 +1315,6 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Tanggung jawab: periksa bukti sebelum menyimpulkan dan jelaskan keterbatasan teknologi (Amsal 18:13).",
       "Responsibility: examine evidence before concluding and explain technological limitations (Proverbs 18:13)."
@@ -1601,24 +1425,6 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Tanggung jawab: periksa bukti sebelum menyimpulkan dan jelaskan keterbatasan teknologi (Amsal 18:13).",
       "Responsibility: examine evidence before concluding and explain technological limitations (Proverbs 18:13)."
@@ -1729,24 +1535,6 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Tanggung jawab: periksa bukti sebelum menyimpulkan dan jelaskan keterbatasan teknologi (Amsal 18:13).",
       "Responsibility: examine evidence before concluding and explain technological limitations (Proverbs 18:13)."
@@ -1857,24 +1645,6 @@ const LESSONS=[
       }
     ],
     "kind": "F3",
-    "times": [
-      [
-        "Demo & satu pertanyaan|Demo & one question",
-        5
-      ],
-      [
-        "Praktik BSD|BSD practice",
-        45
-      ],
-      [
-        "Modifikasi & uji|Modification & testing",
-        20
-      ],
-      [
-        "Hasil & refleksi|Results & reflection",
-        10
-      ]
-    ],
     "wka": [
       "Kejujuran: laporkan hasil benar dan gagal tanpa memilih bukti yang menguntungkan saja (Amsal 12:22).",
       "Honesty: report successes and failures without selecting only favorable evidence (Proverbs 12:22)."
@@ -1904,7 +1674,7 @@ const LESSONS=[
       "tn-ai-auto-navigation",
       "tn-ai-find-the-finish-line"
     ],
-    "range": "Your modified BSD project · individual demo",
+    "range": "Your modified BSD project · individual summative demonstration",
     "tasks": [
       [
         "Pilih satu karya modifikasi. Siapkan tautan, perubahan, hasil uji, dan keterbatasan.",
@@ -1932,8 +1702,8 @@ const LESSONS=[
       "A concise portfolio and an explainable individual demo."
     ],
     "prep": [
-      "14 × 80 menit = 18 jam 40 menit lanjutan. Overview seluruh course 25 jam; beberapa proyek 2 jam dipadatkan dengan checkpoint/lanjutan mandiri. Untuk kelas besar, mulai verifikasi pada pertemuan 13 dan pakai video singkat plus tanya jawab individual. Nilai resmi tetap mengikuti buku nilai yang ada.",
-      "14 × 80 minutes = 18 hours 40 minutes of continuation. The complete course overview is 25 hours; some 2-hour projects use checkpoints/independent continuation. For a large class, begin verification in meeting 13 and use short videos plus individual questions. Official grades follow the existing gradebook."
+      "Umumkan jadwal demo pada sesi akhir dan tenggat bersama. Mulai verifikasi individual saat karya siap.",
+      "Announce a final-session demo window and shared deadline. Start individual verification as work becomes ready."
     ],
     "oral": [
       "Apa kontribusimu? Tunjuk kode, prediksi perubahan, dan jelaskan satu keterbatasan.",
@@ -1992,23 +1762,189 @@ const LESSONS=[
       }
     ],
     "kind": "",
-    "times": [
-      [
-        "Siapkan bukti|Prepare evidence",
-        10
-      ],
-      [
-        "Demo & verifikasi individual|Individual demos & verification",
-        60
-      ],
-      [
-        "Refleksi|Reflection",
-        10
-      ]
-    ],
     "wka": [
       "Kejujuran: laporkan hasil benar dan gagal tanpa memilih bukti yang menguntungkan saja (Amsal 12:22).",
       "Honesty: report successes and failures without selecting only favorable evidence (Proverbs 12:22)."
+    ]
+  }
+];
+const UNITS=[
+  {
+    "id": "intro",
+    "title": "Introduction to AI",
+    "prior": true,
+    "projects": [
+      "tn-webcam-image-classification",
+      "tn-card-sorting-activity"
+    ],
+    "guides": [],
+    "result": [
+      "Jelaskan bagaimana gambar dikelompokkan dan satu keterbatasan prediksi.",
+      "Explain how images are grouped and one prediction limitation."
+    ]
+  },
+  {
+    "id": "train",
+    "title": "How to Train Your AI",
+    "prior": true,
+    "projects": [
+      "tn-machine-learning-image-classification",
+      "tn-image-upload-classifier"
+    ],
+    "guides": [
+      1
+    ],
+    "result": [
+      "Classifier gambar berjalan; contoh training dan pengujian terpisah.",
+      "A working image classifier with separate training and test examples."
+    ]
+  },
+  {
+    "id": "live",
+    "title": "Predicting with Live Data",
+    "projects": [
+      "tn-webcam-live-classifier",
+      "tn-webcam-live-classifier-coding-project",
+      "tn-adjustable-accuracy-webcam-classifier"
+    ],
+    "guides": [
+      2,
+      3,
+      4
+    ],
+    "result": [
+      "Live classifier berjalan dan perbandingan K memakai hasil uji.",
+      "A working live classifier and a K comparison based on test results."
+    ]
+  },
+  {
+    "id": "music",
+    "title": "Responsive Instrument",
+    "projects": [
+      "tn-responsive-instrument",
+      "tn-music-generator"
+    ],
+    "guides": [
+      5,
+      6
+    ],
+    "result": [
+      "Tiga kelas memilih suara yang sesuai dan kontrol pause bekerja.",
+      "Three classes select their mapped sounds and pause works."
+    ]
+  },
+  {
+    "id": "chess",
+    "title": "AI Chess Player",
+    "projects": [
+      "tn-ai-chess-player"
+    ],
+    "guides": [
+      7,
+      8
+    ],
+    "result": [
+      "Langkah legal diperiksa; keputusan dan waktu pada dua depth dibandingkan.",
+      "Legal moves are checked; decisions and time are compared at two depths."
+    ]
+  },
+  {
+    "id": "assistant",
+    "title": "AI Digital Assistant",
+    "projects": [
+      "tn-ai-digital-assistant"
+    ],
+    "guides": [
+      9
+    ],
+    "result": [
+      "Dua perintah baru dan fallback diuji dengan tiga input.",
+      "Two new commands and a fallback tested with three inputs."
+    ]
+  },
+  {
+    "id": "rescue",
+    "title": "AI Animal Rescue",
+    "projects": [
+      "tn-ai-animal-rescue"
+    ],
+    "guides": [
+      10
+    ],
+    "result": [
+      "Pencarian jalur diuji pada target terjangkau dan terisolasi.",
+      "Pathfinding tested with a reachable and an isolated target."
+    ]
+  },
+  {
+    "id": "navigation",
+    "title": "AI Navigation Algorithm",
+    "projects": [
+      "tn-ai-navigation-algorithm"
+    ],
+    "guides": [
+      11
+    ],
+    "result": [
+      "Urutan perintah membawa mobil ke tujuan dan jejak sel dijelaskan.",
+      "Commands take the car to the destination and the cell trace is explained."
+    ]
+  },
+  {
+    "id": "auto",
+    "title": "AI Auto Navigation",
+    "projects": [
+      "tn-ai-auto-navigation"
+    ],
+    "guides": [
+      12
+    ],
+    "result": [
+      "Aturan arah diuji pada belokan dan jalan buntu.",
+      "Direction rules tested on a turn and a dead end."
+    ]
+  },
+  {
+    "id": "finish",
+    "title": "AI Find the Finish Line",
+    "projects": [
+      "tn-ai-find-the-finish-line"
+    ],
+    "guides": [
+      13
+    ],
+    "result": [
+      "Finish, jalan buntu, dan retry diuji; gerak/reset dicatat.",
+      "Finish, dead end, and retry tested; movements/reset recorded."
+    ]
+  }
+];
+const CHECKPOINTS=[
+  {
+    "id": "F1",
+    "guide": 1,
+    "unit": "train",
+    "trigger": [
+      "Setelah Image Upload Classifier siap. Bisa dikerjakan sekarang memakai karya lama.",
+      "After Image Upload Classifier is ready. You can use your existing work now."
+    ]
+  },
+  {
+    "id": "F2",
+    "guide": 4,
+    "unit": "live",
+    "trigger": [
+      "Setelah Adjustable Accuracy Webcam Classifier siap.",
+      "After Adjustable Accuracy Webcam Classifier is ready."
+    ]
+  },
+  {
+    "id": "F3",
+    "guide": 13,
+    "unit": "finish",
+    "trigger": [
+      "Setelah Find the Finish Line siap.",
+      "After Find the Finish Line is ready."
     ]
   }
 ];
