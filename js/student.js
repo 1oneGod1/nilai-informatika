@@ -533,7 +533,7 @@ function buildGrade12MaterialsCard(student) {
           <div class="flex flex-wrap items-center gap-2 mb-2"><span class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold">MATERI KELAS</span><span class="text-[10px] font-mono-tech text-cyan-200 bg-cyan-500/10 border border-cyan-400/20 px-2 py-0.5 rounded-full">KELAS 12 · BSD COURSE 3</span></div>
           <h3 class="text-xl font-black text-white">Sustainable Web Studio</h3>
           <p class="text-sm text-slate-300 mt-1 max-w-2xl">Hari ini belajar apa di BSD? Lihat materi, hasil yang perlu ditunjukkan, refleksi, dan tantangan modifikasi. Indonesia–English.</p>
-          <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech"><span class="text-emerald-300">26 panduan pertemuan</span><span class="text-cyan-300">Belajar · hasil · refleksi · modifikasi</span><span class="text-lime-300">3 assignment</span></div>
+          <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech"><span class="text-emerald-300">18 panduan pertemuan</span><span class="text-cyan-300">Belajar · hasil · refleksi · modifikasi</span><span class="text-lime-300">3 assignment</span></div>
         </div>
         <button type="button" onclick="openGrade12Materials()" class="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black font-mono-tech text-xs px-5 py-3 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0">BUKA SUSTAINABLE WEB STUDIO <i class="fas fa-arrow-right"></i></button>
       </div>
