@@ -302,6 +302,24 @@ function openGrade10TeacherPreview() {
   window.location.href = `grade10-uiux.html?teacherPreview=1#${section}`;
 }
 
+function openGrade11TeacherPreview() {
+  const teacher = auth.currentUser;
+  if (!teacher) {
+    showAlert("Sesi guru tidak ditemukan. Silakan masuk kembali.", "warning");
+    return;
+  }
+  sessionStorage.setItem("csReportGrade11Session", JSON.stringify({
+    id: `teacher-preview-${teacher.uid}`,
+    name: "Review Guru",
+    className: "11 · Review guru",
+    verifiedAt: Date.now(),
+    teacherUid: teacher.uid,
+    teacherEmail: String(teacher.email || ""),
+    isTeacherPreview: true,
+  }));
+  window.location.href = "grade11-ai/index.html?teacherPreview=1#teacher";
+}
+
 function openGrade8TeacherPreview() {
   const teacher = auth.currentUser;
   if (!teacher) {
