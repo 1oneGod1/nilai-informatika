@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 const root=new URL('../',import.meta.url),folder=new URL('grade12-sustainable/',root);
 const fingerprint=bytes=>createHash('sha256').update(bytes).digest('hex').slice(0,12);
 let html=await fs.readFile(new URL('index.html',folder),'utf8');
-for(const base of ['data.js','sources.js','audit.js','access.js','app.js','style.css']){
+for(const base of ['data.js','sources.js','audit.js','guides.js','access.js','app.js','style.css']){
   const bytes=await fs.readFile(new URL(base,folder)),[name,ext]=base.split('.'),filename=name+'.'+fingerprint(bytes)+'.'+ext;
   await fs.writeFile(new URL(filename,folder),bytes);
   const pattern=new RegExp('("'+name+')(?:\\.[a-f0-9]{12})?\\.'+ext+'(?:\\?[^"\\s]*)?"','g');
