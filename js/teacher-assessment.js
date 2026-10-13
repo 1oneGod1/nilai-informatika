@@ -181,6 +181,9 @@ function loadDcAssessmentDraft() {
     dcTeacherState.quarter,
     dcTeacherState.grade,
   );
+  if (dcTeacherState.draft.reviewed && !dcTeacherState.draft.previousGradebook) {
+    dcTeacherState.draft.previousGradebook = Object.fromEntries(Object.entries(student || {}).filter(([key]) => /^q2_(f\d+|sumatif)$/.test(key)));
+  }
   dcTeacherState.dirty = false;
   ensureDcSelectedAssessment();
   renderDcAssessmentPanel();
@@ -196,6 +199,7 @@ function dcSetCriterionScore(assessmentId, criterionId, maximum, value) {
   if (!assessmentDraft) return;
   const numericValue = Math.min(maximum, Math.max(0, Number(value) || 0));
   assessmentDraft.criteria[criterionId] = numericValue;
+  if (dcTeacherState.draft.reviewed) dcTeacherState.draft.reviewed[assessmentId] = false;
   dcTeacherState.dirty = true;
   renderDcAssessmentPanel();
 }
@@ -308,7 +312,7 @@ async function saveDcAssessment() {
       summativeField,
     );
     const obsoleteFormativeFields =
-      typeof getObsoleteFormativeFields === "function"
+      !course.gradingVersion && typeof getObsoleteFormativeFields === "function"
         ? getObsoleteFormativeFields(student, dcTeacherState.quarter)
         : [];
     const studentUpdate = {
@@ -327,6 +331,7 @@ async function saveDcAssessment() {
       delete student[field];
     });
     student.digitalCitizenshipAssessment[`q${dcTeacherState.quarter}`] = record;
+    if (record.gradingVersion && record.publishedGradebook) dcTeacherState.draft.publishedGradebook = { ...record.publishedGradebook };
     Object.assign(student, gradebookFields);
     dcTeacherState.dirty = false;
     updateDcSaveState();
@@ -339,7 +344,7 @@ async function saveDcAssessment() {
     }
     const syncedCount = Object.keys(formativeGradebookFields).length;
     showAlert(
-      `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.${syncedCount ? ` Nilai F1–F${syncedCount} otomatis masuk ke buku nilai.` : ""}${syncedSummativeScore ? " Nilai Sumatif otomatis masuk ke buku nilai." : ""}`,
+      `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.${syncedCount ? ` Nilai F1–F${syncedCount} otomatis masuk ke buku nilai.` : ""}${course.gradingVersion ? (record.assessmentComplete ? " Nilai akhir AI 20–30–50 otomatis masuk ke buku nilai; skor course dan sumatif tersedia terpisah." : " Penilaian sementara tersimpan. Nilai resmi sebelumnya tetap sampai seluruh 14 komponen diperiksa.") : (syncedSummativeScore ? " Nilai Sumatif otomatis masuk ke buku nilai." : "")}`,
       "success",
     );
   } catch (error) {
@@ -456,10 +461,13 @@ function renderDcAssessmentPanel() {
         </div>
         <div class="dc-unit-score"><span>Nilai proyek</span><strong>${raw}</strong><small>${completed}/${assessment.criteria.length} kriteria tuntas</small></div>
       </div>
+      ${course.gradingVersion ? '<p class="dc-assessment-brief">Course 20% · F1–F3 30% · Sumatif 50%. Nilai akhir menunggu seluruh komponen diperiksa. Catatan lama tetap diarsipkan.</p>' : ''}
+      ${course.gradingVersion ? dcAiArchiveHtml(dcTeacherState.draft) : ''}
       ${briefHtml}
       ${starterCodeHtml}
       <div class="dc-rubric-guide"><span><i class="fas fa-check-square"></i> Centang untuk poin penuh</span><span><i class="fas fa-keyboard"></i> Isi poin untuk nilai parsial</span><span><i class="fas fa-user-pen"></i> Versi siswa dan kalimat lengkap wajib</span></div>
       <div class="dc-criteria-list">${criteriaHtml}</div>
+      ${course.gradingVersion ? '<label class="dc-criterion-check"><input type="checkbox" '+(dcTeacherState.draft.reviewed?.[assessment.id]===true?'checked':'')+' data-assessment="'+assessment.id+'" onchange="dcSetAssessmentReviewed(this.dataset.assessment,this.checked)" /><span>Komponen sudah diperiksa guru (nilai 0 juga harus ditandai)</span></label>' : ''}
       <label class="dc-teacher-note"><span>Catatan guru</span><textarea oninput="dcSetAssessmentNote('${assessment.id}',this.value)" placeholder="Kekuatan, hal yang perlu diperbaiki, atau tindak lanjut…">${escHtml(assessmentDraft.note || "")}</textarea></label>
     </section>`;
 }
@@ -478,7 +486,7 @@ function renderDcAssessmentNav(summary) {
       return `
         <button type="button" class="dc-nav-item ${selected ? "is-active" : ""}"
           style="--dc-item:${assessment.color}" onclick="dcSelectAssessment('${assessment.id}')">
-          <span>${assessment.number}</span><div><strong>${escHtml(assessment.title)}</strong><small>${assessment.type}${assessment.jp ? ` · ${assessment.jp} JP` : ""} · ${assessment.weight}%</small></div><b>${raw}</b>
+          <span>${assessment.number}</span><div><strong>${escHtml(assessment.title)}</strong><small>${assessment.type}${assessment.jp ? ` · ${assessment.jp} JP` : ""} · ${assessment.weight}%</small></div><b>${dcTeacherState.draft.reviewed && dcTeacherState.draft.reviewed[assessment.id] !== true ? "Belum dinilai" : raw}</b>
         </button>`;
     })
     .join("");
@@ -498,11 +506,13 @@ function renderDcSummary(summary, student) {
   const summativeCard = weightTotals.summative
     ? `<div class="dc-summary-card"><span>Sumatif</span><strong>${dcFormatOneDecimal(summary.summative)}<small>/${dcFormatCourseWeight(weightTotals.summative)}</small></strong></div>`
     : "";
+  area.classList.toggle('has-completion',Boolean(weightTotals.completion));
   area.innerHTML = `
     <div class="dc-selected-student"><span>SISWA TERPILIH</span><strong>${studentLabel}</strong><small>Periode Q${dcTeacherState.quarter}</small></div>
+    ${weightTotals.completion ? '<div class="dc-summary-card"><span>Penyelesaian course</span><strong>'+dcFormatOneDecimal(summary.completion)+'<small>/20</small></strong></div>' : ''}
     ${formativeCard}
     ${summativeCard}
-    <div class="dc-summary-card dc-summary-final"><span>Nilai akhir</span><strong>${dcFormatOneDecimal(summary.finalScore)}</strong></div>`;
+    <div class="dc-summary-card dc-summary-final"><span>${course?.gradingVersion && !summary.complete ? "Nilai sementara" : "Nilai akhir"}</span><strong>${dcFormatOneDecimal(summary.finalScore)}</strong>${course?.gradingVersion ? `<small>${summary.reviewedCount}/14 komponen diperiksa</small>` : ""}</div>`;
 }
 
 function renderDcQuizPanel(content, summary, quiz) {
@@ -537,3 +547,6 @@ window.dcSetAssessmentNote = dcSetAssessmentNote;
 window.dcToggleQuizAnswer = dcToggleQuizAnswer;
 window.dcSetQuizNote = dcSetQuizNote;
 window.saveDcAssessment = saveDcAssessment;
+
+function dcSetAssessmentReviewed(id,checked){if(!dcTeacherState.draft.reviewed||!(id in dcTeacherState.draft.reviewed))return;dcTeacherState.draft.reviewed[id]=checked===true;dcTeacherState.dirty=true;renderDcAssessmentPanel();}
+window.dcSetAssessmentReviewed=dcSetAssessmentReviewed;

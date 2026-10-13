@@ -809,7 +809,7 @@ function renderStudentDetail(id) {
       const sTxtCls = sNum < kkm ? "text-rose-400" : "text-emerald-400";
       tiles += `
         <div class="bg-gradient-to-br from-indigo-500/10 to-cyan-500/5 border border-indigo-500/20 p-3 rounded-xl flex flex-col items-center justify-center">
-          <span class="text-[10px] text-indigo-300 font-bold uppercase tracking-widest mb-1 font-mono-tech">Sumatif Q${q}</span>
+          <span class="text-[10px] text-indigo-300 font-bold uppercase tracking-widest mb-1 font-mono-tech">${typeof dcIsAiWeightedRecord === "function" && dcIsAiWeightedRecord(s.digitalCitizenshipAssessment?.[`q${q}`], q, getStudentGrade(s)) && (s.digitalCitizenshipAssessment?.[`q${q}`]?.assessmentComplete || dcAiHasPublishedGrades(s.digitalCitizenshipAssessment?.[`q${q}`])) ? "Nilai akhir AI" : "Sumatif"} Q${q}</span>
           <span class="text-3xl font-black ${sTxtCls}">${sNum}</span>
         </div>`;
     }

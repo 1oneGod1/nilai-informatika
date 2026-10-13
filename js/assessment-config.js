@@ -2233,8 +2233,8 @@ function dcFormatOneDecimal(value) {
   return (Math.round((number + Number.EPSILON) * 10) / 10).toFixed(1);
 }
 
-function dcCreateEmptyDraft(quarter = 1, grade = 9) {
-  const course = dcGetCourseConfig(quarter, grade);
+function dcCreateEmptyDraft(quarter = 1, grade = 9, courseOverride = null) {
+  const course = courseOverride || dcGetCourseConfig(quarter, grade);
   const rubricScores = {};
   (course?.assessments || []).forEach((assessment) => {
     rubricScores[assessment.id] = {
@@ -2251,9 +2251,9 @@ function dcCreateEmptyDraft(quarter = 1, grade = 9) {
   };
 }
 
-function dcDraftFromStored(stored, quarter = 1, grade = 9) {
-  const course = dcGetCourseConfig(quarter, grade);
-  const draft = dcCreateEmptyDraft(quarter, grade);
+function dcDraftFromStored(stored, quarter = 1, grade = 9, courseOverride = null) {
+  const course = courseOverride || dcGetCourseConfig(quarter, grade);
+  const draft = dcCreateEmptyDraft(quarter, grade, course);
   if (!course || !stored || typeof stored !== "object") return draft;
 
   course.assessments.forEach((assessment) => {
@@ -2277,8 +2277,8 @@ function dcDraftFromStored(stored, quarter = 1, grade = 9) {
   return draft;
 }
 
-function dcCalculateSummary(draft, quarter = 1, grade = 9) {
-  const course = dcGetCourseConfig(quarter, grade);
+function dcCalculateSummary(draft, quarter = 1, grade = 9, courseOverride = null) {
+  const course = courseOverride || dcGetCourseConfig(quarter, grade);
   const rawScores = {};
   const contributions = {};
   let formative = 0;
@@ -2410,13 +2410,14 @@ function dcBuildFormativeGradebookFields(
   quarter,
   grade = 9,
 ) {
-  const course = dcGetCourseConfig(quarter, grade);
+  const course = typeof dcGetRecordCourse === "function" ? dcGetRecordCourse(storedRecord, quarter, grade) : dcGetCourseConfig(quarter, grade);
   if (!course || !storedRecord || typeof storedRecord !== "object") return {};
 
   const recalculatedSummary = dcCalculateSummary(
-    dcDraftFromStored(storedRecord, quarter, grade),
+    dcDraftFromStored(storedRecord, quarter, grade, course),
     quarter,
     grade,
+    course,
   );
   const rawScores =
     storedRecord.rawScores && typeof storedRecord.rawScores === "object"
@@ -2424,7 +2425,7 @@ function dcBuildFormativeGradebookFields(
       : {};
   const fields = {};
 
-  const formativeAssessments = dcGetFormativeAssessments(quarter, grade);
+  const formativeAssessments = course.assessments.filter(a => a.type === "Formatif");
   const groupedAssessments =
     dcUsesGroupedFormativeGradebook(grade)
       ? dcGroupSequentialAssessments(formativeAssessments, 3)
@@ -2487,7 +2488,7 @@ function dcBuildSummativeGradebookField(
     return {};
   }
 
-  const course = dcGetCourseConfig(normalizedQuarter, normalizedGrade);
+  const course = (typeof dcGetRecordCourse === "function" ? dcGetRecordCourse(storedRecord, normalizedQuarter, normalizedGrade) : dcGetCourseConfig(normalizedQuarter, normalizedGrade));
   if (!course) return {};
 
   if (course.gradebookSummativeMode === "overall") {
@@ -2508,7 +2509,7 @@ function dcBuildSummativeGradebookField(
     if (!hasAssessmentEvidence && !hasStoredEvidence) return {};
 
     const summary = dcCalculateSummary(
-      dcDraftFromStored(storedRecord, normalizedQuarter, normalizedGrade),
+      dcDraftFromStored(storedRecord, normalizedQuarter, normalizedGrade, course),
       normalizedQuarter,
       normalizedGrade,
     );
@@ -2576,6 +2577,7 @@ function dcBuildSummativeGradebookField(
     dcDraftFromStored(storedRecord, normalizedQuarter, normalizedGrade),
     normalizedQuarter,
     normalizedGrade,
+    course,
   );
 
   if (derivedSummativeIds) {
@@ -2739,15 +2741,16 @@ function dcBuildStudentAssessmentHtml(student, kkm) {
 
   const quarterHtml = quarters
     .map((quarter) => {
-      const course = dcGetCourseConfig(quarter, grade);
       const stored = records[`q${quarter}`];
-      const draft = dcDraftFromStored(stored, quarter, grade);
-      const summary = dcCalculateSummary(draft, quarter, grade);
+      const course = typeof dcGetRecordCourse === "function" ? dcGetRecordCourse(stored, quarter, grade) : dcGetCourseConfig(quarter, grade);
+      const draft = dcDraftFromStored(stored, quarter, grade, course);
+      const summary = dcCalculateSummary(draft, quarter, grade, course);
       const weightTotals = dcGetCourseWeightTotals(course);
-      const status = dcScoreStatus(summary.finalScore, kkm);
+      const status = course.gradingVersion && !summary.complete ? "Penilaian berlangsung" : dcScoreStatus(summary.finalScore, kkm);
       const assessmentCards = course.assessments
         .map((assessment) => dcBuildStudentRubricCard(assessment, draft, summary))
         .join("");
+      const completionSummary = weightTotals.completion ? `<div><span>Penyelesaian course</span><strong>${dcFormatOneDecimal(summary.completion)}<small>/${dcFormatCourseWeight(weightTotals.completion)}</small></strong></div>` : "";
       const formativeSummary = weightTotals.formative
         ? `<div><span>Formatif</span><strong>${dcFormatOneDecimal(summary.formative)}<small>/${dcFormatCourseWeight(weightTotals.formative)}</small></strong></div>`
         : "";
@@ -2761,9 +2764,10 @@ function dcBuildStudentAssessmentHtml(student, kkm) {
         <section class="dc-student-quarter">
           <div class="dc-student-quarter-head">
             <div><span>PERIODE Q${quarter}</span><h4>${escHtml(course.title)}</h4></div>
-            <div class="dc-student-final ${status === "Tuntas" ? "is-complete" : ""}"><small>Nilai akhir</small><strong>${dcFormatOneDecimal(summary.finalScore)}</strong><span>${status}</span></div>
+            <div class="dc-student-final ${status === "Tuntas" ? "is-complete" : ""}"><small>${course.gradingVersion && !summary.complete ? "Nilai sementara" : "Nilai akhir"}</small><strong>${dcFormatOneDecimal(summary.finalScore)}</strong><span>${status}</span></div>
           </div>
           <div class="dc-student-summary-grid">
+            ${completionSummary}
             ${formativeSummary}
             ${summativeSummary}
             ${thirdSummary}
@@ -2776,7 +2780,7 @@ function dcBuildStudentAssessmentHtml(student, kkm) {
     })
     .join("");
 
-  const onlyCourse = quarters.length === 1 ? dcGetCourseConfig(quarters[0], grade) : null;
+  const onlyCourse = quarters.length === 1 ? (typeof dcGetRecordCourse === "function" ? dcGetRecordCourse(records[`q${quarters[0]}`], quarters[0], grade) : dcGetCourseConfig(quarters[0], grade)) : null;
   const weightDescription = onlyCourse
     ? dcDescribeCourseWeights(onlyCourse)
     : "Bobot mengikuti konfigurasi setiap periode";

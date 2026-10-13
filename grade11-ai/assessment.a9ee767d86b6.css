@@ -1,0 +1,7 @@
+.dc-assessment-summary.has-completion{grid-template-columns:minmax(12rem,1fr) repeat(4,minmax(6.5rem,.35fr))}
+.dc-assessment-controls .dc-grade-field{width:100px;min-width:100px;max-width:100px}
+.ai-assessment-archive{margin:14px 0;padding:14px;border:1px solid #334155;border-radius:10px;color:#94a3b8}
+.ai-assessment-archive summary{cursor:pointer;font-weight:650}
+.ai-assessment-archive ul{padding-left:20px;font-size:13px}
+@media(max-width:1050px){.dc-assessment-summary.has-completion{grid-template-columns:repeat(2,minmax(0,1fr))}.dc-assessment-summary.has-completion .dc-selected-student{grid-column:1/-1}}
+@media(max-width:500px){.dc-assessment-summary.has-completion{grid-template-columns:1fr}}

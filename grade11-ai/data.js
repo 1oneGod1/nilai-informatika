@@ -216,7 +216,13 @@ const COURSE={
     }
   ],
   "mode": "self-paced",
-  "sessions": 14
+  "sessions": 14,
+  "assessmentWeights": {
+    "completion": 20,
+    "formative": 30,
+    "summative": 50
+  },
+  "gradingVersion": "g11-ai-20-30-50-v1"
 };
 const LESSONS=[
   {
@@ -1781,7 +1787,8 @@ const UNITS=[
     "result": [
       "Jelaskan bagaimana gambar dikelompokkan dan satu keterbatasan prediksi.",
       "Explain how images are grouped and one prediction limitation."
-    ]
+    ],
+    "weight": 2
   },
   {
     "id": "train",
@@ -1797,7 +1804,8 @@ const UNITS=[
     "result": [
       "Classifier gambar berjalan; contoh training dan pengujian terpisah.",
       "A working image classifier with separate training and test examples."
-    ]
+    ],
+    "weight": 2
   },
   {
     "id": "live",
@@ -1815,7 +1823,8 @@ const UNITS=[
     "result": [
       "Live classifier berjalan dan perbandingan K memakai hasil uji.",
       "A working live classifier and a K comparison based on test results."
-    ]
+    ],
+    "weight": 2
   },
   {
     "id": "music",
@@ -1831,7 +1840,8 @@ const UNITS=[
     "result": [
       "Tiga kelas memilih suara yang sesuai dan kontrol pause bekerja.",
       "Three classes select their mapped sounds and pause works."
-    ]
+    ],
+    "weight": 2
   },
   {
     "id": "chess",
@@ -1846,7 +1856,8 @@ const UNITS=[
     "result": [
       "Langkah legal diperiksa; keputusan dan waktu pada dua depth dibandingkan.",
       "Legal moves are checked; decisions and time are compared at two depths."
-    ]
+    ],
+    "weight": 2
   },
   {
     "id": "assistant",
@@ -1860,7 +1871,8 @@ const UNITS=[
     "result": [
       "Dua perintah baru dan fallback diuji dengan tiga input.",
       "Two new commands and a fallback tested with three inputs."
-    ]
+    ],
+    "weight": 2
   },
   {
     "id": "rescue",
@@ -1874,7 +1886,8 @@ const UNITS=[
     "result": [
       "Pencarian jalur diuji pada target terjangkau dan terisolasi.",
       "Pathfinding tested with a reachable and an isolated target."
-    ]
+    ],
+    "weight": 2
   },
   {
     "id": "navigation",
@@ -1888,7 +1901,8 @@ const UNITS=[
     "result": [
       "Urutan perintah membawa mobil ke tujuan dan jejak sel dijelaskan.",
       "Commands take the car to the destination and the cell trace is explained."
-    ]
+    ],
+    "weight": 2
   },
   {
     "id": "auto",
@@ -1902,7 +1916,8 @@ const UNITS=[
     "result": [
       "Aturan arah diuji pada belokan dan jalan buntu.",
       "Direction rules tested on a turn and a dead end."
-    ]
+    ],
+    "weight": 2
   },
   {
     "id": "finish",
@@ -1916,7 +1931,8 @@ const UNITS=[
     "result": [
       "Finish, jalan buntu, dan retry diuji; gerak/reset dicatat.",
       "Finish, dead end, and retry tested; movements/reset recorded."
-    ]
+    ],
+    "weight": 2
   }
 ];
 const CHECKPOINTS=[
@@ -1927,7 +1943,8 @@ const CHECKPOINTS=[
     "trigger": [
       "Setelah Image Upload Classifier siap. Bisa dikerjakan sekarang memakai karya lama.",
       "After Image Upload Classifier is ready. You can use your existing work now."
-    ]
+    ],
+    "weight": 10
   },
   {
     "id": "F2",
@@ -1936,7 +1953,8 @@ const CHECKPOINTS=[
     "trigger": [
       "Setelah Adjustable Accuracy Webcam Classifier siap.",
       "After Adjustable Accuracy Webcam Classifier is ready."
-    ]
+    ],
+    "weight": 10
   },
   {
     "id": "F3",
@@ -1945,6 +1963,7 @@ const CHECKPOINTS=[
     "trigger": [
       "Setelah Find the Finish Line siap.",
       "After Find the Finish Line is ready."
-    ]
+    ],
+    "weight": 10
   }
 ];

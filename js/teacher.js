@@ -405,7 +405,8 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
     : {};
 }
 
-function usesOverallAssessmentAsSummative(grade, quarter) {
+function usesOverallAssessmentAsSummative(grade, quarter, record = null) {
+  if (Number(grade) === 11 && Number(quarter) === 2) return typeof dcIsAiWeightedRecord === "function" && dcIsAiWeightedRecord(record, quarter, grade) && (G11_AI_WEIGHTED_ASSESSMENTS.every(a => record.reviewed?.[a.id] === true) || dcAiHasPublishedGrades(record));
   const normalizedGrade = Number(grade);
   const normalizedQuarter = Number(quarter);
   const course =
@@ -1898,7 +1899,7 @@ function listenToSiswaData() {
                 needsMigration = true;
               }
             });
-            getObsoleteFormativeFields(val, quarter).forEach((field) => {
+            (getTeacherStudentGrade(studentRecord) === 11 && quarter === 2 ? [] : getObsoleteFormativeFields(val, quarter)).forEach((field) => {
               updates[`${id}/${field}`] = null;
               needsMigration = true;
             });
@@ -2060,7 +2061,7 @@ function renderTableHead() {
       <th class="${TH}">Kelas</th>
       <th class="${TH}">Password / Akun</th>
       ${fCols}
-      <th class="${TH_INDIGO}">Sumatif Q${activeQuarter}</th>
+      <th class="${TH_INDIGO}">Sumatif / Nilai akhir Q${activeQuarter}</th>
       <th class="${TH}">Status (Q${activeQuarter})</th>
       <th class="${TH}" style="width:100px">Aksi</th>
     </tr>`;
@@ -2160,6 +2161,7 @@ function renderTableBody(data) {
         usesOverallAssessmentAsSummative(
           getTeacherStudentGrade(s),
           activeQuarter,
+          s.digitalCitizenshipAssessment?.[`q${activeQuarter}`],
         );
       const finalScore = isAutoFinalScore
         ? Number(sumatifValue || 0)
@@ -2273,8 +2275,9 @@ function renderTableBody(data) {
         </td>
         <td class="px-3 py-3" data-label="Password / Akun">${passwordHTML}</td>
         ${fInputs}
-        <td class="px-2 py-3" data-label="Sumatif Q${activeQuarter}">
+        <td class="px-2 py-3" data-label="${isAutoFinalScore ? "Nilai akhir" : "Sumatif"} Q${activeQuarter}">
           <input type="number" min="0" max="100" class="${sCls}${isAutoSummative ? " cursor-not-allowed opacity-80" : ""}" id="r-s-${s.id}" value="${sumatifVal}" placeholder="-" oninput="highlightScore(this,${kkm})" ${isAutoSummative ? `readonly title="${autoSummativeLabel}" aria-label="${autoSummativeLabel}"` : ""} />
+          ${isAutoFinalScore && getTeacherStudentGrade(s) === 11 && activeQuarter === 2 ? '<small class="block text-[10px] text-slate-400 mt-1">Course '+autoFormativeFields.q2_courseCompletion+' · Sumatif '+autoFormativeFields.q2_aiSummative+'</small>' : ''}
         </td>
         <td class="px-3 py-3 text-center" data-label="Status Q${activeQuarter}">${statusChip}</td>
         <td class="student-row-actions px-4 py-3" data-label="Simpan / Hapus">
@@ -2523,7 +2526,9 @@ function exportExcel() {
   const headers = ["No", "NIS", "Nama Siswa", "Kelas", "Password"];
   for (let i = 1; i <= numFormatif[activeQuarter]; i++)
     headers.push(`Formatif ${i}`);
-  headers.push("Sumatif", "Status", "KKM");
+  const exportAiComponents = Number(activeQuarter) === 2 && filteredSiswa.some(s => getTeacherStudentGrade(s) === 11 && typeof dcIsAiWeightedRecord === "function" && dcIsAiWeightedRecord(s.digitalCitizenshipAssessment?.q2));
+  headers.push("Sumatif / Nilai akhir", "Status", "KKM");
+  if (exportAiComponents) headers.push("Course AI (20%)", "Sumatif AI (50%)", "Nilai akhir AI");
 
   const rows = filteredSiswa.map((s, idx) => {
     const row = [idx + 1, s.nis || "", s.nama, s.kelas, s.password || ""];
@@ -2542,6 +2547,7 @@ function exportExcel() {
       usesOverallAssessmentAsSummative(
         getTeacherStudentGrade(s),
         activeQuarter,
+        s.digitalCitizenshipAssessment?.[`q${activeQuarter}`],
       );
 
     let fCount = 0;
@@ -2578,6 +2584,7 @@ function exportExcel() {
     }
     row.push(status);
     row.push(kkm);
+    if (exportAiComponents) row.push(autoGradebookFields.q2_courseCompletion ?? "", autoGradebookFields.q2_aiSummative ?? "", autoGradebookFields.q2_aiFinal ?? "");
     return row;
   });
 
