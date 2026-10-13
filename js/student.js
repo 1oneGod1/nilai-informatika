@@ -445,6 +445,10 @@ async function loadGrade10ReportScores(studentId, kkm) {
 }
 
 function rememberVerifiedStudent(student) {
+  if (student && getStudentGrade(student) === 8) {
+    sessionStorage.setItem("csReportGrade8Session", JSON.stringify({id:String(student.id),name:String(student.nama||"Siswa Kelas 8"),className:String(student.kelas||"8"),verifiedAt:Date.now()}));
+    return;
+  }
   if (student && getStudentGrade(student) === 12) {
     sessionStorage.setItem("csReportGrade12Session", JSON.stringify({
       id: String(student.id),
@@ -487,6 +491,23 @@ function openGrade10Materials() {
 
   rememberVerifiedStudent(selectedStudentForDetail);
   window.location.href = "grade10-uiux.html";
+}
+
+function openGrade8Materials() {
+  const student = selectedStudentForDetail;
+  if (!student || getStudentGrade(student) !== 8) {
+    showAlert("Materi Game Studio tersedia untuk siswa kelas 8.", "warning");
+    return;
+  }
+  let session;
+  try { session = JSON.parse(sessionStorage.getItem("csReportGrade8Session") || "null"); } catch {}
+  const age = Date.now() - Number(session?.verifiedAt);
+  if (!session || session.id !== String(student.id) || !Number.isFinite(age)
+    || age < 0 || age > 12 * 60 * 60 * 1000) {
+    requestPasswordForStudent(student.id);
+    return;
+  }
+  window.location.href = "grade8-games/index.html";
 }
 
 function openGrade9Materials() {
@@ -536,6 +557,23 @@ function buildGrade12MaterialsCard(student) {
           <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech"><span class="text-emerald-300">18 panduan pertemuan</span><span class="text-cyan-300">Belajar · hasil · refleksi · modifikasi</span><span class="text-lime-300">3 assignment</span></div>
         </div>
         <button type="button" onclick="openGrade12Materials()" class="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black font-mono-tech text-xs px-5 py-3 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0">BUKA SUSTAINABLE WEB STUDIO <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </section>`;
+}
+
+function buildGrade8MaterialsCard(student) {
+  if (getStudentGrade(student) !== 8) return "";
+  return `
+    <section id="grade8GameMaterials" class="mb-6 rounded-2xl border border-emerald-400/25 bg-gradient-to-br from-emerald-500/10 via-slate-900/70 to-cyan-500/10 overflow-hidden">
+      <div class="p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center text-emerald-300 text-xl shrink-0"><i class="fas fa-gamepad"></i></div>
+        <div class="flex-1">
+          <div class="flex flex-wrap items-center gap-2 mb-2"><span class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold">MATERI KELAS</span><span class="text-[10px] font-mono-tech text-cyan-200 bg-cyan-500/10 border border-cyan-400/20 px-2 py-0.5 rounded-full">KELAS 8</span></div>
+          <h3 class="text-xl font-black text-white">Game Studio: Mobile Game Developer</h3>
+          <p class="text-sm text-slate-300 mt-1 max-w-2xl">Buka tugas hari ini, kerjakan di BSD, lalu coba tantangan. 8 pertemuan untuk membuat dan memodifikasi game.</p>
+          <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech"><span class="text-emerald-300">8 × 2 JP</span><span class="text-cyan-300">24 soal latihan pilihan</span><span class="text-lime-300">Game final pilihan</span></div>
+        </div>
+        <button type="button" onclick="openGrade8Materials()" class="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black font-mono-tech text-xs px-5 py-3 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0">BUKA GAME STUDIO <i class="fas fa-arrow-right"></i></button>
       </div>
     </section>`;
 }
@@ -759,6 +797,7 @@ function renderStudentDetail(id) {
     typeof dcBuildStudentAssessmentHtml === "function"
       ? dcBuildStudentAssessmentHtml(s, kkm)
       : "";
+  const grade8MaterialsHtml = buildGrade8MaterialsCard(s);
   const grade9MaterialsHtml = buildGrade9MaterialsCard(s);
   const grade12MaterialsHtml = buildGrade12MaterialsCard(s);
   const grade10MaterialsHtml = buildGrade10MaterialsCard(s);
@@ -815,6 +854,7 @@ function renderStudentDetail(id) {
         </div>
       </div>
 
+      ${grade8MaterialsHtml}
       ${grade9MaterialsHtml}
       ${grade12MaterialsHtml}
       ${grade10MaterialsHtml}
