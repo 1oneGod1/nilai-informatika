@@ -1652,3 +1652,91 @@ const RUBRIC = [
     ]
   }
 ];
+
+// Concise classroom tasks; original practice banks remain available as optional revision.
+const CLASSROOM_TASKS = [
+  {
+    "steps": [
+      "Buka Explore “Code Your Own World with VR”. Coba contoh dunianya.",
+      "Buka Set up A-Frame. Jalankan scene dan satu objek.",
+      "Ubah warna objek, lalu jalankan lagi."
+    ],
+    "challenge": "Tambahkan objek kedua dengan warna berbeda. Tunjukkan kode warna dan posisinya.",
+    "result": "Scene dua objek + penjelasan satu atribut."
+  },
+  {
+    "steps": [
+      "Buka A-Frame Modeling. Coba posisi, rotasi, dan pengelompokan pada model DNA.",
+      "Susun beberapa bentuk dalam satu objek induk.",
+      "Jalankan scene dan ubah posisi induknya."
+    ],
+    "challenge": "Buat pohon, kursi, atau meja. Pindahkan atau putar lewat induknya.",
+    "result": "Objek gabungan + demonstrasi perubahan posisi atau rotasi."
+  },
+  {
+    "steps": [
+      "Buka A-Frame Image Textures. Terapkan satu tekstur pada scene awal.",
+      "Buka A-Frame Lighting and Fog. Coba cahaya dasar.",
+      "Simpan gambar scene sebelum dan sesudah perubahan cahaya."
+    ],
+    "challenge": "Buat dua suasana. Pilih yang sesuai tema dan beri satu alasan.",
+    "result": "Dua screenshot + alasan memilih suasana."
+  },
+  {
+    "steps": [
+      "Buka Import Third-Party Models into A-Frame. Gunakan model BSD atau aset dari guru.",
+      "Muat aset dan tampilkan model dalam scene.",
+      "Sesuaikan posisi dan ukuran. Catat sumber asetnya."
+    ],
+    "challenge": "Sesuaikan proporsi model dengan objek di sekitarnya. Jelaskan satu pemeriksaan jika model tidak tampil.",
+    "result": "Model tampil + sumber aset + penjelasan satu pemeriksaan."
+  },
+  {
+    "steps": [
+      "Buka A-Frame Gaze Interactions dengan kode awal dari guru.",
+      "Jalankan kamera, cursor, dan target.",
+      "Ubah respons warna. Uji dengan menatap target."
+    ],
+    "challenge": "Minta teman mencoba tanpa petunjuk. Perbaiki satu bagian yang membingungkan.",
+    "result": "Interaksi berjalan + satu temuan teman + satu perbaikan."
+  },
+  {
+    "steps": [
+      "Buka Final Project: Diorama. Lihat proyek sebelumnya sebagai referensi.",
+      "Pilih tema. Buat sketsa dan daftar fitur minimum.",
+      "Cek rancangan dengan guru, lalu mulai scene di Sandbox."
+    ],
+    "challenge": "Tentukan satu hal yang akan dilakukan pengunjung. Buat scene awal mendukung hal itu.",
+    "result": "Sketsa + daftar fitur + scene awal."
+  },
+  {
+    "steps": [
+      "Buka diorama di Sandbox. Bangun fitur minimum dari rancanganmu.",
+      "Uji scene. Pilih satu masalah untuk diperbaiki.",
+      "Tunjukkan prototipe dan satu bagian kode kepada guru."
+    ],
+    "challenge": "Tulis dugaan → ubah satu hal → uji ulang. Jelaskan apakah masalahnya selesai.",
+    "result": "Prototipe + satu catatan debugging + penjelasan kode."
+  },
+  {
+    "steps": [
+      "Buka diorama di Sandbox. Minta teman mencoba satu tugas.",
+      "Catat satu masalah. Perbaiki fungsi atau tampilannya.",
+      "Uji ulang tugas yang sama. Simpan versi akhir."
+    ],
+    "challenge": "Bandingkan sebelum dan sesudah revisi. Tunjukkan bahwa perbaikannya membantu pengguna.",
+    "result": "Versi final + bukti sebelum/sesudah + alasan revisi."
+  },
+  {
+    "steps": [
+      "Siapkan diorama final dan bukti proses untuk dikumpulkan.",
+      "Demonstrasikan karya. Jelaskan satu bagian kode sesuai jadwal guru.",
+      "Kerjakan tes konsep resmi dari guru."
+    ],
+    "challenge": "Lakukan satu modifikasi kecil yang diminta guru. Prediksi hasilnya, lalu uji.",
+    "result": "Karya final + dokumentasi + demo individual + tes konsep."
+  }
+];
+const CLASSROOM_TIMES = [[["Demo singkat & tujuan",5],["Eksplorasi contoh VR",10],["Scene pertama & tantangan",55],["Tunjukkan hasil & refleksi",10]],[["Demo singkat & target",5],["Modeling terpandu",30],["Modifikasi objek",35],["Tunjukkan hasil & refleksi",10]],[["Demo singkat & target",5],["Tekstur pada scene awal",25],["Cahaya dasar",25],["Bandingkan dua versi",15],["Tunjukkan hasil & refleksi",10]],[["Demo impor & sumber",10],["Impor model terpandu",35],["Skala, posisi & pengujian",25],["Tunjukkan hasil & refleksi",10]],[["Demo pemicu & respons",10],["Gaze dengan kode awal",35],["Uji teman & perbaikan",25],["Tunjukkan hasil & refleksi",10]],[["Brief & rubrik",5],["Tema, sketsa & fitur minimum",20],["Cek rancangan bersama guru",10],["Mulai diorama di Sandbox",35],["Tunjukkan hasil & target berikutnya",10]],[["Target hari ini",5],["Pengembangan diorama",50],["Cek kode & demonstrasi individual",15],["Tunjukkan hasil & log proses",10]],[["Target hari ini",5],["Uji oleh teman",15],["Revisi fungsi & desain",35],["Demonstrasi individual",15],["Simpan hasil & refleksi",10]],[["Siapkan karya",5],["Tes konsep resmi dari guru",15],["Demonstrasi tersisa & pengumpulan",50],["Refleksi akhir",10]]];
+LESSONS.forEach((lesson,index)=>{lesson.classroom=CLASSROOM_TASKS[index];lesson.times=CLASSROOM_TIMES[index];lesson.brief.tasks=lesson.classroom.steps;});
+LESSONS[0].brief.teacherScript="Hari ini kita membuat scene VR pertama. Buka dua bagian BSD yang tertulis, jalankan satu objek, lalu ubah warnanya. Tantangannya: tambah objek kedua dengan warna berbeda. Tunjukkan hasil dan kode satu atribut kepada saya.";

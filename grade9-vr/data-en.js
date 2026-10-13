@@ -1652,3 +1652,91 @@ const RUBRIC = [
     ]
   }
 ];
+
+// Concise classroom tasks; original practice banks remain available as optional revision.
+const CLASSROOM_TASKS = [
+  {
+    "steps": [
+      "Open Explore “Code Your Own World with VR”. Try the sample world.",
+      "Open Set up A-Frame. Run a scene with one object.",
+      "Change the object’s colour and run it again."
+    ],
+    "challenge": "Add a second object in a different colour. Point to the code for its colour and position.",
+    "result": "Two objects in a scene + explain one attribute."
+  },
+  {
+    "steps": [
+      "Open A-Frame Modeling. Try position, rotation, and grouping in the DNA model.",
+      "Group several shapes under one parent entity.",
+      "Run the scene and move the parent."
+    ],
+    "challenge": "Build a tree, chair, or table. Move or rotate it through its parent.",
+    "result": "A grouped model + demonstrate a position or rotation change."
+  },
+  {
+    "steps": [
+      "Open A-Frame Image Textures. Apply one texture to the starter scene.",
+      "Open A-Frame Lighting and Fog. Try basic lighting.",
+      "Save images before and after changing the light."
+    ],
+    "challenge": "Create two moods. Choose one for your theme and give one reason.",
+    "result": "Two screenshots + a reason for your choice."
+  },
+  {
+    "steps": [
+      "Open Import Third-Party Models into A-Frame. Use a BSD model or a teacher-provided asset.",
+      "Load the asset and display the model in the scene.",
+      "Adjust its position and size. Record the asset source."
+    ],
+    "challenge": "Match the model’s proportions to nearby objects. Explain one check if it does not appear.",
+    "result": "A visible model + asset source + explain one check."
+  },
+  {
+    "steps": [
+      "Open A-Frame Gaze Interactions using the teacher’s starter code.",
+      "Run the camera, cursor, and target.",
+      "Change the colour response. Test it by gazing at the target."
+    ],
+    "challenge": "Ask a classmate to try it without instructions. Improve one confusing part.",
+    "result": "A working interaction + one user finding + one improvement."
+  },
+  {
+    "steps": [
+      "Open Final Project: Diorama. Use previous projects as references.",
+      "Choose a theme. Sketch it and list the minimum features.",
+      "Check your plan with your teacher, then start a scene in Sandbox."
+    ],
+    "challenge": "Choose one action for your visitor. Make the starter scene support that action.",
+    "result": "Sketch + feature list + starter scene."
+  },
+  {
+    "steps": [
+      "Open your diorama in Sandbox. Build the minimum features in your plan.",
+      "Test the scene. Choose one problem to fix.",
+      "Show your prototype and one piece of code to your teacher."
+    ],
+    "challenge": "Write a prediction → change one thing → retest. Explain whether the problem is solved.",
+    "result": "Prototype + one debugging note + explain your code."
+  },
+  {
+    "steps": [
+      "Open your diorama in Sandbox. Ask a classmate to try one task.",
+      "Record one problem. Improve the function or design.",
+      "Retest the same task. Save the final version."
+    ],
+    "challenge": "Compare before and after. Show how your change helps the user.",
+    "result": "Final version + before/after evidence + a reason for the revision."
+  },
+  {
+    "steps": [
+      "Prepare your final diorama and process evidence for submission.",
+      "Demonstrate your work and explain one piece of code on your teacher’s schedule.",
+      "Take the official concept test provided by your teacher."
+    ],
+    "challenge": "Make one small change requested by your teacher. Predict the result, then test it.",
+    "result": "Final work + documentation + individual demo + concept test."
+  }
+];
+const CLASSROOM_TIMES = [[["Quick demo & goal",5],["Explore a VR example",10],["First scene & challenge",55],["Show results & reflect",10]],[["Quick demo & target",5],["Guided modeling",30],["Modify your model",35],["Show results & reflect",10]],[["Quick demo & target",5],["Texture the starter scene",25],["Basic lighting",25],["Compare two versions",15],["Show results & reflect",10]],[["Import demo & sources",10],["Guided model import",35],["Scale, position & test",25],["Show results & reflect",10]],[["Trigger & response demo",10],["Gaze with starter code",35],["Peer test & improve",25],["Show results & reflect",10]],[["Brief & rubric",5],["Theme, sketch & minimum features",20],["Check your plan with your teacher",10],["Start your diorama in Sandbox",35],["Show results & next target",10]],[["Today’s target",5],["Develop your diorama",50],["Code check & individual demos",15],["Show results & process log",10]],[["Today’s target",5],["Peer testing",15],["Revise function & design",35],["Individual demos",15],["Save results & reflect",10]],[["Prepare your work",5],["Official teacher-provided concept test",15],["Remaining demos & submission",50],["Final reflection",10]]];
+LESSONS.forEach((lesson,index)=>{lesson.classroom=CLASSROOM_TASKS[index];lesson.times=CLASSROOM_TIMES[index];lesson.brief.tasks=lesson.classroom.steps;});
+LESSONS[0].brief.teacherScript="Today we will build our first VR scene. Open the two listed BSD sections, run one object, then change its colour. Your challenge is to add a second object in a different colour. Show me the result and the code for one attribute.";

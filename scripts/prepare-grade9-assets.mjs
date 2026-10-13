@@ -25,5 +25,11 @@ else{
  html=html.replace(old,'<script defer src="'+bootName+'"></script>');
 }
 console.log(bootName);
+const classroom=await fs.readFile(new URL('classroom.css',folder));
+const cssName='classroom.'+createHash('sha256').update(classroom).digest('hex').slice(0,12)+'.css';
+await fs.writeFile(new URL(cssName,folder),classroom);
+if(/<link rel="stylesheet" href="classroom(?:\.[a-f0-9]{12})?\.css">/.test(html))html=html.replace(/<link rel="stylesheet" href="classroom(?:\.[a-f0-9]{12})?\.css">/,'<link rel="stylesheet" href="'+cssName+'">');
+else html=html.replace('</head>','  <link rel="stylesheet" href="'+cssName+'">\n</head>');
+console.log(cssName);
 // Keep earlier fingerprinted files so already-open versions can still load them.
 await fs.writeFile(entry,html);

@@ -2,6 +2,7 @@
 const VR_SESSION_KEY = 'csReportGrade9Session';
 const VR_SESSION_MAX_AGE = 12 * 60 * 60 * 1000;
 let vrSession = null;
+let vrTeacherVerified = false;
 
 function readVrSession() {
   try {
@@ -51,8 +52,10 @@ async function validateVrTeacher(session) {
 }
 
 async function initializeVrAccess() {
+  vrTeacherVerified = false;
   vrSession = readVrSession();
-  if (vrSession?.isTeacherPreview === true && !(await validateVrTeacher(vrSession))) {
+  if (vrSession?.isTeacherPreview === true) vrTeacherVerified = await validateVrTeacher(vrSession);
+  if (vrSession?.isTeacherPreview === true && !vrTeacherVerified) {
     vrSession = null;
     sessionStorage.removeItem(VR_SESSION_KEY);
     document.getElementById('gate-copy').textContent = 'Buka mode review dari dashboard guru yang sudah terverifikasi.';

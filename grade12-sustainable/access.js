@@ -2,6 +2,7 @@
 const G12_SESSION_KEY = 'csReportGrade12Session';
 const G12_SESSION_MAX_AGE = 12 * 60 * 60 * 1000;
 let g12Session = null;
+let g12TeacherVerified = false;
 function readG12Session() {
   try {
     const raw = sessionStorage.getItem(G12_SESSION_KEY);
@@ -34,10 +35,14 @@ async function validateG12Teacher(session) {
   } catch { return false; }
 }
 async function initializeG12Access() {
+  g12TeacherVerified = false;
   g12Session = readG12Session();
-  if (g12Session?.isTeacherPreview === true && !(await validateG12Teacher(g12Session))) {
-    g12Session = null; sessionStorage.removeItem(G12_SESSION_KEY);
-    document.getElementById('gate-copy').textContent = t('Buka review dari dashboard guru terverifikasi.','Open review from a verified teacher dashboard.');
+  if (g12Session?.isTeacherPreview === true) {
+    g12TeacherVerified = await validateG12Teacher(g12Session);
+    if (!g12TeacherVerified) {
+      g12Session = null; sessionStorage.removeItem(G12_SESSION_KEY);
+      document.getElementById('gate-copy').textContent = t('Buka review dari dashboard guru terverifikasi.','Open review from a verified teacher dashboard.');
+    }
   }
   if (!g12Session) return false;
   document.getElementById('access-gate').hidden = true;

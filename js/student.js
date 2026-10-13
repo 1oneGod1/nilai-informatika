@@ -549,7 +549,7 @@ function buildGrade9MaterialsCard(student) {
         <div class="flex-1">
           <div class="flex flex-wrap items-center gap-2 mb-2"><span class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold">MATERI KELAS</span><span class="text-[10px] font-mono-tech text-cyan-200 bg-cyan-500/10 border border-cyan-400/20 px-2 py-0.5 rounded-full">KELAS 9</span></div>
           <h3 class="text-xl font-black text-white">VR Studio: Construct a VR World</h3>
-          <p class="text-sm text-slate-300 mt-1 max-w-2xl">Buka 9 pertemuan, simulasi konsep A-Frame, kuis latihan, refleksi, dan panduan proyek diorama langsung dari CS.Report.</p>
+          <p class="text-sm text-slate-300 mt-1 max-w-2xl">Buka tugas hari ini, kerjakan di BSD, lalu coba tantangan. 9 pertemuan untuk membuat diorama VR.</p>
           <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech"><span class="text-emerald-300">9 × 2 JP</span><span class="text-cyan-300">34 soal latihan</span><span class="text-lime-300">Proyek diorama</span></div>
         </div>
         <button type="button" onclick="openGrade9Materials()" class="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black font-mono-tech text-xs px-5 py-3 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0">BUKA VR STUDIO <i class="fas fa-arrow-right"></i></button>
