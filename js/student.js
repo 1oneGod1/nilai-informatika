@@ -184,22 +184,19 @@ function submitForgotPasswordRequest(event) {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
   btn.disabled = true;
 
-  siswaRef
-    .child(selectedStudentForDetail.id)
-    .update({
-      password: newPassword,
-      pendingPassword: null,
-      pendingPasswordAt: null,
-    })
+  const isCloudStudent=getStudentGrade(selectedStudentForDetail)===11;
+  siswaRef.child(selectedStudentForDetail.id).update(isCloudStudent
+    ? {pendingPassword:newPassword,pendingPasswordAt:Date.now()}
+    : {password:newPassword,pendingPassword:null,pendingPasswordAt:null})
     .then(() => {
-      selectedStudentForDetail.password = newPassword;
+      if(!isCloudStudent)selectedStudentForDetail.password = newPassword;
 
       const modal = bootstrap.Modal.getInstance(
         document.getElementById("studentPasswordModal"),
       );
       if (modal) modal.hide();
       showAlert(
-        "Password berhasil diubah. Gunakan password baru Anda untuk masuk berikutnya.",
+        isCloudStudent ? "Permintaan terkirim. Tunggu guru menyetujui password baru sebelum masuk." : "Password berhasil diubah. Gunakan password baru Anda untuk masuk berikutnya.",
         "success",
       );
 
@@ -218,7 +215,7 @@ function submitForgotPasswordRequest(event) {
     });
 }
 
-function verifyStudentPassword(event) {
+async function verifyStudentPassword(event) {
   event.preventDefault();
 
   if (!selectedStudentForDetail) {
@@ -236,11 +233,13 @@ function verifyStudentPassword(event) {
     return;
   }
 
-  const modal = bootstrap.Modal.getInstance(
-    document.getElementById("studentPasswordModal"),
-  );
+  const button=event.target.querySelector('button[type="submit"]');
+  if(button)button.disabled=true;
+  try {if (getStudentGrade(selectedStudentForDetail) === 11) await G11CloudIdentity.login(selectedStudentForDetail.id,inputPassword);}
+  catch(error){showStudentPasswordError(error.message);return;}
+  finally {if(button)button.disabled=false;}
+  const modal = bootstrap.Modal.getInstance(document.getElementById("studentPasswordModal"));
   if (modal) modal.hide();
-
   rememberVerifiedStudent(selectedStudentForDetail);
   renderStudentDetail(selectedStudentForDetail.id);
 }
@@ -693,13 +692,9 @@ function submitChangePassword(event) {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
   btn.disabled = true;
 
-  siswaRef
-    .child(selectedStudentForDetail.id)
-    .update({
-      password: newPwd,
-      pendingPassword: null,
-      pendingPasswordAt: null,
-    })
+  (getStudentGrade(selectedStudentForDetail)===11
+    ? G11CloudIdentity.changeOwnPassword(selectedStudentForDetail,selectedStudentForDetail.password||"Sph12345!",newPwd)
+    : siswaRef.child(selectedStudentForDetail.id).update({password:newPwd,pendingPassword:null,pendingPasswordAt:null}))
     .then(() => {
       selectedStudentForDetail.password = newPwd;
 
@@ -922,6 +917,8 @@ function renderStudentDetail(id) {
 }
 
 function closeStudentDetail() {
+  if(getStudentGrade(selectedStudentForDetail)===11&&typeof G11CloudIdentity!=="undefined")G11CloudIdentity.logout().catch(()=>{});
+  selectedStudentForDetail=null;
   const awaitingText = document.getElementById("awaitingText");
   document.getElementById("studentDetail").classList.add("hidden");
   document.getElementById("searchResults").classList.remove("hidden");

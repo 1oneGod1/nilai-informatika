@@ -10,6 +10,7 @@ const dcTeacherState = {
   selectedAssessmentId: "",
   draft: dcCreateEmptyDraft(4, 9),
   dirty: false,
+  saving:false,
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -31,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   studentSelect.addEventListener("change", () => {
+    if(dcTeacherState.saving){studentSelect.value=dcTeacherState.studentId;return;}
     const nextStudentId = studentSelect.value;
     if (
       dcTeacherState.dirty &&
@@ -72,6 +74,7 @@ function ensureDcSelectedAssessment() {
 }
 
 function changeDcAssessmentGrade(grade) {
+  if(dcTeacherState.saving)return;
   const nextGrade = Number(grade || 9);
   const gradeSelect = document.getElementById("dcAssessmentGrade");
   if (!DC_COURSES_BY_GRADE[nextGrade]) return;
@@ -106,6 +109,7 @@ function changeDcAssessmentGrade(grade) {
 }
 
 function syncAssessmentQuarter(quarter) {
+  if(dcTeacherState.saving)return;
   const nextQuarter = Number(quarter || 1);
   if (
     dcTeacherState.dirty &&
@@ -190,18 +194,31 @@ function loadDcAssessmentDraft() {
 }
 
 function dcSelectAssessment(assessmentId) {
+  if(dcTeacherState.saving)return;
   dcTeacherState.selectedAssessmentId = assessmentId;
   renderDcAssessmentPanel();
 }
 
-function dcSetCriterionScore(assessmentId, criterionId, maximum, value) {
+function dcSetCriterionScore(assessmentId, criterionId, maximum, value, render = true) {
+  if(dcTeacherState.saving)return;
   const assessmentDraft = dcTeacherState.draft.rubricScores[assessmentId];
   if (!assessmentDraft) return;
   const numericValue = Math.min(maximum, Math.max(0, Number(value) || 0));
   assessmentDraft.criteria[criterionId] = numericValue;
   if (dcTeacherState.draft.reviewed) dcTeacherState.draft.reviewed[assessmentId] = false;
   dcTeacherState.dirty = true;
-  renderDcAssessmentPanel();
+  if(render)renderDcAssessmentPanel();
+  else {
+    const reviewedInput=document.querySelector?.('input[data-assessment="'+assessmentId+'"]');
+    if(reviewedInput)reviewedInput.checked=false;
+    const pointsInput=document.querySelector?.('input[data-score="'+assessmentId+'/'+criterionId+'"]');
+    const criterionRow=pointsInput?.closest('.dc-criterion-row');
+    if(criterionRow){criterionRow.classList.toggle('is-complete',numericValue===maximum);criterionRow.querySelector('input[type="checkbox"]').checked=numericValue===maximum;}
+    const summary=dcCalculateSummary(dcTeacherState.draft,dcTeacherState.quarter,dcTeacherState.grade);
+    renderDcSummary(summary,allSiswa.find(s=>s.id===dcTeacherState.studentId));
+    renderDcAssessmentNav(summary);
+    updateDcSaveState();
+  }
 }
 
 function dcToggleCriterion(assessmentId, criterionId, maximum, checked) {
@@ -209,6 +226,7 @@ function dcToggleCriterion(assessmentId, criterionId, maximum, checked) {
 }
 
 function dcSetAssessmentNote(assessmentId, value) {
+  if(dcTeacherState.saving)return;
   const assessmentDraft = dcTeacherState.draft.rubricScores[assessmentId];
   if (!assessmentDraft) return;
   assessmentDraft.note = String(value || "");
@@ -217,6 +235,7 @@ function dcSetAssessmentNote(assessmentId, value) {
 }
 
 function dcToggleQuizAnswer(index, checked) {
+  if(dcTeacherState.saving)return;
   if (!Array.isArray(dcTeacherState.draft.quizAnswers)) return;
   dcTeacherState.draft.quizAnswers[index] = Boolean(checked);
   dcTeacherState.dirty = true;
@@ -224,6 +243,7 @@ function dcToggleQuizAnswer(index, checked) {
 }
 
 function dcSetQuizNote(value) {
+  if(dcTeacherState.saving)return;
   dcTeacherState.draft.quizNote = String(value || "");
   dcTeacherState.dirty = true;
   updateDcSaveState();
@@ -270,6 +290,7 @@ function updateDcSaveState() {
 }
 
 async function saveDcAssessment() {
+  if(dcTeacherState.saving)return;
   const course = getCurrentDcCourse();
   if (!course) {
     showAlert(`Assessment untuk Q${dcTeacherState.quarter} belum tersedia.`, "warning");
@@ -289,7 +310,11 @@ async function saveDcAssessment() {
     button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Menyimpan…';
   }
 
+  dcTeacherState.saving=true;
+  const saveContext={studentId:student.id,grade:dcTeacherState.grade,quarter:dcTeacherState.quarter};
   try {
+    if(typeof G11CloudIdentity!=="undefined")await G11CloudIdentity.verifyTeacher();
+    if(typeof G11Monitor!=="undefined"&&course.gradingVersion)G11Monitor.invalidateStale();
     const record = dcBuildStoredRecord(
       dcTeacherState.draft,
       dcTeacherState.quarter,
@@ -333,7 +358,7 @@ async function saveDcAssessment() {
     student.digitalCitizenshipAssessment[`q${dcTeacherState.quarter}`] = record;
     if (record.gradingVersion && record.publishedGradebook) dcTeacherState.draft.publishedGradebook = { ...record.publishedGradebook };
     Object.assign(student, gradebookFields);
-    dcTeacherState.dirty = false;
+    if(dcTeacherState.studentId===saveContext.studentId&&dcTeacherState.grade===saveContext.grade&&dcTeacherState.quarter===saveContext.quarter)dcTeacherState.dirty = Boolean(course.gradingVersion&&typeof G11Monitor!=="undefined"&&Object.entries(record.evidenceVersions||{}).some(([id,v])=>record.reviewed?.[id]&&v!==G11Monitor.version(student.id,id)));
     updateDcSaveState();
     renderTableBody(allSiswa);
     if (typeof ensureFormativeColumnCountForGrade === "function") {
@@ -350,6 +375,7 @@ async function saveDcAssessment() {
   } catch (error) {
     showAlert("Gagal menyimpan penilaian: " + error.message, "danger");
   } finally {
+    dcTeacherState.saving=false;
     if (button) {
       button.disabled = false;
       button.innerHTML = originalHtml;
@@ -438,7 +464,9 @@ function renderDcAssessmentPanel() {
           </label>
           <label class="dc-points-input">
             <input type="number" min="0" max="${criterion.max}" value="${value}"
+              data-score="${assessment.id}/${criterion.id}"
               aria-label="Poin ${escHtml(criterion.label)}"
+              oninput="dcSetCriterionScore('${assessment.id}','${criterion.id}',${criterion.max},this.value,false)"
               onchange="dcSetCriterionScore('${assessment.id}','${criterion.id}',${criterion.max},this.value)" />
             <span>/ ${criterion.max}</span>
           </label>
@@ -463,6 +491,7 @@ function renderDcAssessmentPanel() {
       </div>
       ${course.gradingVersion ? '<p class="dc-assessment-brief">Course 20% · F1–F3 30% · Sumatif 50%. Nilai akhir menunggu seluruh komponen diperiksa. Catatan lama tetap diarsipkan.</p>' : ''}
       ${course.gradingVersion ? dcAiArchiveHtml(dcTeacherState.draft) : ''}
+      ${course.gradingVersion ? '<div id="g11EvidencePanel"></div>' : ''}
       ${briefHtml}
       ${starterCodeHtml}
       <div class="dc-rubric-guide"><span><i class="fas fa-check-square"></i> Centang untuk poin penuh</span><span><i class="fas fa-keyboard"></i> Isi poin untuk nilai parsial</span><span><i class="fas fa-user-pen"></i> Versi siswa dan kalimat lengkap wajib</span></div>
@@ -470,6 +499,7 @@ function renderDcAssessmentPanel() {
       ${course.gradingVersion ? '<label class="dc-criterion-check"><input type="checkbox" '+(dcTeacherState.draft.reviewed?.[assessment.id]===true?'checked':'')+' data-assessment="'+assessment.id+'" onchange="dcSetAssessmentReviewed(this.dataset.assessment,this.checked)" /><span>Komponen sudah diperiksa guru (nilai 0 juga harus ditandai)</span></label>' : ''}
       <label class="dc-teacher-note"><span>Catatan guru</span><textarea oninput="dcSetAssessmentNote('${assessment.id}',this.value)" placeholder="Kekuatan, hal yang perlu diperbaiki, atau tindak lanjut…">${escHtml(assessmentDraft.note || "")}</textarea></label>
     </section>`;
+  if(course.gradingVersion&&typeof G11Monitor!=="undefined")G11Monitor.renderEvidence();
 }
 
 function renderDcAssessmentNav(summary) {
@@ -548,5 +578,5 @@ window.dcToggleQuizAnswer = dcToggleQuizAnswer;
 window.dcSetQuizNote = dcSetQuizNote;
 window.saveDcAssessment = saveDcAssessment;
 
-function dcSetAssessmentReviewed(id,checked){if(!dcTeacherState.draft.reviewed||!(id in dcTeacherState.draft.reviewed))return;dcTeacherState.draft.reviewed[id]=checked===true;dcTeacherState.dirty=true;renderDcAssessmentPanel();}
+function dcSetAssessmentReviewed(id,checked){if(dcTeacherState.saving)return;if(!dcTeacherState.draft.reviewed||!(id in dcTeacherState.draft.reviewed))return;dcTeacherState.draft.reviewed[id]=checked===true;if(checked===true&&typeof G11Monitor!=="undefined"){dcTeacherState.draft.evidenceVersions??={};dcTeacherState.draft.evidenceVersions[id]=G11Monitor.version(dcTeacherState.studentId,id);}dcTeacherState.dirty=true;renderDcAssessmentPanel();}
 window.dcSetAssessmentReviewed=dcSetAssessmentReviewed;

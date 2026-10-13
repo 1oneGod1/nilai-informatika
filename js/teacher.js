@@ -504,11 +504,13 @@ async function syncGrade10AutoGradebookFields() {
 function listenToLearningProgressData() {
   if (learningProgressListenerAttached) return;
   learningProgressListenerAttached = true;
+  if(typeof G11Monitor!=="undefined")G11Monitor.start();
 
   db.ref("learningProgress").on(
     "value",
     (snap) => {
       const data = snap.val() || {};
+      if(typeof G11Monitor!=="undefined")G11Monitor.onProgress(data);
       grade10UiUxProgressByStudent = {};
       Object.entries(data).forEach(([studentId, progress]) => {
         if (progress?.grade10UiUx) {
@@ -1919,6 +1921,7 @@ function listenToSiswaData() {
         }
       }
       renderTableBody(allSiswa);
+      if(typeof G11Monitor!=="undefined")G11Monitor.render();
       if (typeof refreshAssessmentStudentOptions === "function") {
         refreshAssessmentStudentOptions();
       }
@@ -2012,9 +2015,7 @@ function saveSiswaRow(id) {
     updated[field] = v !== "" ? Number(v) : "";
   }
 
-  siswaRef
-    .child(id)
-    .update(updated)
+  (getTeacherStudentGrade(siswa)===11 ? G11CloudIdentity.updateTeacherStudent(siswa,updated) : siswaRef.child(id).update(updated))
     .then(() =>
       showAlert(
         `Data <strong>${escHtml(siswa.nama)}</strong> berhasil diperbarui.`,
@@ -2303,13 +2304,7 @@ function approveStudentPassword(id) {
 
   if (!confirm(`Setujui pengajuan password baru untuk ${siswa.nama}?`)) return;
 
-  siswaRef
-    .child(id)
-    .update({
-      password: siswa.pendingPassword,
-      pendingPassword: null,
-      pendingPasswordAt: null,
-    })
+  (getTeacherStudentGrade(siswa)===11 ? G11CloudIdentity.updateTeacherStudent(siswa,{password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}) : siswaRef.child(id).update({password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}))
     .then(() => {
       showAlert("Password baru berhasil disetujui", "success");
     })

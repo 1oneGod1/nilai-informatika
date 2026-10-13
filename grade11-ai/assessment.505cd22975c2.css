@@ -1,0 +1,10 @@
+.dc-assessment-summary.has-completion{grid-template-columns:minmax(12rem,1fr) repeat(4,minmax(6.5rem,.35fr))}
+.dc-assessment-controls .dc-grade-field{width:100px;min-width:100px;max-width:100px}
+.ai-assessment-archive{margin:14px 0;padding:14px;border:1px solid #334155;border-radius:10px;color:#94a3b8}
+.ai-assessment-archive summary{cursor:pointer;font-weight:650}
+.ai-assessment-archive ul{padding-left:20px;font-size:13px}
+@media(max-width:1050px){.dc-assessment-summary.has-completion{grid-template-columns:repeat(2,minmax(0,1fr))}.dc-assessment-summary.has-completion .dc-selected-student{grid-column:1/-1}}
+@media(max-width:500px){.dc-assessment-summary.has-completion{grid-template-columns:1fr}}
+
+/* Firebase evidence and the teacher monitor */
+.g11-monitor-controls{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}.g11-monitor-controls label{display:grid;gap:6px;flex:1;min-width:160px}.g11-monitor-controls input,.g11-monitor-controls select,.g11-evidence textarea,.g11-evidence select{width:100%;color:#e2e8f0;background:#111827;border:1px solid #475569;border-radius:8px;padding:10px}.g11-monitor-row{display:flex;gap:20px;justify-content:space-between;padding:16px 0;border-top:1px solid #334155}.g11-monitor-row small,.g11-evidence small{display:block;color:#94a3b8;margin:6px 0}.g11-monitor-row p{margin:4px 0;white-space:pre-wrap}.g11-monitor-row>div:last-child{display:flex;gap:8px;flex-direction:column;min-width:180px}.g11-evidence{padding:16px;margin:14px 0;background:#0f172a;border:1px solid #334155;border-radius:12px}.g11-evidence-text{white-space:pre-wrap;overflow-wrap:anywhere}.g11-evidence label{display:grid;gap:6px;margin:10px 0}.g11-evidence textarea{min-height:80px}@media(max-width:640px){.g11-monitor-row{flex-direction:column}.g11-monitor-row>div:last-child{min-width:0}}

@@ -139,7 +139,7 @@
         }
       }
     </style>
-  <link rel="stylesheet" href="grade11-ai/assessment.a9ee767d86b6.css">
+  <link rel="stylesheet" href="grade11-ai/assessment.505cd22975c2.css">
 </head>
   <body class="teacher-dashboard min-h-screen flex flex-col">
     <!-- NAVBAR Teacher -->
@@ -541,6 +541,12 @@
           </div>
         </section>
 
+        <section id="g11MonitorPanel" class="dc-assessment-shell glass-panel-teacher rounded-2xl">
+          <h2>Monitor kelas 11 · AI Studio</h2>
+          <p>Aktifkan akun cloud siswa sekali. Buka bukti, kirim feedback, lalu simpan penilaian melalui rubrik. Target harian fleksibel.</p>
+          <div class="g11-monitor-controls"><label>Cari siswa<input id="g11MonitorSearch" type="search" placeholder="Nama siswa"></label><label>Kelas<select id="g11MonitorClass"><option value="">Semua kelas 11</option></select></label><label>Tampilkan<select id="g11MonitorFilter"><option value="all">Semua siswa</option><option value="pending">Perlu diperiksa / revisi</option></select></label></div>
+          <div id="g11MonitorList" aria-live="polite">Memuat progres Firebase…</div>
+        </section>
         <!-- WORKSPACE PENILAIAN KELAS 7, 8, 9, 11, DAN 12 (KHUSUS GURU) -->
         <section
           id="dcAssessmentPanel"
@@ -849,11 +855,13 @@
 
     <!-- Custom Scripts -->
     <script src="js/firebase-init.js?v=20260819d"></script>
+    <script src="js/grade11-cloud.79fad816d570.js"></script>
     <script src="js/auth.js?v=20260329b"></script>
     <script src="js/assessment-config.9f69538c8f3c.js"></script>
-    <script src="js/grade11-ai-assessment.4a0bf818fede.js"></script>
+    <script src="js/grade11-ai-assessment.cef0899bed65.js"></script>
     <!-- teacher.js contains only the logic needed for the dashboard page (auth check, CRUD, admins) -->
-    <script src="js/teacher.dea2ef067278.js"></script>
-    <script src="js/teacher-assessment.df7e1e6a860a.js"></script>
+    <script src="js/teacher.dab73114be2c.js"></script>
+    <script src="js/grade11-ai-monitor.d71492ab247d.js"></script>
+    <script src="js/teacher-assessment.9a6f2c3a7065.js"></script>
   </body>
 </html>

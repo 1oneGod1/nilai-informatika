@@ -4,16 +4,16 @@
     ".write": false,
     "siswa": {
       ".read": true,
-      ".write": "auth != null && (newData.exists() || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
+      ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
       "$siswaId": {
-        ".write": "auth != null",
+        ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
         "q1_f1": {
-          ".write": "auth != null || (root.child('learningProgress').child($siswaId).child('grade10UiUx').child('teacherAssessment').child('wireframe').child('assessed').val() === true && root.child('learningProgress').child($siswaId).child('grade10UiUx').child('teacherAssessment').child('wireframe').child('score').isNumber() && root.child('learningProgress').child($siswaId).child('grade10UiUx').child('postTest').child('score').isNumber() && newData.isNumber() && newData.val() === (root.child('learningProgress').child($siswaId).child('grade10UiUx').child('teacherAssessment').child('wireframe').child('score').val() * 10 + root.child('learningProgress').child($siswaId).child('grade10UiUx').child('postTest').child('score').val() * 3) / 10)",
+          ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true))) || (root.child('siswa').child($siswaId).child('kelas').val().matches(/^10/) && root.child('learningProgress').child($siswaId).child('grade10UiUx').child('teacherAssessment').child('wireframe').child('assessed').val() === true && root.child('learningProgress').child($siswaId).child('grade10UiUx').child('teacherAssessment').child('wireframe').child('score').isNumber() && root.child('learningProgress').child($siswaId).child('grade10UiUx').child('postTest').child('score').isNumber() && newData.isNumber() && newData.val() === (root.child('learningProgress').child($siswaId).child('grade10UiUx').child('teacherAssessment').child('wireframe').child('score').val() * 10 + root.child('learningProgress').child($siswaId).child('grade10UiUx').child('postTest').child('score').val() * 3) / 10)",
           ".validate": "!newData.exists() || (newData.isNumber() && newData.val() >= 0 && newData.val() <= 100)"
         },
         "password": {
-          ".write": true,
-          ".validate": "newData.isString() && newData.val().length >= 6"
+          ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true))) || (auth != null && root.child('grade11AiAccounts').child($siswaId).child('uid').val() === auth.uid && root.child('siswa').child($siswaId).child('kelas').val().matches(/^11/)) || (auth == null && !root.child('siswa').child($siswaId).child('kelas').val().matches(/^11/))",
+          ".validate": "newData.isString() && newData.val().length >= 6 && newData.val().length <= 128"
         },
         "pendingPassword": {
           ".write": true,
@@ -26,26 +26,29 @@
       }
     },
     "guru": {
-      ".read": "auth != null",
+      ".read": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
       "$uid": {
-        ".read": "auth != null",
+        ".read": "auth != null && (auth.uid === $uid || (auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com'))",
         ".write": "auth != null && (auth.uid === $uid || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
         "isVerified": {
-          ".write": "auth != null && (auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')"
+          ".validate": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || newData.val() === data.val() || (!data.exists() && newData.val() === false))"
         },
         "verifiedBy": {
-          ".write": "auth != null && (auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')"
+          ".validate": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || newData.val() === data.val())"
         },
         "verifiedAt": {
-          ".write": "auth != null && (auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')"
+          ".validate": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || newData.val() === data.val())"
+        },
+        "emailVerified": {
+          ".validate": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || newData.val() === data.val() || (!data.exists() && newData.val() === false) || (auth.uid === $uid && auth.token.email_verified === true && newData.val() === true))"
+        },
+        "email": {
+          ".validate": "newData.isString() && auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (auth.uid === $uid && newData.val() === auth.token.email))"
         }
       }
     },
     "settings": {
       "kkm": {
-        ".read": true,
-        ".write": "auth != null && (root.child('guru').child(auth.uid).child('isVerified').val() === true || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
-        ".validate": "newData.hasChildren(['7', '8', '9', '10', '11', '12'])",
         "7": {
           ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
         },
@@ -64,17 +67,20 @@
         "12": {
           ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
         },
+        ".read": true,
+        ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+        ".validate": "newData.hasChildren(['7', '8', '9', '10', '11', '12'])",
         "$other": {
           ".validate": false
         }
       }
     },
     "learningProgress": {
-      ".read": "auth != null && (root.child('guru').child(auth.uid).child('isVerified').val() === true || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
+      ".read": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
       "$studentId": {
         "grade10UiUx": {
           ".read": true,
-          ".write": "auth != null && (root.child('guru').child(auth.uid).child('isVerified').val() === true || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
+          ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
           "preTest": {
             ".write": "!data.exists() && newData.exists()",
             ".validate": "newData.hasChildren(['correct', 'total', 'score', 'attempts', 'submittedAt']) && newData.child('correct').isNumber() && newData.child('correct').val() >= 0 && newData.child('correct').val() <= 5 && newData.child('total').val() === 5 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100 && newData.child('attempts').isNumber() && newData.child('attempts').val() === 1 && newData.child('submittedAt').isNumber()"
@@ -92,7 +98,7 @@
             ".validate": "newData.hasChildren(['reference', 'structure', 'fidelity', 'journey']) && newData.child('reference').isBoolean() && newData.child('structure').isBoolean() && newData.child('fidelity').isBoolean() && newData.child('journey').isBoolean()"
           },
           "teacherAssessment": {
-            ".write": "auth != null && (root.child('guru').child(auth.uid).child('isVerified').val() === true || auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com')",
+            ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
             "wireframe": {
               ".validate": "newData.hasChildren(['assessed', 'criteria', 'score', 'updatedAt']) && newData.child('score').val() === newData.child('criteria').child('reference').val() + newData.child('criteria').child('structure').val() + newData.child('criteria').child('hierarchy').val() + newData.child('criteria').child('navigation').val() + newData.child('criteria').child('spacing').val() + newData.child('criteria').child('fidelity').val() + newData.child('criteria').child('completeness').val()",
               "assessed": {
@@ -284,6 +290,1643 @@
           "$other": {
             ".validate": false
           }
+        },
+        "grade11Ai": {
+          ".read": "(auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))) || (auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/))",
+          "student": {
+            "projects": {
+              "tn-webcam-image-classification": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-card-sorting-activity": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-machine-learning-image-classification": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-image-upload-classifier": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-webcam-live-classifier": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-webcam-live-classifier-coding-project": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-adjustable-accuracy-webcam-classifier": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-responsive-instrument": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-music-generator": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-ai-chess-player": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-ai-digital-assistant": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-ai-animal-rescue": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-ai-navigation-algorithm": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-ai-auto-navigation": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "tn-ai-find-the-finish-line": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','ready','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "ready": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "$other": {
+                ".validate": false
+              }
+            },
+            "lessons": {
+              "1": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "2": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "3": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "4": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "5": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "6": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "7": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "8": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "9": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "10": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "11": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "12": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "13": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "14": {
+                ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+                ".validate": "newData.hasChildren(['evidence','reflection','done','quiz','revision','updatedAt','updatedBy'])",
+                "evidence": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "reflection": {
+                  ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "done": {
+                  ".validate": "newData.isBoolean()"
+                },
+                "quiz": {
+                  ".validate": "newData.hasChildren(['best','last'])",
+                  "best": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "last": {
+                    ".validate": "newData.isNumber() && (newData.val() === -1 || (newData.val() >= 0 && newData.val() <= 100))"
+                  },
+                  "draft": {
+                    "$index": {
+                      ".validate": "($index === '0' || $index === '1') && newData.isNumber() && (newData.val() === -1 || newData.val() === 0 || newData.val() === 1 || newData.val() === 2)"
+                    }
+                  },
+                  "$other": {
+                    ".validate": false
+                  }
+                },
+                "revision": {
+                  ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "$other": {
+                ".validate": false
+              }
+            },
+            "target": {
+              ".write": "(auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && newData.exists()",
+              ".validate": "newData.hasChildren(['date','unitId','goal','revision','updatedAt','updatedBy'])",
+              "date": {
+                ".validate": "newData.isString() && newData.val().length <= 10"
+              },
+              "unitId": {
+                ".validate": "newData.val().matches(/^(intro|train|live|music|chess|assistant|rescue|navigation|auto|finish)$/)"
+              },
+              "goal": {
+                ".validate": "newData.isString() && newData.val().length <= 600"
+              },
+              "revision": {
+                ".validate": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+              },
+              "updatedAt": {
+                ".validate": "newData.isNumber() && newData.val() === now"
+              },
+              "updatedBy": {
+                ".validate": "newData.val() === auth.uid"
+              },
+              "$other": {
+                ".validate": false
+              }
+            },
+            "$other": {
+              ".validate": false
+            }
+          },
+          "teacher": {
+            "reviews": {
+              "p_tn-webcam-image-classification": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-card-sorting-activity": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-machine-learning-image-classification": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-image-upload-classifier": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-webcam-live-classifier": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-webcam-live-classifier-coding-project": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-adjustable-accuracy-webcam-classifier": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-responsive-instrument": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-music-generator": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-ai-chess-player": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-ai-digital-assistant": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-ai-animal-rescue": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-ai-navigation-algorithm": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-ai-auto-navigation": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "p_tn-ai-find-the-finish-line": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_1": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_2": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_3": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_4": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_5": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_6": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_7": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_8": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_9": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_10": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_11": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_12": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_13": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "l_14": {
+                ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+                ".validate": "newData.hasChildren(['message','status','sourceRevision','updatedAt','updatedBy'])",
+                "message": {
+                  ".validate": "newData.isString() && newData.val().length <= 2000"
+                },
+                "status": {
+                  ".validate": "newData.val() === 'seen' || newData.val() === 'needs_revision' || newData.val() === 'accepted'"
+                },
+                "sourceRevision": {
+                  ".validate": "newData.isNumber() && newData.val() >= 0"
+                },
+                "updatedAt": {
+                  ".validate": "newData.isNumber() && newData.val() === now"
+                },
+                "updatedBy": {
+                  ".validate": "newData.val() === auth.uid"
+                },
+                "$other": {
+                  ".validate": false
+                }
+              },
+              "$other": {
+                ".validate": false
+              }
+            },
+            "$other": {
+              ".validate": false
+            }
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    "grade11AiAccounts": {
+      ".read": true,
+      "$studentId": {
+        ".write": "auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))",
+        ".validate": "newData.hasChildren(['uid','email','grade','createdAt','createdBy'])",
+        "uid": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128"
+        },
+        "email": {
+          ".validate": "newData.isString() && newData.val().matches(/^g11\\..*@students\\.cs-report\\.invalid$/)"
+        },
+        "grade": {
+          ".validate": "newData.val() === 11"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "createdBy": {
+          ".validate": "newData.val() === auth.uid"
+        },
+        "$other": {
+          ".validate": false
         }
       }
     }
