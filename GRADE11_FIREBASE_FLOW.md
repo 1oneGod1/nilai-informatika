@@ -1,3 +1,9 @@
+# Current website: formative focus
+
+Students see three tasks only: F1 classifier improvement, F2 KNN experiment, and F3 navigation modification. Each task offers BSD instructions, one modification challenge, evidence submission, and teacher feedback. Existing cloud accounts continue to work.
+
+The teacher workspace displays only F1/F2/F3. Each reviewed formative score saves to its own gradebook field without requiring course-completion or summative grading. Historical course/summative records and the original final-grade policy remain stored; formative-only saves do not replace the published final grade.
+
 # Grade 11 AI Studio — Firebase workflow
 
 1. Sign in as a verified teacher. In **Monitor kelas 11 · AI Studio**, activate each student's cloud account once. The account uses the existing CS.Report student password; no student email is needed.

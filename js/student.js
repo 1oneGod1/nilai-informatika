@@ -589,11 +589,11 @@ function buildGrade11MaterialsCard(student) {
         <div class="w-14 h-14 rounded-2xl bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center text-emerald-300 text-xl shrink-0"><i class="fas fa-brain"></i></div>
         <div class="flex-1">
           <div class="flex flex-wrap items-center gap-2 mb-2"><span class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold">MATERI KELAS</span><span class="text-[10px] font-mono-tech text-cyan-200 bg-cyan-500/10 border border-cyan-400/20 px-2 py-0.5 rounded-full">KELAS 11</span></div>
-          <h3 class="text-xl font-black text-white">AI Studio: Code the Future with AI</h3>
-          <p class="text-sm text-slate-300 mt-1 max-w-2xl">Buka tugas hari ini, kerjakan di BSD, lalu coba tantangan. Lanjut dari course terakhir, pilih targetmu, lalu siapkan bukti course, formatif, dan sumatif.</p>
-          <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech"><span class="text-emerald-300">14 × 2 JP</span><span class="text-cyan-300">28 soal latihan pilihan</span><span class="text-lime-300">Target harian fleksibel</span></div>
+          <h3 class="text-xl font-black text-white">Formatif AI · Kelas 11</h3>
+          <p class="text-sm text-slate-300 mt-1 max-w-2xl">Pilih F1, F2, atau F3. Modifikasi karya BSD, kirim hasil uji, lalu lihat feedback guru.</p>
+          <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-tech"><span class="text-emerald-300">3 tugas formatif</span><span class="text-cyan-300">Bukti & feedback</span></div>
         </div>
-        <button type="button" onclick="openGrade11Materials()" class="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black font-mono-tech text-xs px-5 py-3 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0">BUKA AI STUDIO <i class="fas fa-arrow-right"></i></button>
+        <button type="button" onclick="openGrade11Materials()" class="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black font-mono-tech text-xs px-5 py-3 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0">BUKA FORMATIF <i class="fas fa-arrow-right"></i></button>
       </div>
     </section>`;
 }
