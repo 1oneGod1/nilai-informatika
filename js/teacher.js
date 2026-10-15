@@ -533,6 +533,7 @@ function listenToLearningProgressData() {
     },
     (error) => {
       console.warn("Gagal memuat learning progress:", error);
+      if(typeof G11Monitor!=="undefined")G11Monitor.onProgressError(error);
     },
   );
 }
@@ -918,6 +919,11 @@ async function openStudentLearningProgress(studentId, focusSection = "") {
   const student = allSiswa.find((item) => item.id === studentId);
   if (!student) {
     showAlert("Data siswa tidak ditemukan.", "danger");
+    return;
+  }
+
+  if (getTeacherStudentGrade(student) === 11 && typeof G11Monitor !== "undefined") {
+    G11Monitor.open(student.id);
     return;
   }
 
@@ -2264,7 +2270,12 @@ function renderTableBody(data) {
                 <i class="fas ${hasSummativeSubmission ? "fa-circle-check" : "fa-clock"}"></i>${hasSummativeSubmission ? "SUMMATIVE TERKIRIM" : "SUMMATIVE BELUM DIKIRIM"}
               </button>
             </div>`
-          : `<span class="font-bold text-slate-200">${escHtml(s.nama)}</span>`;
+          : getTeacherStudentGrade(s) === 11
+            ? `<button type="button" onclick="openStudentLearningProgress('${escHtml(s.id)}')" class="group/name text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-cyan-500/10 transition-colors" title="Lihat jawaban dan screenshot F1–F3">
+                <strong class="block text-slate-200 group-hover/name:text-cyan-300 transition-colors">${escHtml(s.nama)}</strong>
+                <small class="block text-[9px] text-cyan-500/70 font-mono-tech mt-0.5">LIHAT BUKTI F1–F3</small>
+              </button>`
+            : `<span class="font-bold text-slate-200">${escHtml(s.nama)}</span>`;
 
       return `
       <tr id="row-${s.id}" class="hover:bg-slate-800/50 transition-colors group">
