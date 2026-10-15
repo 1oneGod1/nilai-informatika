@@ -255,6 +255,10 @@ const LESSONS=[
       [
         "Perbaiki satu aspek: label, keseimbangan, atau variasi data. Latih ulang dan uji keenam gambar yang sama.",
         "Improve one aspect: labels, balance, or data variety. Retrain and test the same six images."
+      ],
+      [
+        "Ambil screenshot yang memperlihatkan training dan hasil pengujian. Jika BSD hanya membuka PDF atau tidak memberi link share, screenshot inilah bukti yang dikirim.",
+        "Take screenshots that show the training and test results. If BSD only opens a PDF or provides no share link, submit these screenshots as your evidence."
       ]
     ],
     "challenge": [
@@ -266,8 +270,8 @@ const LESSONS=[
       "Compare before/after using the same test inputs. No improvement is also a valid finding: explain the evidence and next step."
     ],
     "result": [
-      "Tautan salinan, satu perubahan, dan 6 hasil uji sebelum/sesudah.",
-      "A copy link, one change, and six before/after test results."
+      "Screenshot training/pengujian, satu perubahan dan prediksi, serta 6 hasil uji sebelum/sesudah.",
+      "Training/testing screenshots, one change and prediction, plus six before/after test results."
     ],
     "prep": [
       "Mulai setelah Webcam Live Classifier sesuai laporan guru. Gunakan benda aman, bukan foto identitas. Jika karya lama belum tersedia, siapkan checkpoint Upload Classifier.",
@@ -585,6 +589,10 @@ const LESSONS=[
       [
         "Catat jumlah label benar dari 6 untuk setiap K. Pilih K dan jelaskan satu kegagalan.",
         "Record correct labels out of 6 for each K. Choose K and explain one failure."
+      ],
+      [
+        "Ambil screenshot setup training dan hasil uji K=1, K=3, dan K=5. Tidak perlu link share dari BSD.",
+        "Take screenshots of the training setup and the K=1, K=3, and K=5 test results. A BSD share link is not required."
       ]
     ],
     "challenge": [
@@ -596,8 +604,8 @@ const LESSONS=[
       "K is not a confidence threshold. Larger K is not always better; compare correct labels on fixed inputs."
     ],
     "result": [
-      "Tabel K=1/3/5, benar dari 6, dan alasan pilihan.",
-      "A K=1/3/5 table, correct counts out of 6, and a reasoned choice."
+      "Screenshot training/pengujian, tabel K=1/3/5, jumlah benar dari 6, dan alasan pilihan.",
+      "Training/testing screenshots, a K=1/3/5 table, correct counts out of 6, and a reasoned choice."
     ],
     "prep": [
       "Kode adjustConfidence() menskalakan confidence dengan faktor K dan Math.random(). Gunakan label benar sebagai bukti. Input webcam tidak persis identik: samakan benda, posisi, cahaya, dan urutan; catat keterbatasannya.",
@@ -1576,6 +1584,10 @@ const LESSONS=[
       [
         "Uji sampai finish, jalan buntu, dan retry. Catat jejak/jumlah gerak serta posisi setelah reset.",
         "Test reaching the finish, a dead end, and retry. Record the trace/move count and position after reset."
+      ],
+      [
+        "Ambil screenshot perubahan kode/peta dan hasil finish, jalan buntu, atau retry. Pilih screenshot yang paling jelas menunjukkan perubahan dan hasil uji.",
+        "Take screenshots of the code/map change and the finish, dead-end, or retry result. Choose the clearest screenshots showing the change and test outcome."
       ]
     ],
     "challenge": [
@@ -1587,8 +1599,8 @@ const LESSONS=[
       "The fastest found route may not be best among all possibilities. Check that retry does not use incorrect old state."
     ],
     "result": [
-      "Tautan sebelum/sesudah, satu perubahan, dan tiga kasus uji.",
-      "Before/after links, one change, and three test cases."
+      "Screenshot perubahan dan hasil, satu prediksi, serta catatan tiga kasus uji: finish, jalan buntu, dan retry.",
+      "Change/result screenshots, one prediction, and notes for three test cases: finish, dead end, and retry."
     ],
     "prep": [
       "Sediakan checkpoint Auto Navigation. Mulai pemeriksaan individual di sini untuk meringankan demo terakhir.",

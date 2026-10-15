@@ -639,6 +639,20 @@
                 "reflection": {
                   ".validate": "newData.isString() && newData.val().length <= 4000"
                 },
+                "screenshots": {
+                  "$index": {
+                    ".validate": "($index === '0' || $index === '1') && newData.hasChildren(['name','data'])",
+                    "name": {
+                      ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 120"
+                    },
+                    "data": {
+                      ".validate": "newData.isString() && newData.val().length > 23 && newData.val().length <= 320000 && newData.val().matches(/^data:image\\/jpeg;base64,[A-Za-z0-9+\\/=]+$/)"
+                    },
+                    "$other": {
+                      ".validate": false
+                    }
+                  }
+                },
                 "done": {
                   ".validate": "newData.isBoolean()"
                 },
@@ -764,6 +778,20 @@
                 },
                 "reflection": {
                   ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "screenshots": {
+                  "$index": {
+                    ".validate": "($index === '0' || $index === '1') && newData.hasChildren(['name','data'])",
+                    "name": {
+                      ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 120"
+                    },
+                    "data": {
+                      ".validate": "newData.isString() && newData.val().length > 23 && newData.val().length <= 320000 && newData.val().matches(/^data:image\\/jpeg;base64,[A-Za-z0-9+\\/=]+$/)"
+                    },
+                    "$other": {
+                      ".validate": false
+                    }
+                  }
                 },
                 "done": {
                   ".validate": "newData.isBoolean()"
@@ -1142,6 +1170,20 @@
                 },
                 "reflection": {
                   ".validate": "newData.isString() && newData.val().length <= 4000"
+                },
+                "screenshots": {
+                  "$index": {
+                    ".validate": "($index === '0' || $index === '1') && newData.hasChildren(['name','data'])",
+                    "name": {
+                      ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 120"
+                    },
+                    "data": {
+                      ".validate": "newData.isString() && newData.val().length > 23 && newData.val().length <= 320000 && newData.val().matches(/^data:image\\/jpeg;base64,[A-Za-z0-9+\\/=]+$/)"
+                    },
+                    "$other": {
+                      ".validate": false
+                    }
+                  }
                 },
                 "done": {
                   ".validate": "newData.isBoolean()"

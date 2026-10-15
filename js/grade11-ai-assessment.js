@@ -21,7 +21,7 @@ const G11_AI_WEIGHTED_ASSESSMENTS = G11_AI_UNITS.map(([key,title,projects],index
   brief:'Periksa seluruh aktivitas: '+projects.join(', ')+'. Gunakan bukti karya lama jika sudah selesai. Nilai kualitas penyelesaian, bukan kecepatan. Beri poin parsial sesuai bukti, lalu tandai komponen sudah diperiksa.',
   criteria:[
     {id:'steps',label:'Langkah wajib pada seluruh aktivitas course selesai; poin parsial sesuai bagian yang terbukti selesai',max:60},
-    {id:'evidence',label:'Hasil kegiatan/karya dapat ditunjukkan, disertai tautan atau bukti dan satu uji/contoh hasil',max:20},
+    {id:'evidence',label:'Screenshot memperlihatkan proses atau perubahan serta hasil pengujian yang dapat diperiksa guru',max:20},
     {id:'explanation',label:'Siswa menjelaskan satu konsep atau alur input → proses → output dengan kata-kata sendiri',max:20},
   ],
 })).concat([

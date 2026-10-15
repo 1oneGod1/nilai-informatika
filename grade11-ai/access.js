@@ -6,7 +6,7 @@ let g11TeacherVerified = false;
 function readG11Session() {
   try {
     const raw = sessionStorage.getItem(G11_SESSION_KEY);
-    const localPreview = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('preview') === '1';
+    const localPreview = (['localhost','127.0.0.1'].includes(location.hostname) || location.protocol === 'file:') && new URLSearchParams(location.search).get('preview') === '1';
     if (!raw && localPreview) return { id: 'local-grade11-preview', name: 'Grade 11 Test Student', className: '11A', verifiedAt: Date.now(), isLocalPreview: true };
     if (!raw) return null;
     const value = JSON.parse(raw), age = Date.now() - Number(value?.verifiedAt);
