@@ -137,8 +137,8 @@ const COURSE={
       "name": "F1",
       "guide": 1,
       "focus": [
-        "Perbaiki data dan bandingkan 6 hasil uji.",
-        "Improve data and compare 6 test results."
+        "Bandingkan 3 lalu 6 sampel latihan per kelas dengan 1 foto uji yang sama.",
+        "Compare 3 then 6 training samples per class using the same single test photo."
       ]
     },
     {
@@ -228,12 +228,12 @@ const LESSONS=[
   {
     "id": 1,
     "title": [
-      "F1 · Perbaiki classifier lamamu",
-      "F1 · Improve your existing classifier"
+      "F1 · Bandingkan 3 dan 6 sampel latihan",
+      "F1 · Compare 3 and 6 training samples"
     ],
     "goal": [
-      "Ubah satu hal pada data, lalu buktikan dampaknya.",
-      "Change one thing in the data, then show its effect."
+      "Latih model dengan 3 lalu total 6 sampel per kelas. Bandingkan prediksinya pada 1 foto uji yang sama.",
+      "Train with 3 then a total of 6 samples per class. Compare predictions on the same single test photo."
     ],
     "learn": [
       "Data latih memberi contoh; data uji yang terpisah memeriksa prediksi baru. Lebih banyak gambar serupa belum tentu lebih baik.",
@@ -245,41 +245,45 @@ const LESSONS=[
     "range": "Image Upload Classifier · revisit steps 12–17 in your own copy",
     "tasks": [
       [
-        "Salin karya sebelumnya. Siapkan 6 gambar uji baru: 3 untuk setiap kelas. Jangan masukkan ke data latih.",
-        "Copy your previous project. Prepare 6 new test images: 3 per class. Keep them out of training data."
+        "Persiapan: gunakan salinan Image Upload Classifier dengan dua kelas, misalnya Buku dan Botol. Siapkan 3 foto sampel latihan untuk setiap kelas. Siapkan juga 1 foto uji baru dari salah satu kelas; jangan masukkan foto uji ini ke sampel latihan.",
+        "Preparation: use a copy of Image Upload Classifier with two classes, such as Book and Bottle. Prepare 3 training sample photos for each class. Also prepare 1 new test photo from one class; keep this test photo out of the training samples."
       ],
       [
-        "Uji keenam gambar. Catat label benar, label prediksi, dan jumlah benar dari 6.",
-        "Test all six images. Record the expected label, predicted label, and correct count out of 6."
+        "Tahap 1: pastikan setiap kelas berisi 3 sampel latihan, klik Train, lalu uji 1 foto baru tadi. Catat nama benda pada foto, label yang seharusnya, dan prediksi model (benar atau salah). Ambil screenshot hasil tahap 1.",
+        "Stage 1: make sure each class has 3 training samples, click Train, then test the 1 new photo. Record the object, its expected label, and the model prediction (correct or incorrect). Take a screenshot of the stage 1 result."
       ],
       [
-        "Perbaiki satu aspek: label, keseimbangan, atau variasi data. Latih ulang dan uji keenam gambar yang sama.",
-        "Improve one aspect: labels, balance, or data variety. Retrain and test the same six images."
+        "Sebelum tahap 2, tulis prediksimu. Tambahkan 3 sampel latihan baru pada setiap kelas sehingga totalnya menjadi 6 sampel per kelas. Pertahankan 3 sampel awal dan gunakan label kelas yang sama.",
+        "Before stage 2, write your prediction. Add 3 new training samples to each class so each class has 6 samples in total. Keep the original 3 samples and the same class labels."
       ],
       [
-        "Ambil screenshot yang memperlihatkan training dan hasil pengujian. Jika BSD hanya membuka PDF atau tidak memberi link share, screenshot inilah bukti yang dikirim.",
-        "Take screenshots that show the training and test results. If BSD only opens a PDF or provides no share link, submit these screenshots as your evidence."
+        "Tahap 2: klik Train lagi setelah setiap kelas berisi total 6 sampel. Uji kembali 1 foto yang persis sama seperti tahap 1. Catat prediksi model (benar atau salah), lalu bandingkan kedua hasil. Ambil screenshot hasil tahap 2.",
+        "Stage 2: click Train again after each class has 6 samples in total. Retest the exact same single photo from stage 1. Record the model prediction (correct or incorrect), then compare both results. Take a screenshot of the stage 2 result."
+      ],
+      [
+        "Kirim 2 screenshot: satu untuk tahap 1 dan satu untuk tahap 2. Usahakan jumlah sampel per kelas dan hasil prediksi terlihat. Isi perubahan/prediksi serta hasil kedua tahap dan satu keterbatasan di formulir bawah. Link share BSD tidak diperlukan.",
+        "Submit 2 screenshots: one for stage 1 and one for stage 2. Show the sample count per class and prediction result where possible. Fill in your change/prediction, both test results, and one limitation below. A BSD share link is not required."
       ]
     ],
     "challenge": [
-      "Tambahkan variasi latar atau sudut untuk satu kelas. Jelaskan mengapa perubahan itu dipilih.",
-      "Add background or angle variety for one class. Explain why you chose that change."
+      "Jelaskan mengapa prediksi berubah atau tetap sama setelah sampel latihan bertambah. Hasil yang tidak meningkat tetap boleh dilaporkan.",
+      "Explain why the prediction changed or stayed the same after adding training samples. It is valid to report no improvement."
     ],
     "check": [
-      "Bandingkan sebelum/sesudah dengan input uji yang sama. Hasil tidak meningkat juga boleh: jelaskan bukti dan langkah berikutnya.",
-      "Compare before/after using the same test inputs. No improvement is also a valid finding: explain the evidence and next step."
+      "Angka 3 dan 6 adalah jumlah sampel latihan untuk SETIAP kelas. Tahap 2 menambah 3 menjadi total 6 per kelas. Foto uji hanya 1 dan harus sama pada kedua tahap; foto itu tidak dipakai untuk training.",
+      "The numbers 3 and 6 are training sample counts for EACH class. Stage 2 adds 3 to reach 6 per class in total. Use only 1 test photo, identical in both stages, and never use it for training."
     ],
     "result": [
-      "Screenshot training/pengujian, satu perubahan dan prediksi, serta 6 hasil uji sebelum/sesudah.",
-      "Training/testing screenshots, one change and prediction, plus six before/after test results."
+      "2 screenshot tahap 1/2; jumlah sampel 3 lalu 6 per kelas; prediksi sebelum menambah sampel; hasil pada 1 foto yang sama di kedua tahap; dan satu keterbatasan.",
+      "2 screenshots for stages 1/2; 3 then 6 samples per class; a prediction before adding samples; both results on the same single photo; and one limitation."
     ],
     "prep": [
       "Mulai setelah Webcam Live Classifier sesuai laporan guru. Gunakan benda aman, bukan foto identitas. Jika karya lama belum tersedia, siapkan checkpoint Upload Classifier.",
       "Start after Webcam Live Classifier as reported by the teacher. Use safe objects rather than identity photos. Prepare an Upload Classifier checkpoint if previous work is unavailable."
     ],
     "oral": [
-      "Apa yang berubah? Apakah input uji tetap sama? Tunjukkan satu kesalahan prediksi.",
-      "What changed? Did you keep test inputs fixed? Show one prediction error."
+      "Berapa sampel di setiap kelas pada tahap 1 dan 2? Apakah foto uji sama? Apa prediksi model pada masing-masing tahap? Apa batas kesimpulan dari satu foto uji?",
+      "How many samples are in each class at stages 1 and 2? Is the test photo the same? What did the model predict at each stage? What can one test photo tell us, and what can it not?"
     ],
     "questions": [
       {
@@ -318,8 +322,8 @@ const LESSONS=[
             "Change training and all test inputs together."
           ],
           [
-            "Ubah satu aspek data; gunakan 6 input uji yang sama.",
-            "Change one data aspect; reuse the same 6 test inputs."
+            "Tambah sampel latihan dari 3 menjadi 6 per kelas; uji foto baru yang sama pada kedua tahap.",
+            "Increase training samples from 3 to 6 per class; test the same new photo in both stages."
           ],
           [
             "Bandingkan hanya prediksi yang berhasil.",
