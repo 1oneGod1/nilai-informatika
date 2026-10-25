@@ -128,6 +128,121 @@
         color: #1e40af;
         border: 1px solid #3b82f6;
       }
+      /* Dashboard tabs */
+      .dash-quarter {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        order: 2;
+        padding: 8px 0;
+      }
+      .dash-quarter-label {
+        font-size: 10px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-right: 4px;
+      }
+      .dash-quarter .quarter-tab {
+        width: auto !important;
+        padding: 0.4rem 0.9rem !important;
+        border-radius: 0.6rem !important;
+        font-size: 0.8rem;
+      }
+      .dash-quarter .quarter-tab i {
+        display: none;
+      }
+      @media (max-width: 767px) {
+        nav.glass-panel-teacher {
+          position: static;
+        }
+        .dash-quarter {
+          width: 100%;
+        }
+        .teacher-dashboard .dash-quarter .quarter-tab {
+          flex: 1 1 0;
+          min-height: 40px;
+        }
+      }
+      .dash-tabs {
+        display: flex;
+        gap: 4px;
+        margin-top: 12px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .dash-tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .dash-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #94a3b8;
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: color 0.2s, border-color 0.2s;
+      }
+      .dash-tab i {
+        font-size: 0.75rem;
+      }
+      .dash-tab:hover {
+        color: #e2e8f0;
+      }
+      .dash-tab[aria-selected="true"] {
+        color: #38bdf8;
+        border-bottom-color: #38bdf8;
+      }
+      .dash-tab-badge {
+        background: #f43f5e;
+        color: #fff;
+        font-size: 10px;
+        line-height: 1;
+        padding: 3px 6px;
+        border-radius: 999px;
+      }
+      .dash-panel[hidden] {
+        display: none !important;
+      }
+      .dash-stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        color: #cbd5e1;
+        background: rgba(15, 23, 42, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .dash-stat b {
+        font-family: "JetBrains Mono", monospace;
+        color: #fff;
+      }
+      .dash-stat-rose b {
+        color: #fb7185;
+      }
+      .dash-stat-amber b {
+        color: #fbbf24;
+      }
+      .dash-stat-emerald b {
+        color: #34d399;
+      }
+      .dash-stat-indigo b {
+        color: #a5b4fc;
+      }
+      .dash-stat[hidden] {
+        display: none;
+      }
+      .dash-course-grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+      }
       @keyframes slideInX {
         from {
           transform: translateX(100%);
@@ -147,7 +262,7 @@
       class="glass-panel-teacher border-b border-slate-700/50 sticky top-0 z-30"
     >
       <div
-        class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between"
+        class="max-w-[1400px] mx-auto px-4 lg:px-6 pt-4 pb-0 flex flex-wrap items-center justify-between gap-x-4 gap-y-3"
       >
         <div class="flex flex-wrap items-center gap-4">
           <div
@@ -190,6 +305,21 @@
           </button>
         </div>
       </div>
+      <div class="max-w-[1400px] mx-auto px-4 lg:px-6 flex flex-wrap items-end justify-between gap-x-4">
+        <div class="dash-quarter" role="group" aria-label="Pilih kuartal">
+          <span class="dash-quarter-label font-mono-tech">Kuartal</span>
+          <button onclick="setQuarter(1)" id="btnQ1" class="quarter-tab px-6 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto">Q1</button>
+          <button onclick="setQuarter(2)" id="btnQ2" class="quarter-tab px-6 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto">Q2</button>
+          <button onclick="setQuarter(3)" id="btnQ3" class="quarter-tab px-6 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto">Q3</button>
+          <button onclick="setQuarter(4)" id="btnQ4" class="quarter-tab active px-6 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto">Q4</button>
+        </div>
+        <div class="dash-tabs" role="tablist" aria-label="Menu dashboard guru">
+          <button type="button" role="tab" id="dashTab-nilai" class="dash-tab" data-dash-tab="nilai" aria-controls="dashPanel-nilai" aria-selected="false"><i class="fas fa-table"></i> Buku nilai</button>
+          <button type="button" role="tab" id="dashTab-penilaian" class="dash-tab" data-dash-tab="penilaian" aria-controls="dashPanel-penilaian" aria-selected="false"><i class="fas fa-clipboard-check"></i> Penilaian rubrik</button>
+          <button type="button" role="tab" id="dashTab-materi" class="dash-tab" data-dash-tab="materi" aria-controls="dashPanel-materi" aria-selected="false"><i class="fas fa-book-open"></i> Materi kelas</button>
+          <button type="button" role="tab" id="dashTab-pengaturan" class="dash-tab" data-dash-tab="pengaturan" aria-controls="dashPanel-pengaturan" aria-selected="false"><i class="fas fa-sliders"></i> Pengaturan <span id="dashSettingsBadge" class="dash-tab-badge" hidden>0</span></button>
+        </div>
+      </div>
     </nav>
 
     <div id="alertArea"></div>
@@ -203,421 +333,25 @@
         class="relative w-full max-w-[1400px] mx-auto px-4 lg:px-6 py-8 flex flex-col gap-6"
         style="z-index: 1"
       >
-        <!-- ADMIN PANEL -->
+        <div id="dashPanel-nilai" class="dash-panel flex flex-col gap-6" role="tabpanel" aria-labelledby="dashTab-nilai" data-dash-panel="nilai">
+          <div class="glass-panel-teacher rounded-2xl p-4 md:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 border-l-4 border-l-cyan-500">
+            <div id="dashStats" class="flex flex-wrap items-center gap-2" aria-live="polite">
+              <span class="dash-stat"><b id="dashStatTotal">0</b> siswa ditampilkan</span>
+              <span class="dash-stat dash-stat-rose"><b id="dashStatRemedial">0</b> remedial</span>
+              <span class="dash-stat dash-stat-amber"><b id="dashStatSusulan">0</b> susulan</span>
+              <span class="dash-stat dash-stat-emerald"><b id="dashStatTuntas">0</b> tuntas</span>
+              <span class="dash-stat dash-stat-indigo" id="dashStatPasswordWrap" hidden><b id="dashStatPassword">0</b> pengajuan password</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" id="dashAddToggle" aria-expanded="false" aria-controls="dashAddPanel" class="flex-1 sm:flex-none text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 border text-cyan-300 border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20"><i class="fas fa-user-plus"></i> Tambah siswa</button>
+              <button onclick="downloadTemplate()" class="flex-1 sm:flex-none text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 border text-indigo-400 border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20"><i class="fas fa-download"></i> Template Excel</button>
+              <button onclick="triggerImport()" class="flex-1 sm:flex-none text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 border text-amber-400 border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20"><i class="fas fa-upload"></i> Import</button>
+              <input type="file" id="importFileExcel" accept=".xlsx, .xls" class="hidden" onchange="importExcel(event)" />
+              <button onclick="exportExcel()" class="flex-1 sm:flex-none text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 border text-emerald-400 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20"><i class="fas fa-file-export"></i> Export</button>
+            </div>
+          </div>
         <div
-          id="adminPanelBtn"
-          class="glass-panel-teacher rounded-2xl overflow-hidden border-l-4 border-l-emerald-500"
-          style="display: none"
-        >
-          <button
-            class="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-800/60 transition-colors"
-            onclick="this.nextElementSibling.classList.toggle('hidden')"
-          >
-            <span
-              class="flex items-center gap-3 text-emerald-400 font-bold text-sm"
-            >
-              <i class="fas fa-shield-check"></i> Panel Verifikasi Guru (Admin
-              Utama)
-              <span
-                id="adminBadgeCount"
-                class="bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full"
-                style="display: none"
-                >0</span
-              >
-            </span>
-            <i class="fas fa-chevron-down text-slate-500 text-xs"></i>
-          </button>
-          <div
-            class="hidden border-t border-slate-700/50 relative overflow-hidden bg-slate-900/40"
-          >
-            <div id="adminPanelContent" class="relative z-10 p-2"></div>
-          </div>
-        </div>
-
-        <!-- EXCEL FEATURES -->
-        <div
-          class="glass-panel-teacher rounded-2xl p-5 border-l-4 border-l-amber-500 flex flex-wrap gap-4 items-center justify-between"
-        >
-          <div
-            class="flex items-center gap-2.5 text-amber-400 font-semibold w-full sm:w-auto"
-          >
-            <i class="fas fa-file-excel"></i> Fitur Sinkronisasi Data (Excel)
-          </div>
-          <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-            <button
-              onclick="downloadTemplate()"
-              class="flex-1 sm:flex-none text-xs font-bold text-indigo-400 border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              <i class="fas fa-download"></i> Template Excel
-            </button>
-            <button
-              onclick="triggerImport()"
-              class="flex-1 sm:flex-none text-xs font-bold text-amber-400 border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              <i class="fas fa-upload"></i> Import Data
-            </button>
-            <input
-              type="file"
-              id="importFileExcel"
-              accept=".xlsx, .xls"
-              class="hidden"
-              onchange="importExcel(event)"
-            />
-            <button
-              onclick="exportExcel()"
-              class="flex-1 sm:flex-none text-xs font-bold text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              <i class="fas fa-file-export"></i> Export Keseluruhan
-            </button>
-            <button
-              id="deleteAllStudentsBtn"
-              type="button"
-              onclick="deleteAllStudentData()"
-              class="flex-1 sm:flex-none text-xs font-bold text-rose-300 border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 px-4 py-2 rounded-lg transition-colors items-center justify-center gap-2"
-              style="display: none"
-              title="Khusus Super Admin"
-            >
-              <i class="fas fa-trash-can"></i> Hapus Semua Siswa
-            </button>
-          </div>
-        </div>
-
-        <!-- PENGATURAN PENILAIAN (Accordion) -->
-        <div
-          class="glass-panel-teacher rounded-2xl overflow-hidden border-l-4 border-l-slate-600"
-        >
-          <button
-            class="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-800/60 transition-colors"
-            onclick="this.nextElementSibling.classList.toggle('hidden')"
-          >
-            <span
-              class="flex items-center gap-3 text-slate-300 font-semibold text-sm"
-            >
-              <i class="fas fa-cog text-slate-400"></i> Pengaturan
-              Penilaian
-            </span>
-            <i class="fas fa-chevron-down text-slate-500 text-xs"></i>
-          </button>
-          <div
-            class="hidden border-t border-slate-700/50 px-5 py-5 bg-slate-900/30"
-          >
-            <div class="flex items-end gap-4 flex-wrap">
-              <div>
-                <label
-                  class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2"
-                  >Jumlah Formatif</label
-                >
-                <input
-                  type="number"
-                  id="numFormatif"
-                  value="2"
-                  min="1"
-                  max="50"
-                  class="w-24 bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-                />
-              </div>
-              <button
-                onclick="applySettings()"
-                class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-              >
-                <i class="fas fa-check text-emerald-400 text-xs"></i> Terapkan
-              </button>
-            </div>
-            <div class="mt-6 border-t border-slate-700/60 pt-5">
-              <div
-                class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4"
-              >
-                <div>
-                  <h3 class="text-sm font-bold text-white">
-                    Kriteria Ketuntasan Minimal (KKM)
-                  </h3>
-                  <p class="text-xs text-slate-400 mt-1">
-                    Atur standar KKM per tingkat kelas. Perubahan langsung
-                    dipakai pada tabel guru dan hasil siswa.
-                  </p>
-                </div>
-                <span
-                  id="kkmSettingsStatus"
-                  class="text-[10px] font-mono-tech text-cyan-300"
-                  >TERSIMPAN DI FIREBASE</span
-                >
-              </div>
-              <div
-                id="kkmSettingsGrid"
-                class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"
-              >
-                <label class="block">
-                  <span
-                    class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2"
-                    >Kelas 7</span
-                  >
-                  <input
-                    type="number"
-                    id="kkmGrade7"
-                    value="72"
-                    min="1"
-                    max="100"
-                    step="1"
-                    class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-                  />
-                </label>
-                <label class="block">
-                  <span class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2">Kelas 8</span>
-                  <input type="number" id="kkmGrade8" value="73" min="1" max="100" step="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
-                </label>
-                <label class="block">
-                  <span class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2">Kelas 9</span>
-                  <input type="number" id="kkmGrade9" value="74" min="1" max="100" step="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
-                </label>
-                <label class="block">
-                  <span class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2">Kelas 10</span>
-                  <input type="number" id="kkmGrade10" value="75" min="1" max="100" step="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
-                </label>
-                <label class="block">
-                  <span class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2">Kelas 11</span>
-                  <input type="number" id="kkmGrade11" value="76" min="1" max="100" step="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
-                </label>
-                <label class="block">
-                  <span class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2">Kelas 12</span>
-                  <input type="number" id="kkmGrade12" value="77" min="1" max="100" step="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
-                </label>
-              </div>
-              <div class="mt-4 flex flex-wrap items-center gap-3">
-                <button
-                  id="saveKkmSettingsButton"
-                  type="button"
-                  onclick="saveKkmSettings()"
-                  class="flex items-center gap-2 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-200 border border-cyan-500/40 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-                >
-                  <i class="fas fa-floppy-disk text-xs"></i> Simpan KKM
-                </button>
-                <p class="text-[10px] text-slate-500 font-mono-tech">
-                  Berlaku untuk seluruh guru dan siswa.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- QUARTER TABS -->
-        <div
-          class="glass-panel-teacher rounded-2xl p-3 flex flex-wrap gap-2 items-center justify-center border-l-4 border-l-purple-500"
-        >
-          <button
-            onclick="setQuarter(1)"
-            id="btnQ1"
-            class="quarter-tab px-6 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto"
-          >
-            <i class="fas fa-cube mr-1 text-purple-400"></i> Q1
-          </button>
-          <button
-            onclick="setQuarter(2)"
-            id="btnQ2"
-            class="quarter-tab px-6 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto"
-          >
-            <i class="fas fa-cube mr-1 text-purple-400"></i> Q2
-          </button>
-          <button
-            onclick="setQuarter(3)"
-            id="btnQ3"
-            class="quarter-tab px-6 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto"
-          >
-            <i class="fas fa-cube mr-1 text-purple-400"></i> Q3
-          </button>
-          <button
-            onclick="setQuarter(4)"
-            id="btnQ4"
-            class="quarter-tab active px-6 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto"
-          >
-            <i class="fas fa-cube mr-1 text-purple-400"></i> Q4
-          </button>
-        </div>
-
-        <!-- GRADE 9 VR MATERIAL REVIEW -->
-        <section class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-emerald-400" aria-labelledby="grade12ReviewTitle">
-          <div class="flex flex-col lg:flex-row lg:items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 flex items-center justify-center text-lg shrink-0"><i class="fas fa-code"></i></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold uppercase mb-1.5">Kelas 12 · Review Guru</p>
-              <h2 id="grade12ReviewTitle" class="text-lg font-black text-white">Sustainable Web Studio · BSD Course 3</h2>
-              <p class="text-sm text-slate-300 mt-1">18 panduan harian berbasis BSD: materi, hasil, refleksi, dan tantangan modifikasi beserta cara uji. Indonesia–English.</p>
-            </div>
-            <button type="button" onclick="openGrade12TeacherPreview()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"><i class="fas fa-eye"></i> Review Sustainable Web Studio</button>
-          </div>
-        </section>
-
-        <section class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-emerald-400" aria-labelledby="grade11ReviewTitle">
-          <div class="flex flex-col lg:flex-row lg:items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 flex items-center justify-center text-lg shrink-0"><i class="fas fa-brain"></i></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold uppercase mb-1.5">Kelas 11 · Review Guru</p>
-              <h2 id="grade11ReviewTitle" class="text-lg font-black text-white">AI Studio: Code the Future with AI</h2>
-              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">14 sesi × 2 JP dengan tempo masing-masing. Target pribadi, bukti penyelesaian tiap course, tiga formatif, dan karya sumatif. Panduan guru memuat konferensi individual dan WKA.</p>
-            </div>
-            <button type="button" onclick="openGrade11TeacherPreview()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"><i class="fas fa-eye"></i> Review AI Studio</button>
-          </div>
-        </section>
-
-        <section class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-emerald-400" aria-labelledby="grade8ReviewTitle">
-          <div class="flex flex-col lg:flex-row lg:items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 flex items-center justify-center text-lg shrink-0"><i class="fas fa-gamepad"></i></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold uppercase mb-1.5">Kelas 8 · Review Guru</p>
-              <h2 id="grade8ReviewTitle" class="text-lg font-black text-white">Game Studio: Mobile Game Developer</h2>
-              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">Q2 · Rubrik lima game BSD, masing-masing /100. Nilai dari karya yang sudah selesai atau demo siswa, lalu simpan ke F1–F5.</p>
-            </div>
-            <div class="flex flex-wrap gap-2"><button type="button" onclick="openGrade8Assessment()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"><i class="fas fa-clipboard-check"></i> Nilai tugas BSD</button><button type="button" onclick="openGrade8TeacherPreview()" class="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-400/40 px-4 py-2.5 text-xs font-black text-emerald-300 transition-colors whitespace-nowrap"><i class="fas fa-eye"></i> Review Game Studio</button></div>
-          </div>
-        </section>
-
-        <section class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-emerald-400" aria-labelledby="grade9ReviewTitle">
-          <div class="flex flex-col lg:flex-row lg:items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 flex items-center justify-center text-lg shrink-0"><i class="fas fa-cubes"></i></div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold uppercase mb-1.5">Kelas 9 · Review Guru</p>
-              <h2 id="grade9ReviewTitle" class="text-lg font-black text-white">VR Studio: Construct a VR World</h2>
-              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">Review 9 pertemuan, simulasi, kuis latihan, dan rubrik 70–20–10. Siswa membuka materi dari halaman nilainya setelah mencari nama dan verifikasi password. Review ini tidak mengubah nilai siswa.</p>
-            </div>
-            <button type="button" onclick="openGrade9TeacherPreview()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"><i class="fas fa-eye"></i> Review VR Studio</button>
-          </div>
-        </section>
-
-        <!-- GRADE 10 MATERIAL REVIEW -->
-        <section
-          class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-cyan-400"
-          aria-labelledby="grade10ReviewTitle"
-        >
-          <div class="flex flex-col lg:flex-row lg:items-center gap-5">
-            <div
-              class="w-12 h-12 rounded-xl bg-cyan-400/10 border border-cyan-400/30 text-cyan-300 flex items-center justify-center text-lg shrink-0"
-            >
-              <i class="fas fa-eye"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p
-                class="text-[10px] font-mono-tech tracking-[0.2em] text-cyan-300 font-bold uppercase mb-1.5"
-              >
-                Grade 10 · Teacher Review
-              </p>
-              <h2 id="grade10ReviewTitle" class="text-lg font-black text-white">
-                Review materi UI/UX yang diterima siswa
-              </h2>
-              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">
-                Buka seluruh materi, pre-test, post-test, Section 1–4, dan Summative
-                Mission tanpa memakai akun siswa. Aktivitas dalam mode review tidak akan
-                menyimpan progress atau nilai ke Firebase.
-              </p>
-            </div>
-            <div class="flex flex-col sm:flex-row sm:items-end gap-3 w-full lg:w-auto">
-              <label class="flex-1 lg:w-52">
-                <span
-                  class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-1.5"
-                  >Mulai dari</span
-                >
-                <select
-                  id="grade10TeacherPreviewSection"
-                  class="w-full bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-400"
-                >
-                  <option value="overview">Course overview</option>
-                  <option value="pre-test">Pre-test: Wireframe</option>
-                  <option value="section-1">Section 1: Wireframe</option>
-                  <option value="post-test">Post-test 1</option>
-                  <option value="section-2">Section 2: Project Setup</option>
-                  <option value="pre-test-2">Figma Pre-test</option>
-                  <option value="section-3">Section 3: Figma Basics</option>
-                  <option value="section-4">Section 4: Toolbar Lab</option>
-                  <option value="post-test-2">Post-test 2</option>
-                  <option value="summative">Summative: Individual Redesign</option>
-                </select>
-              </label>
-              <button
-                type="button"
-                onclick="openGrade10TeacherPreview()"
-                class="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"
-              >
-                <i class="fas fa-arrow-up-right-from-square"></i> Review materi
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section id="g11MonitorPanel" class="dc-assessment-shell glass-panel-teacher rounded-2xl">
-          <h2>Formatif kelas 11 · Bukti & feedback</h2>
-          <p>Cari siswa, buka F1/F2/F3, lalu beri feedback dan nilai.</p>
-          <div class="g11-monitor-controls"><label>Cari siswa<input id="g11MonitorSearch" type="search" placeholder="Nama siswa"></label><label>Kelas<select id="g11MonitorClass"><option value="">Semua kelas 11</option></select></label><label>Tampilkan<select id="g11MonitorFilter"><option value="all">Semua siswa</option><option value="pending">Perlu diperiksa / revisi</option></select></label></div>
-          <div id="g11MonitorList" aria-live="polite">Memuat progres Firebase…</div>
-        </section>
-        <!-- WORKSPACE PENILAIAN KELAS 7, 8, 9, 11, DAN 12 (KHUSUS GURU) -->
-        <section
-          id="dcAssessmentPanel"
-          class="dc-assessment-shell glass-panel-teacher rounded-2xl"
-          aria-labelledby="dcAssessmentTitle"
-        >
-          <div class="dc-assessment-header">
-            <div>
-              <span id="dcAssessmentEyebrow" class="dc-eyebrow"
-                >GRADE 9 ASSESSMENT WORKSPACE</span
-              >
-              <h2 id="dcAssessmentTitle">Assessment Technology and Me</h2>
-              <p id="dcAssessmentDescription">
-                Formatif 40% dan sumatif 60%. Checklist dapat diberi poin penuh
-                atau nilai parsial sesuai hasil proyek siswa.
-              </p>
-            </div>
-            <div class="dc-assessment-controls">
-              <label class="dc-control-field dc-grade-field">
-                <span>Kelas</span>
-                <select id="dcAssessmentGrade">
-                  <option value="7">Grade 7</option>
-                  <option value="8">Grade 8</option>
-                  <option value="9" selected>Grade 9</option>
-                  <option value="11">Grade 11</option>
-                  <option value="12">Grade 12</option>
-                </select>
-              </label>
-              <label class="dc-control-field">
-                <span>Nama siswa</span>
-                <select id="dcAssessmentStudent">
-                  <option value="">Pilih siswa dari daftar…</option>
-                </select>
-              </label>
-              <label class="dc-control-field dc-period-field">
-                <span>Periode</span>
-                <select id="dcAssessmentPeriod">
-                  <option value="1">Q1</option>
-                  <option value="2">Q2</option>
-                  <option value="3">Q3</option>
-                  <option value="4">Q4</option>
-                </select>
-              </label>
-              <div class="dc-save-actions">
-                <span id="dcSaveState" class="dc-save-state">Data tersimpan</span>
-                <button
-                  id="dcSaveButton"
-                  type="button"
-                  class="dc-save-button"
-                  onclick="saveDcAssessment()"
-                >
-                  <i class="fas fa-cloud-arrow-up"></i> Simpan penilaian
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div id="dcAssessmentSummary" class="dc-assessment-summary"></div>
-          <div class="dc-assessment-layout">
-            <nav
-              id="dcAssessmentNav"
-              class="dc-assessment-nav"
-              aria-label="Bagian penilaian"
-            ></nav>
-            <div id="dcAssessmentContent" class="dc-assessment-content"></div>
-          </div>
-        </section>
-
-        <!-- TAMBAH SISWA BARU -->
-        <div
-          class="glass-panel-teacher rounded-2xl p-6 md:p-8 border-l-4 border-l-cyan-500"
+          id="dashAddPanel" hidden class="glass-panel-teacher rounded-2xl p-6 md:p-8 border-l-4 border-l-cyan-500"
         >
           <div
             class="flex items-center gap-3 text-white font-bold mb-6 text-lg"
@@ -713,8 +447,6 @@
             </div>
           </form>
         </div>
-
-        <!-- TABEL NILAI SISWA -->
         <div
           class="glass-panel-teacher rounded-2xl overflow-hidden flex flex-col mb-10 border border-slate-700"
         >
@@ -794,6 +526,336 @@
             </table>
           </div>
         </div>
+        </div>
+        <div id="dashPanel-penilaian" class="dash-panel flex flex-col gap-6" role="tabpanel" aria-labelledby="dashTab-penilaian" data-dash-panel="penilaian">
+        <section
+          id="dcAssessmentPanel"
+          class="dc-assessment-shell glass-panel-teacher rounded-2xl"
+          aria-labelledby="dcAssessmentTitle"
+        >
+          <div class="dc-assessment-header">
+            <div>
+              <span id="dcAssessmentEyebrow" class="dc-eyebrow"
+                >GRADE 9 ASSESSMENT WORKSPACE</span
+              >
+              <h2 id="dcAssessmentTitle">Assessment Technology and Me</h2>
+              <p id="dcAssessmentDescription">
+                Formatif 40% dan sumatif 60%. Checklist dapat diberi poin penuh
+                atau nilai parsial sesuai hasil proyek siswa.
+              </p>
+            </div>
+            <div class="dc-assessment-controls">
+              <label class="dc-control-field dc-grade-field">
+                <span>Kelas</span>
+                <select id="dcAssessmentGrade">
+                  <option value="7">Grade 7</option>
+                  <option value="8">Grade 8</option>
+                  <option value="9" selected>Grade 9</option>
+                  <option value="11">Grade 11</option>
+                  <option value="12">Grade 12</option>
+                </select>
+              </label>
+              <label class="dc-control-field">
+                <span>Nama siswa</span>
+                <select id="dcAssessmentStudent">
+                  <option value="">Pilih siswa dari daftar…</option>
+                </select>
+              </label>
+              <label class="dc-control-field dc-period-field">
+                <span>Periode</span>
+                <select id="dcAssessmentPeriod">
+                  <option value="1">Q1</option>
+                  <option value="2">Q2</option>
+                  <option value="3">Q3</option>
+                  <option value="4">Q4</option>
+                </select>
+              </label>
+              <div class="dc-save-actions">
+                <span id="dcSaveState" class="dc-save-state">Data tersimpan</span>
+                <button
+                  id="dcSaveButton"
+                  type="button"
+                  class="dc-save-button"
+                  onclick="saveDcAssessment()"
+                >
+                  <i class="fas fa-cloud-arrow-up"></i> Simpan penilaian
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="dcAssessmentSummary" class="dc-assessment-summary"></div>
+          <div class="dc-assessment-layout">
+            <nav
+              id="dcAssessmentNav"
+              class="dc-assessment-nav"
+              aria-label="Bagian penilaian"
+            ></nav>
+            <div id="dcAssessmentContent" class="dc-assessment-content"></div>
+          </div>
+        </section>
+        <section id="g11MonitorPanel" class="dc-assessment-shell glass-panel-teacher rounded-2xl">
+          <h2>Formatif kelas 11 · Bukti & feedback</h2>
+          <p>Cari siswa, buka F1/F2/F3, lalu beri feedback dan nilai.</p>
+          <div class="g11-monitor-controls"><label>Cari siswa<input id="g11MonitorSearch" type="search" placeholder="Nama siswa"></label><label>Kelas<select id="g11MonitorClass"><option value="">Semua kelas 11</option></select></label><label>Tampilkan<select id="g11MonitorFilter"><option value="all">Semua siswa</option><option value="pending">Perlu diperiksa / revisi</option></select></label></div>
+          <div id="g11MonitorList" aria-live="polite">Memuat progres Firebase…</div>
+        </section>
+        </div>
+        <div id="dashPanel-materi" class="dash-panel flex flex-col gap-6" role="tabpanel" aria-labelledby="dashTab-materi" data-dash-panel="materi">
+          <p class="text-xs text-slate-400 -mb-2">Buka materi seperti yang dilihat siswa. Mode review tidak mengubah nilai atau progres siswa.</p>
+          <div class="dash-course-grid">
+        <section class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-emerald-400" aria-labelledby="grade8ReviewTitle">
+          <div class="flex flex-col items-start gap-4 h-full">
+            <div class="w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 flex items-center justify-center text-lg shrink-0"><i class="fas fa-gamepad"></i></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold uppercase mb-1.5">Kelas 8 · Review Guru</p>
+              <h2 id="grade8ReviewTitle" class="text-lg font-black text-white">Game Studio: Mobile Game Developer</h2>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">Q2 · Rubrik lima game BSD, masing-masing /100. Nilai dari karya yang sudah selesai atau demo siswa, lalu simpan ke F1–F5.</p>
+            </div>
+            <div class="flex flex-wrap gap-2"><button type="button" onclick="openGrade8Assessment()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"><i class="fas fa-clipboard-check"></i> Nilai tugas BSD</button><button type="button" onclick="openGrade8TeacherPreview()" class="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-400/40 px-4 py-2.5 text-xs font-black text-emerald-300 transition-colors whitespace-nowrap"><i class="fas fa-eye"></i> Review Game Studio</button></div>
+          </div>
+        </section>
+        <section class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-emerald-400" aria-labelledby="grade9ReviewTitle">
+          <div class="flex flex-col items-start gap-4 h-full">
+            <div class="w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 flex items-center justify-center text-lg shrink-0"><i class="fas fa-cubes"></i></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold uppercase mb-1.5">Kelas 9 · Review Guru</p>
+              <h2 id="grade9ReviewTitle" class="text-lg font-black text-white">VR Studio: Construct a VR World</h2>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">Review 9 pertemuan, simulasi, kuis latihan, dan rubrik 70–20–10. Siswa membuka materi dari halaman nilainya setelah mencari nama dan verifikasi password. Review ini tidak mengubah nilai siswa.</p>
+            </div>
+            <button type="button" onclick="openGrade9TeacherPreview()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"><i class="fas fa-eye"></i> Review VR Studio</button>
+          </div>
+        </section>
+        <section
+          class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-cyan-400"
+          aria-labelledby="grade10ReviewTitle"
+        >
+          <div class="flex flex-col items-start gap-4 h-full">
+            <div
+              class="w-12 h-12 rounded-xl bg-cyan-400/10 border border-cyan-400/30 text-cyan-300 flex items-center justify-center text-lg shrink-0"
+            >
+              <i class="fas fa-eye"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p
+                class="text-[10px] font-mono-tech tracking-[0.2em] text-cyan-300 font-bold uppercase mb-1.5"
+              >
+                Grade 10 · Teacher Review
+              </p>
+              <h2 id="grade10ReviewTitle" class="text-lg font-black text-white">
+                Review materi UI/UX yang diterima siswa
+              </h2>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">
+                Buka seluruh materi, pre-test, post-test, Section 1–4, dan Summative
+                Mission tanpa memakai akun siswa. Aktivitas dalam mode review tidak akan
+                menyimpan progress atau nilai ke Firebase.
+              </p>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:items-end gap-3 w-full">
+              <label class="flex-1 lg:w-52">
+                <span
+                  class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-1.5"
+                  >Mulai dari</span
+                >
+                <select
+                  id="grade10TeacherPreviewSection"
+                  class="w-full bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-400"
+                >
+                  <option value="overview">Course overview</option>
+                  <option value="pre-test">Pre-test: Wireframe</option>
+                  <option value="section-1">Section 1: Wireframe</option>
+                  <option value="post-test">Post-test 1</option>
+                  <option value="section-2">Section 2: Project Setup</option>
+                  <option value="pre-test-2">Figma Pre-test</option>
+                  <option value="section-3">Section 3: Figma Basics</option>
+                  <option value="section-4">Section 4: Toolbar Lab</option>
+                  <option value="post-test-2">Post-test 2</option>
+                  <option value="summative">Summative: Individual Redesign</option>
+                </select>
+              </label>
+              <button
+                type="button"
+                onclick="openGrade10TeacherPreview()"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"
+              >
+                <i class="fas fa-arrow-up-right-from-square"></i> Review materi
+              </button>
+            </div>
+          </div>
+        </section>
+        <section class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-emerald-400" aria-labelledby="grade11ReviewTitle">
+          <div class="flex flex-col items-start gap-4 h-full">
+            <div class="w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 flex items-center justify-center text-lg shrink-0"><i class="fas fa-brain"></i></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold uppercase mb-1.5">Kelas 11 · Review Guru</p>
+              <h2 id="grade11ReviewTitle" class="text-lg font-black text-white">AI Studio: Code the Future with AI</h2>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">14 sesi × 2 JP dengan tempo masing-masing. Target pribadi, bukti penyelesaian tiap course, tiga formatif, dan karya sumatif. Panduan guru memuat konferensi individual dan WKA.</p>
+            </div>
+            <button type="button" onclick="openGrade11TeacherPreview()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"><i class="fas fa-eye"></i> Review AI Studio</button>
+          </div>
+        </section>
+        <section class="glass-panel-teacher rounded-2xl p-5 md:p-6 border-l-4 border-l-emerald-400" aria-labelledby="grade12ReviewTitle">
+          <div class="flex flex-col items-start gap-4 h-full">
+            <div class="w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 flex items-center justify-center text-lg shrink-0"><i class="fas fa-code"></i></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold uppercase mb-1.5">Kelas 12 · Review Guru</p>
+              <h2 id="grade12ReviewTitle" class="text-lg font-black text-white">Sustainable Web Studio · BSD Course 3</h2>
+              <p class="text-sm text-slate-300 mt-1">18 panduan harian berbasis BSD: materi, hasil, refleksi, dan tantangan modifikasi beserta cara uji. Indonesia–English.</p>
+            </div>
+            <button type="button" onclick="openGrade12TeacherPreview()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"><i class="fas fa-eye"></i> Review Sustainable Web Studio</button>
+          </div>
+        </section>
+          </div>
+        </div>
+        <div id="dashPanel-pengaturan" class="dash-panel flex flex-col gap-6" role="tabpanel" aria-labelledby="dashTab-pengaturan" data-dash-panel="pengaturan">
+        <div
+          id="adminPanelBtn"
+          class="glass-panel-teacher rounded-2xl overflow-hidden border-l-4 border-l-emerald-500"
+          style="display: none"
+        >
+          <button
+            class="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-800/60 transition-colors"
+            onclick="this.nextElementSibling.classList.toggle('hidden')"
+          >
+            <span
+              class="flex items-center gap-3 text-emerald-400 font-bold text-sm"
+            >
+              <i class="fas fa-shield-check"></i> Panel Verifikasi Guru (Admin
+              Utama)
+              <span
+                id="adminBadgeCount"
+                class="bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full"
+                style="display: none"
+                >0</span
+              >
+            </span>
+            <i class="fas fa-chevron-down text-slate-500 text-xs"></i>
+          </button>
+          <div
+            class="border-t border-slate-700/50 relative overflow-hidden bg-slate-900/40"
+          >
+            <div id="adminPanelContent" class="relative z-10 p-2"></div>
+          </div>
+        </div>
+          <div class="glass-panel-teacher rounded-2xl overflow-hidden border-l-4 border-l-slate-600">
+            <div class="px-5 py-4 border-b border-slate-700/50 flex items-center gap-3 text-slate-300 font-semibold text-sm">
+              <i class="fas fa-cog text-slate-400"></i> Pengaturan Penilaian
+            </div>
+            <div class="px-5 py-5 bg-slate-900/30">
+            <div class="flex items-end gap-4 flex-wrap">
+              <div>
+                <label
+                  class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2"
+                  >Jumlah Formatif</label
+                >
+                <input
+                  type="number"
+                  id="numFormatif"
+                  value="2"
+                  min="1"
+                  max="50"
+                  class="w-24 bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                />
+              </div>
+              <button
+                onclick="applySettings()"
+                class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+              >
+                <i class="fas fa-check text-emerald-400 text-xs"></i> Terapkan
+              </button>
+            </div>
+            <div class="mt-6 border-t border-slate-700/60 pt-5">
+              <div
+                class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4"
+              >
+                <div>
+                  <h3 class="text-sm font-bold text-white">
+                    Kriteria Ketuntasan Minimal (KKM)
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Atur standar KKM per tingkat kelas. Perubahan langsung
+                    dipakai pada tabel guru dan hasil siswa.
+                  </p>
+                </div>
+                <span
+                  id="kkmSettingsStatus"
+                  class="text-[10px] font-mono-tech text-cyan-300"
+                  >TERSIMPAN DI FIREBASE</span
+                >
+              </div>
+              <div
+                id="kkmSettingsGrid"
+                class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"
+              >
+                <label class="block">
+                  <span
+                    class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2"
+                    >Kelas 7</span
+                  >
+                  <input
+                    type="number"
+                    id="kkmGrade7"
+                    value="72"
+                    min="1"
+                    max="100"
+                    step="1"
+                    class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                  />
+                </label>
+                <label class="block">
+                  <span class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2">Kelas 8</span>
+                  <input type="number" id="kkmGrade8" value="73" min="1" max="100" step="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
+                </label>
+                <label class="block">
+                  <span class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2">Kelas 9</span>
+                  <input type="number" id="kkmGrade9" value="74" min="1" max="100" step="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
+                </label>
+                <label class="block">
+                  <span class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2">Kelas 10</span>
+                  <input type="number" id="kkmGrade10" value="75" min="1" max="100" step="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
+                </label>
+                <label class="block">
+                  <span class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2">Kelas 11</span>
+                  <input type="number" id="kkmGrade11" value="76" min="1" max="100" step="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
+                </label>
+                <label class="block">
+                  <span class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-2">Kelas 12</span>
+                  <input type="number" id="kkmGrade12" value="77" min="1" max="100" step="1" class="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
+                </label>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  id="saveKkmSettingsButton"
+                  type="button"
+                  onclick="saveKkmSettings()"
+                  class="flex items-center gap-2 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-200 border border-cyan-500/40 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                >
+                  <i class="fas fa-floppy-disk text-xs"></i> Simpan KKM
+                </button>
+                <p class="text-[10px] text-slate-500 font-mono-tech">
+                  Berlaku untuk seluruh guru dan siswa.
+                </p>
+              </div>
+            </div>
+            </div>
+          </div>
+          <div class="glass-panel-teacher rounded-2xl p-5 border-l-4 border-l-rose-500 flex flex-col sm:flex-row sm:items-center justify-between gap-4" id="dashDangerZone">
+            <div>
+              <h3 class="text-sm font-bold text-white">Zona berbahaya</h3>
+              <p class="text-xs text-slate-400 mt-1">Menghapus semua data siswa tidak dapat dibatalkan. Ekspor Excel terlebih dahulu.</p>
+            </div>
+            <button
+              id="deleteAllStudentsBtn"
+              type="button"
+              onclick="deleteAllStudentData()"
+              class="text-xs font-bold text-rose-300 border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 px-4 py-2 rounded-lg transition-colors items-center justify-center gap-2"
+              style="display: none"
+              title="Khusus Super Admin"
+            >
+              <i class="fas fa-trash-can"></i> Hapus Semua Siswa
+            </button>
+          </div>
+        </div>
       </main>
     </div>
 
@@ -866,5 +928,6 @@
     <script src="js/teacher.bf0634dd521e.js"></script>
     <script src="js/grade11-ai-monitor.c85fa1b7c59f.js"></script>
     <script src="js/teacher-assessment.0a3a97652b63.js"></script>
+    <script src="js/dashboard-tabs.8d97bb0ce0f0.js"></script>
   </body>
 </html>
