@@ -65,6 +65,7 @@ dcDraftFromStored=function(stored,quarter=1,grade=9,override=null){
   const current=stored?.courseId===G8_GAME_COURSE_ID,draft=g8BaseRead(current?stored:null,quarter,grade,override);
   draft.reviewed=Object.fromEntries(G8_GAME_ASSESSMENTS.map(a=>[a.id,current&&stored.reviewed?.[a.id]===true]));
   for(const a of G8_GAME_ASSESSMENTS)draft.rubricScores[a.id].evidenceUrl=current?g8EvidenceUrl(stored.rubricScores?.[a.id]?.evidenceUrl):'';
+  for(const key of ["evidenceVersions","evidenceSnapshots"])if(current&&stored[key])draft[key]=JSON.parse(JSON.stringify(stored[key]));
   if(current&&stored.previousGradebook)draft.previousGradebook={...stored.previousGradebook};
   const previous=current?stored.previousAssessment:stored;if(previous)draft.previousAssessment=JSON.parse(JSON.stringify(previous));
   return draft;
@@ -72,6 +73,7 @@ dcDraftFromStored=function(stored,quarter=1,grade=9,override=null){
 dcBuildStoredRecord=function(draft,quarter,updatedBy,grade=9){
   const record=g8BaseRecord(draft,quarter,updatedBy,grade);
   if(g8IsGameCourse(quarter,grade)){
+    for(const key of ["evidenceVersions","evidenceSnapshots"])if(draft[key])record[key]=JSON.parse(JSON.stringify(draft[key]));
     record.assessmentVersion='g8-bsd-games-v1';record.reviewed={...draft.reviewed};
     record.rubricScores=Object.fromEntries(G8_GAME_ASSESSMENTS.map(a=>[a.id,{...draft.rubricScores[a.id],criteria:{...draft.rubricScores[a.id].criteria},evidenceUrl:g8EvidenceUrl(draft.rubricScores[a.id].evidenceUrl)}]));
     record.assessmentComplete=G8_GAME_ASSESSMENTS.every(a=>record.reviewed[a.id]===true);
@@ -96,7 +98,7 @@ dcBuildStudentAssessmentHtml=function(student,kkm){
   return earlier+'<section class="dc-student-score-card"><h3>Game Studio · Nilai tugas BSD</h3><p>Nilai /100 untuk setiap proyek yang sudah diperiksa guru.</p>'+G8_GAME_ASSESSMENTS.map(a=>record.reviewed?.[a.id]===true?dcBuildStudentRubricCard(a,draft,summary):'<p>'+a.number+' · '+escHtml(a.title)+': belum dinilai</p>').join('')+'</section>';
 };
 
-function g8EvidenceFieldHTML(assessment,draft){const url=g8EvidenceUrl(draft.evidenceUrl);return '<label class="dc-teacher-note"><span>Tautan karya BSD (opsional jika demo langsung)</span><input type="url" maxlength="2000" style="width:100%;padding:10px;color:inherit;background:#0f172a;border:1px solid #334155;border-radius:8px" value="'+escHtml(draft.evidenceUrl||'')+'" placeholder="https://app.bsd.education/..." aria-label="Tautan karya BSD" oninput="dcSetGameEvidence(\''+assessment.id+'\',this.value)" /></label><p><a id="g8-evidence-open" href="'+escHtml(url||'#')+'" '+(url?'':'hidden')+' target="_blank" rel="noopener noreferrer">Buka karya siswa ↗</a></p><p class="small">Boleh nilai dari demo karya yang sudah selesai di BSD. Pilih poin penuh atau parsial sesuai bukti.</p>';}
+function g8EvidenceFieldHTML(assessment,draft){const url=g8EvidenceUrl(draft.evidenceUrl);return '<div id="g8EvidencePanel"></div><label class="dc-teacher-note"><span>Tautan karya BSD (opsional jika demo langsung)</span><input type="url" maxlength="2000" style="width:100%;padding:10px;color:inherit;background:#0f172a;border:1px solid #334155;border-radius:8px" value="'+escHtml(draft.evidenceUrl||'')+'" placeholder="https://app.bsd.education/..." aria-label="Tautan karya BSD" oninput="dcSetGameEvidence(\''+assessment.id+'\',this.value)" /></label><p><a id="g8-evidence-open" href="'+escHtml(url||'#')+'" '+(url?'':'hidden')+' target="_blank" rel="noopener noreferrer">Buka karya siswa ↗</a></p><p class="small">Boleh nilai dari demo karya yang sudah selesai di BSD. Pilih poin penuh atau parsial sesuai bukti.</p>';}
 function dcSetGameEvidence(id,value){if(dcTeacherState.saving)return;const row=dcTeacherState.draft.rubricScores[id];if(!row)return;row.evidenceUrl=String(value||'').slice(0,2000);dcTeacherState.draft.reviewed[id]=false;dcTeacherState.dirty=true;const reviewed=document.querySelector?.('input[data-assessment="'+id+'"]');if(reviewed)reviewed.checked=false;const link=document.getElementById('g8-evidence-open'),url=g8EvidenceUrl(row.evidenceUrl);if(link){link.href=url||'#';link.hidden=!url;}const summary=dcCalculateSummary(dcTeacherState.draft,dcTeacherState.quarter,dcTeacherState.grade);renderDcSummary(summary,allSiswa.find(s=>s.id===dcTeacherState.studentId));renderDcAssessmentNav(summary);updateDcSaveState();}
 function openGrade8Assessment(){
   if(dcTeacherState.saving)return;

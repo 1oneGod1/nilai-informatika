@@ -316,6 +316,7 @@ async function saveDcAssessment() {
   try {
     if(typeof G11CloudIdentity!=="undefined")await G11CloudIdentity.verifyTeacher();
     if(typeof G11Monitor!=="undefined"&&course.gradingVersion)G11Monitor.invalidateStale();
+    if(course.reviewedFormativeOnly&&typeof G8Submissions!=="undefined")await G8Submissions.refreshBeforeSave(student.id);
     const record = dcBuildStoredRecord(
       dcTeacherState.draft,
       dcTeacherState.quarter,
@@ -360,7 +361,7 @@ async function saveDcAssessment() {
     student.digitalCitizenshipAssessment[`q${dcTeacherState.quarter}`] = record;
     if (record.gradingVersion && record.publishedGradebook) dcTeacherState.draft.publishedGradebook = { ...record.publishedGradebook };
     Object.assign(student, gradebookFields);
-    if(dcTeacherState.studentId===saveContext.studentId&&dcTeacherState.grade===saveContext.grade&&dcTeacherState.quarter===saveContext.quarter)dcTeacherState.dirty = Boolean(course.gradingVersion&&typeof G11Monitor!=="undefined"&&Object.entries(record.evidenceVersions||{}).some(([id,v])=>record.reviewed?.[id]&&v!==G11Monitor.version(student.id,id)));
+    if(dcTeacherState.studentId===saveContext.studentId&&dcTeacherState.grade===saveContext.grade&&dcTeacherState.quarter===saveContext.quarter)dcTeacherState.dirty = Boolean(course.gradingVersion&&typeof G11Monitor!=="undefined"&&Object.entries(record.evidenceVersions||{}).some(([id,v])=>record.reviewed?.[id]&&v!==G11Monitor.version(student.id,id)) || (course.reviewedFormativeOnly&&typeof G8Submissions!=="undefined"&&G8Submissions.isStaleRecord(record,student.id)));
     updateDcSaveState();
     renderTableBody(allSiswa);
     if (typeof ensureFormativeColumnCountForGrade === "function") {
@@ -503,6 +504,7 @@ function renderDcAssessmentPanel() {
       <label class="dc-teacher-note"><span>Catatan guru</span><textarea oninput="dcSetAssessmentNote('${assessment.id}',this.value)" placeholder="Kekuatan, hal yang perlu diperbaiki, atau tindak lanjut…">${escHtml(assessmentDraft.note || "")}</textarea></label>
     </section>`;
   if(course.gradingVersion&&typeof G11Monitor!=="undefined")G11Monitor.renderEvidence();
+  if(course.reviewedFormativeOnly&&typeof G8Submissions!=="undefined")G8Submissions.render();
 }
 
 function renderDcAssessmentNav(summary) {
@@ -580,5 +582,5 @@ window.dcToggleQuizAnswer = dcToggleQuizAnswer;
 window.dcSetQuizNote = dcSetQuizNote;
 window.saveDcAssessment = saveDcAssessment;
 
-function dcSetAssessmentReviewed(id,checked){if(dcTeacherState.saving)return;if(!dcTeacherState.draft.reviewed||!(id in dcTeacherState.draft.reviewed))return;dcTeacherState.draft.reviewed[id]=checked===true;if(checked===true&&isAiFormativeWorkspace()&&typeof G11Monitor!=="undefined"){dcTeacherState.draft.evidenceVersions??={};dcTeacherState.draft.evidenceVersions[id]=G11Monitor.version(dcTeacherState.studentId,id);}dcTeacherState.dirty=true;renderDcAssessmentPanel();}
+function dcSetAssessmentReviewed(id,checked){if(dcTeacherState.saving)return;if(!dcTeacherState.draft.reviewed||!(id in dcTeacherState.draft.reviewed))return;dcTeacherState.draft.reviewed[id]=checked===true;if(checked===true&&isAiFormativeWorkspace()&&typeof G11Monitor!=="undefined"){dcTeacherState.draft.evidenceVersions??={};dcTeacherState.draft.evidenceVersions[id]=G11Monitor.version(dcTeacherState.studentId,id);}if(checked===true&&getCurrentDcCourse()?.reviewedFormativeOnly&&typeof G8Submissions!=="undefined"){dcTeacherState.draft.evidenceVersions??={};dcTeacherState.draft.evidenceSnapshots??={};dcTeacherState.draft.evidenceVersions[id]=G8Submissions.version(dcTeacherState.studentId,id);dcTeacherState.draft.evidenceSnapshots[id]=G8Submissions.snapshot(dcTeacherState.studentId,id);}dcTeacherState.dirty=true;renderDcAssessmentPanel();}
 window.dcSetAssessmentReviewed=dcSetAssessmentReviewed;

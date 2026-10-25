@@ -1,0 +1,2809 @@
+/* ========================================================
+   teacher.js
+   Hanya dijalankan di dashboard.html.
+   Mengelola data siswa, tabel nilai, dan Panel Admin.
+   ======================================================== */
+
+let allSiswa = [];
+let activeQuarter = 4; // Default ke Q4 untuk Sense, Decide, and Deliver with VEX IQ
+let numFormatif = { 1: 3, 2: 3, 3: 3, 4: 3 }; // Assessment workspace expands this when a course has more formative rubrics
+let selectedLearningProgressStudent = null;
+let selectedLearningProgressData = {};
+let selectedLearningProgressFocus = "";
+let grade10UiUxProgressByStudent = {};
+let learningProgressListenerAttached = false;
+let grade10AutoSyncInFlight = false;
+
+const GRADE10_WIREFRAME_RUBRIC = [
+  {
+    id: "reference",
+    label: "Reference is identifiable",
+    description: "The selected webpage and the page area analysed by the student are clearly identifiable.",
+  },
+  {
+    id: "structure",
+    label: "Major sections correspond",
+    description: "The wireframe represents the major sections that actually appear on the selected webpage.",
+  },
+  {
+    id: "hierarchy",
+    label: "Hierarchy corresponds",
+    description: "Block size and emphasis reflect what the webpage communicates as primary and secondary.",
+  },
+  {
+    id: "navigation",
+    label: "Navigation and CTA correspond",
+    description: "Navigation, important controls, CTA, and the main user path match what can be observed.",
+  },
+  {
+    id: "spacing",
+    label: "Order and grouping correspond",
+    description: "Content order, grouping, and approximate spatial relationships follow the webpage.",
+  },
+  {
+    id: "fidelity",
+    label: "Evidence is translated correctly",
+    description: "The student uses simple shapes and labels to communicate findings without copying colours or decoration.",
+  },
+  {
+    id: "completeness",
+    label: "Analysis is complete and explainable",
+    description: "Important observed parts are not omitted, and the student can explain each wireframe block using the reference.",
+  },
+];
+
+const GRADE10_WIREFRAME_CRITERION_MAX = 10;
+const GRADE10_WIREFRAME_TOTAL_MAX =
+  GRADE10_WIREFRAME_RUBRIC.length * GRADE10_WIREFRAME_CRITERION_MAX;
+
+const GRADE10_FIGMA_SIMILARITY_RUBRIC = [
+  {
+    id: "layout",
+    label: "Struktur dan urutan section",
+    description: "Header, navigasi, hero, konten, CTA, dan footer tersusun sesuai website acuan.",
+  },
+  {
+    id: "proportion",
+    label: "Proporsi, ukuran, dan grid",
+    description: "Lebar, tinggi, skala, kolom, serta posisi elemen mendekati proporsi pada website.",
+  },
+  {
+    id: "spacing",
+    label: "Spacing dan alignment",
+    description: "Margin, padding, jarak antar-elemen, alignment, dan whitespace konsisten dengan acuan.",
+  },
+  {
+    id: "typography",
+    label: "Tipografi dan hierarchy",
+    description: "Jenis, ukuran, ketebalan, line-height, dan hierarchy teks terlihat serupa.",
+  },
+  {
+    id: "color",
+    label: "Warna dan visual styling",
+    description: "Warna, background, border, radius, dan shadow mendekati tampilan website acuan.",
+  },
+  {
+    id: "assets",
+    label: "Gambar, ikon, dan komponen",
+    description: "Aset visual, tombol, kartu, input, dan komponen penting dibuat serta ditempatkan dengan tepat.",
+  },
+  {
+    id: "fidelity",
+    label: "Kemiripan dan kelengkapan keseluruhan",
+    description: "Desain Figma lengkap, mudah dikenali sebagai halaman acuan, dan tidak menghilangkan bagian penting.",
+  },
+];
+
+const GRADE10_FIGMA_SIMILARITY_CRITERION_MAX = 10;
+const GRADE10_FIGMA_SIMILARITY_TOTAL_MAX =
+  GRADE10_FIGMA_SIMILARITY_RUBRIC.length *
+  GRADE10_FIGMA_SIMILARITY_CRITERION_MAX;
+
+const GRADE10_SUMMATIVE_RUBRIC = [
+  {
+    id: "userProblem",
+    label: "Identifikasi masalah pengguna",
+    description:
+      "Masalah yang dipilih spesifik dan terhubung dengan kebutuhan pengguna yang nyata.",
+    max: 15,
+    legacyId: "problemClarity",
+    legacyScale: 0.75,
+  },
+  {
+    id: "referenceAnalysis",
+    label: "Analisis website atau aplikasi acuan",
+    description:
+      "Siswa menunjukkan bagian acuan yang dipertahankan, diperbaiki, atau dihilangkan beserta alasannya.",
+    max: 10,
+    legacyId: "problemClarity",
+    legacyScale: 0.5,
+  },
+  {
+    id: "webStructure",
+    label: "Kelengkapan struktur web",
+    description:
+      "Header, navigasi, hero atau pembuka, konten utama, CTA, dan footer tersedia serta tersusun jelas.",
+    max: 15,
+    legacyId: "uiQuality",
+    legacyScale: 0.6,
+  },
+  {
+    id: "uxSolution",
+    label: "Kualitas solusi UX",
+    description:
+      "Redesign mempermudah alur, navigasi, aksesibilitas, kejelasan, atau pengambilan keputusan pengguna.",
+    max: 20,
+    legacyId: "uxImprovement",
+    legacyScale: 0.8,
+  },
+  {
+    id: "visualConsistency",
+    label: "Visual hierarchy dan konsistensi UI",
+    description:
+      "Tipografi, warna, spacing, alignment, komponen, dan penekanan informasi dibuat konsisten.",
+    max: 15,
+    legacyId: "uiQuality",
+    legacyScale: 0.6,
+  },
+  {
+    id: "figmaSkills",
+    label: "Kemampuan menggunakan Figma",
+    description:
+      "Frame, layout, komponen, alignment, dan prototype atau interaksi digunakan dengan tepat.",
+    max: 15,
+    legacyId: "completeness",
+    legacyScale: 1.5,
+  },
+  {
+    id: "designRationale",
+    label: "Penjelasan keputusan desain",
+    description:
+      "Siswa menjelaskan perubahan sebelum dan sesudah redesign serta alasan keputusan pentingnya.",
+    max: 10,
+    legacyId: "designExplanation",
+    legacyScale: 0.5,
+  },
+];
+
+const GRADE10_SUMMATIVE_TOTAL_MAX = GRADE10_SUMMATIVE_RUBRIC.reduce(
+  (total, criterion) => total + criterion.max,
+  0,
+);
+
+function normalizeWireframeCriterionPoints(value) {
+  if (value === true) return GRADE10_WIREFRAME_CRITERION_MAX;
+  if (value === false || value === null || value === undefined || value === "")
+    return 0;
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return 0;
+  return Math.min(
+    GRADE10_WIREFRAME_CRITERION_MAX,
+    Math.max(0, Math.round(numericValue)),
+  );
+}
+
+function normalizeFigmaSimilarityCriterionPoints(value) {
+  return normalizeWireframeCriterionPoints(value);
+}
+
+function normalizeGrade10SummativeCriterionPoints(value, maximum) {
+  if (value === null || value === undefined || value === "") return 0;
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return 0;
+  return Math.min(maximum, Math.max(0, Math.round(numericValue)));
+}
+
+const GRADE10_UIUX_XP = {
+  preTest: 80,
+  section1: 120,
+  section2: 100,
+  postTest1: 100,
+  figmaPreTest: 80,
+  section3: 120,
+  section4: 180,
+  postTest2: 100,
+  summative: 120,
+};
+
+const GRADE10_UIUX_TOTAL_XP = Object.values(GRADE10_UIUX_XP).reduce(
+  (total, value) => total + value,
+  0,
+);
+
+function isAdminEmailSafe(email) {
+  if (typeof isAdminEmail === "function") return isAdminEmail(email);
+  const normalized = String(email || "")
+    .trim()
+    .toLowerCase();
+  return (
+    normalized === "andi.purba@sdh.or.id" ||
+    normalized === "pandapotanandi@gmail.com"
+  );
+}
+
+function getTeacherStudentGrade(student) {
+  const match = String(student?.kelas || "").match(/\d+/);
+  return match ? Number(match[0]) : 0;
+}
+
+function normalizeAutoFormativeScore(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const score = Number(value);
+  if (!Number.isFinite(score)) return null;
+  const clamped = Math.max(0, Math.min(100, score));
+  return Number(clamped.toFixed(2));
+}
+
+function buildGrade10AutoGradebookFields(progress, quarter = 1) {
+  if (
+    Number(quarter) !== 1 ||
+    !progress ||
+    typeof progress !== "object" ||
+    typeof calculateGrade10UiUxProgress !== "function"
+  ) {
+    return {};
+  }
+
+  const summary = calculateGrade10UiUxProgress(progress);
+  const fields = {};
+  const formative1 = normalizeAutoFormativeScore(summary.formative1);
+  const formative2 = normalizeAutoFormativeScore(summary.formative2);
+  const summative = normalizeAutoFormativeScore(summary.summative);
+
+  if (formative1 !== null) fields.q1_f1 = formative1;
+  if (formative2 !== null) fields.q1_f2 = formative2;
+  if (summative !== null) fields.q1_sumatif = summative;
+
+  return fields;
+}
+
+function openGrade10TeacherPreview() {
+  const teacher = auth.currentUser;
+  if (!teacher) {
+    showAlert("Sesi guru tidak ditemukan. Silakan masuk kembali.", "warning");
+    return;
+  }
+
+  const sectionSelect = document.getElementById(
+    "grade10TeacherPreviewSection",
+  );
+  const requestedSection = String(sectionSelect?.value || "overview");
+  const validSections = [
+    "overview",
+    "pre-test",
+    "section-1",
+    "post-test",
+    "section-2",
+    "pre-test-2",
+    "section-3",
+    "section-4",
+    "post-test-2",
+    "summative",
+  ];
+  const section = validSections.includes(requestedSection)
+    ? requestedSection
+    : "overview";
+  const previewSession = {
+    id: `teacher-preview-${teacher.uid}`,
+    name: "Teacher Review",
+    className: "Grade 10 · Preview only",
+    groupName: "Teacher review",
+    verifiedAt: Date.now(),
+    teacherUid: teacher.uid,
+    teacherEmail: String(teacher.email || ""),
+    isLocalPreview: true,
+    isTeacherPreview: true,
+  };
+
+  sessionStorage.setItem(
+    "csReportGrade10Session",
+    JSON.stringify(previewSession),
+  );
+  window.location.href = `grade10-uiux.html?teacherPreview=1#${section}`;
+}
+
+function openGrade11TeacherPreview() {
+  const teacher = auth.currentUser;
+  if (!teacher) {
+    showAlert("Sesi guru tidak ditemukan. Silakan masuk kembali.", "warning");
+    return;
+  }
+  sessionStorage.setItem("csReportGrade11Session", JSON.stringify({
+    id: `teacher-preview-${teacher.uid}`,
+    name: "Review Guru",
+    className: "11 · Review guru",
+    verifiedAt: Date.now(),
+    teacherUid: teacher.uid,
+    teacherEmail: String(teacher.email || ""),
+    isTeacherPreview: true,
+  }));
+  window.location.href = "grade11-ai/index.html?teacherPreview=1#teacher";
+}
+
+function openGrade8TeacherPreview() {
+  const teacher = auth.currentUser;
+  if (!teacher) {
+    showAlert("Sesi guru tidak ditemukan. Silakan masuk kembali.", "warning");
+    return;
+  }
+  sessionStorage.setItem("csReportGrade8Session", JSON.stringify({
+    id: `teacher-preview-${teacher.uid}`,
+    name: "Review Guru",
+    className: "8 · Review guru",
+    verifiedAt: Date.now(),
+    teacherUid: teacher.uid,
+    teacherEmail: String(teacher.email || ""),
+    isTeacherPreview: true,
+  }));
+  window.location.href = "grade8-games/index.html?teacherPreview=1#teacher";
+}
+
+function openGrade9TeacherPreview() {
+  const teacher = auth.currentUser;
+  if (!teacher) {
+    showAlert("Sesi guru tidak ditemukan. Silakan masuk kembali.", "warning");
+    return;
+  }
+  sessionStorage.setItem("csReportGrade9Session", JSON.stringify({
+    id: `teacher-preview-${teacher.uid}`,
+    name: "Review Guru",
+    className: "9 · Review guru",
+    verifiedAt: Date.now(),
+    teacherUid: teacher.uid,
+    teacherEmail: String(teacher.email || ""),
+    isTeacherPreview: true,
+  }));
+  window.location.href = "grade9-vr/index.html?teacherPreview=1#teacher";
+}
+
+function openGrade12TeacherPreview() {
+  const teacher = auth.currentUser;
+  if (!teacher) {
+    showAlert("Sesi guru tidak ditemukan. Silakan masuk kembali.", "warning");
+    return;
+  }
+  sessionStorage.setItem("csReportGrade12Session", JSON.stringify({
+    id: `teacher-preview-${teacher.uid}`,
+    name: "Review Guru",
+    className: "12 · Review guru",
+    verifiedAt: Date.now(),
+    teacherUid: teacher.uid,
+    isTeacherPreview: true,
+  }));
+  window.location.href = "grade12-sustainable/index.html?teacherPreview=1#teacher";
+}
+
+function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
+  const grade = getTeacherStudentGrade(student);
+  if (grade === 10) {
+    if (Number(quarter) !== 1) return {};
+    const savedFields = [1, 2].reduce((fields, index) => {
+      const field = `q1_f${index}`;
+      const value = student?.[field];
+      if (value === "" || value === null || value === undefined) {
+        return fields;
+      }
+      const score = Number(value);
+      if (Number.isFinite(score)) fields[field] = score;
+      return fields;
+    }, {});
+    const progressFields = buildGrade10AutoGradebookFields(
+      grade10UiUxProgressByStudent[String(student?.id || "")],
+      quarter,
+    );
+    return { ...savedFields, ...progressFields };
+  }
+
+  if (typeof dcBuildGradebookFields !== "function") {
+    return {};
+  }
+
+  const storedRecord =
+    student?.digitalCitizenshipAssessment?.[`q${Number(quarter)}`];
+  return storedRecord
+    ? dcBuildGradebookFields(storedRecord, quarter, grade)
+    : {};
+}
+
+function usesOverallAssessmentAsSummative(grade, quarter, record = null) {
+  if (Number(grade) === 11 && Number(quarter) === 2) return typeof dcIsAiWeightedRecord === "function" && dcIsAiWeightedRecord(record, quarter, grade) && (G11_AI_WEIGHTED_ASSESSMENTS.every(a => record.reviewed?.[a.id] === true) || dcAiHasPublishedGrades(record));
+  const normalizedGrade = Number(grade);
+  const normalizedQuarter = Number(quarter);
+  const course =
+    typeof dcGetCourseConfig === "function"
+      ? dcGetCourseConfig(normalizedQuarter, normalizedGrade)
+      : null;
+  return (
+    course?.gradebookSummativeMode === "overall" ||
+    (normalizedGrade === 9 && normalizedQuarter === 1)
+  );
+}
+
+function getConfiguredFormativeCount(grade, quarter = activeQuarter) {
+  if (typeof dcGetFormativeGradebookFieldCount === "function") {
+    return dcGetFormativeGradebookFieldCount(Number(quarter), Number(grade));
+  }
+  if (typeof dcGetCourseConfig !== "function") return 0;
+  const course = dcGetCourseConfig(Number(quarter), Number(grade));
+  if (!course || !Array.isArray(course.assessments)) return 0;
+  return course.assessments.filter(
+    (assessment) => assessment.type === "Formatif",
+  ).length;
+}
+
+function ensureFormativeColumnCountForGrade(grade, quarter = activeQuarter) {
+  const normalizedQuarter = Number(quarter);
+  const requiredCount = getConfiguredFormativeCount(grade, normalizedQuarter);
+  if (
+    !requiredCount ||
+    requiredCount === Number(numFormatif[normalizedQuarter] || 0)
+  ) {
+    return requiredCount;
+  }
+
+  numFormatif[normalizedQuarter] = requiredCount;
+  if (normalizedQuarter === Number(activeQuarter)) {
+    const input = document.getElementById("numFormatif");
+    if (input) input.value = requiredCount;
+    renderFormFormatifInputs();
+    renderTableHead();
+    if (Array.isArray(allSiswa)) {
+      renderTableBody(allSiswa);
+    }
+  }
+  return requiredCount;
+}
+
+function getObsoleteFormativeFields(student, quarter = activeQuarter) {
+  const grade = getTeacherStudentGrade(student);
+  if (![11, 12].includes(grade)) return [];
+  const normalizedQuarter = Number(quarter);
+  const maximumField = getConfiguredFormativeCount(grade, normalizedQuarter);
+  if (!maximumField) return [];
+  const pattern = new RegExp(`^q${normalizedQuarter}_f(\\d+)$`);
+  return Object.keys(student || {}).filter((field) => {
+    const match = field.match(pattern);
+    return match && Number(match[1]) > maximumField;
+  });
+}
+
+async function syncGrade10AutoGradebookFields() {
+  if (grade10AutoSyncInFlight || !allSiswa.length) return;
+
+  const updates = {};
+  allSiswa.forEach((student) => {
+    if (getTeacherStudentGrade(student) !== 10) return;
+    const fields = getStudentAutoFormativeFields(student, 1);
+    Object.entries(fields).forEach(([field, score]) => {
+      const currentScore = student[field];
+      const alreadySynced =
+        currentScore !== "" &&
+        currentScore !== null &&
+        currentScore !== undefined &&
+        Number(currentScore) === Number(score);
+      if (!alreadySynced) {
+        updates[`${student.id}/${field}`] = score;
+        student[field] = score;
+      }
+    });
+  });
+
+  if (!Object.keys(updates).length) return;
+
+  grade10AutoSyncInFlight = true;
+  try {
+    await siswaRef.update(updates);
+    console.log("Auto-sinkronisasi nilai Grade 10 UI/UX berhasil.");
+  } catch (error) {
+    console.warn("Auto-sinkronisasi nilai Grade 10 UI/UX gagal:", error);
+  } finally {
+    grade10AutoSyncInFlight = false;
+  }
+}
+
+function listenToLearningProgressData() {
+  if (learningProgressListenerAttached) return;
+  learningProgressListenerAttached = true;
+  if(typeof G11Monitor!=="undefined")G11Monitor.start();
+
+  db.ref("learningProgress").on(
+    "value",
+    (snap) => {
+      const data = snap.val() || {};
+      if(typeof G11Monitor!=="undefined")G11Monitor.onProgress(data);
+      if(typeof G8Submissions!=="undefined")G8Submissions.onProgress(data);
+      grade10UiUxProgressByStudent = {};
+      Object.entries(data).forEach(([studentId, progress]) => {
+        if (progress?.grade10UiUx) {
+          grade10UiUxProgressByStudent[String(studentId)] = progress.grade10UiUx;
+        }
+      });
+
+      syncGrade10AutoGradebookFields().then(() => renderTableBody(allSiswa));
+
+      const modal = document.getElementById("learningProgressModal");
+      if (
+        selectedLearningProgressStudent &&
+        getTeacherStudentGrade(selectedLearningProgressStudent) === 10 &&
+        !modal?.classList.contains("hidden")
+      ) {
+        renderStudentLearningProgress(
+          grade10UiUxProgressByStudent[selectedLearningProgressStudent.id] || {},
+        );
+      }
+    },
+    (error) => {
+      console.warn("Gagal memuat learning progress:", error);
+      if(typeof G11Monitor!=="undefined")G11Monitor.onProgressError(error);
+    },
+  );
+}
+
+function getSafeReferenceUrl(value) {
+  try {
+    const parsed = new URL(String(value || ""));
+    return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "";
+  } catch (error) {
+    return "";
+  }
+}
+
+function hasGrade10SummativeSubmission(progress) {
+  const submission = progress?.summativeRedesign;
+  return Boolean(
+    submission?.appName &&
+      submission?.userProblem &&
+      getSafeReferenceUrl(submission.referenceUrl) &&
+      getSafeReferenceUrl(submission.figmaUrl),
+  );
+}
+
+function buildGrade10FigmaSubmissionCard(plan, sectionLabel, title, roleKey) {
+  const submission = plan && typeof plan === "object" ? plan : {};
+  const submittedUrl = String(submission.figmaUrl || "").trim();
+  const figmaUrl = getSafeReferenceUrl(submittedUrl);
+  const savedAt = Number(submission.savedAt || 0);
+  const savedLabel = savedAt
+    ? new Date(savedAt).toLocaleString("id-ID")
+    : "Waktu kirim belum tersedia";
+  const role = submission[roleKey] || submission.role || submission.studentRole;
+
+  return `<article class="rounded-xl border ${figmaUrl ? "border-violet-400/30 bg-violet-400/[0.06]" : "border-slate-700 bg-slate-900/45"} p-4">
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+      <div class="min-w-0">
+        <span class="text-[9px] font-mono-tech tracking-widest ${figmaUrl ? "text-violet-300" : "text-slate-500"}">${escHtml(sectionLabel)}</span>
+        <h4 class="text-sm font-black text-white mt-1">${escHtml(title)}</h4>
+        <p class="text-xs text-slate-400 mt-2">Grup: <strong class="text-slate-200">${escHtml(submission.groupName || "Belum diisi")}</strong></p>
+        <p class="text-xs text-slate-400 mt-1">Peran: <strong class="text-slate-200">${escHtml(role || "Belum diisi")}</strong></p>
+        <p class="break-all text-[10px] font-mono-tech ${figmaUrl ? "text-violet-200" : "text-slate-600"} mt-3">${escHtml(submittedUrl || "Belum ada tautan Figma")}</p>
+        <small class="block text-[10px] font-mono-tech text-slate-500 mt-2"><i class="fas fa-clock mr-1"></i>${escHtml(savedLabel)}</small>
+      </div>
+      ${
+        figmaUrl
+          ? `<a href="${escHtml(figmaUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-lg border border-violet-400/35 bg-violet-400/10 px-3.5 py-2.5 text-xs font-black text-violet-200 hover:bg-violet-400/20 shrink-0">BUKA FIGMA <i class="fas fa-arrow-up-right-from-square"></i></a>`
+          : `<span class="text-[10px] font-mono-tech ${submittedUrl ? "text-rose-400" : "text-amber-400"}">${submittedUrl ? "TAUTAN TIDAK VALID" : "BELUM DIKIRIM"}</span>`
+      }
+    </div>
+  </article>`;
+}
+
+function teacherChecksComplete(saved, keys) {
+  return Boolean(saved) && keys.every((key) => saved[key] === true);
+}
+
+function teacherSection1DiscoveryComplete(discovery) {
+  if (!discovery || discovery.conceptDone !== true || discovery.exitCorrect !== true)
+    return false;
+  const foundZones = discovery.foundZones;
+  if (Array.isArray(foundZones)) return new Set(foundZones).size >= 6;
+  if (!foundZones || typeof foundZones !== "object") return false;
+  return Object.values(foundZones).filter((value) => value === true).length >= 6;
+}
+
+function getWireframeRubricAssessment(progress = {}) {
+  const saved = progress.teacherAssessment?.wireframe || {};
+  const savedCriteria = saved.criteria || {};
+  const criteria = Object.fromEntries(
+    GRADE10_WIREFRAME_RUBRIC.map((criterion) => [
+      criterion.id,
+      normalizeWireframeCriterionPoints(savedCriteria[criterion.id]),
+    ]),
+  );
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const achieved = Object.values(criteria).filter((value) => value > 0).length;
+  return {
+    assessed: saved.assessed === true,
+    criteria,
+    achieved,
+    score,
+    updatedAt: Number(saved.updatedAt || 0),
+  };
+}
+
+function getFigmaSimilarityRubricAssessment(progress = {}) {
+  const saved = progress.teacherAssessment?.figmaSimilarity || {};
+  const savedCriteria = saved.criteria || {};
+  const criteria = Object.fromEntries(
+    GRADE10_FIGMA_SIMILARITY_RUBRIC.map((criterion) => [
+      criterion.id,
+      normalizeFigmaSimilarityCriterionPoints(savedCriteria[criterion.id]),
+    ]),
+  );
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const achieved = Object.values(criteria).filter((value) => value > 0).length;
+  return {
+    assessed: saved.assessed === true,
+    criteria,
+    achieved,
+    score,
+    updatedAt: Number(saved.updatedAt || 0),
+  };
+}
+
+function getGrade10SummativeRubricAssessment(progress = {}) {
+  const saved = progress.teacherAssessment?.summativeRedesign || {};
+  const savedCriteria = saved.criteria || {};
+  const criteria = Object.fromEntries(
+    GRADE10_SUMMATIVE_RUBRIC.map((criterion) => {
+      const hasCurrentScore = Object.prototype.hasOwnProperty.call(
+        savedCriteria,
+        criterion.id,
+      );
+      const legacyScore = Number(savedCriteria[criterion.legacyId]);
+      const score = hasCurrentScore
+        ? savedCriteria[criterion.id]
+        : Number.isFinite(legacyScore)
+          ? legacyScore * criterion.legacyScale
+          : 0;
+      return [
+        criterion.id,
+        normalizeGrade10SummativeCriterionPoints(score, criterion.max),
+      ];
+    }),
+  );
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const achieved = Object.values(criteria).filter((value) => value > 0).length;
+  return {
+    assessed: saved.assessed === true,
+    criteria,
+    achieved,
+    score,
+    updatedAt: Number(saved.updatedAt || 0),
+  };
+}
+
+function calculateGrade10UiUxProgress(progress = {}) {
+  const section1 =
+    teacherSection1DiscoveryComplete(progress.section1Discovery) &&
+    Boolean(progress.websitePlan) &&
+    teacherChecksComplete(progress.section1Checklist, [
+      "reference",
+      "structure",
+      "fidelity",
+      "journey",
+    ]);
+  const section2 =
+    Boolean(progress.groupPlan) &&
+    teacherChecksComplete(progress.section2Checklist, [
+      "group",
+      "file",
+      "match",
+      "responsive",
+      "explain",
+    ]);
+  const section3State = progress.section3Progress || {};
+  const section3Zones = section3State.zones || {};
+  const section3 =
+    section3State.environment === true &&
+    section3State.route === true &&
+    section3State.shortcut === true &&
+    ["toolbar", "layers", "canvas", "inspector"].every(
+      (key) => section3Zones[key] === true,
+    );
+  const section4State = progress.section4Workshop || {};
+  const exploredTools = section4State.toolsExplored || {};
+  const guidedBuildSteps = section4State.guidedBuildSteps || {};
+  const section4 =
+    Boolean(section4State.framePreset) &&
+    section4State.layerChallenge === true &&
+    ["move", "frame", "shape", "pen", "text", "layers"].every(
+      (key) => exploredTools[key] === true,
+    ) &&
+    ["frame", "layout", "typography", "image", "style", "autolayout"].every(
+      (key) => guidedBuildSteps[key] === true,
+    ) &&
+    Boolean(progress.figmaFoundationPlan) &&
+    teacherChecksComplete(progress.section4Checklist, [
+      "assignedGroup",
+      "sharedFile",
+      "frame",
+      "objects",
+      "layers",
+      "explain",
+    ]);
+
+  const states = {
+    preTest: Boolean(progress.preTest),
+    section1,
+    section2,
+    postTest1: Boolean(progress.postTest),
+    figmaPreTest: Boolean(progress.figmaPreTest),
+    section3,
+    section4,
+    postTest2: Boolean(progress.postTest2),
+    summative: Boolean(progress.summativeRedesign),
+  };
+  const xp = Object.entries(GRADE10_UIUX_XP).reduce(
+    (total, [key, points]) => total + (states[key] ? points : 0),
+    0,
+  );
+
+  const wireframeAssessment = getWireframeRubricAssessment(progress);
+  const figmaSimilarityAssessment =
+    getFigmaSimilarityRubricAssessment(progress);
+  const summativeAssessment = getGrade10SummativeRubricAssessment(progress);
+  const section1Product = wireframeAssessment.assessed
+    ? wireframeAssessment.score
+    : 0;
+  const section4Product = figmaSimilarityAssessment.assessed
+    ? figmaSimilarityAssessment.score
+    : 0;
+  const post1Points = progress.postTest
+    ? Number(progress.postTest.score || 0) * 0.3
+    : 0;
+  const post2Points = progress.postTest2
+    ? Number(progress.postTest2.score || 0) * 0.3
+    : 0;
+  const formative1 = wireframeAssessment.assessed
+    ? Number((section1Product + post1Points).toFixed(1))
+    : null;
+  const formative2 = figmaSimilarityAssessment.assessed
+    ? Number((section4Product + post2Points).toFixed(1))
+    : null;
+  const formativeAverage = Number(
+    (
+      ((formative1 === null ? 0 : formative1) +
+        (formative2 === null ? 0 : formative2)) /
+      2
+    ).toFixed(2),
+  );
+  const formativeContribution = Number((formativeAverage * 0.3).toFixed(2));
+  const summativeContribution = Number(
+    (summativeAssessment.score * 0.7).toFixed(2),
+  );
+  const overallSummative = Number(
+    (formativeContribution + summativeContribution).toFixed(1),
+  );
+
+  return {
+    states,
+    xp,
+    percent: Math.round((xp / GRADE10_UIUX_TOTAL_XP) * 100),
+    formative1,
+    formative2,
+    summative: summativeAssessment.assessed
+      ? overallSummative
+      : null,
+    formative1Breakdown: {
+      product: section1Product,
+      productAssessed: wireframeAssessment.assessed,
+      postTest: post1Points,
+      complete: wireframeAssessment.assessed && states.postTest1,
+    },
+    formative2Breakdown: {
+      product: section4Product,
+      productAssessed: figmaSimilarityAssessment.assessed,
+      postTest: post2Points,
+      complete: figmaSimilarityAssessment.assessed && states.postTest2,
+    },
+    summativeBreakdown: {
+      formativeAverage,
+      formativeContribution,
+      formativeComplete:
+        wireframeAssessment.assessed &&
+        states.postTest1 &&
+        figmaSimilarityAssessment.assessed &&
+        states.postTest2,
+      assessment: summativeAssessment.score,
+      assessmentContribution: summativeContribution,
+    },
+  };
+}
+
+function formatTeacherProgressScore(value) {
+  if (value === null || value === undefined) return "—";
+  const rounded = Math.round(Number(value) * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+}
+
+function getGrade10FormativeOneGradebookScore(progress = {}) {
+  const score = calculateGrade10UiUxProgress(progress).formative1;
+  if (score === null || score === undefined || !Number.isFinite(Number(score))) {
+    return null;
+  }
+  return Math.round(Number(score) * 10) / 10;
+}
+
+async function syncGrade10FormativeOneToGradebook(student, progress = {}) {
+  if (!student || getTeacherStudentGrade(student) !== 10) return null;
+  const score = getGrade10FormativeOneGradebookScore(progress);
+  if (score === null) return null;
+  const currentScore = student.q1_f1;
+  if (
+    currentScore !== "" &&
+    currentScore !== null &&
+    currentScore !== undefined &&
+    Number(currentScore) === score
+  ) {
+    return score;
+  }
+  await siswaRef.child(student.id).child("q1_f1").set(score);
+  student.q1_f1 = score;
+  return score;
+}
+
+function getGrade10FormativeTwoGradebookScore(progress = {}) {
+  const score = calculateGrade10UiUxProgress(progress).formative2;
+  if (score === null || score === undefined || !Number.isFinite(Number(score))) {
+    return null;
+  }
+  return Math.round(Number(score) * 10) / 10;
+}
+
+async function syncGrade10FormativeTwoToGradebook(student, progress = {}) {
+  if (!student || getTeacherStudentGrade(student) !== 10) return null;
+  const score = getGrade10FormativeTwoGradebookScore(progress);
+  if (score === null) return null;
+  const currentScore = student.q1_f2;
+  if (
+    currentScore !== "" &&
+    currentScore !== null &&
+    currentScore !== undefined &&
+    Number(currentScore) === score
+  ) {
+    return score;
+  }
+  await siswaRef.child(student.id).child("q1_f2").set(score);
+  student.q1_f2 = score;
+  return score;
+}
+
+function getGrade10SummativeGradebookScore(progress = {}) {
+  const score = calculateGrade10UiUxProgress(progress).summative;
+  if (score === null || score === undefined || !Number.isFinite(Number(score))) {
+    return null;
+  }
+  return Math.round(Number(score) * 10) / 10;
+}
+
+async function syncGrade10SummativeToGradebook(student, progress = {}) {
+  if (!student || getTeacherStudentGrade(student) !== 10) return null;
+  const score = getGrade10SummativeGradebookScore(progress);
+  if (score === null) return null;
+  const currentScore = student.q1_sumatif;
+  if (
+    currentScore !== "" &&
+    currentScore !== null &&
+    currentScore !== undefined &&
+    Number(currentScore) === score
+  ) {
+    return score;
+  }
+  await siswaRef.child(student.id).child("q1_sumatif").set(score);
+  student.q1_sumatif = score;
+  return score;
+}
+
+function findLatestProgressTimestamp(value) {
+  if (!value || typeof value !== "object") return 0;
+  return Object.entries(value).reduce((latest, [key, child]) => {
+    if (
+      ["savedAt", "submittedAt", "updatedAt"].includes(key) &&
+      Number.isFinite(Number(child))
+    ) {
+      return Math.max(latest, Number(child));
+    }
+    return Math.max(latest, findLatestProgressTimestamp(child));
+  }, 0);
+}
+
+async function openStudentLearningProgress(studentId, focusSection = "") {
+  const student = allSiswa.find((item) => item.id === studentId);
+  if (!student) {
+    showAlert("Data siswa tidak ditemukan.", "danger");
+    return;
+  }
+
+  if (getTeacherStudentGrade(student) === 11 && typeof G11Monitor !== "undefined") {
+    G11Monitor.open(student.id);
+    return;
+  }
+
+  selectedLearningProgressStudent = student;
+  selectedLearningProgressFocus = focusSection;
+  const modal = document.getElementById("learningProgressModal");
+  const body = document.getElementById("learningProgressBody");
+  const resetButton = document.getElementById("resetLearningProgressButton");
+  document.getElementById("learningProgressTitle").textContent = student.nama;
+  document.getElementById("learningProgressStudentMeta").textContent =
+    `${student.nis || "NIS belum tersedia"} · ${student.kelas || "Kelas belum tersedia"}`;
+  body.innerHTML = `
+    <div class="py-14 text-center text-slate-500 font-mono-tech text-sm">
+      <i class="fas fa-circle-notch fa-spin text-cyan-400 text-2xl mb-3 block"></i>
+      Memuat progress siswa…
+    </div>`;
+  resetButton.disabled = true;
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+
+  if (getTeacherStudentGrade(student) !== 10) {
+    body.innerHTML = `
+      <div class="rounded-xl border border-amber-500/30 bg-amber-500/10 p-5 text-amber-200">
+        <strong class="block mb-2"><i class="fas fa-circle-info mr-2"></i>Materi belum tersedia</strong>
+        <p class="text-sm text-amber-100/70">Progress UI/UX interaktif saat ini hanya digunakan oleh siswa Grade 10.</p>
+      </div>`;
+    return;
+  }
+
+  try {
+    const snapshot = await db
+      .ref("learningProgress")
+      .child(student.id)
+      .child("grade10UiUx")
+      .once("value");
+    const progress = snapshot.val() || {};
+    try {
+      await Promise.all([
+        syncGrade10FormativeOneToGradebook(student, progress),
+        syncGrade10FormativeTwoToGradebook(student, progress),
+      ]);
+    } catch (syncError) {
+      console.warn("Sinkronisasi Q1 F1/F2 saat membuka progress gagal:", syncError);
+    }
+    renderStudentLearningProgress(progress, focusSection);
+  } catch (error) {
+    body.innerHTML = `
+      <div class="rounded-xl border border-rose-500/30 bg-rose-500/10 p-5 text-rose-200">
+        <strong class="block mb-2"><i class="fas fa-triangle-exclamation mr-2"></i>Progress gagal dimuat</strong>
+        <p class="text-sm text-rose-100/70">${escHtml(error.message || "Periksa koneksi lalu coba lagi.")}</p>
+      </div>`;
+  }
+}
+
+function renderStudentLearningProgress(progress, focusSection = selectedLearningProgressFocus) {
+  const body = document.getElementById("learningProgressBody");
+  const resetButton = document.getElementById("resetLearningProgressButton");
+  selectedLearningProgressData = progress || {};
+  const summary = calculateGrade10UiUxProgress(progress);
+  const activityProgress = Object.fromEntries(
+    Object.entries(progress || {}).filter(([key]) => key !== "teacherAssessment"),
+  );
+  const hasProgress = Object.keys(activityProgress).length > 0;
+  const latestTimestamp = findLatestProgressTimestamp(activityProgress);
+  const latestLabel = latestTimestamp
+    ? new Date(latestTimestamp).toLocaleString("id-ID")
+    : "Belum ada aktivitas";
+  const wireframeAssessment = getWireframeRubricAssessment(progress);
+  const wireframeUpdatedLabel = wireframeAssessment.updatedAt
+    ? new Date(wireframeAssessment.updatedAt).toLocaleString("id-ID")
+    : "Belum pernah disimpan";
+  const figmaSimilarityAssessment =
+    getFigmaSimilarityRubricAssessment(progress);
+  const figmaSimilarityUpdatedLabel = figmaSimilarityAssessment.updatedAt
+    ? new Date(figmaSimilarityAssessment.updatedAt).toLocaleString("id-ID")
+    : "Belum pernah disimpan";
+  const summativeAssessment = getGrade10SummativeRubricAssessment(progress);
+  const summativeAssessmentUpdatedLabel = summativeAssessment.updatedAt
+    ? new Date(summativeAssessment.updatedAt).toLocaleString("id-ID")
+    : "Belum pernah dinilai";
+  const websitePlan = progress.websitePlan || {};
+  const referenceUrl = getSafeReferenceUrl(websitePlan.websiteUrl);
+  const groupPlan = progress.groupPlan || {};
+  const figmaFoundationPlan = progress.figmaFoundationPlan || {};
+  const figmaAssessmentUrl = getSafeReferenceUrl(
+    figmaFoundationPlan.figmaUrl || groupPlan.figmaUrl,
+  );
+  const summativePlan = progress.summativeRedesign || {};
+  const summativeReferenceUrl = getSafeReferenceUrl(summativePlan.referenceUrl);
+  const summativeFigmaUrl = getSafeReferenceUrl(summativePlan.figmaUrl);
+  const hasSummativeSubmission = hasGrade10SummativeSubmission(progress);
+  const summativeSubmittedAt = Number(summativePlan.savedAt || 0);
+  const summativeSubmittedLabel = summativeSubmittedAt
+    ? new Date(summativeSubmittedAt).toLocaleString("id-ID")
+    : "Belum pernah dikirim";
+  const steps = [
+    ["preTest", "Pre-test 1", progress.preTest?.score],
+    ["section1", "Section 1 · Wireframe"],
+    ["postTest1", "Post-test 1", progress.postTest?.score],
+    ["section2", "Section 2 · Project Setup"],
+    ["figmaPreTest", "Figma Pre-test", progress.figmaPreTest?.score],
+    ["section3", "Section 3 · Figma Basics"],
+    ["section4", "Section 4 · Toolbar Lab"],
+    ["postTest2", "Post-test 2", progress.postTest2?.score],
+    ["summative", "Summative · Individual Redesign"],
+  ];
+
+  body.innerHTML = `
+    <div class="grid gap-4 mb-5">
+      <article class="rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-5">
+        <div class="flex items-end justify-between gap-3 mb-3">
+          <div><span class="text-[10px] font-mono-tech tracking-widest text-cyan-300">TOTAL EXPERIENCE</span><h3 class="text-3xl font-black text-white mt-1">${summary.xp} <small class="text-sm text-slate-500">/ ${GRADE10_UIUX_TOTAL_XP} XP</small></h3></div>
+          <strong class="text-2xl text-lime-300">${summary.percent}%</strong>
+        </div>
+        <div class="h-2 rounded-full bg-slate-800 overflow-hidden"><span class="block h-full rounded-full bg-gradient-to-r from-cyan-400 via-violet-400 to-lime-300" style="width:${summary.percent}%"></span></div>
+        <p class="text-[11px] text-slate-500 font-mono-tech mt-3"><i class="fas fa-clock mr-1"></i> Aktivitas terakhir: ${escHtml(latestLabel)}</p>
+      </article>
+      <article class="grid sm:grid-cols-3 gap-3">
+        <div class="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-4"><span class="text-[9px] text-emerald-300 font-mono-tech">RAPORT Q1 · FORMATIF 1</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative1)}</strong><small class="block text-slate-500 mt-1">${summary.formative1Breakdown.productAssessed ? `Rubrik ${summary.formative1Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative1Breakdown.postTest)}/30</small>${summary.formative1 !== null && !summary.formative1Breakdown.complete ? '<small class="block text-amber-400 mt-2"><i class="fas fa-clock mr-1"></i>Nilai sementara · Post-test 1 belum dikerjakan</small>' : ""}</div>
+        <div class="rounded-xl border border-violet-500/25 bg-violet-500/5 p-4"><span class="text-[9px] text-violet-300 font-mono-tech">RAPORT Q1 · FORMATIF 2</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.formative2)}</strong><small class="block text-slate-500 mt-1">${summary.formative2Breakdown.productAssessed ? `Rubrik ${summary.formative2Breakdown.product}/70` : "Rubrik belum dinilai"} + Post-test ${formatTeacherProgressScore(summary.formative2Breakdown.postTest)}/30</small>${summary.formative2 !== null && !summary.formative2Breakdown.complete ? '<small class="block text-amber-400 mt-2"><i class="fas fa-clock mr-1"></i>Nilai sementara · Post-test 2 belum dikerjakan</small>' : ""}</div>
+        <div class="rounded-xl border border-pink-500/25 bg-pink-500/5 p-4"><span class="text-[9px] text-pink-300 font-mono-tech">RAPORT Q1 · OVERALL SUMMATIVE</span><strong class="block text-2xl text-white mt-1">${formatTeacherProgressScore(summary.summative)}</strong><small class="block text-slate-500 mt-1">${summativeAssessment.assessed ? `Formatif ${formatTeacherProgressScore(summary.summativeBreakdown.formativeAverage)} × 30% + Rubrik ${summativeAssessment.score} × 70%` : "Rubrik belum dinilai"}</small>${summary.summative !== null && !summary.summativeBreakdown.formativeComplete ? '<small class="block text-amber-400 mt-2"><i class="fas fa-triangle-exclamation mr-1"></i>Sementara · komponen formatif belum lengkap</small>' : ""}</div>
+      </article>
+    </div>
+    <section class="mb-5 rounded-2xl border border-violet-400/25 bg-gradient-to-br from-violet-500/[0.08] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
+      <div class="border-b border-slate-700/60 p-5">
+        <span class="text-[10px] font-mono-tech tracking-[0.18em] text-violet-300 font-bold">FIGMA ASSIGNMENT SUBMISSIONS</span>
+        <h3 class="text-lg font-black text-white mt-1">Tautan Figma yang dikirim siswa</h3>
+        <p class="text-xs text-slate-400 mt-1">Buka file langsung dari submission Section 2 atau Section 4.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-3 p-5">
+        ${buildGrade10FigmaSubmissionCard(groupPlan, "SECTION 2 · PROJECT SETUP", "Shared Figma file", "studentRole")}
+        ${buildGrade10FigmaSubmissionCard(figmaFoundationPlan, "SECTION 4 · GROUP EVIDENCE", "Figma product evidence", "role")}
+      </div>
+    </section>
+    <section class="mb-5 rounded-2xl border border-violet-400/30 bg-gradient-to-br from-violet-500/[0.09] via-slate-900/65 to-fuchsia-400/[0.04] overflow-hidden">
+      <div class="p-5 border-b border-slate-700/60 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div>
+          <span class="text-[10px] font-mono-tech tracking-[0.18em] text-violet-300 font-bold">FORMATIF 2 · FIGMA SIMILARITY RUBRIC</span>
+          <h3 class="text-lg font-black text-white mt-1">Kemiripan website acuan dengan desain Figma</h3>
+          <p class="text-xs text-slate-400 mt-1">Bandingkan kedua tampilan pada ukuran viewport yang sama. Nilai setiap kriteria 0–10 poin.</p>
+        </div>
+        <div class="sm:text-right shrink-0">
+          <strong id="figmaSimilarityRubricScore" class="block text-3xl font-black text-violet-300">${figmaSimilarityAssessment.score}<small class="text-sm text-slate-500">/${GRADE10_FIGMA_SIMILARITY_TOTAL_MAX}</small></strong>
+          <span id="figmaSimilarityRubricCount" class="text-[10px] font-mono-tech text-slate-500">${figmaSimilarityAssessment.achieved}/${GRADE10_FIGMA_SIMILARITY_RUBRIC.length} KRITERIA TERISI</span>
+        </div>
+      </div>
+      <div class="mx-5 mt-5 grid sm:grid-cols-2 gap-3">
+        <article class="rounded-xl border border-cyan-400/20 bg-cyan-400/[0.05] p-4">
+          <span class="text-[9px] font-mono-tech tracking-widest text-cyan-300">WEBSITE ACUAN</span>
+          <h4 class="text-sm font-black text-white mt-1">${escHtml(websitePlan.websiteName || "Website belum dipilih")}</h4>
+          ${referenceUrl ? `<a href="${escHtml(referenceUrl)}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 text-xs font-black text-cyan-200 hover:text-cyan-100">BUKA WEBSITE <i class="fas fa-arrow-up-right-from-square"></i></a>` : `<p class="mt-3 text-[10px] font-mono-tech text-amber-400">URL BELUM TERSEDIA</p>`}
+        </article>
+        <article class="rounded-xl border border-violet-400/25 bg-violet-400/[0.06] p-4">
+          <span class="text-[9px] font-mono-tech tracking-widest text-violet-300">DESAIN FIGMA SISWA</span>
+          <h4 class="text-sm font-black text-white mt-1">${escHtml(figmaFoundationPlan.groupName || groupPlan.groupName || "Submission belum tersedia")}</h4>
+          ${figmaAssessmentUrl ? `<a href="${escHtml(figmaAssessmentUrl)}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-2 text-xs font-black text-violet-200 hover:text-violet-100">BUKA FIGMA <i class="fas fa-arrow-up-right-from-square"></i></a>` : `<p class="mt-3 text-[10px] font-mono-tech text-amber-400">FIGMA BELUM DIKIRIM</p>`}
+        </article>
+      </div>
+      <div class="mx-5 mt-3 rounded-xl border border-slate-700 bg-slate-950/45 p-3 text-[10px] font-mono-tech text-slate-400">
+        <strong class="text-slate-200 mr-2">PANDUAN:</strong> 9–10 sangat mirip · 7–8 sebagian besar mirip · 5–6 cukup mirip · 1–4 masih jauh · 0 belum tersedia
+      </div>
+      <div class="grid md:grid-cols-2 gap-2.5 p-5">
+        ${GRADE10_FIGMA_SIMILARITY_RUBRIC.map(
+          (criterion, index) => `<article class="rounded-xl border border-slate-700 bg-slate-950/45 p-3.5 hover:border-violet-400/45 transition-colors">
+            <div class="flex items-start gap-3">
+              <input type="checkbox" data-figma-similarity-full="${criterion.id}" onchange="setFigmaSimilarityCriterionFull('${criterion.id}', this.checked)" ${figmaSimilarityAssessment.criteria[criterion.id] === GRADE10_FIGMA_SIMILARITY_CRITERION_MAX ? "checked" : ""} class="mt-1 h-4 w-4 accent-violet-400 shrink-0" aria-label="Beri poin penuh untuk ${criterion.label}" />
+              <span class="grid w-7 h-7 shrink-0 place-items-center rounded-lg bg-violet-400/10 text-violet-300 text-xs font-black">${index + 1}</span>
+              <span class="min-w-0 flex-1"><strong class="block text-sm text-white">${criterion.label}</strong><small class="block text-[11px] leading-relaxed text-slate-500 mt-1">${criterion.description}</small></span>
+            </div>
+            <label class="mt-3 ml-14 flex items-center justify-end gap-2 text-[10px] font-mono-tech text-slate-500">
+              POIN
+              <input type="number" min="0" max="${GRADE10_FIGMA_SIMILARITY_CRITERION_MAX}" step="1" inputmode="numeric" data-figma-similarity-rubric="${criterion.id}" value="${figmaSimilarityAssessment.criteria[criterion.id]}" oninput="updateFigmaSimilarityRubricPreview()" class="w-16 rounded-lg border border-slate-600 bg-slate-900 px-2 py-1.5 text-center text-sm font-black text-violet-300 outline-none focus:border-violet-400" aria-label="Poin ${criterion.label}" />
+              <b class="text-xs text-violet-300">/${GRADE10_FIGMA_SIMILARITY_CRITERION_MAX}</b>
+            </label>
+          </article>`,
+        ).join("")}
+      </div>
+      <div class="px-5 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p class="text-[10px] font-mono-tech text-slate-500"><i class="fas fa-clock mr-1"></i>${escHtml(figmaSimilarityUpdatedLabel)}</p>
+        <button id="saveFigmaSimilarityRubricButton" type="button" onclick="saveFigmaSimilarityAssessment()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-violet-300 hover:bg-violet-200 px-4 py-2.5 text-xs font-black text-slate-950 transition-colors">
+          <i class="fas fa-floppy-disk"></i> SAVE FIGMA SCORE
+        </button>
+      </div>
+    </section>
+    <section id="grade10SummativeSubmissionCard" class="mb-5 scroll-mt-5 rounded-2xl border border-pink-400/25 bg-pink-400/[0.05] p-5">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-pink-400/15 pb-3">
+        <strong class="text-xs text-white">Submission Summative Grade 10</strong>
+        <span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-bold font-mono-tech tracking-wider ${hasSummativeSubmission ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : "border-amber-400/30 bg-amber-400/10 text-amber-300"}">
+          <i class="fas ${hasSummativeSubmission ? "fa-circle-check" : "fa-clock"}"></i>${hasSummativeSubmission ? "TERKIRIM" : "BELUM DIKIRIM"}
+        </span>
+      </div>
+      <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+        <div class="min-w-0">
+          <span class="text-[10px] font-mono-tech tracking-[0.18em] text-pink-300 font-bold">SUMMATIVE · INDIVIDUAL REDESIGN</span>
+          <h3 class="text-lg font-black text-white mt-1">${escHtml(summativePlan.appName || "Belum mengisi summative evidence")}</h3>
+          <p class="text-xs leading-relaxed text-slate-400 mt-2">${escHtml(summativePlan.userProblem || "Siswa belum menulis user problem yang akan diperbaiki.")}</p>
+          <small class="mt-3 block text-[10px] font-mono-tech text-slate-500"><i class="fas fa-clock mr-1"></i>${escHtml(summativeSubmittedLabel)}</small>
+        </div>
+        <div class="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0">
+          ${
+            summativeReferenceUrl
+              ? `<a href="${escHtml(summativeReferenceUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-lg border border-pink-400/30 bg-pink-400/10 px-3.5 py-2.5 text-xs font-bold text-pink-200 hover:bg-pink-400/20">BUKA APP/WEB ACUAN <i class="fas fa-arrow-up-right-from-square"></i></a>`
+              : `<span class="text-[10px] font-mono-tech text-amber-400">LINK APP/WEB BELUM ADA</span>`
+          }
+          ${
+            summativeFigmaUrl
+              ? `<a href="${escHtml(summativeFigmaUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-lg border border-violet-400/30 bg-violet-400/10 px-3.5 py-2.5 text-xs font-bold text-violet-200 hover:bg-violet-400/20">BUKA FIGMA REDESIGN <i class="fab fa-figma"></i></a>`
+              : `<span class="text-[10px] font-mono-tech text-amber-400">LINK FIGMA BELUM ADA</span>`
+          }
+        </div>
+      </div>
+      <div class="mt-5 border-t border-pink-400/15 pt-5">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+          <div>
+            <span class="text-[10px] font-mono-tech tracking-[0.18em] text-pink-300 font-bold">RUBRIK SUMATIF · 100 POIN</span>
+            <h4 class="text-base font-black text-white mt-1">Nilai individual redesign siswa</h4>
+            <p class="text-xs text-slate-400 mt-1">Nilai ini otomatis mengisi kolom Sumatif Q1.</p>
+          </div>
+          <div class="sm:text-right shrink-0">
+            <strong id="grade10SummativeRubricScore" class="block text-3xl font-black text-pink-300">${summativeAssessment.score}<small class="text-sm text-slate-500">/${GRADE10_SUMMATIVE_TOTAL_MAX}</small></strong>
+            <span id="grade10SummativeRubricCount" class="text-[10px] font-mono-tech text-slate-500">${summativeAssessment.achieved}/${GRADE10_SUMMATIVE_RUBRIC.length} KRITERIA TERISI</span>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-2.5 mt-4">
+          ${GRADE10_SUMMATIVE_RUBRIC.map(
+            (criterion, index) => `<article class="rounded-xl border border-slate-700 bg-slate-950/45 p-3.5 hover:border-pink-400/40 transition-colors">
+              <div class="flex items-start gap-3">
+                <input type="checkbox" data-grade10-summative-full="${criterion.id}" onchange="setGrade10SummativeCriterionFull('${criterion.id}', this.checked)" ${summativeAssessment.criteria[criterion.id] === criterion.max ? "checked" : ""} ${hasSummativeSubmission ? "" : "disabled"} class="mt-1 h-4 w-4 accent-pink-400 shrink-0 disabled:opacity-40" aria-label="Beri poin penuh untuk ${criterion.label}" />
+                <span class="grid w-7 h-7 shrink-0 place-items-center rounded-lg bg-pink-400/10 text-pink-300 text-xs font-black">${index + 1}</span>
+                <span class="min-w-0 flex-1"><strong class="block text-sm text-white">${criterion.label}</strong><small class="block text-[11px] leading-relaxed text-slate-500 mt-1">${criterion.description}</small></span>
+              </div>
+              <label class="mt-3 ml-14 flex items-center justify-end gap-2 text-[10px] font-mono-tech text-slate-500">
+                POIN
+                <input type="number" min="0" max="${criterion.max}" step="1" inputmode="numeric" data-grade10-summative-rubric="${criterion.id}" value="${summativeAssessment.criteria[criterion.id]}" oninput="updateGrade10SummativeRubricPreview()" ${hasSummativeSubmission ? "" : "disabled"} class="w-16 rounded-lg border border-slate-600 bg-slate-900 px-2 py-1.5 text-center text-sm font-black text-pink-300 outline-none focus:border-pink-400 disabled:opacity-40" aria-label="Poin ${criterion.label}" />
+                <b class="text-xs text-pink-300">/${criterion.max}</b>
+              </label>
+            </article>`,
+          ).join("")}
+        </div>
+        <div class="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <p class="text-[10px] font-mono-tech text-slate-500"><i class="fas fa-clock mr-1"></i>${escHtml(summativeAssessmentUpdatedLabel)}</p>
+          <button id="saveGrade10SummativeRubricButton" type="button" onclick="saveGrade10SummativeAssessment()" ${hasSummativeSubmission ? "" : "disabled"} class="inline-flex items-center justify-center gap-2 rounded-lg bg-pink-300 hover:bg-pink-200 px-4 py-2.5 text-xs font-black text-slate-950 transition-colors disabled:cursor-not-allowed disabled:opacity-40">
+            <i class="fas fa-floppy-disk"></i> SAVE SUMMATIVE SCORE
+          </button>
+        </div>
+        ${hasSummativeSubmission ? "" : '<p class="mt-3 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] p-3 text-[10px] font-mono-tech text-amber-300">RUBRIK AKAN AKTIF SETELAH SISWA MENGIRIM SEMUA EVIDENCE SUMATIF.</p>'}
+      </div>
+    </section>
+    <section class="mb-5 rounded-2xl border border-lime-400/25 bg-gradient-to-br from-lime-400/[0.07] via-slate-900/60 to-cyan-400/[0.05] overflow-hidden">
+      <div class="p-5 border-b border-slate-700/60 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div>
+          <span class="text-[10px] font-mono-tech tracking-[0.18em] text-lime-300 font-bold">FORMATIF 1 · WIREFRAME RUBRIC</span>
+          <h3 class="text-lg font-black text-white mt-1">Nilai kesesuaian analisis dengan website acuan</h3>
+          <p class="text-xs text-slate-400 mt-1">Bandingkan gambar wireframe siswa dengan website pilihannya. Atur 0–10 poin untuk setiap kriteria; warna dan dekorasi tidak dinilai.</p>
+        </div>
+        <div class="sm:text-right shrink-0">
+          <strong id="wireframeRubricScore" class="block text-3xl font-black text-lime-300">${wireframeAssessment.score}<small class="text-sm text-slate-500">/${GRADE10_WIREFRAME_TOTAL_MAX}</small></strong>
+          <span id="wireframeRubricCount" class="text-[10px] font-mono-tech text-slate-500">${wireframeAssessment.achieved}/${GRADE10_WIREFRAME_RUBRIC.length} KRITERIA TERISI</span>
+        </div>
+      </div>
+      <div class="mx-5 mt-5 rounded-xl border border-cyan-400/20 bg-cyan-400/[0.05] p-4">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div class="min-w-0">
+            <span class="text-[9px] font-mono-tech tracking-widest text-cyan-300">WEBSITE ACUAN SISWA</span>
+            <h4 class="text-white font-black mt-1">${escHtml(websitePlan.websiteName || "Belum memilih website")}</h4>
+            <p class="text-xs leading-relaxed text-slate-400 mt-2">${escHtml(websitePlan.reason || "Fokus investigasi belum ditulis.")}</p>
+            <small class="block text-[10px] font-mono-tech text-slate-500 mt-2">Alat: ${escHtml(websitePlan.tool || "Belum dipilih")}</small>
+          </div>
+          ${referenceUrl ? `<a href="${escHtml(referenceUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-2.5 text-xs font-bold text-cyan-200 hover:bg-cyan-400/20 shrink-0">BUKA WEBSITE <i class="fas fa-arrow-up-right-from-square"></i></a>` : `<span class="text-[10px] font-mono-tech text-amber-400">URL BELUM TERSEDIA</span>`}
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-2.5 p-5">
+        ${GRADE10_WIREFRAME_RUBRIC.map(
+          (criterion, index) => `<article class="rounded-xl border border-slate-700 bg-slate-950/45 p-3.5 hover:border-lime-400/40 transition-colors">
+            <div class="flex items-start gap-3">
+              <input type="checkbox" data-wireframe-full="${criterion.id}" onchange="setWireframeCriterionFull('${criterion.id}', this.checked)" ${wireframeAssessment.criteria[criterion.id] === GRADE10_WIREFRAME_CRITERION_MAX ? "checked" : ""} class="mt-1 h-4 w-4 accent-lime-400 shrink-0" aria-label="Beri poin penuh untuk ${criterion.label}" />
+              <span class="grid w-7 h-7 shrink-0 place-items-center rounded-lg bg-lime-400/10 text-lime-300 text-xs font-black">${index + 1}</span>
+              <span class="min-w-0 flex-1"><strong class="block text-sm text-white">${criterion.label}</strong><small class="block text-[11px] leading-relaxed text-slate-500 mt-1">${criterion.description}</small></span>
+            </div>
+            <label class="mt-3 ml-14 flex items-center justify-end gap-2 text-[10px] font-mono-tech text-slate-500">
+              POIN
+              <input type="number" min="0" max="${GRADE10_WIREFRAME_CRITERION_MAX}" step="1" inputmode="numeric" data-wireframe-rubric="${criterion.id}" value="${wireframeAssessment.criteria[criterion.id]}" oninput="updateWireframeRubricPreview('${criterion.id}')" class="w-16 rounded-lg border border-slate-600 bg-slate-900 px-2 py-1.5 text-center text-sm font-black text-lime-300 outline-none focus:border-lime-400" aria-label="Poin ${criterion.label}" />
+              <b class="text-xs text-lime-300">/${GRADE10_WIREFRAME_CRITERION_MAX}</b>
+            </label>
+          </article>`,
+        ).join("")}
+      </div>
+      <div class="px-5 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p class="text-[10px] font-mono-tech text-slate-500"><i class="fas fa-clock mr-1"></i>${escHtml(wireframeUpdatedLabel)}</p>
+        <button id="saveWireframeRubricButton" type="button" onclick="saveWireframeAssessment()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-lime-300 hover:bg-lime-200 px-4 py-2.5 text-xs font-black text-slate-950 transition-colors">
+          <i class="fas fa-floppy-disk"></i> SAVE WIREFRAME SCORE
+        </button>
+      </div>
+    </section>
+    <div class="grid sm:grid-cols-2 gap-2.5">
+      ${steps
+        .map(([key, label, score]) => {
+          const complete = summary.states[key] === true;
+          const scoreLabel = Number.isFinite(Number(score)) ? `${Number(score)}%` : "";
+          return `<article class="flex items-center gap-3 rounded-xl border ${complete ? "border-emerald-500/25 bg-emerald-500/5" : "border-slate-700 bg-slate-900/45"} p-3.5">
+            <span class="grid w-9 h-9 shrink-0 place-items-center rounded-lg ${complete ? "bg-emerald-500/15 text-emerald-300" : "bg-slate-800 text-slate-600"}"><i class="fas ${complete ? "fa-check" : "fa-minus"}"></i></span>
+            <div class="min-w-0 flex-1"><strong class="block text-sm ${complete ? "text-white" : "text-slate-400"}">${escHtml(label)}</strong><small class="text-[10px] font-mono-tech ${complete ? "text-emerald-400" : "text-slate-600"}">${complete ? "SELESAI" : "BELUM SELESAI"}</small></div>
+            ${scoreLabel ? `<b class="text-sm text-cyan-300">${scoreLabel}</b>` : ""}
+          </article>`;
+        })
+        .join("")}
+    </div>
+    ${
+      hasProgress
+        ? ""
+        : `<div class="mt-5 rounded-xl border border-dashed border-slate-600 p-4 text-center text-sm text-slate-500">Siswa belum memulai kegiatan UI/UX.</div>`
+    }`;
+  resetButton.disabled = !hasProgress;
+  if (focusSection === "summative") {
+    requestAnimationFrame(() => {
+      document
+        .getElementById("grade10SummativeSubmissionCard")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      selectedLearningProgressFocus = "";
+    });
+  }
+}
+
+function setFigmaSimilarityCriterionFull(criterionId, isFull) {
+  const input = document.querySelector(
+    `[data-figma-similarity-rubric="${criterionId}"]`,
+  );
+  if (input) {
+    input.value = isFull ? GRADE10_FIGMA_SIMILARITY_CRITERION_MAX : 0;
+  }
+  updateFigmaSimilarityRubricPreview();
+}
+
+function updateFigmaSimilarityRubricPreview() {
+  const inputs = Array.from(
+    document.querySelectorAll("[data-figma-similarity-rubric]"),
+  );
+  const points = inputs.map((input) => {
+    const normalized = normalizeFigmaSimilarityCriterionPoints(input.value);
+    if (input.value !== "" && Number(input.value) !== normalized) {
+      input.value = normalized;
+    }
+    const criterionId = input.dataset.figmaSimilarityRubric;
+    const fullCheckbox = document.querySelector(
+      `[data-figma-similarity-full="${criterionId}"]`,
+    );
+    if (fullCheckbox) {
+      fullCheckbox.checked =
+        normalized === GRADE10_FIGMA_SIMILARITY_CRITERION_MAX;
+    }
+    return normalized;
+  });
+  const score = points.reduce((total, value) => total + value, 0);
+  const achieved = points.filter((value) => value > 0).length;
+  const scoreElement = document.getElementById("figmaSimilarityRubricScore");
+  const countElement = document.getElementById("figmaSimilarityRubricCount");
+  if (scoreElement) {
+    scoreElement.innerHTML = `${score}<small class="text-sm text-slate-500">/${GRADE10_FIGMA_SIMILARITY_TOTAL_MAX}</small>`;
+  }
+  if (countElement) {
+    countElement.textContent = `${achieved}/${GRADE10_FIGMA_SIMILARITY_RUBRIC.length} KRITERIA TERISI`;
+  }
+}
+
+function setGrade10SummativeCriterionFull(criterionId, isFull) {
+  const criterion = GRADE10_SUMMATIVE_RUBRIC.find(
+    (item) => item.id === criterionId,
+  );
+  const input = document.querySelector(
+    `[data-grade10-summative-rubric="${criterionId}"]`,
+  );
+  if (criterion && input) {
+    input.value = isFull ? criterion.max : 0;
+  }
+  updateGrade10SummativeRubricPreview();
+}
+
+function updateGrade10SummativeRubricPreview() {
+  const points = GRADE10_SUMMATIVE_RUBRIC.map((criterion) => {
+    const input = document.querySelector(
+      `[data-grade10-summative-rubric="${criterion.id}"]`,
+    );
+    const normalized = normalizeGrade10SummativeCriterionPoints(
+      input?.value,
+      criterion.max,
+    );
+    if (input && input.value !== "" && Number(input.value) !== normalized) {
+      input.value = normalized;
+    }
+    const fullCheckbox = document.querySelector(
+      `[data-grade10-summative-full="${criterion.id}"]`,
+    );
+    if (fullCheckbox) fullCheckbox.checked = normalized === criterion.max;
+    return normalized;
+  });
+  const score = points.reduce((total, value) => total + value, 0);
+  const achieved = points.filter((value) => value > 0).length;
+  const scoreElement = document.getElementById("grade10SummativeRubricScore");
+  const countElement = document.getElementById("grade10SummativeRubricCount");
+  if (scoreElement) {
+    scoreElement.innerHTML = `${score}<small class="text-sm text-slate-500">/${GRADE10_SUMMATIVE_TOTAL_MAX}</small>`;
+  }
+  if (countElement) {
+    countElement.textContent = `${achieved}/${GRADE10_SUMMATIVE_RUBRIC.length} KRITERIA TERISI`;
+  }
+}
+
+async function saveGrade10SummativeAssessment() {
+  const student = selectedLearningProgressStudent;
+  if (!student || getTeacherStudentGrade(student) !== 10) return;
+  if (!hasGrade10SummativeSubmission(selectedLearningProgressData)) {
+    showAlert(
+      "Rubrik belum dapat disimpan karena submission Summative siswa belum lengkap.",
+      "warning",
+    );
+    return;
+  }
+
+  const criteria = Object.fromEntries(
+    GRADE10_SUMMATIVE_RUBRIC.map((criterion) => [
+      criterion.id,
+      normalizeGrade10SummativeCriterionPoints(
+        document.querySelector(
+          `[data-grade10-summative-rubric="${criterion.id}"]`,
+        )?.value,
+        criterion.max,
+      ),
+    ]),
+  );
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const button = document.getElementById("saveGrade10SummativeRubricButton");
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> SAVING…';
+  }
+
+  const progressRef = db
+    .ref("learningProgress")
+    .child(student.id)
+    .child("grade10UiUx");
+  try {
+    await progressRef
+      .child("teacherAssessment")
+      .child("summativeRedesign")
+      .set({
+        assessed: true,
+        criteria,
+        score,
+        updatedAt: Date.now(),
+      });
+    const snapshot = await progressRef.once("value");
+    const progress = snapshot.val() || {};
+    grade10UiUxProgressByStudent[student.id] = progress;
+    let gradebookSyncError = null;
+    let overallSummativeScore = null;
+    try {
+      overallSummativeScore = await syncGrade10SummativeToGradebook(student, progress);
+    } catch (syncError) {
+      gradebookSyncError = syncError;
+      console.warn("Sinkronisasi Q1 Sumatif Grade 10 gagal:", syncError);
+    }
+    renderTableBody(allSiswa);
+    renderStudentLearningProgress(progress);
+    showAlert(
+      gradebookSyncError
+        ? `Rubrik Sumatif <strong>${escHtml(student.nama)}</strong> tersimpan, tetapi kolom Sumatif Q1 belum berhasil disinkronkan.`
+        : `Rubrik Sumatif <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_SUMMATIVE_TOTAL_MAX}. Overall Summative Q1 diperbarui menjadi ${formatTeacherProgressScore(overallSummativeScore)} (Formatif 30% + Sumatif 70%).`,
+      gradebookSyncError ? "warning" : "success",
+    );
+  } catch (error) {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+    const permissionDenied = /permission[_ -]?denied/i.test(
+      String(error?.code || error?.message || ""),
+    );
+    showAlert(
+      permissionDenied
+        ? "Izin Firebase ditolak. Terapkan database rules terbaru sebelum menyimpan rubrik Sumatif."
+        : "Gagal menyimpan rubrik Sumatif: " + error.message,
+      "danger",
+    );
+  }
+}
+
+async function saveFigmaSimilarityAssessment() {
+  const student = selectedLearningProgressStudent;
+  if (!student || getTeacherStudentGrade(student) !== 10) return;
+
+  const criteria = {};
+  GRADE10_FIGMA_SIMILARITY_RUBRIC.forEach((criterion) => {
+    criteria[criterion.id] = normalizeFigmaSimilarityCriterionPoints(
+      document.querySelector(
+        `[data-figma-similarity-rubric="${criterion.id}"]`,
+      )?.value,
+    );
+  });
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const button = document.getElementById("saveFigmaSimilarityRubricButton");
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> SAVING…';
+  }
+
+  const progressRef = db
+    .ref("learningProgress")
+    .child(student.id)
+    .child("grade10UiUx");
+  try {
+    await progressRef
+      .child("teacherAssessment")
+      .child("figmaSimilarity")
+      .set({
+        assessed: true,
+        criteria,
+        score,
+        updatedAt: Date.now(),
+      });
+    const snapshot = await progressRef.once("value");
+    const progress = snapshot.val() || {};
+    const formativeTwoScore = getGrade10FormativeTwoGradebookScore(progress);
+    let gradebookSyncError = null;
+    if (formativeTwoScore !== null) {
+      try {
+        await syncGrade10FormativeTwoToGradebook(student, progress);
+      } catch (syncError) {
+        gradebookSyncError = syncError;
+        console.warn("Sinkronisasi Q1 F2 setelah penilaian gagal:", syncError);
+      }
+    }
+    renderStudentLearningProgress(progress);
+    showAlert(
+      gradebookSyncError
+        ? `Nilai kemiripan Figma <strong>${escHtml(student.nama)}</strong> tersimpan, tetapi buku nilai Q1 F2 belum berhasil disinkronkan.`
+        : `Nilai kemiripan Figma <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_FIGMA_SIMILARITY_TOTAL_MAX}.${formativeTwoScore !== null ? ` Buku nilai Q1 F2 diperbarui menjadi ${formatTeacherProgressScore(formativeTwoScore)}${progress.postTest2 ? "." : " sebagai nilai sementara; Post-test 2 belum dikerjakan."}` : ""}`,
+      gradebookSyncError ? "warning" : "success",
+    );
+  } catch (error) {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+    const permissionDenied = /permission[_ -]?denied/i.test(
+      String(error?.code || error?.message || ""),
+    );
+    showAlert(
+      permissionDenied
+        ? "Izin Firebase ditolak. Terapkan database rules terbaru sebelum menyimpan rubrik Figma."
+        : "Gagal menyimpan nilai kemiripan Figma: " + error.message,
+      "danger",
+    );
+  }
+}
+
+function setWireframeCriterionFull(criterionId, isFull) {
+  const input = document.querySelector(
+    `[data-wireframe-rubric="${criterionId}"]`,
+  );
+  if (input) input.value = isFull ? GRADE10_WIREFRAME_CRITERION_MAX : 0;
+  updateWireframeRubricPreview();
+}
+
+function updateWireframeRubricPreview() {
+  const inputs = Array.from(
+    document.querySelectorAll("[data-wireframe-rubric]"),
+  );
+  const points = inputs.map((input) => {
+    const normalized = normalizeWireframeCriterionPoints(input.value);
+    if (input.value !== "" && Number(input.value) !== normalized) {
+      input.value = normalized;
+    }
+    const criterionId = input.dataset.wireframeRubric;
+    const fullCheckbox = document.querySelector(
+      `[data-wireframe-full="${criterionId}"]`,
+    );
+    if (fullCheckbox) {
+      fullCheckbox.checked =
+        normalized === GRADE10_WIREFRAME_CRITERION_MAX;
+    }
+    return normalized;
+  });
+  const score = points.reduce((total, value) => total + value, 0);
+  const achieved = points.filter((value) => value > 0).length;
+  const scoreElement = document.getElementById("wireframeRubricScore");
+  const countElement = document.getElementById("wireframeRubricCount");
+  if (scoreElement) {
+    scoreElement.innerHTML = `${score}<small class="text-sm text-slate-500">/${GRADE10_WIREFRAME_TOTAL_MAX}</small>`;
+  }
+  if (countElement) {
+    countElement.textContent = `${achieved}/${GRADE10_WIREFRAME_RUBRIC.length} KRITERIA TERISI`;
+  }
+}
+
+async function saveWireframeAssessment() {
+  const student = selectedLearningProgressStudent;
+  if (!student || getTeacherStudentGrade(student) !== 10) return;
+
+  const criteria = {};
+  GRADE10_WIREFRAME_RUBRIC.forEach((criterion) => {
+    criteria[criterion.id] = normalizeWireframeCriterionPoints(
+      document.querySelector(`[data-wireframe-rubric="${criterion.id}"]`)
+        ?.value,
+    );
+  });
+  const score = Object.values(criteria).reduce(
+    (total, value) => total + value,
+    0,
+  );
+  const button = document.getElementById("saveWireframeRubricButton");
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> SAVING…';
+  }
+
+  const progressRef = db
+    .ref("learningProgress")
+    .child(student.id)
+    .child("grade10UiUx");
+  try {
+    await progressRef.child("teacherAssessment").child("wireframe").set({
+      assessed: true,
+      criteria,
+      score,
+      updatedAt: Date.now(),
+    });
+    const snapshot = await progressRef.once("value");
+    const progress = snapshot.val() || {};
+    grade10UiUxProgressByStudent[student.id] = progress;
+    const formativeOneScore = getGrade10FormativeOneGradebookScore(progress);
+    let gradebookSyncError = null;
+    if (formativeOneScore !== null) {
+      try {
+        await syncGrade10FormativeOneToGradebook(student, progress);
+      } catch (syncError) {
+        gradebookSyncError = syncError;
+        console.warn("Sinkronisasi Q1 F1 setelah penilaian gagal:", syncError);
+      }
+    }
+    renderTableBody(allSiswa);
+    renderStudentLearningProgress(progress);
+    showAlert(
+      gradebookSyncError
+        ? `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan, tetapi buku nilai Q1 F1 belum berhasil disinkronkan.`
+        : `Nilai Wireframe <strong>${escHtml(student.nama)}</strong> tersimpan: ${score}/${GRADE10_WIREFRAME_TOTAL_MAX}.${formativeOneScore !== null ? ` Buku nilai Q1 F1 diperbarui menjadi ${formatTeacherProgressScore(formativeOneScore)}${progress.postTest ? "." : " sebagai nilai sementara; Post-test 1 belum dikerjakan."}` : ""}`,
+      gradebookSyncError ? "warning" : "success",
+    );
+  } catch (error) {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+    const permissionDenied = /permission[_ -]?denied/i.test(
+      String(error?.code || error?.message || ""),
+    );
+    showAlert(
+      permissionDenied
+        ? "Izin Firebase ditolak. Pastikan akun guru sudah disetujui admin dan aturan database terbaru sudah diterapkan."
+        : "Gagal menyimpan nilai Wireframe: " + error.message,
+      "danger",
+    );
+  }
+}
+
+function closeStudentLearningProgress() {
+  document.getElementById("learningProgressModal")?.classList.add("hidden");
+  document.body.style.overflow = "";
+  selectedLearningProgressStudent = null;
+  selectedLearningProgressData = {};
+  selectedLearningProgressFocus = "";
+}
+
+async function resetStudentLearningProgress() {
+  const student = selectedLearningProgressStudent;
+  if (!student || getTeacherStudentGrade(student) !== 10) return;
+  const confirmed = confirm(
+    `Reset seluruh progress UI/UX milik ${student.nama}?\n\nPre-test, post-test, checklist, file evidence, dan seluruh XP akan dihapus. Nilai serta akun siswa tidak ikut terhapus.`,
+  );
+  if (!confirmed) return;
+
+  const button = document.getElementById("resetLearningProgressButton");
+  const originalHtml = button.innerHTML;
+  button.disabled = true;
+  button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Mereset…';
+  try {
+    const progressRef = db
+      .ref("learningProgress")
+      .child(student.id)
+      .child("grade10UiUx");
+    const teacherAssessment = selectedLearningProgressData.teacherAssessment;
+    if (teacherAssessment) {
+      await progressRef.set({ teacherAssessment });
+      renderStudentLearningProgress({ teacherAssessment });
+    } else {
+      await progressRef.remove();
+      renderStudentLearningProgress({});
+    }
+    showAlert(
+      `Progress UI/UX <strong>${escHtml(student.nama)}</strong> berhasil direset ke 0 XP.`,
+      "success",
+    );
+  } catch (error) {
+    button.disabled = false;
+    showAlert("Gagal mereset progress: " + error.message, "danger");
+  } finally {
+    button.innerHTML = originalHtml;
+  }
+}
+
+function setQuarter(q) {
+  activeQuarter = q;
+  // Update Tabs UI
+  for (let i = 1; i <= 4; i++) {
+    const btn = document.getElementById("btnQ" + i);
+    if (btn)
+      btn.className = `quarter-tab px-6 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto ${i === activeQuarter ? "active" : ""}`;
+    if (btn)
+      btn.innerHTML = `<i class="fas fa-cube mr-1 text-purple-400"></i> Q${i}`;
+  }
+  // Sync input value
+  const inputNum = document.getElementById("numFormatif");
+  if (inputNum) inputNum.value = numFormatif[activeQuarter];
+
+  renderFormFormatifInputs();
+  renderTableHead();
+  renderTableBody(allSiswa);
+  if (typeof syncAssessmentQuarter === "function") {
+    syncAssessmentQuarter(activeQuarter);
+  }
+}
+
+// G��G��G�� AUTHENTICATION CHECK G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+document.addEventListener("DOMContentLoaded", () => {
+  const progressModal = document.getElementById("learningProgressModal");
+  renderKkmSettingsInputs();
+  window.addEventListener("kkm-settings-changed", () => {
+    renderKkmSettingsInputs();
+    if (allSiswa.length > 0) {
+      renderTableBody(allSiswa);
+    }
+  });
+
+  progressModal?.addEventListener("click", (event) => {
+    if (event.target === progressModal) closeStudentLearningProgress();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !progressModal?.classList.contains("hidden")) {
+      closeStudentLearningProgress();
+    }
+  });
+
+  auth.onAuthStateChanged((user) => {
+    if (!user) {
+      window.location.href = "index.html"; // Belum login G�� usir
+      return;
+    }
+
+    // Cek status isVerified di Realtime Database
+    guruRef
+      .child(user.uid)
+      .once("value")
+      .then(async (snap) => {
+        const data = snap.val() || {};
+        const isAdminUtama =
+          isAdminEmailSafe(user.email) || isAdminEmailSafe(data.email);
+
+        if (isAdminUtama && (!data.isVerified || !data.emailVerified)) {
+          await guruRef.child(user.uid).update({
+            email: data.email || user.email || "",
+            uid: user.uid,
+            isVerified: true,
+            emailVerified: true,
+            verifiedAt: data.verifiedAt || Date.now(),
+            verifiedBy: data.verifiedBy || "auto",
+            emailVerifiedAt: data.emailVerifiedAt || Date.now(),
+          });
+          data.isVerified = true;
+          data.emailVerified = true;
+        }
+
+        const hasAccess =
+          (data.isVerified || isAdminUtama) &&
+          (data.emailVerified || user.emailVerified || isAdminUtama);
+
+        if (!hasAccess) {
+          auth.signOut().then(() => {
+            alert(
+              "Akun belum memenuhi syarat verifikasi email/admin. Anda tidak bisa mengakses dashboard.",
+            );
+            window.location.href = "index.html";
+          });
+          return;
+        }
+
+        // Lulus verifikasi
+        const displayEmail = data.email || user.email || "";
+
+        // Update UI Header
+        const userNameEl = document.getElementById("userNameDisplay");
+        if (userNameEl) userNameEl.textContent = displayEmail;
+        const roleBadge = document.getElementById("roleBadge");
+        if (roleBadge) {
+          if (isAdminUtama) {
+            roleBadge.innerHTML = `<i class="fas fa-shield-alt mr-1"></i>Super Admin`;
+            roleBadge.className =
+              "bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold px-3 py-1 rounded-full uppercase hidden sm:flex items-center gap-1.5";
+          } else {
+            roleBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>Guru`;
+          }
+        }
+
+        // Tampilkan Admin Panel jika Admin Utama
+        if (isAdminUtama) {
+          try {
+            loadAdminPanel(displayEmail);
+          } catch (e) {
+            console.warn(e);
+          }
+        }
+
+        // Mulai fitur Dashboard
+        renderFormFormatifInputs();
+        renderTableHead();
+        listenToLearningProgressData();
+        listenToSiswaData();
+      });
+  });
+});
+
+// G��G��G�� SETTINGS FORMATIF G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+function renderKkmSettingsInputs() {
+  const grades =
+    typeof KKM_GRADES !== "undefined" ? KKM_GRADES : [7, 8, 9, 10, 11, 12];
+  grades.forEach((grade) => {
+    const input = document.getElementById(`kkmGrade${grade}`);
+    if (input) input.value = getKKM(grade);
+  });
+  const status = document.getElementById("kkmSettingsStatus");
+  if (status) {
+    status.textContent = `AKTIF · ${grades
+      .map((grade) => `${grade}=${getKKM(grade)}`)
+      .join(" · ")}`;
+  }
+}
+
+async function saveKkmSettings() {
+  const grades =
+    typeof KKM_GRADES !== "undefined" ? KKM_GRADES : [7, 8, 9, 10, 11, 12];
+  const settings = {};
+  for (const grade of grades) {
+    const input = document.getElementById(`kkmGrade${grade}`);
+    const value = Number(input?.value);
+    if (!Number.isInteger(value) || value < 1 || value > 100) {
+      showAlert(
+        `KKM kelas ${grade} harus berupa bilangan bulat antara 1 dan 100.`,
+        "danger",
+      );
+      input?.focus();
+      return;
+    }
+    settings[grade] = value;
+  }
+
+  const button = document.getElementById("saveKkmSettingsButton");
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML =
+      '<i class="fas fa-circle-notch fa-spin text-xs"></i> Menyimpan...';
+  }
+
+  try {
+    await kkmRef.set(settings);
+    applyKKMSettings(settings);
+    renderKkmSettingsInputs();
+    renderTableBody(allSiswa);
+    showAlert(
+      `KKM berhasil disimpan: kelas 7 = ${settings[7]}, kelas 8 = ${settings[8]}, kelas 9 = ${settings[9]}.`,
+      "success",
+    );
+  } catch (error) {
+    const permissionDenied = /permission[_ -]?denied/i.test(
+      String(error?.code || error?.message || ""),
+    );
+    showAlert(
+      permissionDenied
+        ? "Izin menyimpan KKM ditolak. Pastikan akun guru sudah terverifikasi dan aturan Firebase terbaru sudah diterapkan."
+        : `Gagal menyimpan KKM: ${escHtml(error?.message || "Kesalahan tidak diketahui")}`,
+      "danger",
+    );
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+  }
+}
+
+function applySettings() {
+  const val = parseInt(document.getElementById("numFormatif").value, 10);
+  if (isNaN(val) || val < 1 || val > 50) {
+    showAlert("Jumlah formatif harus antara 1 dan 50.", "danger");
+    return;
+  }
+  numFormatif[activeQuarter] = val;
+  renderFormFormatifInputs();
+  renderTableHead();
+  renderTableBody(allSiswa);
+  showAlert(
+    `Pengaturan diterapkan: ${val} kolom Formatif untuk Quarter ${activeQuarter}.`,
+    "success",
+  );
+}
+
+function renderFormFormatifInputs() {
+  const grp = document.getElementById("formatifGroupAdd");
+  if (!grp) return;
+  grp.innerHTML = "";
+  for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
+    grp.innerHTML += `
+      <div class="col-span-1 border border-slate-700/50 rounded-lg bg-slate-800/20 p-2">
+        <label class="block text-[10px] text-slate-400 font-mono-tech uppercase mb-1 text-center">Q${activeQuarter} - F${i}</label>
+        <input type="number" id="formatif${i}" placeholder="0-100" min="0" max="100"
+          class="w-full bg-slate-900/60 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-center text-white font-mono-tech focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500" />
+      </div>`;
+  }
+}
+
+// G��G��G�� REALTIME LISTENER SISWA G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+function listenToSiswaData() {
+  siswaRef.on(
+    "value",
+    (snap) => {
+      allSiswa = [];
+      const data = snap.val();
+      let madeChanges = false;
+      let updates = {};
+
+      if (data) {
+        Object.entries(data).forEach(([id, val]) => {
+          const studentRecord = { id, ...val };
+          // Cek migrasi data lama ke Q3
+          let needsMigration = false;
+          for (let i = 1; i <= 10; i++) {
+            if (val["formatif" + i] !== undefined) {
+              updates[`${id}/q3_f${i}`] = val["formatif" + i];
+              updates[`${id}/formatif${i}`] = null;
+              needsMigration = true;
+            }
+          }
+          if (val["sumatif"] !== undefined) {
+            updates[`${id}/q3_sumatif`] = val["sumatif"];
+            updates[`${id}/sumatif`] = null;
+            needsMigration = true;
+          }
+
+          for (let quarter = 1; quarter <= 4; quarter++) {
+            const autoFormativeFields = getStudentAutoFormativeFields(
+              studentRecord,
+              quarter,
+            );
+            Object.entries(autoFormativeFields).forEach(([field, score]) => {
+              const currentScore = val[field];
+              const alreadySynced =
+                currentScore !== "" &&
+                currentScore !== null &&
+                currentScore !== undefined &&
+                Number(currentScore) === Number(score);
+              if (!alreadySynced) {
+                updates[`${id}/${field}`] = score;
+                studentRecord[field] = score;
+                needsMigration = true;
+              }
+            });
+            (getTeacherStudentGrade(studentRecord) === 11 && quarter === 2 ? [] : getObsoleteFormativeFields(val, quarter)).forEach((field) => {
+              updates[`${id}/${field}`] = null;
+              needsMigration = true;
+            });
+          }
+
+          if (needsMigration) madeChanges = true;
+          allSiswa.push(studentRecord);
+        });
+
+        allSiswa.sort((a, b) => a.nama.localeCompare(b.nama, "id"));
+        if (madeChanges) {
+          siswaRef.update(updates).then(() => {
+            console.log(
+              "Auto-migrasi dan sinkronisasi nilai gradebook berhasil.",
+            );
+          });
+        }
+      }
+      renderTableBody(allSiswa);
+      if(typeof G11Monitor!=="undefined")G11Monitor.render();
+      if (typeof refreshAssessmentStudentOptions === "function") {
+        refreshAssessmentStudentOptions();
+      }
+    },
+    (err) => {
+      showAlert("Gagal memuat data Firebase: " + err.message, "danger");
+    },
+  );
+}
+
+// G��G��G�� ADD SISWA G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+function addSiswa(event) {
+  event.preventDefault();
+  const nis = document.getElementById("nis").value.trim();
+  const nama = document.getElementById("nama").value.trim();
+  const kelas = document.getElementById("kelas").value.trim();
+  const pwd = document.getElementById("siswaPassword").value.trim();
+  const sumatif = document.getElementById("sumatif").value.trim();
+
+  if (!nis || !nama || !kelas || !pwd) {
+    showAlert("NIS, Nama Siswa, Kelas, dan Password wajib diisi.", "warning");
+    return;
+  }
+
+  const record = {
+    nis,
+    nama,
+    kelas,
+    password: pwd,
+    createdAt: Date.now(),
+  };
+
+  record[`q${activeQuarter}_sumatif`] = sumatif !== "" ? Number(sumatif) : "";
+
+  for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
+    const el = document.getElementById("formatif" + i);
+    const v = el ? el.value.trim() : "";
+    record[`q${activeQuarter}_f${i}`] = v !== "" ? Number(v) : "";
+  }
+
+  siswaRef
+    .push(record)
+    .then(() => {
+      showAlert(
+        `Siswa <strong>${escHtml(nama)}</strong> berhasil ditambahkan.`,
+        "success",
+      );
+      document.getElementById("addForm").reset();
+    })
+    .catch((err) => showAlert("Gagal menyimpan: " + err.message, "danger"));
+}
+
+// G��G��G�� EDIT & DELETE SISWA G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+function saveSiswaRow(id) {
+  const siswa = allSiswa.find((s) => s.id === id);
+  if (!siswa) return;
+
+  const rowNisEl = document.getElementById("r-nis-" + id);
+  const rowPwdEl = document.getElementById("r-pwd-" + id);
+  const sumatifEl = document.getElementById("r-s-" + id);
+
+  const updated = {
+    nama: siswa.nama,
+    kelas: siswa.kelas,
+    password: rowPwdEl ? rowPwdEl.value.trim() : siswa.password, // Updates from table
+    nis: rowNisEl ? rowNisEl.value.trim() : siswa.nis,
+    updatedAt: Date.now(),
+  };
+
+  const autoFormativeFields = getStudentAutoFormativeFields(
+    siswa,
+    activeQuarter,
+  );
+  const sumatifField = `q${activeQuarter}_sumatif`;
+  updated[sumatifField] = Object.prototype.hasOwnProperty.call(
+    autoFormativeFields,
+    sumatifField,
+  )
+    ? autoFormativeFields[sumatifField]
+    : sumatifEl && sumatifEl.value.trim() !== ""
+      ? Number(sumatifEl.value.trim())
+      : "";
+  for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
+    const field = `q${activeQuarter}_f${i}`;
+    if (Object.prototype.hasOwnProperty.call(autoFormativeFields, field)) {
+      updated[field] = autoFormativeFields[field];
+      continue;
+    }
+    const el = document.getElementById("r-f" + i + "-" + id);
+    const v = el ? el.value.trim() : "";
+    updated[field] = v !== "" ? Number(v) : "";
+  }
+
+  (getTeacherStudentGrade(siswa)===8 ? G8CloudIdentity.updateTeacherStudent(siswa,updated) : getTeacherStudentGrade(siswa)===11 ? G11CloudIdentity.updateTeacherStudent(siswa,updated) : siswaRef.child(id).update(updated))
+    .then(() =>
+      showAlert(
+        `Data <strong>${escHtml(siswa.nama)}</strong> berhasil diperbarui.`,
+        "success",
+      ),
+    )
+    .catch((err) => showAlert("Gagal menyimpan: " + err.message, "danger"));
+}
+
+function deleteSiswa(id, nama) {
+  if (!confirm(`Hapus data siswa "${nama}"? Semua datanya akan hilang total.`))
+    return;
+  siswaRef
+    .child(id)
+    .remove()
+    .then(() =>
+      showAlert(`Siswa <strong>${escHtml(nama)}</strong> dihapus.`, "success"),
+    )
+    .catch((err) => showAlert("Gagal menghapus: " + err.message, "danger"));
+}
+
+// G��G��G�� RENDER TABLE BODY (CRUD) G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+const TH_CYAN =
+  "px-4 py-4 text-center text-cyan-500/80 text-[10px] uppercase tracking-widest font-bold whitespace-nowrap";
+const TH_INDIGO =
+  "px-4 py-4 text-center text-indigo-400/80 text-[10px] uppercase tracking-widest font-bold whitespace-nowrap";
+const TH =
+  "px-4 py-4 text-center text-slate-400 text-[10px] uppercase tracking-widest font-bold whitespace-nowrap";
+const TH_LEFT =
+  "px-4 py-4 text-left text-slate-400 text-[10px] uppercase tracking-widest font-bold whitespace-nowrap";
+
+function renderTableHead() {
+  let fCols = "";
+  for (let i = 1; i <= numFormatif[activeQuarter]; i++)
+    fCols += `<th class="${TH_CYAN}">Q${activeQuarter} - F${i}</th>`;
+
+  const thead = document.getElementById("tableHead");
+  if (!thead) return;
+  thead.innerHTML = `
+    <tr>
+      <th class="${TH}" style="width:40px">No</th>
+      <th class="${TH_LEFT}" style="width:120px">NIS</th>
+      <th class="${TH_LEFT}">Nama Siswa</th>
+      <th class="${TH}">Kelas</th>
+      <th class="${TH}">Password / Akun</th>
+      ${fCols}
+      <th class="${TH_INDIGO}">Sumatif / Nilai akhir Q${activeQuarter}</th>
+      <th class="${TH}">Status (Q${activeQuarter})</th>
+      <th class="${TH}" style="width:100px">Aksi</th>
+    </tr>`;
+}
+
+function highlightScore(el, kkm) {
+  const v = el.value.trim();
+  el.className =
+    v !== "" && Number(v) < kkm ? "table-input input-remedial" : "table-input";
+}
+
+function filterTable() {
+  renderTableBody(allSiswa);
+}
+
+function renderTableBody(data) {
+  const tbody = document.getElementById("tableBody");
+  if (!tbody) return;
+
+  // Filter Kelas Dropdown
+  const selFilter = document.getElementById("filterKelas");
+  const currentKelas = selFilter?.value || "";
+  if (selFilter) {
+    const listKelas = [...new Set((data || []).map((s) => s.kelas))].sort(
+      (a, b) => {
+        const na = parseInt(a.match(/\d+/)?.[0] || 0);
+        const nb = parseInt(b.match(/\d+/)?.[0] || 0);
+        return na !== nb ? na - nb : a.localeCompare(b);
+      },
+    );
+    selFilter.innerHTML =
+      `<option value="">Semua Kelas</option>` +
+      listKelas
+        .map(
+          (k) =>
+            `<option value="${escHtml(k)}"${k === currentKelas ? " selected" : ""}>${escHtml(k)}</option>`,
+        )
+        .join("");
+  }
+
+  // Search Text
+  const searchVal = (
+    document.getElementById("teacherSearch")?.value || ""
+  ).toLowerCase();
+
+  const filtered = data.filter((s) => {
+    const matchName = s.nama.toLowerCase().includes(searchVal);
+    const matchKelas = currentKelas ? s.kelas === currentKelas : true;
+    return matchName && matchKelas;
+  });
+
+  const shownEl = document.getElementById("shownCount");
+  const totalEl = document.getElementById("totalCount");
+  if (shownEl) shownEl.textContent = filtered.length;
+  if (totalEl) totalEl.textContent = allSiswa.length;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="20" class="text-center py-12">
+      <div class="flex flex-col items-center gap-3 text-slate-500">
+        <i class="fas fa-search text-3xl text-slate-600"></i>
+        <span class="text-sm font-mono-tech">Tidak ada data yang sesuai filter.</span>
+      </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered
+    .map((s, idx) => {
+      const kkm = getKKM(s.kelas);
+      const autoFormativeFields = getStudentAutoFormativeFields(
+        s,
+        activeQuarter,
+      );
+      const fArr = [];
+      for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
+        fArr.push(
+          s[`q${activeQuarter}_f${i}`] !== undefined
+            ? s[`q${activeQuarter}_f${i}`]
+            : "",
+        );
+      }
+
+      // Status Logic
+      const avgF = fArr.some((v) => v !== "")
+        ? fArr.reduce((a, b) => a + Number(b || 0), 0) /
+          fArr.filter((v) => v !== "").length
+        : 0;
+      const sumatifField = `q${activeQuarter}_sumatif`;
+      const isAutoSummative = Object.prototype.hasOwnProperty.call(
+        autoFormativeFields,
+        sumatifField,
+      );
+      const sumatifValue = isAutoSummative
+        ? autoFormativeFields[sumatifField]
+        : s[sumatifField];
+      const isAutoFinalScore =
+        isAutoSummative &&
+        usesOverallAssessmentAsSummative(
+          getTeacherStudentGrade(s),
+          activeQuarter,
+          s.digitalCitizenshipAssessment?.[`q${activeQuarter}`],
+        );
+      const finalScore = isAutoFinalScore
+        ? Number(sumatifValue || 0)
+        : avgF * 0.4 + Number(sumatifValue || 0) * 0.6;
+      let status = finalScore >= kkm ? "Tuntas" : "Remedial";
+      if (
+        fArr.every((v) => v === "") &&
+        (sumatifValue === "" || sumatifValue === undefined)
+      )
+        status = "Susulan";
+
+      // Build Inputs
+      let fInputs = "";
+      for (let i = 0; i < numFormatif[activeQuarter]; i++) {
+        const val = fArr[i];
+        const field = `q${activeQuarter}_f${i + 1}`;
+        const isAutoFilled = Object.prototype.hasOwnProperty.call(
+          autoFormativeFields,
+          field,
+        );
+        const num =
+          val !== "" && val !== null && val !== undefined ? Number(val) : "";
+        const cls =
+          num !== "" && num < kkm
+            ? "table-input input-remedial"
+            : "table-input";
+        fInputs += `
+        <td class="px-2 py-3" data-label="Q${activeQuarter} - F${i + 1}">
+          <input type="number" min="0" max="100" class="${cls}${isAutoFilled ? " cursor-not-allowed opacity-80" : ""}" id="r-f${i + 1}-${s.id}" value="${num}" placeholder="-" oninput="highlightScore(this,${kkm})" ${isAutoFilled ? 'readonly title="Terisi otomatis dari rubrik penilaian" aria-label="Nilai formatif otomatis dari rubrik"' : ""} />
+        </td>`;
+      }
+
+      const sumatifVal =
+        sumatifValue !== "" &&
+        sumatifValue !== null &&
+        sumatifValue !== undefined
+          ? Number(sumatifValue)
+          : "";
+      const sCls =
+        sumatifVal !== "" && sumatifVal < kkm
+          ? "table-input input-remedial"
+          : "table-input";
+      const autoSummativeLabel = isAutoFinalScore
+        ? "Nilai akhir otomatis dari kalkulasi assessment"
+        : "Nilai Sumatif otomatis dari rubrik assessment";
+
+      // NIS Editable
+      const nisEditable = `<input type="text" class="table-input" style="width:100%; text-align:left;" id="r-nis-${s.id}" value="${escHtml(s.nis || "")}" placeholder="NIS" />`;
+
+      // Password Editable & Pending Password Request
+      let passwordHTML = `<div class="flex items-center gap-2 w-full max-w-[150px]"><input type="text" class="table-input" style="text-align:left;" id="r-pwd-${s.id}" value="${escHtml(s.password || "Sph12345!")}" placeholder="Password" /></div>`;
+
+      if (s.pendingPassword) {
+        passwordHTML += `
+        <div class="mt-2 bg-indigo-500/10 border border-indigo-500/30 rounded p-1.5 flex flex-col gap-1.5 text-[10px] w-full max-w-[150px]">
+          <span class="text-indigo-300 font-bold whitespace-nowrap"><i class="fas fa-bell text-xs animate-pulse text-indigo-400 mr-1"></i> Pengajuan Reset: <br><span class="text-white font-mono-tech mt-1 inline-block">${escHtml(s.pendingPassword)}</span></span>
+          <div class="flex items-center gap-1 mt-0.5">
+            <button onclick="approveStudentPassword('${s.id}')" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/50 rounded py-0.5 transition-colors font-bold text-[9px] uppercase"><i class="fas fa-check"></i></button>
+            <button onclick="rejectStudentPassword('${s.id}')" class="flex-1 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/50 rounded py-0.5 transition-colors font-bold text-[9px] uppercase"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
+      `;
+      }
+
+      // Status Chip
+      let dotCls, chipCls, chipLabel, animateDot;
+      if (status === "Tuntas") {
+        dotCls = "bg-emerald-500";
+        chipLabel = "Tuntas";
+        animateDot = "";
+        chipCls =
+          "inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider";
+      } else if (status === "Remedial") {
+        dotCls = "bg-rose-500";
+        chipLabel = "Remedial";
+        animateDot = "animate-pulse";
+        chipCls =
+          "inline-flex items-center gap-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider";
+      } else {
+        dotCls = "bg-amber-500";
+        chipLabel = "Susulan";
+        animateDot = "animate-pulse";
+        chipCls =
+          "inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider";
+      }
+      const statusChip = `<span class="${chipCls}"><span class="w-1.5 h-1.5 rounded-full ${dotCls} flex-shrink-0 ${animateDot}"></span>${chipLabel}</span>`;
+      const grade10Progress =
+        grade10UiUxProgressByStudent[String(s.id || "")] || {};
+      const hasSummativeSubmission =
+        hasGrade10SummativeSubmission(grade10Progress);
+      const studentNameCell =
+        getTeacherStudentGrade(s) === 10
+          ? `<div class="flex flex-col items-start gap-1">
+              <button type="button" onclick="openStudentLearningProgress('${escHtml(s.id)}')" class="group/name text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-cyan-500/10 transition-colors" title="Lihat dan reset progress UI/UX">
+                <strong class="block text-slate-200 group-hover/name:text-cyan-300 transition-colors">${escHtml(s.nama)}</strong>
+                <small class="block text-[9px] text-cyan-500/70 font-mono-tech mt-0.5"><i class="fas fa-chart-line mr-1"></i>LIHAT PROGRESS</small>
+              </button>
+              <button type="button" onclick="openStudentLearningProgress('${escHtml(s.id)}', 'summative')" class="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[8px] font-bold font-mono-tech tracking-wide transition-colors ${hasSummativeSubmission ? "border-pink-400/35 bg-pink-400/10 text-pink-300 hover:bg-pink-400/20" : "border-amber-400/25 bg-amber-400/[0.07] text-amber-400/80 hover:bg-amber-400/15"}" title="Buka submission Summative Grade 10">
+                <i class="fas ${hasSummativeSubmission ? "fa-circle-check" : "fa-clock"}"></i>${hasSummativeSubmission ? "SUMMATIVE TERKIRIM" : "SUMMATIVE BELUM DIKIRIM"}
+              </button>
+            </div>`
+          : getTeacherStudentGrade(s) === 11
+            ? `<button type="button" onclick="openStudentLearningProgress('${escHtml(s.id)}')" class="group/name text-left rounded-lg px-2 py-1.5 -mx-2 hover:bg-cyan-500/10 transition-colors" title="Lihat jawaban dan screenshot F1–F3">
+                <strong class="block text-slate-200 group-hover/name:text-cyan-300 transition-colors">${escHtml(s.nama)}</strong>
+                <small class="block text-[9px] text-cyan-500/70 font-mono-tech mt-0.5">LIHAT BUKTI F1–F3</small>
+              </button>`
+            : `<span class="font-bold text-slate-200">${escHtml(s.nama)}</span>`;
+
+      return `
+      <tr id="row-${s.id}" class="hover:bg-slate-800/50 transition-colors group">
+        <td class="student-row-number px-3 py-3 text-center text-slate-500 font-mono-tech text-sm">${idx + 1}</td>
+        <td class="px-3 py-3 font-mono-tech text-sm w-[120px]" data-label="NIS">${nisEditable}</td>
+        <td class="student-row-name px-3 py-3 whitespace-nowrap" data-label="Nama siswa">${studentNameCell}</td>
+        <td class="px-3 py-3 text-center" data-label="Kelas">
+          <span class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-xs font-mono-tech text-slate-300">${escHtml(s.kelas)}</span>
+        </td>
+        <td class="px-3 py-3" data-label="Password / Akun">${passwordHTML}</td>
+        ${fInputs}
+        <td class="px-2 py-3" data-label="${isAutoFinalScore ? "Nilai akhir" : "Sumatif"} Q${activeQuarter}">
+          <input type="number" min="0" max="100" class="${sCls}${isAutoSummative ? " cursor-not-allowed opacity-80" : ""}" id="r-s-${s.id}" value="${sumatifVal}" placeholder="-" oninput="highlightScore(this,${kkm})" ${isAutoSummative ? `readonly title="${autoSummativeLabel}" aria-label="${autoSummativeLabel}"` : ""} />
+          ${isAutoFinalScore && getTeacherStudentGrade(s) === 11 && activeQuarter === 2 ? '<small class="block text-[10px] text-slate-400 mt-1">Course '+autoFormativeFields.q2_courseCompletion+' · Sumatif '+autoFormativeFields.q2_aiSummative+'</small>' : ''}
+        </td>
+        <td class="px-3 py-3 text-center" data-label="Status Q${activeQuarter}">${statusChip}</td>
+        <td class="student-row-actions px-4 py-3" data-label="Simpan / Hapus">
+          <div class="flex items-center justify-center gap-2">
+            <button title="Simpan NIS, Password & Nilai" onclick="saveSiswaRow('${s.id}')"
+              class="w-8 h-8 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-colors flex items-center justify-center">
+              <i class="fas fa-check text-xs"></i>
+            </button>
+            <button title="Hapus Siswa" onclick="deleteSiswa('${s.id}','${escHtml(s.nama)}')"
+              class="w-8 h-8 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 hover:border-rose-500/50 transition-colors flex items-center justify-center">
+              <i class="fas fa-trash-alt text-xs"></i>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+    })
+    .join("");
+}
+
+function approveStudentPassword(id) {
+  const siswa = allSiswa.find((s) => s.id === id);
+  if (!siswa || !siswa.pendingPassword) return;
+
+  if (!confirm(`Setujui pengajuan password baru untuk ${siswa.nama}?`)) return;
+
+  (getTeacherStudentGrade(siswa)===8 ? G8CloudIdentity.updateTeacherStudent(siswa,{password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}) : getTeacherStudentGrade(siswa)===11 ? G11CloudIdentity.updateTeacherStudent(siswa,{password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}) : siswaRef.child(id).update({password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}))
+    .then(() => {
+      showAlert("Password baru berhasil disetujui", "success");
+    })
+    .catch((err) => {
+      showAlert("Gagal menyetujui password: " + err.message, "danger");
+    });
+}
+
+function rejectStudentPassword(id) {
+  const siswa = allSiswa.find((s) => s.id === id);
+  if (!siswa || !siswa.pendingPassword) return;
+
+  if (!confirm(`Tolak pengajuan password dari ${siswa.nama}?`)) return;
+
+  siswaRef
+    .child(id)
+    .update({
+      pendingPassword: null,
+      pendingPasswordAt: null,
+    })
+    .then(() => {
+      showAlert("Pengajuan password ditolak", "info");
+    })
+    .catch((err) => {
+      showAlert("Gagal menolak pengajuan: " + err.message, "danger");
+    });
+}
+
+// G��G��G�� ADMIN PANEL (SUPER ADMIN ONLY) G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+let activeAdminEmail = "";
+
+function loadAdminPanel(adminEmail) {
+  activeAdminEmail = adminEmail;
+  const adminPanelBtn = document.getElementById("adminPanelBtn");
+  if (adminPanelBtn) adminPanelBtn.style.display = ""; // Munculkan accordion admin
+  const deleteAllStudentsBtn = document.getElementById("deleteAllStudentsBtn");
+  if (deleteAllStudentsBtn) deleteAllStudentsBtn.style.display = "inline-flex";
+
+  guruRef.on(
+    "value",
+    (snap) => {
+      const allGuru = snap.val() || {};
+      const pendingGuru = Object.entries(allGuru)
+        .filter(([uid, data]) => {
+          if (!data || typeof data !== "object") return false;
+          const email = String(data.email || "");
+          const isVerifiedStrict = data.isVerified === true;
+          return !isVerifiedStrict && !isAdminEmailSafe(email);
+        })
+        .map(([uid, data]) => ({ uid, ...data }))
+        .sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+
+      renderAdminPanel(pendingGuru);
+    },
+    (err) => console.error("AdminPanel Listen Error:", err),
+  );
+}
+
+function renderAdminPanel(pendingGuru) {
+  const container = document.getElementById("adminPanelContent");
+  if (!container) return;
+
+  if (pendingGuru.length === 0) {
+    document.getElementById("adminBadgeCount").style.display = "none";
+    container.innerHTML = `
+      <div class="flex items-center gap-2 text-emerald-400 text-sm font-mono-tech p-4">
+        <i class="fas fa-check-circle"></i> System Secure. Tidak ada antrean registrasi guru.
+      </div>`;
+    return;
+  }
+
+  // Tampilkan badge jumlah antrean
+  const badge = document.getElementById("adminBadgeCount");
+  if (badge) {
+    badge.textContent = pendingGuru.length;
+    badge.style.display = "inline-flex";
+  }
+
+  container.innerHTML = pendingGuru
+    .map(
+      (guru) => `
+    <div class="flex items-center justify-between gap-3 p-4 bg-slate-900/60 border-b border-slate-700/50 hover:bg-slate-800/60 transition-colors">
+      <div class="flex-1 min-w-0">
+        <p class="font-bold text-sm text-slate-200">${escHtml(guru.email || "(email tidak tersedia)")}</p>
+        <p class="text-xs text-slate-500 font-mono-tech mt-1">
+          <i class="fas fa-clock mr-1"></i> Register: ${guru.createdAt ? new Date(guru.createdAt).toLocaleString("id-ID") : "-"}
+        </p>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button onclick="verifyGuruAccount('${escHtml(guru.uid)}')"\n          class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-colors shadow-lg shadow-emerald-900/20">\n          <i class="fas fa-check mr-1"></i>Approve\n        </button>
+        <button onclick="rejectGuruAccount('${escHtml(guru.uid)}')"\n          class="px-4 py-2 bg-slate-800 hover:bg-rose-900/50 text-rose-400 border border-slate-700 hover:border-rose-500/50 text-xs font-bold rounded-lg transition-colors">\n          <i class="fas fa-times mr-1"></i>Reject\n        </button>
+      </div>
+    </div>
+  `,
+    )
+    .join("");
+}
+
+function verifyGuruAccount(uid) {
+  if (!confirm("Approve akun guru ini?")) return;
+  guruRef
+    .child(uid)
+    .update({
+      isVerified: true,
+      verifiedAt: Date.now(),
+      verifiedBy: activeAdminEmail,
+    })
+    .then(() => showAlert("Akun guru berhasil di-approve!", "success"))
+    .catch((err) => showAlert("Gagal: " + err.message, "danger"));
+}
+
+function rejectGuruAccount(uid) {
+  if (!confirm("Tolak (Hapus) akun guru ini permanen?")) return;
+  guruRef
+    .child(uid)
+    .remove()
+    .then(() => showAlert("Akun guru ditolak dan dihapus permanen.", "info"))
+    .catch((err) => showAlert("Gagal: " + err.message, "danger"));
+}
+
+// G��G��G�� LOGOUT GURU G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��G��
+async function deleteAllStudentData() {
+  const button = document.getElementById("deleteAllStudentsBtn");
+  const currentEmail = String(auth.currentUser?.email || activeAdminEmail || "")
+    .trim()
+    .toLowerCase();
+
+  if (!auth.currentUser || !isAdminEmailSafe(currentEmail)) {
+    showAlert("Hanya Super Admin yang dapat menghapus semua data siswa.", "danger");
+    return;
+  }
+
+  const totalStudents = allSiswa.length;
+  if (totalStudents === 0) {
+    showAlert("Tidak ada data siswa yang perlu dihapus.", "info");
+    return;
+  }
+
+  const firstConfirmation = window.confirm(
+    `Anda akan menghapus ${totalStudents} siswa beserta seluruh nilai, password, dan rubriknya. Data ini tidak dapat dipulihkan. Lanjutkan?`,
+  );
+  if (!firstConfirmation) return;
+
+  const verificationPhrase = `HAPUS ${totalStudents} SISWA`;
+  const typedPhrase = window.prompt(
+    `Untuk mengonfirmasi, ketik persis:\n${verificationPhrase}`,
+    "",
+  );
+
+  if (typedPhrase !== verificationPhrase) {
+    showAlert("Frasa verifikasi tidak sesuai. Penghapusan dibatalkan.", "warning");
+    return;
+  }
+
+  const finalConfirmation = window.confirm(
+    `Konfirmasi terakhir: hapus permanen seluruh ${totalStudents} data siswa sekarang?`,
+  );
+  if (!finalConfirmation) return;
+
+  const originalHtml = button?.innerHTML || "";
+  if (button) {
+    button.disabled = true;
+    button.innerHTML =
+      '<i class="fas fa-circle-notch fa-spin"></i> Menghapus data…';
+  }
+
+  try {
+    await siswaRef.remove();
+    showAlert(
+      `${totalStudents} data siswa berhasil dihapus. Daftar siswa sekarang kosong dan siap diisi dengan data terbaru.`,
+      "success",
+    );
+  } catch (error) {
+    showAlert("Gagal menghapus semua data siswa: " + error.message, "danger");
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+  }
+}
+
+window.deleteAllStudentData = deleteAllStudentData;
+
+function logoutGuru() {
+  auth
+    .signOut()
+    .then(() => {
+      window.location.href = "index.html";
+    })
+    .catch((err) => alert("Gagal logout: " + err.message));
+}
+
+// G��G��G�� EXCEL FEATURES (EXPORT, IMPORT, TEMPLATE) G��G��G��G��G��G��G��G��G��G��G��G��
+function exportExcel() {
+  const selFilter = document.getElementById("filterKelas");
+  const currentKelas = selFilter?.value || "";
+  const searchVal = (
+    document.getElementById("teacherSearch")?.value || ""
+  ).toLowerCase();
+
+  const filteredSiswa = allSiswa.filter((s) => {
+    const matchName = s.nama.toLowerCase().includes(searchVal);
+    const matchKelas = currentKelas ? s.kelas === currentKelas : true;
+    return matchName && matchKelas;
+  });
+
+  if (filteredSiswa.length === 0)
+    return showAlert(
+      "Tidak ada data untuk diekspor sesuai filter saat ini.",
+      "warning",
+    );
+
+  const headers = ["No", "NIS", "Nama Siswa", "Kelas", "Password"];
+  for (let i = 1; i <= numFormatif[activeQuarter]; i++)
+    headers.push(`Formatif ${i}`);
+  const exportAiComponents = Number(activeQuarter) === 2 && filteredSiswa.some(s => getTeacherStudentGrade(s) === 11 && typeof dcIsAiWeightedRecord === "function" && dcIsAiWeightedRecord(s.digitalCitizenshipAssessment?.q2));
+  headers.push("Sumatif / Nilai akhir", "Status", "KKM");
+  if (exportAiComponents) headers.push("Course AI (20%)", "Sumatif AI (50%)", "Nilai akhir AI");
+
+  const rows = filteredSiswa.map((s, idx) => {
+    const row = [idx + 1, s.nis || "", s.nama, s.kelas, s.password || ""];
+    const kkm = getKKM(s.kelas);
+    const autoGradebookFields = getStudentAutoFormativeFields(
+      s,
+      activeQuarter,
+    );
+    const sumatifField = `q${activeQuarter}_sumatif`;
+    const isAutoSummative = Object.prototype.hasOwnProperty.call(
+      autoGradebookFields,
+      sumatifField,
+    );
+    const isAutoFinalScore =
+      isAutoSummative &&
+      usesOverallAssessmentAsSummative(
+        getTeacherStudentGrade(s),
+        activeQuarter,
+        s.digitalCitizenshipAssessment?.[`q${activeQuarter}`],
+      );
+
+    let fCount = 0;
+    let fSum = 0;
+    let allEmpty = true;
+    for (let i = 1; i <= numFormatif[activeQuarter]; i++) {
+      const v = s[`q${activeQuarter}_f${i}`];
+      if (v !== "" && v !== null && v !== undefined) {
+        row.push(Number(v));
+        fSum += Number(v);
+        fCount++;
+        allEmpty = false;
+      } else {
+        row.push("");
+      }
+    }
+    const sVal = isAutoSummative
+      ? autoGradebookFields[sumatifField]
+      : s[sumatifField];
+    if (sVal !== "" && sVal !== null && sVal !== undefined) {
+      row.push(Number(sVal));
+      allEmpty = false;
+    } else {
+      row.push("");
+    }
+
+    let status = "Susulan";
+    if (!allEmpty) {
+      const avgF = fCount > 0 ? fSum / fCount : 0;
+      const finalScore = isAutoFinalScore
+        ? Number(sVal || 0)
+        : avgF * 0.4 + Number(sVal || 0) * 0.6;
+      status = finalScore >= kkm ? "Tuntas" : "Remedial";
+    }
+    row.push(status);
+    row.push(kkm);
+    if (exportAiComponents) row.push(autoGradebookFields.q2_courseCompletion ?? "", autoGradebookFields.q2_aiSummative ?? "", autoGradebookFields.q2_aiFinal ?? "");
+    return row;
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  ws["!cols"] = [
+    { wch: 5 },
+    { wch: 12 },
+    { wch: 28 },
+    { wch: 12 },
+    { wch: 15 },
+    ...Array(numFormatif[activeQuarter]).fill({ wch: 10 }),
+    { wch: 10 },
+    { wch: 10 },
+    { wch: 6 },
+  ];
+  const wb = XLSX.utils.book_new();
+  const sheetName = currentKelas
+    ? `Data Q${activeQuarter} ${currentKelas}`
+    : `Data Nilai Q${activeQuarter}`;
+  XLSX.utils.book_append_sheet(wb, ws, sheetName.substring(0, 31)); // excel sheet names max 31 chars
+
+  const fileNameClass = currentKelas ? `_${currentKelas}` : "";
+  XLSX.writeFile(
+    wb,
+    `Database_Nilai_Q${activeQuarter}${fileNameClass}_` +
+      new Date().toISOString().slice(0, 10) +
+      ".xlsx",
+  );
+  showAlert(
+    `Export Excel Quarter ${activeQuarter} berhasil diunduh.`,
+    "success",
+  );
+}
+
+function downloadTemplate() {
+  const selFilter = document.getElementById("filterKelas");
+  const currentKelas = selFilter?.value || "";
+  const searchVal = (
+    document.getElementById("teacherSearch")?.value || ""
+  ).toLowerCase();
+
+  const filteredSiswa = allSiswa.filter((s) => {
+    const matchName = s.nama.toLowerCase().includes(searchVal);
+    const matchKelas = currentKelas ? s.kelas === currentKelas : true;
+    return matchName && matchKelas;
+  });
+
+  const headers = ["NIS", "Nama Siswa", "Kelas", "Password"];
+  for (let i = 1; i <= numFormatif[activeQuarter]; i++)
+    headers.push(`Formatif ${i}`);
+  headers.push("Sumatif");
+
+  let rows;
+  if (filteredSiswa.length > 0) {
+    // Pre-fill dengan daftar siswa yang sedang ditampilkan; kolom nilai dikosongkan untuk diisi
+    rows = filteredSiswa.map((s) => {
+      const row = [s.nis || "", s.nama, s.kelas, s.password || ""];
+      for (let i = 0; i < numFormatif[activeQuarter]; i++) row.push("");
+      row.push("");
+      return row;
+    });
+  } else {
+    // Fallback: tidak ada siswa terfilter, sediakan satu baris contoh
+    const example = ["12345678", "Contoh Nama", "10 RPL 1", "SandiKuat123!"];
+    for (let i = 0; i < numFormatif[activeQuarter]; i++) example.push(75);
+    example.push(85);
+    rows = [example];
+  }
+
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  ws["!cols"] = [
+    { wch: 15 },
+    { wch: 25 },
+    { wch: 12 },
+    { wch: 20 },
+    ...Array(numFormatif[activeQuarter]).fill({ wch: 10 }),
+    { wch: 10 },
+  ];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Template Import");
+
+  const fileNameClass = currentKelas ? `_${currentKelas.replace(/\s+/g, "")}` : "";
+  XLSX.writeFile(
+    wb,
+    `Template_Import_Nilai_Q${activeQuarter}${fileNameClass}.xlsx`,
+  );
+  showAlert(
+    filteredSiswa.length > 0
+      ? `Template Q${activeQuarter} berisi ${filteredSiswa.length} siswa${currentKelas ? " kelas " + currentKelas : ""} berhasil diunduh.`
+      : `Template Excel Quarter ${activeQuarter} berhasil diunduh.`,
+    "success",
+  );
+}
+
+function triggerImport() {
+  document.getElementById("importFileExcel").click();
+}
+
+function importExcel(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+
+      if (rows.length < 2) return showAlert("File Excel kosong.", "warning");
+
+      const head = rows[0].map((h) => String(h).trim().toLowerCase());
+      const iNis = head.findIndex((h) => h.includes("nis"));
+      const iNama = head.findIndex((h) => h.includes("nama"));
+      const iKelas = head.findIndex((h) => h.includes("kelas"));
+      const iPwd = head.findIndex((h) => h.includes("password"));
+      const iSumat = head.findIndex((h) => h.includes("sumatif"));
+
+      const qCols = [];
+      for (let i = 1; i <= 10; i++) {
+        qCols.push(
+          head.findIndex(
+            (h) => h.includes(`formatif ${i}`) || h.includes(`f${i}`),
+          ),
+        );
+      }
+
+      if (iNama === -1 || iKelas === -1) {
+        return showAlert(
+          "Format salah! Harus ada kolom Nama Siswa dan Kelas.",
+          "danger",
+        );
+      }
+
+      const batch = {};
+      let updated = 0;
+      let created = 0;
+
+      rows.slice(1).forEach((r) => {
+        if (!r.some((c) => c !== "")) return; // skip row kosong
+        const nis = String(r[iNis] || "").trim();
+        const nama = String(r[iNama] || "").trim();
+        const kelas = String(r[iKelas] || "").trim();
+        const pwd = iPwd >= 0 ? String(r[iPwd] || "").trim() : "";
+        if (!nama || !kelas) return;
+
+        // Cocokkan dengan siswa yang sudah ada: utamakan NIS, lalu nama+kelas
+        const existing = allSiswa.find((s) => {
+          if (nis && s.nis) return String(s.nis).trim() === nis;
+          return (
+            s.nama.trim().toLowerCase() === nama.toLowerCase() &&
+            s.kelas.trim() === kelas
+          );
+        });
+
+        // Kumpulkan nilai dari baris template
+        const scores = {};
+        if (iSumat >= 0 && r[iSumat] !== "" && r[iSumat] !== null)
+          scores[`q${activeQuarter}_sumatif`] = Number(r[iSumat]);
+        qCols.forEach((colIdx, arrIdx) => {
+          if (colIdx >= 0 && r[colIdx] !== "" && r[colIdx] !== null)
+            scores[`q${activeQuarter}_f${arrIdx + 1}`] = Number(r[colIdx]);
+        });
+
+        if (existing) {
+          // UPDATE: hanya ubah nilai siswa yang ada, jangan timpa password/nama
+          Object.keys(scores).forEach((field) => {
+            batch[`${existing.id}/${field}`] = scores[field];
+          });
+          // Isi NIS bila sebelumnya kosong
+          if (nis && !existing.nis) batch[`${existing.id}/nis`] = nis;
+          updated++;
+        } else {
+          // CREATE: siswa baru butuh password valid (min 6 karakter)
+          if (pwd.length < 6) return; // lewati: rule database menolak password pendek
+          const key = siswaRef.push().key;
+          batch[`${key}/nis`] = nis;
+          batch[`${key}/nama`] = nama;
+          batch[`${key}/kelas`] = kelas;
+          batch[`${key}/password`] = pwd;
+          batch[`${key}/createdAt`] = Date.now();
+          Object.keys(scores).forEach((field) => {
+            batch[`${key}/${field}`] = scores[field];
+          });
+          created++;
+        }
+      });
+
+      const count = updated + created;
+      if (count === 0)
+        return showAlert(
+          "Tidak ada baris valid untuk diimpor. Pastikan nama/kelas sesuai siswa terdaftar.",
+          "warning",
+        );
+
+      db.ref("siswa")
+        .update(batch)
+        .then(() => {
+          const parts = [];
+          if (updated) parts.push(`${updated} nilai diperbarui`);
+          if (created) parts.push(`${created} siswa baru`);
+          showAlert(
+            `Import sukses (Quarter ${activeQuarter}): ${parts.join(", ")}.`,
+            "success",
+          );
+        });
+    } catch (err) {
+      showAlert("Gagal membaca Excel: " + err.message, "danger");
+    } finally {
+      event.target.value = ""; // Reset file input
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}

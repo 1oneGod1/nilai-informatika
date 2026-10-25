@@ -16,7 +16,11 @@
       "**/Scripts/**",
       "**/Lib/**",
       "**/Include/**",
-      "design-qa.md"
+      "design-qa.md",
+      "**/*debug*.log",
+      "database.rules.json",
+      "scripts/**",
+      "**/*.md"
     ],
     "headers": [
       {

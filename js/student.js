@@ -184,7 +184,7 @@ function submitForgotPasswordRequest(event) {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
   btn.disabled = true;
 
-  const isCloudStudent=getStudentGrade(selectedStudentForDetail)===11;
+  const isCloudStudent=[8,11].includes(getStudentGrade(selectedStudentForDetail));
   siswaRef.child(selectedStudentForDetail.id).update(isCloudStudent
     ? {pendingPassword:newPassword,pendingPasswordAt:Date.now()}
     : {password:newPassword,pendingPassword:null,pendingPasswordAt:null})
@@ -235,7 +235,7 @@ async function verifyStudentPassword(event) {
 
   const button=event.target.querySelector('button[type="submit"]');
   if(button)button.disabled=true;
-  try {if (getStudentGrade(selectedStudentForDetail) === 11) await G11CloudIdentity.login(selectedStudentForDetail.id,inputPassword);}
+  try {if(getStudentGrade(selectedStudentForDetail)===8)await G8CloudIdentity.login(selectedStudentForDetail.id,inputPassword);if (getStudentGrade(selectedStudentForDetail) === 11) await G11CloudIdentity.login(selectedStudentForDetail.id,inputPassword);}
   catch(error){showStudentPasswordError(error.message);return;}
   finally {if(button)button.disabled=false;}
   const modal = bootstrap.Modal.getInstance(document.getElementById("studentPasswordModal"));
@@ -692,7 +692,9 @@ function submitChangePassword(event) {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
   btn.disabled = true;
 
-  (getStudentGrade(selectedStudentForDetail)===11
+  (getStudentGrade(selectedStudentForDetail)===8
+    ? G8CloudIdentity.changeOwnPassword(selectedStudentForDetail,selectedStudentForDetail.password||"Sph12345!",newPwd)
+    : getStudentGrade(selectedStudentForDetail)===11
     ? G11CloudIdentity.changeOwnPassword(selectedStudentForDetail,selectedStudentForDetail.password||"Sph12345!",newPwd)
     : siswaRef.child(selectedStudentForDetail.id).update({password:newPwd,pendingPassword:null,pendingPasswordAt:null}))
     .then(() => {
@@ -917,6 +919,7 @@ function renderStudentDetail(id) {
 }
 
 function closeStudentDetail() {
+  if(getStudentGrade(selectedStudentForDetail)===8&&typeof G8CloudIdentity!=="undefined")G8CloudIdentity.logout().catch(()=>{});
   if(getStudentGrade(selectedStudentForDetail)===11&&typeof G11CloudIdentity!=="undefined")G11CloudIdentity.logout().catch(()=>{});
   selectedStudentForDetail=null;
   const awaitingText = document.getElementById("awaitingText");
