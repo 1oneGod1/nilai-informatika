@@ -641,12 +641,12 @@
                 },
                 "screenshots": {
                   "$index": {
-                    ".validate": "($index === '0' || $index === '1') && newData.hasChildren(['name','data'])",
+                    ".validate": "($index === '0' || $index === '1') && newData.hasChildren(['name','imageId'])",
                     "name": {
                       ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 120"
                     },
-                    "data": {
-                      ".validate": "newData.isString() && newData.val().length > 23 && newData.val().length <= 320000 && newData.val().matches(/^data:image\\/jpeg;base64,[A-Za-z0-9+\\/=]+$/)"
+                    "imageId": {
+                      ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/)"
                     },
                     "$other": {
                       ".validate": false
@@ -781,12 +781,12 @@
                 },
                 "screenshots": {
                   "$index": {
-                    ".validate": "($index === '0' || $index === '1') && newData.hasChildren(['name','data'])",
+                    ".validate": "($index === '0' || $index === '1') && newData.hasChildren(['name','imageId'])",
                     "name": {
                       ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 120"
                     },
-                    "data": {
-                      ".validate": "newData.isString() && newData.val().length > 23 && newData.val().length <= 320000 && newData.val().matches(/^data:image\\/jpeg;base64,[A-Za-z0-9+\\/=]+$/)"
+                    "imageId": {
+                      ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/)"
                     },
                     "$other": {
                       ".validate": false
@@ -1173,12 +1173,12 @@
                 },
                 "screenshots": {
                   "$index": {
-                    ".validate": "($index === '0' || $index === '1') && newData.hasChildren(['name','data'])",
+                    ".validate": "($index === '0' || $index === '1') && newData.hasChildren(['name','imageId'])",
                     "name": {
                       ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 120"
                     },
-                    "data": {
-                      ".validate": "newData.isString() && newData.val().length > 23 && newData.val().length <= 320000 && newData.val().matches(/^data:image\\/jpeg;base64,[A-Za-z0-9+\\/=]+$/)"
+                    "imageId": {
+                      ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/)"
                     },
                     "$other": {
                       ".validate": false
@@ -2523,6 +2523,30 @@
         },
         "$other": {
           ".validate": false
+        }
+      }
+    },
+    "learningEvidenceImages": {
+      "$studentId": {
+        ".read": "(auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))) || (auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/))",
+        "$imageId": {
+          ".write": "((auth != null && ((auth.token.email === 'andi.purba@sdh.or.id' || auth.token.email === 'pandapotanandi@gmail.com') || (root.child('guru').child(auth.uid).child('isVerified').val() === true && (auth.token.email_verified === true || root.child('guru').child(auth.uid).child('emailVerified').val() === true)))) || ((auth != null && root.child('grade11AiAccounts').child($studentId).child('uid').val() === auth.uid && root.child('siswa').child($studentId).child('kelas').val().matches(/^11/)) && !data.exists() && newData.exists()))",
+          ".validate": "$imageId.matches(/^[a-f0-9]{32}$/) && newData.hasChildren(['data','lesson','createdAt','createdBy'])",
+          "data": {
+            ".validate": "newData.isString() && newData.val().length > 23 && newData.val().length <= 320000 && newData.val().matches(/^data:image\\/jpeg;base64,[A-Za-z0-9+\\/=]+$/)"
+          },
+          "lesson": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 14"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "createdBy": {
+            ".validate": "newData.isString() && newData.val().length <= 128"
+          },
+          "$other": {
+            ".validate": false
+          }
         }
       }
     }
