@@ -86,6 +86,8 @@ const LESSONS = [
     "code": "<a-scene>\n  <a-box position=\"0 1 -3\"\n         color=\"#D8EF9B\"></a-box>\n</a-scene>",
     "challenge": "Add a second object with a different color. Explain which parts of the code set the color and position of each object.",
     "evidence": "A scene with two objects, plus an explanation of the scene and one attribute.",
+    "submitEvidence": "BSD link to a scene with two objects + an explanation of the scene and one attribute.",
+    "submitExample": "Example: I added a blue a-sphere at position=\"1 1 -3\" next to a red a-box. The color attribute sets the colour, position sets the location, and a-scene holds the whole 3D world.",
     "summary": [
       "The scene contains the 3D world.",
       "Elements create objects; attributes control their properties.",
@@ -269,6 +271,8 @@ const LESSONS = [
     "code": "<a-entity position=\"0 1 -3\">\n  <a-box width=\"2\" height=\"0.2\" depth=\"1\"></a-box>\n  <a-cylinder position=\"0 -0.6 0\"\n              radius=\"0.1\" height=\"1\"></a-cylinder>\n</a-entity>",
     "challenge": "Create a tree, chair, or table from several shapes. Move the whole model by changing its parent, then explain what happened.",
     "evidence": "A combined model and a demonstration of one position or rotation change.",
+    "submitEvidence": "BSD link to a combined model + an explanation of one position or rotation change made through the parent object.",
+    "submitExample": "Example: I built a tree from an a-cylinder (trunk) and an a-sphere (leaves) inside one a-entity. When I changed the parent position from 0 0 -3 to 2 0 -3, the whole tree moved.",
     "summary": [
       "Coordinates use X Y Z order.",
       "Rotation changes orientation; position changes location.",
@@ -429,6 +433,8 @@ const LESSONS = [
     "code": "<a-sphere color=\"white\" roughness=\"0.25\"\n  wireframe=\"false\"\n  src=\"/resources/projects/materials-and-textures/ball.jpg\">\n</a-sphere>\n<a-light type=\"ambient\" intensity=\"0.5\"></a-light>",
     "challenge": "Create two atmospheres for the same scene. Change textures or lighting, then choose the version that best supports your theme.",
     "evidence": "Two screenshots and a reason for choosing one atmosphere.",
+    "submitEvidence": "BSD link showing two atmospheres (describe how versions A and B differ) + a reason for choosing one.",
+    "submitExample": "Example: Version A uses a grass texture and bright light (intensity 1). Version B uses dim blue light (intensity 0.4). I chose version B because my theme is a calm night garden.",
     "summary": [
       "Textures affect surface appearance.",
       "Lighting affects visibility and atmosphere.",
@@ -592,6 +598,8 @@ const LESSONS = [
     "code": "<a-scene renderer=\"colorManagement: true;\">\n  <a-assets>\n    <a-asset-item id=\"room\"\n      src=\"/resources/projects/importing-models/scene.gltf\">\n    </a-asset-item>\n  </a-assets>\n  <a-gltf-model src=\"#room\"></a-gltf-model>\n</a-scene>",
     "challenge": "Import a model, adjust its proportions, and record its source. Explain one problem and the checks you performed.",
     "evidence": "A visible, appropriately sized model, source information, and an explanation of a problem.",
+    "submitEvidence": "BSD link to an appropriately sized model + source information + an explanation of a problem and your checks.",
+    "submitExample": "Example: I imported a chair model (source: site name + licence). It was too big at first, so I changed scale to 0.3 0.3 0.3. When it did not appear, I checked the src address and its position.",
     "summary": [
       "Asset addresses must be accessible.",
       "scale changes size; position changes location.",
@@ -759,6 +767,8 @@ const LESSONS = [
     "code": "<!-- A simple adaptation, not the complete BSD project. -->\n<!-- Load A-Frame, then register this component before the scene. -->\n<script>\nAFRAME.registerComponent(\"ubah-warna\", {\n  init: function () {\n    const target = this.el;\n    target.addEventListener(\"click\", function () {\n      target.setAttribute(\"color\", \"green\");\n    });\n  }\n});\n</script>\n<a-scene>\n  <a-camera><a-cursor fuse=\"true\" fuse-timeout=\"1500\"></a-cursor></a-camera>\n  <a-box ubah-warna position=\"0 1.6 -3\" color=\"yellow\"></a-box>\n</a-scene>",
     "challenge": "Create an interactive target. Let a partner try without verbal instructions, then improve one part based on the test.",
     "evidence": "A working interaction, one user finding, and one improvement.",
+    "submitEvidence": "BSD link to a working interaction + one finding from your partner + one improvement.",
+    "submitExample": "Example: The box changes colour after it is gazed at for 1 second. My partner did not know the box could be gazed at, so I added a hint text and made the box bigger.",
     "summary": [
       "An interaction has a trigger and a response.",
       "Targets and instructions should be understandable.",
@@ -923,6 +933,8 @@ const LESSONS = [
     "code": "Short plan:\nTheme: ____________________\nVisitors will: ____________________\nMy own model: ____________________\nMain interaction: ____________________\nAssets and sources: ____________________",
     "challenge": "Create a sketch and a minimum-feature list. Review the scope with the teacher before building in Sandbox.",
     "evidence": "A sketch, feature list, and starter scene in Sandbox.",
+    "submitEvidence": "BSD link to the starter scene in Sandbox + a description of your sketch (theme and layout) + a minimum-feature list.",
+    "submitExample": "Example: Theme: school garden. Visitors gaze at a plant to see its name. Minimum features: 3 plants, a path, 1 gaze interaction. The starter scene in Sandbox already has the ground and the path.",
     "summary": [
       "The theme guides feature choices.",
       "A finished small scope is more useful than a large unfinished plan.",
@@ -1091,6 +1103,8 @@ const LESSONS = [
     "code": "Debugging log:\nExpected: ____________________\nActual: ____________________\nSuspected cause: ____________________\nOne change tested: ____________________\nResult: ____________________",
     "challenge": "Choose a problem in your diorama. Record a hypothesis, test one change, and explain the result to the teacher.",
     "evidence": "A diorama prototype, one debugging log, and a code explanation.",
+    "submitEvidence": "BSD link to your diorama prototype + one debugging log (hypothesis → change → result) + a code explanation.",
+    "submitExample": "Example: Problem: the door was not visible. Hypothesis: the door was inside the wall. I changed position z from -5 to -4.5 and tested again; the door appeared. The position attribute sets where an object is.",
     "summary": [
       "Describe the problem specifically.",
       "Test one change so the cause is easier to trace.",
@@ -1250,6 +1264,8 @@ const LESSONS = [
     "code": "User testing notes:\nUser task: ____________________\nObservation: ____________________\nImpact: ____________________\nChosen revision: ____________________\nResult after retesting: ____________________",
     "challenge": "Ask a partner to test your diorama. Record an important problem, fix it, and repeat the test with that partner.",
     "evidence": "A final version, before-and-after evidence, and a reason for the revision.",
+    "submitEvidence": "BSD link to the final version + a description of before and after the revision + the reason for the revision.",
+    "submitExample": "Example: My partner was confused about which objects could be gazed at. Before: no sign. After: interactive objects are yellow and have a hint text. In the retest, my partner found them straight away.",
     "summary": [
       "Testing needs a task and observation.",
       "Specific feedback is easier to act on.",
@@ -1414,6 +1430,8 @@ const LESSONS = [
     "code": "Demonstration sequence:\n1. Theme and main experience.\n2. A working feature.\n3. A code section you understand.\n4. One revision and its reason.\n5. A small modification requested by the teacher.",
     "challenge": "Prepare a short demonstration and process evidence. Practice explaining one code section without reading the tutorial.",
     "evidence": "A final diorama, documentation, individual demonstration, and teacher-set concept test.",
+    "submitEvidence": "BSD link to the final diorama + a summary of your process documentation + the code section you explain. The demonstration and concept test happen in class.",
+    "submitExample": "Example: Final diorama: a mini museum with 3 artworks and one gaze interaction. I explained the gallery’s parent a-entity, then tried the teacher’s change (light colour); the result matched my prediction.",
     "summary": [
       "A working creation also needs demonstrated understanding.",
       "Extra features do not automatically earn a higher score.",

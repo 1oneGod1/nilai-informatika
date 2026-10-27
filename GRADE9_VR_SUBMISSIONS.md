@@ -5,10 +5,12 @@ Grade 9 VR Studio (`grade9-vr/`) now sends each meeting's task to the teacher th
 ## Students
 
 1. In CS.Report, search for your name/NIS, enter your normal CS.Report password, then select **Buka VR Studio**. On first login, the student's Firebase identity is created automatically. Database rules check that the password matches the existing CS.Report password and that the student's class starts with `9`. No teacher activation is needed. If the cloud login fails, the grade page still opens. VR Studio then works locally and shows "Belum tersambung ke guru".
-2. Each meeting (1–9) shows the challenge next to a **Kirim tugas ke guru / Submit to teacher** form with three required fields:
-   - **BSD project link**: an `https://` share link.
-   - **What I built/changed**: objects, colours, positions and the challenge.
-   - **Reflection**.
+2. Each meeting (1–9) shows the challenge and **Bukti yang diminta / Evidence required** next to a **Kirim tugas ke guru / Submit to teacher** form with three required fields. The form is specific to each meeting:
+   - **BSD project link**: an `https://` share link (the only link/attachment; there are no uploads).
+   - **Jelaskan buktimu (sesuai tantangan)**: the placeholder is the meeting's own example.
+   - The meeting's own **reflection question**.
+
+   Per-meeting texts live in `grade9-vr/data.js` and `data-en.js`: `submitEvidence` (student-facing evidence request: BSD link plus a written description, with no screenshots or sketches to upload) and `submitExample` (placeholder). The original `evidence` field (teacher brief/plan) is unchanged. The teacher panel copies `submitEvidence` in `G9_VR_LESSON_EVIDENCE` (`js/grade9-vr-submissions.js`). The emulator test checks that the two copies match.
 
    The existing exit-ticket answer is sent with the draft and submission when present.
 3. Typing saves a **draft** online. **Kirim tugas ke guru** creates an immutable submission snapshot with a version number, a request ID and the server timestamp. The form shows "sudah diterima Firebase" only after Firebase confirms the write. Offline work is queued in the browser and retried. Notes that were stored only in the browser before this change migrate as drafts, and a downloadable backup is kept. An old "ditandai selesai" flag does not count as a submission.
@@ -20,7 +22,8 @@ Go to **Dashboard → Penilaian rubrik → "Kelas 9 · VR Studio · Bukti & nila
 
 - Filter by class (9A/9B/9C), by name, or by *Kiriman perlu diperiksa* / *F1 belum dinilai*.
 - For each student, the panel shows the F1 submission status, submission time (WIB), version, link, evidence, reflection and exit ticket. Any newer unsubmitted draft is shown separately.
-- Feedback (seen / needs_revision / accepted) is tied to the submission version. Sending feedback does not change any grade.
+- **Lihat bukti pertemuan** switches the evidence view to any meeting 1–9. It shows that meeting's required evidence and the student's answers. The F1 calculator always uses meeting 1.
+- Feedback (seen / needs_revision / accepted) is sent for the meeting being viewed and is tied to that submission version. Sending feedback does not change any grade.
 - **F1 grade**: F1 is meeting 1, BSD "Set up A-Frame" plus the challenge.
   - Due: Tuesday 20 Oct 2026, end of day WIB.
   - Suggested score: `base − 5 × daysLate`. Final rule: `max(KKM, base − 5 × daysLate)`; the grade 9 KKM (`settings/kkm/9`, currently 74) is always the floor, also when the teacher lowers the base for quality.

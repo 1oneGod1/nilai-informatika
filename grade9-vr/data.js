@@ -86,6 +86,8 @@ const LESSONS = [
     "code": "<a-scene>\n  <a-box position=\"0 1 -3\"\n         color=\"#D8EF9B\"></a-box>\n</a-scene>",
     "challenge": "Tambahkan objek kedua dengan warna berbeda. Jelaskan bagian kode yang menentukan warna dan posisi masing-masing objek.",
     "evidence": "Scene berisi dua objek + penjelasan fungsi scene dan satu atribut.",
+    "submitEvidence": "Tautan BSD scene berisi dua objek + penjelasan fungsi scene dan satu atribut.",
+    "submitExample": "Contoh: Saya menambah a-sphere biru di position=\"1 1 -3\" di samping a-box merah. Atribut color mengatur warna, position mengatur letak, dan a-scene menjadi wadah seluruh dunia 3D.",
     "summary": [
       "Scene adalah wadah dunia 3D.",
       "Objek dibuat dari elemen; sifatnya diatur melalui atribut.",
@@ -269,6 +271,8 @@ const LESSONS = [
     "code": "<a-entity position=\"0 1 -3\">\n  <a-box width=\"2\" height=\"0.2\" depth=\"1\"></a-box>\n  <a-cylinder position=\"0 -0.6 0\"\n              radius=\"0.1\" height=\"1\"></a-cylinder>\n</a-entity>",
     "challenge": "Buat pohon, kursi, atau meja dari beberapa bentuk. Pindahkan seluruh model dengan mengubah objek induk, lalu jelaskan perubahan yang terjadi.",
     "evidence": "Objek gabungan + demonstrasi satu perubahan posisi atau rotasi.",
+    "submitEvidence": "Tautan BSD objek gabungan + penjelasan satu perubahan posisi atau rotasi melalui objek induk.",
+    "submitExample": "Contoh: Saya membuat pohon dari a-cylinder (batang) dan a-sphere (daun) di dalam satu a-entity. Saat position induk saya ubah dari 0 0 -3 ke 2 0 -3, seluruh pohon ikut berpindah.",
     "summary": [
       "Urutan koordinat adalah X Y Z.",
       "Rotasi mengubah orientasi; posisi mengubah lokasi.",
@@ -429,6 +433,8 @@ const LESSONS = [
     "code": "<a-sphere color=\"white\" roughness=\"0.25\"\n  wireframe=\"false\"\n  src=\"/resources/projects/materials-and-textures/ball.jpg\">\n</a-sphere>\n<a-light type=\"ambient\" intensity=\"0.5\"></a-light>",
     "challenge": "Buat dua suasana untuk scene yang sama. Ubah tekstur atau pencahayaan, lalu pilih versi yang paling sesuai dengan temamu.",
     "evidence": "Dua tangkapan layar + alasan memilih salah satu suasana.",
+    "submitEvidence": "Tautan BSD yang menampilkan dua suasana (jelaskan perbedaan versi A dan B) + alasan memilih salah satu.",
+    "submitExample": "Contoh: Versi A memakai tekstur rumput dan cahaya terang (intensity 1). Versi B memakai cahaya biru redup (intensity 0.4). Saya memilih versi B karena tema saya taman malam yang tenang.",
     "summary": [
       "Tekstur memengaruhi tampilan permukaan.",
       "Pencahayaan memengaruhi keterlihatan dan suasana.",
@@ -592,6 +598,8 @@ const LESSONS = [
     "code": "<a-scene renderer=\"colorManagement: true;\">\n  <a-assets>\n    <a-asset-item id=\"room\"\n      src=\"/resources/projects/importing-models/scene.gltf\">\n    </a-asset-item>\n  </a-assets>\n  <a-gltf-model src=\"#room\"></a-gltf-model>\n</a-scene>",
     "challenge": "Masukkan satu model, sesuaikan agar proporsinya masuk akal, lalu tambahkan catatan sumbernya. Jelaskan satu masalah yang muncul dan pemeriksaan yang kamu lakukan.",
     "evidence": "Model tampil dengan ukuran sesuai + catatan sumber + penjelasan kendala.",
+    "submitEvidence": "Tautan BSD model dengan ukuran yang sesuai + catatan sumber + penjelasan kendala dan pemeriksaannya.",
+    "submitExample": "Contoh: Saya mengimpor model kursi (sumber: nama situs + lisensi). Awalnya terlalu besar, jadi scale saya ubah ke 0.3 0.3 0.3. Model sempat tidak tampil; saya memeriksa alamat src dan posisinya.",
     "summary": [
       "Alamat aset perlu bisa diakses.",
       "scale mengubah ukuran; position mengubah lokasi.",
@@ -759,6 +767,8 @@ const LESSONS = [
     "code": "<!-- Contoh adaptasi sederhana; bukan seluruh proyek BSD. -->\n<!-- Muat library A-Frame, daftarkan komponen berikut sebelum scene. -->\n<script>\nAFRAME.registerComponent(\"ubah-warna\", {\n  init: function () {\n    const target = this.el;\n    target.addEventListener(\"click\", function () {\n      target.setAttribute(\"color\", \"green\");\n    });\n  }\n});\n</script>\n<a-scene>\n  <a-camera><a-cursor fuse=\"true\" fuse-timeout=\"1500\"></a-cursor></a-camera>\n  <a-box ubah-warna position=\"0 1.6 -3\" color=\"yellow\"></a-box>\n</a-scene>",
     "challenge": "Buat satu target interaktif. Minta teman mencoba tanpa penjelasan lisan, kemudian perbaiki satu bagian berdasarkan hasil pengujian.",
     "evidence": "Interaksi yang berjalan + satu temuan pengguna + satu perbaikan.",
+    "submitEvidence": "Tautan BSD interaksi yang berjalan + satu temuan dari teman + satu perbaikan.",
+    "submitExample": "Contoh: Kotak berubah warna setelah ditatap 1 detik. Teman saya tidak tahu kotak itu bisa ditatap, jadi saya menambah teks petunjuk dan memperbesar kotaknya.",
     "summary": [
       "Interaksi memiliki pemicu dan respons.",
       "Target serta petunjuk harus mudah dipahami.",
@@ -923,6 +933,8 @@ const LESSONS = [
     "code": "Rencana singkat:\nTema: ____________________\nPengunjung akan: ____________________\nObjek buatan sendiri: ____________________\nInteraksi utama: ____________________\nAset dan sumber: ____________________",
     "challenge": "Buat sketsa dan daftar fitur minimum. Periksa cakupannya bersama guru sebelum mulai membangun di Sandbox.",
     "evidence": "Sketsa + daftar fitur + scene awal di Sandbox.",
+    "submitEvidence": "Tautan BSD scene awal di Sandbox + uraian sketsamu (tema dan tata letak) + daftar fitur minimum.",
+    "submitExample": "Contoh: Tema: kebun sekolah. Pengunjung menatap tanaman untuk melihat namanya. Fitur minimum: 3 tanaman, jalan setapak, 1 interaksi gaze. Scene awal di Sandbox sudah berisi tanah dan jalan.",
     "summary": [
       "Tema membantu memilih fitur.",
       "Cakupan kecil yang selesai lebih berguna daripada rancangan besar yang belum berfungsi.",
@@ -1091,6 +1103,8 @@ const LESSONS = [
     "code": "Catatan debugging:\nHarapan: ____________________\nYang terjadi: ____________________\nDugaan penyebab: ____________________\nSatu perubahan yang diuji: ____________________\nHasil: ____________________",
     "challenge": "Pilih satu masalah dalam diorama. Catat dugaan, uji satu perubahan, dan jelaskan hasilnya kepada guru.",
     "evidence": "Prototipe diorama + satu catatan debugging + penjelasan kode.",
+    "submitEvidence": "Tautan BSD prototipe diorama + satu catatan debugging (dugaan → perubahan → hasil) + penjelasan kode.",
+    "submitExample": "Contoh: Masalah: pintu tidak terlihat. Dugaan: pintu berada di dalam dinding. Saya mengubah position z dari -5 ke -4.5 lalu menguji ulang; pintu terlihat. Atribut position menentukan letak objek.",
     "summary": [
       "Masalah perlu dijelaskan secara spesifik.",
       "Uji satu perubahan agar penyebab lebih mudah ditelusuri.",
@@ -1250,6 +1264,8 @@ const LESSONS = [
     "code": "Catatan pengujian:\nTugas pengguna: ____________________\nYang diamati: ____________________\nDampaknya: ____________________\nRevisi yang dipilih: ____________________\nHasil setelah diuji ulang: ____________________",
     "challenge": "Minta teman menguji dioramamu. Catat satu masalah penting, perbaiki, lalu uji ulang bersama teman tersebut.",
     "evidence": "Versi final + satu bukti sebelum-sesudah + alasan revisi.",
+    "submitEvidence": "Tautan BSD versi final + uraian keadaan sebelum dan sesudah revisi + alasan revisi.",
+    "submitExample": "Contoh: Teman saya bingung objek mana yang bisa ditatap. Sebelum: tidak ada tanda. Sesudah: objek interaktif berwarna kuning dan diberi teks petunjuk. Saat diuji ulang, teman langsung menemukannya.",
     "summary": [
       "Pengujian memerlukan tugas dan pengamatan.",
       "Umpan balik spesifik lebih mudah ditindaklanjuti.",
@@ -1414,6 +1430,8 @@ const LESSONS = [
     "code": "Urutan demonstrasi:\n1. Tema dan pengalaman utama.\n2. Fitur yang berfungsi.\n3. Bagian kode yang kamu pahami.\n4. Satu revisi dan alasannya.\n5. Modifikasi kecil sesuai arahan guru.",
     "challenge": "Siapkan demonstrasi singkat dan bukti proses. Berlatih menjelaskan satu bagian kode tanpa membaca tutorial.",
     "evidence": "Diorama final + dokumentasi + demonstrasi individual + tes konsep yang diberikan guru.",
+    "submitEvidence": "Tautan BSD diorama final + ringkasan dokumentasi proses + bagian kode yang kamu jelaskan. Demonstrasi dan tes konsep dilakukan di kelas.",
+    "submitExample": "Contoh: Diorama final: museum mini dengan 3 karya dan satu interaksi gaze. Saya menjelaskan a-entity induk galeri, lalu mencoba modifikasi dari guru (warna lampu); hasilnya sesuai prediksi.",
     "summary": [
       "Karya yang berfungsi perlu disertai pemahaman.",
       "Fitur tambahan tidak otomatis membuat nilai lebih tinggi.",

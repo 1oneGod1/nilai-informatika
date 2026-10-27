@@ -6,3 +6,5 @@
 .cloud-bar{max-width:1196px;margin:10px auto 0;display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}.cloud-bar span{flex:1;min-width:220px}.cloud-bar button{font:inherit;font-size:12px;padding:7px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer}
 .result-card input[type=url]{margin-bottom:12px}.submit-challenge{padding:12px 14px;margin:0 0 14px;border-left:4px solid var(--teal);background:var(--soft);border-radius:8px}.submit-challenge p{margin:6px 0 0}.submission-state{margin:4px 0 10px;font-weight:600}.teacher-feedback{margin-top:14px;padding:12px 14px;border:1px solid var(--teal);border-radius:10px;background:#f1f8ef}.teacher-feedback p{white-space:pre-wrap;margin:6px 0}
 @media(max-width:700px){.cloud-bar{margin:10px 16px 0}}
+.submit-evidence{padding:12px 14px;margin:0 0 14px;border-left:4px solid var(--teal);background:var(--soft);border-radius:8px}
+.submit-evidence p{margin:6px 0 0}
