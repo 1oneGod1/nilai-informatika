@@ -329,7 +329,6 @@ async function saveDcAssessment() {
       dcTeacherState.quarter,
       dcTeacherState.grade,
     );
-    if (typeof G9VrGrades !== "undefined") G9VrGrades.applyReviewed(student, dcTeacherState.quarter, gradebookFields, dcTeacherState.grade);
     const formativeGradebookFields = Object.fromEntries(
       Object.entries(gradebookFields).filter(([field]) =>
         /^q\d+_f\d+$/.test(field),
@@ -373,7 +372,7 @@ async function saveDcAssessment() {
     }
     const syncedCount = Object.keys(formativeGradebookFields).length;
     showAlert(
-      `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.${syncedCount ? (isReviewedProjectWorkspace() ? " Nilai "+Object.keys(formativeGradebookFields).map(field=>field.replace(/^q\d+_f/,"F")).join(", ")+" masuk ke buku nilai." : ` Nilai F1–F${syncedCount} otomatis masuk ke buku nilai.`) : ""}${isAiFormativeWorkspace() ? " Nilai formatif yang sudah diperiksa masuk ke F1/F2/F3." : course.reviewedFormativeOnly ? " Rubrik dan bukti tersimpan; hanya proyek yang ditandai sudah diperiksa masuk ke buku nilai." : course.gradingVersion ? (record.assessmentComplete ? " Nilai akhir AI 20–30–50 otomatis masuk ke buku nilai; skor course dan sumatif tersedia terpisah." : " Penilaian sementara tersimpan. Nilai resmi sebelumnya tetap sampai seluruh 14 komponen diperiksa.") : (syncedSummativeScore ? " Nilai Sumatif otomatis masuk ke buku nilai." : "")}`,
+      `<strong>${escHtml(course.title)}</strong> untuk ${escHtml(student.nama)} pada Q${dcTeacherState.quarter} berhasil disimpan.${syncedCount ? ((isReviewedProjectWorkspace()||(typeof G9VrRubric!=="undefined"&&G9VrRubric.isWorkspace())) ? " Nilai "+Object.keys(formativeGradebookFields).map(field=>field.replace(/^q\d+_f/,"F")).join(", ")+" masuk ke buku nilai." : ` Nilai F1–F${syncedCount} otomatis masuk ke buku nilai.`) : ""}${isAiFormativeWorkspace() ? " Nilai formatif yang sudah diperiksa masuk ke F1/F2/F3." : course.reviewedFormativeOnly ? " Rubrik dan bukti tersimpan; hanya proyek yang ditandai sudah diperiksa masuk ke buku nilai." : course.gradingVersion ? (record.assessmentComplete ? " Nilai akhir AI 20–30–50 otomatis masuk ke buku nilai; skor course dan sumatif tersedia terpisah." : " Penilaian sementara tersimpan. Nilai resmi sebelumnya tetap sampai seluruh 14 komponen diperiksa.") : (syncedSummativeScore ? " Nilai Sumatif otomatis masuk ke buku nilai." : "")}`,
       "success",
     );
   } catch (error) {
@@ -496,16 +495,18 @@ function renderDcAssessmentPanel() {
       ${course.gradingVersion && !isAiFormativeWorkspace() ? '<p class="dc-assessment-brief">Course 20% · F1–F3 30% · Sumatif 50%.</p>' : ''}
       ${course.gradingVersion ? dcAiArchiveHtml(dcTeacherState.draft) : ''}
       ${course.gradingVersion ? '<div id="g11EvidencePanel"></div>' : ''}
+      ${typeof G9VrRubric !== "undefined" && G9VrRubric.isWorkspace() && assessment.id === "vrFundamentals" ? '<div id="g9EvidencePanel"></div>' : ''}
       ${briefHtml}
       ${course.reviewedFormativeOnly ? g8EvidenceFieldHTML(assessment,assessmentDraft) : ""}
       ${starterCodeHtml}
       <div class="dc-rubric-guide"><span><i class="fas fa-check-square"></i> Centang untuk poin penuh</span><span><i class="fas fa-keyboard"></i> Isi poin untuk nilai parsial</span><span><i class="fas fa-user-pen"></i> Versi siswa dan kalimat lengkap wajib</span></div>
       <div class="dc-criteria-list">${criteriaHtml}</div>
-      ${course.gradingVersion || course.reviewedFormativeOnly ? '<label class="dc-criterion-check"><input type="checkbox" '+(dcTeacherState.draft.reviewed?.[assessment.id]===true?'checked':'')+' data-assessment="'+assessment.id+'" onchange="dcSetAssessmentReviewed(this.dataset.assessment,this.checked)" /><span>Komponen sudah diperiksa guru (nilai 0 juga harus ditandai)</span></label>' : ''}
+      ${course.gradingVersion || course.reviewedFormativeOnly || (dcTeacherState.draft.reviewed && assessment.id in dcTeacherState.draft.reviewed) ? '<label class="dc-criterion-check"><input type="checkbox" '+(dcTeacherState.draft.reviewed?.[assessment.id]===true?'checked':'')+' data-assessment="'+assessment.id+'" onchange="dcSetAssessmentReviewed(this.dataset.assessment,this.checked)" /><span>Komponen sudah diperiksa guru (nilai 0 juga harus ditandai)</span></label>' : ''}
       <label class="dc-teacher-note"><span>Catatan guru</span><textarea oninput="dcSetAssessmentNote('${assessment.id}',this.value)" placeholder="Kekuatan, hal yang perlu diperbaiki, atau tindak lanjut…">${escHtml(assessmentDraft.note || "")}</textarea></label>
     </section>`;
   if(course.gradingVersion&&typeof G11Monitor!=="undefined")G11Monitor.renderEvidence();
   if(course.reviewedFormativeOnly&&typeof G8Submissions!=="undefined")G8Submissions.render();
+  if(typeof G9VrMonitor!=="undefined")G9VrMonitor.renderEvidence();
 }
 
 function renderDcAssessmentNav(summary) {

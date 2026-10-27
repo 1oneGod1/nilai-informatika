@@ -528,6 +528,7 @@
         </div>
         </div>
         <div id="dashPanel-penilaian" class="dash-panel flex flex-col gap-6" role="tabpanel" aria-labelledby="dashTab-penilaian" data-dash-panel="penilaian">
+        <div class="flex flex-wrap gap-2 -mb-2"><a href="#g9VrMonitorPanel" class="dc-save-button" style="text-decoration:none" onclick="event.preventDefault();document.getElementById('g9VrMonitorPanel').scrollIntoView({behavior:'smooth',block:'start'})">Kelas 9 · Bukti &amp; nilai F1 ↓</a></div>
         <section
           id="dcAssessmentPanel"
           class="dc-assessment-shell glass-panel-teacher rounded-2xl"
@@ -603,7 +604,7 @@
         <section id="g9VrMonitorPanel" class="dc-assessment-shell glass-panel-teacher rounded-2xl">
           <style>#g9VrMonitorPanel .g9vr-detail input[type=number],#g9VrMonitorPanel .g9vr-detail input[type=date],#g9VrMonitorPanel .g9vr-detail input[type=text]{width:100%;color:#e2e8f0;background:#111827;border:1px solid #475569;border-radius:8px;padding:10px;color-scheme:dark}#g9VrMonitorPanel .g9vr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#g9VrMonitorPanel .g9vr-check{display:flex;align-items:center;gap:10px;margin:12px 0;font-weight:700}#g9VrMonitorPanel .g9vr-check input{width:18px;height:18px}#g9VrMonitorPanel .g9vr-calc{padding:10px;border:1px dashed #475569;border-radius:8px;color:#cbd5e1}#g9VrMonitorPanel .g9vr-save:disabled{opacity:.5;cursor:default}#g9VrMonitorPanel h5{margin:16px 0 8px;font-weight:700;color:#e2e8f0}@media(max-width:640px){#g9VrMonitorPanel .g9vr-grid{grid-template-columns:1fr}}</style>
           <h2>Kelas 9 · VR Studio · Bukti &amp; nilai F1</h2>
-          <p>F1 = VR Studio pertemuan 1 (BSD “Set up A-Frame” + tantangan). Batas Selasa 20 Oktober 2026 (WIB); terlambat −5/hari, tidak di bawah KKM. Bisa dinilai dari kiriman siswa atau tanggal selesai BSD yang diisi manual. Hanya simpanan yang ditandai “sudah diperiksa” yang mengubah Q2 F1.</p>
+          <p>F1 = VR Studio pertemuan 1 (BSD “Set up A-Frame” + tantangan). Batas Selasa 20 Oktober 2026 (WIB); terlambat −5/hari, tidak di bawah KKM. Klik <b>Nilai F1 di rubrik</b> untuk membuka siswa di rubrik di atas (komponen 01 A-Frame Fundamentals): lihat bukti, isi tanggal selesai BSD bila belum ada kiriman, tekan <b>Terapkan ke rubrik</b>, lalu <b>Simpan penilaian</b>.</p>
           <div class="g11-monitor-controls"><label>Cari siswa<input id="g9VrMonitorSearch" type="search" placeholder="Nama siswa"></label><label>Kelas<select id="g9VrMonitorClass"><option value="">Semua kelas 9</option></select></label><label>Tampilkan<select id="g9VrMonitorFilter"><option value="all">Semua siswa</option><option value="pending">Kiriman perlu diperiksa</option><option value="ungraded">F1 belum dinilai</option></select></label></div>
           <div id="g9VrMonitorList" aria-live="polite">Memuat progres Firebase…</div>
         </section>
@@ -932,11 +933,11 @@
     <script src="js/grade8-game-assessment.dfbf30baa6b7.js"></script>
     <script src="js/grade8-submissions.866b0f2484cc.js"></script>
     <script src="js/grade9-cloud-identity.5636913a8844.js"></script>
-    <script src="js/grade9-vr-submissions.9ee1b20d511c.js"></script>
+    <script src="js/grade9-vr-submissions.da37f2aa4c1e.js"></script>
     <!-- teacher.js contains only the logic needed for the dashboard page (auth check, CRUD, admins) -->
-    <script src="js/teacher.33f73354543b.js"></script>
+    <script src="js/teacher.e075f647d34e.js"></script>
     <script src="js/grade11-ai-monitor.50f0afa2516b.js"></script>
-    <script src="js/teacher-assessment.bcabb4a6ffb9.js"></script>
+    <script src="js/teacher-assessment.ae58ca0bd9af.js"></script>
     <script src="js/dashboard-tabs.8d97bb0ce0f0.js"></script>
   </body>
 </html>

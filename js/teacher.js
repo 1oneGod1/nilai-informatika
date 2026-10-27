@@ -403,11 +403,7 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
   const fields = storedRecord
     ? dcBuildGradebookFields(storedRecord, quarter, grade)
     : {};
-  // Teacher-reviewed Grade 9 VR Studio grades (e.g. Q2 F1) take precedence over
-  // rubric-derived values for the same field, so auto-sync never reverts them.
-  return typeof G9VrGrades !== "undefined"
-    ? G9VrGrades.applyReviewed(student, quarter, fields, grade)
-    : fields;
+  return fields;
 }
 
 function usesOverallAssessmentAsSummative(grade, quarter, record = null) {
