@@ -600,6 +600,13 @@
           <div class="g11-monitor-controls"><label>Cari siswa<input id="g11MonitorSearch" type="search" placeholder="Nama siswa"></label><label>Kelas<select id="g11MonitorClass"><option value="">Semua kelas 11</option></select></label><label>Tampilkan<select id="g11MonitorFilter"><option value="all">Semua siswa</option><option value="pending">Perlu diperiksa / revisi</option></select></label></div>
           <div id="g11MonitorList" aria-live="polite">Memuat progres Firebase…</div>
         </section>
+        <section id="g9VrMonitorPanel" class="dc-assessment-shell glass-panel-teacher rounded-2xl">
+          <style>#g9VrMonitorPanel .g9vr-detail input[type=number],#g9VrMonitorPanel .g9vr-detail input[type=date],#g9VrMonitorPanel .g9vr-detail input[type=text]{width:100%;color:#e2e8f0;background:#111827;border:1px solid #475569;border-radius:8px;padding:10px;color-scheme:dark}#g9VrMonitorPanel .g9vr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#g9VrMonitorPanel .g9vr-check{display:flex;align-items:center;gap:10px;margin:12px 0;font-weight:700}#g9VrMonitorPanel .g9vr-check input{width:18px;height:18px}#g9VrMonitorPanel .g9vr-calc{padding:10px;border:1px dashed #475569;border-radius:8px;color:#cbd5e1}#g9VrMonitorPanel .g9vr-save:disabled{opacity:.5;cursor:default}#g9VrMonitorPanel h5{margin:16px 0 8px;font-weight:700;color:#e2e8f0}@media(max-width:640px){#g9VrMonitorPanel .g9vr-grid{grid-template-columns:1fr}}</style>
+          <h2>Kelas 9 · VR Studio · Bukti &amp; nilai F1</h2>
+          <p>F1 = VR Studio pertemuan 1 (BSD “Set up A-Frame” + tantangan). Batas Selasa 20 Oktober 2026 (WIB); terlambat −5/hari, tidak di bawah KKM. Bisa dinilai dari kiriman siswa atau tanggal selesai BSD yang diisi manual. Hanya simpanan yang ditandai “sudah diperiksa” yang mengubah Q2 F1.</p>
+          <div class="g11-monitor-controls"><label>Cari siswa<input id="g9VrMonitorSearch" type="search" placeholder="Nama siswa"></label><label>Kelas<select id="g9VrMonitorClass"><option value="">Semua kelas 9</option></select></label><label>Tampilkan<select id="g9VrMonitorFilter"><option value="all">Semua siswa</option><option value="pending">Kiriman perlu diperiksa</option><option value="ungraded">F1 belum dinilai</option></select></label></div>
+          <div id="g9VrMonitorList" aria-live="polite">Memuat progres Firebase…</div>
+        </section>
         </div>
         <div id="dashPanel-materi" class="dash-panel flex flex-col gap-6" role="tabpanel" aria-labelledby="dashTab-materi" data-dash-panel="materi">
           <p class="text-xs text-slate-400 -mb-2">Buka materi seperti yang dilihat siswa. Mode review tidak mengubah nilai atau progres siswa.</p>
@@ -621,7 +628,7 @@
             <div class="flex-1 min-w-0">
               <p class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold uppercase mb-1.5">Kelas 9 · Review Guru</p>
               <h2 id="grade9ReviewTitle" class="text-lg font-black text-white">VR Studio: Construct a VR World</h2>
-              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">Review 9 pertemuan, simulasi, kuis latihan, dan rubrik 70–20–10. Siswa membuka materi dari halaman nilainya setelah mencari nama dan verifikasi password. Review ini tidak mengubah nilai siswa.</p>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">Review 9 pertemuan, simulasi, kuis latihan, dan rubrik 70–20–10. Siswa membuka materi dari halaman nilainya setelah verifikasi password dan mengirim tugas tiap pertemuan ke Firebase. Bukti &amp; nilai F1 ada di tab Penilaian rubrik. Review ini tidak mengubah nilai siswa.</p>
             </div>
             <button type="button" onclick="openGrade9TeacherPreview()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"><i class="fas fa-eye"></i> Review VR Studio</button>
           </div>
@@ -924,10 +931,12 @@
     <script src="js/grade11-ai-assessment.0654a2a78b16.js"></script>
     <script src="js/grade8-game-assessment.dfbf30baa6b7.js"></script>
     <script src="js/grade8-submissions.866b0f2484cc.js"></script>
+    <script src="js/grade9-cloud-identity.5636913a8844.js"></script>
+    <script src="js/grade9-vr-submissions.f90a2d0a4bae.js"></script>
     <!-- teacher.js contains only the logic needed for the dashboard page (auth check, CRUD, admins) -->
-    <script src="js/teacher.bf0634dd521e.js"></script>
+    <script src="js/teacher.33f73354543b.js"></script>
     <script src="js/grade11-ai-monitor.50f0afa2516b.js"></script>
-    <script src="js/teacher-assessment.0a3a97652b63.js"></script>
+    <script src="js/teacher-assessment.bcabb4a6ffb9.js"></script>
     <script src="js/dashboard-tabs.8d97bb0ce0f0.js"></script>
   </body>
 </html>

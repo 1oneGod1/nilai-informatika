@@ -400,9 +400,14 @@ function getStudentAutoFormativeFields(student, quarter = activeQuarter) {
 
   const storedRecord =
     student?.digitalCitizenshipAssessment?.[`q${Number(quarter)}`];
-  return storedRecord
+  const fields = storedRecord
     ? dcBuildGradebookFields(storedRecord, quarter, grade)
     : {};
+  // Teacher-reviewed Grade 9 VR Studio grades (e.g. Q2 F1) take precedence over
+  // rubric-derived values for the same field, so auto-sync never reverts them.
+  return typeof G9VrGrades !== "undefined"
+    ? G9VrGrades.applyReviewed(student, quarter, fields, grade)
+    : fields;
 }
 
 function usesOverallAssessmentAsSummative(grade, quarter, record = null) {
@@ -505,6 +510,7 @@ function listenToLearningProgressData() {
   if (learningProgressListenerAttached) return;
   learningProgressListenerAttached = true;
   if(typeof G11Monitor!=="undefined")G11Monitor.start();
+  if(typeof G9VrMonitor!=="undefined")G9VrMonitor.start();
 
   db.ref("learningProgress").on(
     "value",
@@ -512,6 +518,7 @@ function listenToLearningProgressData() {
       const data = snap.val() || {};
       if(typeof G11Monitor!=="undefined")G11Monitor.onProgress(data);
       if(typeof G8Submissions!=="undefined")G8Submissions.onProgress(data);
+      if(typeof G9VrMonitor!=="undefined")G9VrMonitor.onProgress(data);
       grade10UiUxProgressByStudent = {};
       Object.entries(data).forEach(([studentId, progress]) => {
         if (progress?.grade10UiUx) {
@@ -535,6 +542,7 @@ function listenToLearningProgressData() {
     (error) => {
       console.warn("Gagal memuat learning progress:", error);
       if(typeof G11Monitor!=="undefined")G11Monitor.onProgressError(error);
+      if(typeof G9VrMonitor!=="undefined")G9VrMonitor.onProgressError(error);
     },
   );
 }
@@ -1929,6 +1937,7 @@ function listenToSiswaData() {
       }
       renderTableBody(allSiswa);
       if(typeof G11Monitor!=="undefined")G11Monitor.render();
+      if(typeof G9VrMonitor!=="undefined")G9VrMonitor.render();
       if (typeof refreshAssessmentStudentOptions === "function") {
         refreshAssessmentStudentOptions();
       }
@@ -2022,7 +2031,7 @@ function saveSiswaRow(id) {
     updated[field] = v !== "" ? Number(v) : "";
   }
 
-  (getTeacherStudentGrade(siswa)===8 ? G8CloudIdentity.updateTeacherStudent(siswa,updated) : getTeacherStudentGrade(siswa)===11 ? G11CloudIdentity.updateTeacherStudent(siswa,updated) : siswaRef.child(id).update(updated))
+  (getTeacherStudentGrade(siswa)===8 ? G8CloudIdentity.updateTeacherStudent(siswa,updated) : getTeacherStudentGrade(siswa)===9 ? G9CloudIdentity.updateTeacherStudent(siswa,updated) : getTeacherStudentGrade(siswa)===11 ? G11CloudIdentity.updateTeacherStudent(siswa,updated) : siswaRef.child(id).update(updated))
     .then(() =>
       showAlert(
         `Data <strong>${escHtml(siswa.nama)}</strong> berhasil diperbarui.`,
@@ -2316,7 +2325,7 @@ function approveStudentPassword(id) {
 
   if (!confirm(`Setujui pengajuan password baru untuk ${siswa.nama}?`)) return;
 
-  (getTeacherStudentGrade(siswa)===8 ? G8CloudIdentity.updateTeacherStudent(siswa,{password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}) : getTeacherStudentGrade(siswa)===11 ? G11CloudIdentity.updateTeacherStudent(siswa,{password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}) : siswaRef.child(id).update({password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}))
+  (getTeacherStudentGrade(siswa)===8 ? G8CloudIdentity.updateTeacherStudent(siswa,{password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}) : getTeacherStudentGrade(siswa)===9 ? G9CloudIdentity.updateTeacherStudent(siswa,{password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}) : getTeacherStudentGrade(siswa)===11 ? G11CloudIdentity.updateTeacherStudent(siswa,{password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}) : siswaRef.child(id).update({password:siswa.pendingPassword,pendingPassword:null,pendingPasswordAt:null}))
     .then(() => {
       showAlert("Password baru berhasil disetujui", "success");
     })

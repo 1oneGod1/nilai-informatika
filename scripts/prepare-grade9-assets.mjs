@@ -14,6 +14,16 @@ for(const name of ['data','app','access','data-en','app-en','access-en']){
   assets[name.endsWith('-en')?'en':'id'][name.replace('-en','')]=filename;
   console.log(filename);
 }
+// Shared (language-neutral) Firebase submission scripts.
+assets.shared={};
+for(const [key,path,prefix] of [['identity','../js/grade9-cloud-identity.js','../js/'],['cloud','cloud.js','']]){
+  const contents=await fs.readFile(new URL(path,folder));
+  const base=path.split('/').pop().replace(/\.js$/,'');
+  const filename=base+'.'+createHash('sha256').update(contents).digest('hex').slice(0,12)+'.js';
+  await fs.writeFile(new URL(prefix+filename,folder),contents);
+  assets.shared[key]=prefix+filename;
+  console.log(prefix+filename);
+}
 const bootstrap=(await fs.readFile(new URL('language.js',folder),'utf8')).replace('__VR_ASSET_MANIFEST__',JSON.stringify(assets));
 const bootName='language.'+createHash('sha256').update(bootstrap).digest('hex').slice(0,12)+'.js';
 await fs.writeFile(new URL(bootName,folder),bootstrap);

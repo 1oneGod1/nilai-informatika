@@ -329,6 +329,7 @@ async function saveDcAssessment() {
       dcTeacherState.quarter,
       dcTeacherState.grade,
     );
+    if (typeof G9VrGrades !== "undefined") G9VrGrades.applyReviewed(student, dcTeacherState.quarter, gradebookFields, dcTeacherState.grade);
     const formativeGradebookFields = Object.fromEntries(
       Object.entries(gradebookFields).filter(([field]) =>
         /^q\d+_f\d+$/.test(field),

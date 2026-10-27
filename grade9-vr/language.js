@@ -17,7 +17,7 @@ if(vrLanguage==='en'){
   'review-banner':'Teacher review mode. Practice notes are separate from students; official grades are unchanged.',
   'footer-companion':'Classroom companion for BSD Construct a VR World.',
   'footer-schedule':'9 lessons · 2 periods per lesson · Explore, Learn & Create',
-  'footer-storage':'Progress and practice notes are saved per student on this browser. Official grades are recorded in the teacher’s gradebook.'
+  'footer-storage':'Drafts save automatically; press Submit to teacher to hand in your task. Practice quiz scores stay on this browser. Official grades are recorded in the teacher’s gradebook.'
  };
  for(const [id,html] of Object.entries(texts))document.getElementById(id).innerHTML=html;
  document.querySelector('.brand small').textContent='GRADE 9 · CODING';
@@ -55,5 +55,5 @@ document.addEventListener('vr-ready',()=>{
  }catch{}
 },{once:true});
 function loadVrLanguageScript(filename){return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=filename;script.async=false;script.onload=resolve;script.onerror=reject;document.head.append(script);});}
-async function loadVrLanguage(){const assets=VR_LANGUAGE_ASSETS[vrLanguage];await loadVrLanguageScript(assets.data);await loadVrLanguageScript(assets.access);await loadVrLanguageScript(assets.app);}
+async function loadVrLanguage(){const assets=VR_LANGUAGE_ASSETS[vrLanguage],shared=VR_LANGUAGE_ASSETS.shared||{};for(const file of [shared.identity,shared.cloud])if(file)await loadVrLanguageScript(file);await loadVrLanguageScript(assets.data);await loadVrLanguageScript(assets.access);await loadVrLanguageScript(assets.app);}
 loadVrLanguage().catch(()=>{document.getElementById('learning-app').hidden=true;document.getElementById('access-gate').hidden=false;document.getElementById('gate-copy').textContent=vrLanguage==='en'?'The materials could not be loaded. Refresh the page or return to CS.Report.':'Materi belum berhasil dimuat. Muat ulang halaman atau kembali ke CS.Report.';});
