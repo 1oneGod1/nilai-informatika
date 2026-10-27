@@ -82,7 +82,7 @@ const SEED={
   await test('7 days late → 74',()=>{assert.equal(G.compute(F1,{base:100,kkm:74,manualDate:'2026-10-27'}).suggested,74);});
   await test('5 days late → 75 (above floor)',()=>{assert.equal(G.compute(F1,{base:100,kkm:74,manualDate:'2026-10-25'}).suggested,75);});
   await test('teacher base 90, 2 days late → 80',()=>{assert.equal(G.compute(F1,{base:90,kkm:74,manualDate:'2026-10-22'}).suggested,80);});
-  await test('base below KKM is kept (penalty does not raise it)',()=>{assert.equal(G.compute(F1,{base:60,kkm:74,manualDate:'2026-10-25'}).suggested,60);assert.equal(G.compute(F1,{base:60,kkm:74,manualDate:'2026-10-19'}).suggested,60);});
+  await test('KKM is always the floor, also for a low base',()=>{assert.equal(G.compute(F1,{base:60,kkm:74,manualDate:'2026-10-25'}).suggested,74);assert.equal(G.compute(F1,{base:60,kkm:74,manualDate:'2026-10-19'}).suggested,74);assert.equal(G.compute(F1,{base:80,kkm:74,manualDate:'2026-10-19'}).suggested,80);});
   await test('submission timestamp uses WIB calendar day',()=>{
     // 2026-10-20 23:30 WIB = 2026-10-20 16:30Z → on time; 2026-10-21 00:30 WIB = 2026-10-20 17:30Z → 1 day late
     assert.equal(G.compute(F1,{base:100,kkm:74,submittedAt:Date.UTC(2026,9,20,16,30)}).suggested,100);

@@ -20,9 +20,9 @@ const G9VrGrades=(()=>{
   function daysLate(completedOn,dueDate){if(!validDate(completedOn)||!validDate(dueDate))return null;return Math.max(0,Math.round((Date.parse(completedOn+'T00:00:00Z')-Date.parse(dueDate+'T00:00:00Z'))/DAY));}
   const clamp=n=>Math.min(100,Math.max(0,Number(n)));
   const round2=n=>Math.round(n*100)/100;
-  /** Late penalty: base − penaltyPerDay × daysLate, never pushed below KKM by the
-   * penalty (a base the teacher already set below KKM for quality is kept). */
-  function suggestedScore({base=100,daysLate:late=0,kkm=0,penaltyPerDay=5}={}){const b=clamp(base),d=Math.max(0,Number(late)||0);if(!Number.isFinite(b))return null;if(!d)return round2(b);return round2(Math.max(Math.min(b,clamp(kkm)),b-penaltyPerDay*d));}
+  /** Teacher rule: score = max(KKM, base − penaltyPerDay × daysLate). KKM is
+   * always the floor, also when the teacher lowers the base for quality. */
+  function suggestedScore({base=100,daysLate:late=0,kkm=0,penaltyPerDay=5}={}){const b=clamp(base),d=Math.max(0,Number(late)||0);if(!Number.isFinite(b))return null;const floor=clamp(kkm)||0;return round2(Math.max(floor,b-penaltyPerDay*d));}
   /** Completion date: manual teacher date wins; otherwise the submission timestamp in WIB. */
   function completion(config,{manualDate='',submittedAt=null}={}){if(validDate(manualDate))return {completedOn:manualDate,dateSource:'manual'};if(Number.isFinite(Number(submittedAt))&&submittedAt!==null)return {completedOn:localDate(submittedAt,config.utcOffsetHours),dateSource:'submission'};return {completedOn:'',dateSource:''};}
   function compute(config,{base,kkm,manualDate,submittedAt}){const c=completion(config,{manualDate,submittedAt});const late=c.completedOn?daysLate(c.completedOn,config.dueDate):null;return {...c,daysLate:late,suggested:late===null?null:suggestedScore({base,daysLate:late,kkm,penaltyPerDay:config.penaltyPerDay})};}
