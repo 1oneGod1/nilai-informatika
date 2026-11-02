@@ -25,9 +25,9 @@ Go to **Dashboard → Penilaian rubrik → "Kelas 9 · VR Studio · Bukti & nila
 - **Lihat bukti pertemuan** switches the evidence view to any meeting 1–9. It shows that meeting's required evidence and the student's answers. The F1 calculator always uses meeting 1.
 - Feedback (seen / needs_revision / accepted) is sent for the meeting being viewed and is tied to that submission version. Sending feedback does not change any grade.
 - **F1 grade**: F1 is meeting 1, BSD "Set up A-Frame" plus the challenge.
-  - Due: Tuesday 20 Oct 2026, end of day WIB.
+  - Due: Monday 26 Oct 2026, end of day WIB. Project due dates in the submission overview (`G9_VR_LESSON_DUE`): P1 26 Oct, P2 1 Nov, P3 8 Nov 2026.
   - Suggested score: `base − 5 × daysLate`. Final rule: `max(KKM, base − 5 × daysLate)`; the grade 9 KKM (`settings/kkm/9`, currently 74) is always the floor, also when the teacher lowers the base for quality.
-  - `daysLate` is the number of calendar days in WIB between the completion date and 20 Oct (0 if the work was completed on or before that date).
+  - `daysLate` is the number of calendar days in WIB between the completion date and 26 Oct (0 if the work was completed on or before that date).
   - The completion date is the **manual completion date** if the teacher enters one (for work finished in BSD before this feature existed). Otherwise it is the date of the Firebase submission timestamp.
   - The base defaults to 100. The teacher can lower it for quality and can override the final score.
   - Tick **Sudah diperiksa guru**, then **Simpan nilai F1**. This writes only `siswa/{id}/q2_f1` and `siswa/{id}/grade9VrGrades/q2_f1`. The second path stores the score, base, completion date and source, days late, KKM, suggested score, whether the score was overridden, the evidence version, and the reviewer.

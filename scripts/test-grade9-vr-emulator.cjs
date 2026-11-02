@@ -75,20 +75,21 @@ const SEED={
 
   section='[unit] ';console.log('\nLate-penalty unit tests');
   const G=C('G9VrGrades'),F1=C('G9_VR_GRADING.q2_f1');
-  await test('config: F1 due 2026-10-20, 5/day, base 100, lesson 1',()=>{assert.equal(F1.dueDate,'2026-10-20');assert.equal(F1.penaltyPerDay,5);assert.equal(F1.baseDefault,100);assert.equal(F1.lessonId,1);assert.equal(F1.field,'q2_f1');});
-  await test('on time → 100',()=>{assert.equal(G.daysLate('2026-10-20','2026-10-20'),0);assert.equal(G.suggestedScore({base:100,daysLate:0,kkm:74}),100);assert.equal(G.compute(F1,{base:100,kkm:74,manualDate:'2026-10-14'}).suggested,100);});
-  await test('1 day late → 95',()=>{const c=G.compute(F1,{base:100,kkm:74,manualDate:'2026-10-21'});assert.equal(c.daysLate,1);assert.equal(c.suggested,95);});
-  await test('6 days late → 74 (KKM floor)',()=>{const c=G.compute(F1,{base:100,kkm:74,manualDate:'2026-10-26'});assert.equal(c.daysLate,6);assert.equal(c.suggested,74);});
-  await test('7 days late → 74',()=>{assert.equal(G.compute(F1,{base:100,kkm:74,manualDate:'2026-10-27'}).suggested,74);});
-  await test('5 days late → 75 (above floor)',()=>{assert.equal(G.compute(F1,{base:100,kkm:74,manualDate:'2026-10-25'}).suggested,75);});
-  await test('teacher base 90, 2 days late → 80',()=>{assert.equal(G.compute(F1,{base:90,kkm:74,manualDate:'2026-10-22'}).suggested,80);});
-  await test('KKM is always the floor, also for a low base',()=>{assert.equal(G.compute(F1,{base:60,kkm:74,manualDate:'2026-10-25'}).suggested,74);assert.equal(G.compute(F1,{base:60,kkm:74,manualDate:'2026-10-19'}).suggested,74);assert.equal(G.compute(F1,{base:80,kkm:74,manualDate:'2026-10-19'}).suggested,80);});
+  const F1T={...F1,dueDate:'2026-10-20'}; // arithmetic fixtures below use a 20 Oct due date
+  await test('config: F1 due 2026-10-26, 5/day, base 100, lesson 1',()=>{assert.equal(F1.dueDate,'2026-10-26');assert.equal(F1.penaltyPerDay,5);assert.equal(F1.baseDefault,100);assert.equal(F1.lessonId,1);assert.equal(F1.field,'q2_f1');});
+  await test('on time → 100',()=>{assert.equal(G.daysLate('2026-10-20','2026-10-20'),0);assert.equal(G.suggestedScore({base:100,daysLate:0,kkm:74}),100);assert.equal(G.compute(F1T,{base:100,kkm:74,manualDate:'2026-10-14'}).suggested,100);});
+  await test('1 day late → 95',()=>{const c=G.compute(F1T,{base:100,kkm:74,manualDate:'2026-10-21'});assert.equal(c.daysLate,1);assert.equal(c.suggested,95);});
+  await test('6 days late → 74 (KKM floor)',()=>{const c=G.compute(F1T,{base:100,kkm:74,manualDate:'2026-10-26'});assert.equal(c.daysLate,6);assert.equal(c.suggested,74);});
+  await test('7 days late → 74',()=>{assert.equal(G.compute(F1T,{base:100,kkm:74,manualDate:'2026-10-27'}).suggested,74);});
+  await test('5 days late → 75 (above floor)',()=>{assert.equal(G.compute(F1T,{base:100,kkm:74,manualDate:'2026-10-25'}).suggested,75);});
+  await test('teacher base 90, 2 days late → 80',()=>{assert.equal(G.compute(F1T,{base:90,kkm:74,manualDate:'2026-10-22'}).suggested,80);});
+  await test('KKM is always the floor, also for a low base',()=>{assert.equal(G.compute(F1T,{base:60,kkm:74,manualDate:'2026-10-25'}).suggested,74);assert.equal(G.compute(F1T,{base:60,kkm:74,manualDate:'2026-10-19'}).suggested,74);assert.equal(G.compute(F1T,{base:80,kkm:74,manualDate:'2026-10-19'}).suggested,80);});
   await test('submission timestamp uses WIB calendar day',()=>{
     // 2026-10-20 23:30 WIB = 2026-10-20 16:30Z → on time; 2026-10-21 00:30 WIB = 2026-10-20 17:30Z → 1 day late
-    assert.equal(G.compute(F1,{base:100,kkm:74,submittedAt:Date.UTC(2026,9,20,16,30)}).suggested,100);
-    const late=G.compute(F1,{base:100,kkm:74,submittedAt:Date.UTC(2026,9,20,17,30)});assert.equal(late.completedOn,'2026-10-21');assert.equal(late.dateSource,'submission');assert.equal(late.suggested,95);});
-  await test('manual completion date overrides submission timestamp',()=>{const c=G.compute(F1,{base:100,kkm:74,manualDate:'2026-10-18',submittedAt:Date.UTC(2026,9,25,3)});assert.equal(c.dateSource,'manual');assert.equal(c.daysLate,0);assert.equal(c.suggested,100);});
-  await test('no date → no suggestion; invalid date ignored',()=>{assert.equal(G.compute(F1,{base:100,kkm:74}).suggested,null);assert.equal(G.compute(F1,{base:100,kkm:74,manualDate:'2026-02-31'}).suggested,null);});
+    assert.equal(G.compute(F1T,{base:100,kkm:74,submittedAt:Date.UTC(2026,9,20,16,30)}).suggested,100);
+    const late=G.compute(F1T,{base:100,kkm:74,submittedAt:Date.UTC(2026,9,20,17,30)});assert.equal(late.completedOn,'2026-10-21');assert.equal(late.dateSource,'submission');assert.equal(late.suggested,95);});
+  await test('manual completion date overrides submission timestamp',()=>{const c=G.compute(F1T,{base:100,kkm:74,manualDate:'2026-10-18',submittedAt:Date.UTC(2026,9,25,3)});assert.equal(c.dateSource,'manual');assert.equal(c.daysLate,0);assert.equal(c.suggested,100);});
+  await test('no date → no suggestion; invalid date ignored',()=>{assert.equal(G.compute(F1T,{base:100,kkm:74}).suggested,null);assert.equal(G.compute(F1T,{base:100,kkm:74,manualDate:'2026-02-31'}).suggested,null);});
   await test('F1 criteria distribution sums exactly and respects maxima',()=>{const crit=C(`dcGetCourseConfig(2,9).assessments.find(a=>a.id==='vrFundamentals').criteria`);assert.equal(crit.reduce((n,c)=>n+c.max,0),100);
     for(const score of [100,95,74,73.5,0,81]){const v=G.distribute(score,crit);const sum=Math.round(Object.values(v).reduce((n,x)=>n+x,0)*100)/100;assert.equal(sum,score,'sum '+score);for(const c of crit)assert.ok(v[c.id]>=0&&v[c.id]<=c.max,c.id+' within max');}});
   await test('grade 9 Q2 rubric writes only reviewed components',()=>{const r=JSON.parse(C(`(()=>{const c=dcGetCourseConfig(2,9);const mk=rev=>{const d=dcCreateEmptyDraft(2,9);for(const a of c.assessments)for(const k of a.criteria)d.rubricScores[a.id].criteria[k.id]=k.max;for(const id of rev)d.reviewed[id]=true;return dcBuildGradebookFields(dcBuildStoredRecord(d,2,'t',9),2,9);};return JSON.stringify({none:mk([]),f1:mk(['vrFundamentals']),f12:mk(['vrFundamentals','modelsAnimation']),sum1:mk(['vrDiorama']),all:mk(c.assessments.map(a=>a.id)),course:c.id});})()`));

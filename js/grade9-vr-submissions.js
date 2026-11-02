@@ -9,10 +9,13 @@
 const G9_VR_GRADING=Object.freeze({
   q2_f1:Object.freeze({key:'q2_f1',label:'F1',field:'q2_f1',quarter:2,lessonId:1,assessmentId:'vrFundamentals',
     title:'VR Studio pertemuan 1 · BSD “Set up A-Frame” + tantangan',
-    dueDate:'2026-10-20',          // inclusive, end of day Asia/Jakarta (UTC+7)
+    dueDate:'2026-10-26',          // inclusive, end of day Asia/Jakarta (UTC+7)
     penaltyPerDay:5,baseDefault:100,utcOffsetHours:7}),
   // Add F2/F3 later, e.g. q2_f2:{key:'q2_f2',field:'q2_f2',quarter:2,lessonId:…,assessmentId:'modelsAnimation',dueDate:'YYYY-MM-DD',penaltyPerDay:5,baseDefault:100,utcOffsetHours:7}
 });
+/* Teacher due dates per VR Studio project (meeting); inclusive, end of day WIB.
+ * Used for the "Terlambat" badge in the submission overview. F1 grading uses G9_VR_GRADING. */
+const G9_VR_LESSON_DUE=Object.freeze({1:'2026-10-26',2:'2026-11-01',3:'2026-11-08'});
 const G9_VR_COURSE_ID='codeYourOwnWorldVr';
 const G9_VR_FORMATIVE=Object.freeze([['vrFundamentals','q2_f1'],['modelsAnimation','q2_f2'],['interactiveVr','q2_f3']]);
 const G9_VR_SUMMATIVE=Object.freeze(['vrDiorama','vrWalkthrough']);
@@ -94,6 +97,7 @@ const G9VrMonitor=(()=>{
   const wibParts=ms=>{const n=Number(ms);if(!Number.isFinite(n)||ms===null)return null;const d=new Date(n);return {date:d.toLocaleDateString('id-ID',{timeZone:'Asia/Jakarta',weekday:'short',day:'numeric',month:'short',year:'numeric'}),time:d.toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit'})+' WIB'};};
   /** Status of one meeting for one student: submitted snapshot, online draft, or nothing. */
   function lessonState(id,n){const row=lessonRow(id,n),sub=row?.submission||null;return {row,sub,kind:sub?'submitted':row?'draft':'none',review:progress[id]?.teacher?.reviews?.[n]||null};}
+  const dueText=d=>G9VrGrades.validDate(d)?new Date(d+'T12:00:00+07:00').toLocaleDateString('id-ID',{timeZone:'Asia/Jakarta',weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
   const REVIEW_LABEL={seen:'Sudah dilihat',needs_revision:'Perlu revisi',accepted:'Diterima'};
   const safeUrl=v=>{try{const u=new URL(String(v||'').trim());return u.protocol==='https:'?u.href:'';}catch{return '';}};
   const kkmFor=s=>typeof getKKM==='function'?getKKM(s?.kelas):74;
@@ -118,7 +122,7 @@ const G9VrMonitor=(()=>{
     const s=students().find(x=>x.id===dcTeacherState.studentId);if(!s){target.innerHTML='';return;}
     const n=viewId(s.id),f1sub=lesson(s.id)?.submission,row=lessonRow(s.id,n),sub=row?.submission,review=progress[s.id]?.teacher?.reviews?.[n],f=form(s),c=calc(s),kkm=kkmFor(s),fb=(f.feedback&&f.feedback.lesson===n?f.feedback:null)||review||{},meta=dcTeacherState.draft?.f1Late;
     const stale=f1sub&&meta&&dcTeacherState.draft?.reviewed?.[config.assessmentId]===true&&Number(meta.sourceVersion||0)<Number(f1sub.version);
-    target.innerHTML=STYLE+'<div class="g11-evidence"><h4>Bukti & keterlambatan F1 · '+esc(s.nama)+'</h4><p class="g11-evidence-caption">'+esc(config.title)+'. Batas Selasa, 20 Oktober 2026 (akhir hari WIB). Terlambat −'+config.penaltyPerDay+'/hari, nilai minimal KKM '+esc(kkm)+'.</p>'+
+    target.innerHTML=STYLE+'<div class="g11-evidence"><h4>Bukti & keterlambatan F1 · '+esc(s.nama)+'</h4><p class="g11-evidence-caption">'+esc(config.title)+'. Batas '+esc(dueText(config.dueDate))+' (akhir hari WIB). Terlambat −'+config.penaltyPerDay+'/hari, nilai minimal KKM '+esc(kkm)+'.</p>'+
       (stale?'<p class="g9vr-stale" role="alert">Siswa mengirim versi F1 baru (v'+esc(f1sub.version)+') setelah dinilai dari v'+esc(meta.sourceVersion)+'. Periksa ulang lalu simpan.</p>':'')+'<label>Lihat bukti pertemuan<select class="g9vr-lesson">'+lessonOptions(s.id,n)+'</select></label>'+evidenceHTML(row,n)+
       (sub?'<label>Feedback guru<textarea maxlength="2000" class="g9vr-feedback">'+esc(fb.message||'')+'</textarea></label><label>Status feedback<select class="g9vr-feedback-status"><option value="seen">Sudah dilihat</option><option value="needs_revision" '+(fb.status==='needs_revision'?'selected':'')+'>Perlu revisi</option><option value="accepted" '+(fb.status==='accepted'?'selected':'')+'>Diterima</option></select></label>'+(review&&review.sourceVersion!==sub.version?'<small>Feedback tersimpan untuk kiriman versi '+esc(review.sourceVersion)+'.</small>':'')+'<button type="button" class="dc-save-button g9vr-feedback-save" data-version="'+esc(sub.version)+'" data-lesson="'+esc(n)+'">Kirim feedback pertemuan '+esc(n)+'</button>':'')+
       '<h5>Hitung nilai F1</h5><div class="g9vr-grid"><label>Nilai dasar (kualitas)<input type="number" min="0" max="100" step="0.5" class="g9vr-base" value="'+esc(f.base)+'"></label><label>Tanggal selesai manual (dari BSD, opsional)<input type="date" class="g9vr-date" value="'+esc(f.manualDate)+'"></label></div>'+
@@ -146,8 +150,8 @@ const G9VrMonitor=(()=>{
     dcTeacherState.studentId=id;const sel=document.getElementById('dcAssessmentStudent');if(sel)sel.value=id;dcTeacherState.selectedAssessmentId=config.assessmentId;loadDcAssessmentDraft();
     document.getElementById('dcAssessmentPanel')?.scrollIntoView({behavior:'smooth',block:'start'});}
   function stateHTML(st,s,n){
-    if(st.kind==='submitted'){const t=wibParts(st.sub.submittedAt),late=n===config.lessonId&&t?G9VrGrades.daysLate(G9VrGrades.localDate(st.sub.submittedAt,config.utcOffsetHours),config.dueDate):null;
-      return '<span class="g9vr-badge g9vr-badge-ok">Terkirim v'+esc(st.sub.version)+'</span>'+(t?'<span class="g9vr-when"><i class="fas fa-calendar-day"></i> '+esc(t.date)+'</span><span class="g9vr-when"><i class="fas fa-clock"></i> '+esc(t.time)+'</span>':'')+(late>0?'<span class="g9vr-badge g9vr-badge-late">Terlambat '+esc(late)+' hari</span>':'')+(st.review?'<span class="g9vr-badge">Feedback: '+esc(REVIEW_LABEL[st.review.status]||st.review.status)+(Number(st.review.sourceVersion)!==Number(st.sub.version)?' (v'+esc(st.review.sourceVersion)+')':'')+'</span>':'');}
+    if(st.kind==='submitted'){const t=wibParts(st.sub.submittedAt),due=G9_VR_LESSON_DUE[n],late=due&&t?G9VrGrades.daysLate(G9VrGrades.localDate(st.sub.submittedAt,config.utcOffsetHours),due):null;
+      return '<span class="g9vr-badge g9vr-badge-ok">Terkirim v'+esc(st.sub.version)+'</span>'+(t?'<span class="g9vr-when"><i class="fas fa-calendar-day"></i> '+esc(t.date)+'</span><span class="g9vr-when"><i class="fas fa-clock"></i> '+esc(t.time)+'</span>':'')+(late>0?'<span class="g9vr-badge g9vr-badge-late">Terlambat '+esc(late)+' hari</span>':late===0?'<span class="g9vr-badge g9vr-badge-ok">Tepat waktu</span>':'')+(st.review?'<span class="g9vr-badge">Feedback: '+esc(REVIEW_LABEL[st.review.status]||st.review.status)+(Number(st.review.sourceVersion)!==Number(st.sub.version)?' (v'+esc(st.review.sourceVersion)+')':'')+'</span>':'');}
     if(st.kind==='draft'){const t=wibParts(st.row.updatedAt);return '<span class="g9vr-badge g9vr-badge-draft">Draft · belum diajukan</span>'+(t?'<span class="g9vr-when">diubah '+esc(t.date)+' · '+esc(t.time)+'</span>':'');}
     return '<span class="g9vr-badge g9vr-badge-none">Belum ada kiriman</span>';}
   function matches(s,st){switch(filter){case 'submitted':return st.kind==='submitted';case 'draft':return st.kind==='draft';case 'none':return st.kind!=='submitted';case 'pending':return isPending(s);case 'ungraded':return !reviewedF1(s);default:return true;}}
@@ -156,7 +160,7 @@ const G9VrMonitor=(()=>{
     const choice=document.getElementById('g9VrMonitorClass');const classes=[...new Set(all.map(s=>String(s.kelas)))].sort();if(choice&&choice.options.length-1!==classes.length){const keep=choice.value;choice.innerHTML='<option value="">Semua kelas 9</option>'+classes.map(c=>'<option>'+esc(c)+'</option>').join('');choice.value=classes.includes(keep)?keep:'';}
     const inClass=all.filter(s=>!cls||String(s.kelas)===cls),states=new Map(inClass.map(s=>[s.id,lessonState(s.id,n)]));
     const count=k=>inClass.filter(s=>states.get(s.id).kind===k).length,info=G9_VR_LESSON_EVIDENCE[n];
-    const summary=document.getElementById('g9VrMonitorSummary');if(summary)summary.innerHTML='<b>Pertemuan '+esc(n)+' · '+esc(info?.title||'')+'</b><span class="g9vr-badge g9vr-badge-ok">Terkirim '+count('submitted')+'</span><span class="g9vr-badge g9vr-badge-draft">Draft '+count('draft')+'</span><span class="g9vr-badge g9vr-badge-none">Belum '+count('none')+'</span><small>dari '+inClass.length+' siswa'+(cls?' '+esc(cls):' kelas 9')+'</small>';
+    const summary=document.getElementById('g9VrMonitorSummary');if(summary)summary.innerHTML='<b>Pertemuan '+esc(n)+' · '+esc(info?.title||'')+'</b>'+(G9_VR_LESSON_DUE[n]?'<span class="g9vr-badge">Batas: '+esc(dueText(G9_VR_LESSON_DUE[n]))+'</span>':'')+'<span class="g9vr-badge g9vr-badge-ok">Terkirim '+count('submitted')+'</span><span class="g9vr-badge g9vr-badge-draft">Draft '+count('draft')+'</span><span class="g9vr-badge g9vr-badge-none">Belum '+count('none')+'</span><small>dari '+inClass.length+' siswa'+(cls?' '+esc(cls):' kelas 9')+'</small>';
     const time=s=>{const st=states.get(s.id);return st.kind==='submitted'?Number(st.sub.submittedAt)||0:null;};
     let list=inClass.filter(s=>String(s.nama||'').toLowerCase().includes(query)&&matches(s,states.get(s.id)));
     if(sortBy!=='name')list=[...list].sort((a,b)=>{const ta=time(a),tb=time(b);if(ta===null&&tb===null)return String(a.nama).localeCompare(String(b.nama));if(ta===null)return 1;if(tb===null)return -1;return sortBy==='newest'?tb-ta:ta-tb;});
@@ -172,4 +176,4 @@ const G9VrMonitor=(()=>{
   function start(){if(started)return;started=true;mount();render();}
   return {start,render,renderEvidence,open,applyPlan,_evidenceHTML:evidenceHTML,_setView(id,n){viewed[id]=Number(n);},_setMonitorLesson(n){monitorLesson=Number(n)||1;},_lessonState:lessonState,_setForm(id,patch){const s=students().find(x=>x.id===id);if(s)Object.assign(form(s),patch);},onProgressError(e){progressError=String(e?.message||e||'error');render();},onProgress(value){progressError='';progress={};for(const [id,row]of Object.entries(value||{}))if(row?.grade9Vr)progress[id]=row.grade9Vr;render();},_state:()=>({progress,forms})};
 })();
-if(typeof window!=='undefined')Object.assign(window,{G9_VR_LESSON_EVIDENCE,G9_VR_GRADING,G9_VR_COURSE_ID,G9VrGrades,G9VrRubric,G9VrMonitor});
+if(typeof window!=='undefined')Object.assign(window,{G9_VR_LESSON_DUE,G9_VR_LESSON_EVIDENCE,G9_VR_GRADING,G9_VR_COURSE_ID,G9VrGrades,G9VrRubric,G9VrMonitor});
