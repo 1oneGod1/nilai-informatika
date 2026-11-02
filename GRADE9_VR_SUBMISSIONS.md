@@ -85,4 +85,6 @@ Teacher rule since Nov 2026: each VR project P1–P3 is graded as F1–F3 (`G9_V
 | P3 | 3 | 03 `interactiveVr` | `q2_f3` | Sun 8 Nov 2026 |
 
 `base = 0.7 × BSD course completion % + 0.3 × challenge score (0–100)`; `score = max(KKM, base − 5 × daysLate)`.
+- Course: tick **Semua step course BSD selesai** → 100% (70 points) automatically; otherwise the teacher enters the completion % manually.
+- Challenge: scored with the project's own rubric `G9_VR_CHALLENGE_RUBRIC` (5 criteria, total 100: P1 second coloured object / layout / colour code / position code / reflection; P2 composite model / parent entity / transform via parent / explanation / reflection; P3 two moods / visible difference / A-vs-B comparison / reason / reflection). Scores are stored in `fNLate.challengeScores`.
 In the rubric workspace (Kelas 9 → Q2 → student → component 01/02/03) the evidence panel asks for course % and challenge score, then **Terapkan ke rubrik** fills that component's criteria proportionally, writes the audit note (`F2 VR: course 80% × 0.7 + challenge 90 × 0.3 = 83; …`) and marks it reviewed. Metadata is stored in `digitalCitizenshipAssessment/q2/f1Late|f2Late|f3Late` only for reviewed components. A legacy single base (records without `course`) still works.

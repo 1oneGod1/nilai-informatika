@@ -182,6 +182,15 @@ const SEED={
     const d=C(`(()=>{const d=dcCreateEmptyDraft(2,9);d.rubricScores.modelsAnimation.criteria=${JSON.stringify(plan.criteria)};d.reviewed.modelsAnimation=true;d.f2Late=${JSON.stringify(plan.meta)};d.f1Late={score:1};const rec=dcBuildStoredRecord(d,2,'t',9);return {rec,fields:dcBuildGradebookFields(rec,2,9)};})()`);
     assert.deepEqual(Object.keys(d.fields),['q2_f2']);assert.equal(d.fields.q2_f2,78);assert.equal(d.rec.f2Late.score,78);assert.equal(d.rec.f1Late,undefined,'f1Late dropped when F1 not reviewed');
     const back=C(`dcDraftFromStored(${JSON.stringify(d.rec)},2,9).f2Late.score`);assert.equal(back,78);});
+  await test('challenge rubric per project sums to 100; P1/P2/P3 match meeting challenges',()=>{const r=C('G9_VR_CHALLENGE_RUBRIC');for(const n of [1,2,3])assert.equal(r[n].reduce((a,c)=>a+c.max,0),100,'rubric '+n);});
+  await test('F3: all steps → course 100% automatically; challenge from rubric; otherwise manual % required',()=>{
+    const crit3=C(`dcGetCourseConfig(2,9).assessments.find(a=>a.id==='interactiveVr').criteria`);const rub={twoMoods:30,difference:20,compare:10,reason:10,reflection:10};
+    C(`G9VrMonitor._setForm('s9b',{allSteps:true,course:'40',challenge:'',rubric:${JSON.stringify(rub)},manualDate:'2026-11-08'},'q2_f3')`);let plan=C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit3)},'q2_f3')`);
+    assert.equal(plan.meta.course,100);assert.equal(plan.meta.allSteps,true);assert.equal(plan.meta.challenge,80);assert.deepEqual(JSON.parse(JSON.stringify(plan.meta.challengeScores)),rub);assert.equal(plan.meta.base,94);assert.equal(plan.meta.score,94);assert.match(plan.note,/^F3 VR: semua step selesai, course 100% /);
+    C(`G9VrMonitor._setForm('s9b',{allSteps:false,course:'40'},'q2_f3')`);plan=C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit3)},'q2_f3')`);assert.equal(plan.meta.base,52);assert.equal(plan.meta.score,74);
+    C(`G9VrMonitor._setForm('s9b',{allSteps:false,course:''},'q2_f3')`);assert.throws(()=>C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit3)},'q2_f3')`),/persentase course/);
+    C(`G9VrMonitor._setForm('s9b',{allSteps:true,rubric:{twoMoods:30}},'q2_f3')`);assert.throws(()=>C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit3)},'q2_f3')`),/rubrik challenge/);
+    C(`G9VrMonitor._setForm('s9b',{allSteps:true,rubric:{...${JSON.stringify(rub)},twoMoods:35}},'q2_f3')`);assert.throws(()=>C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit3)},'q2_f3')`),/rubrik challenge/,'over max rejected');});
   await test('grade metadata validation rejects bad records even for teacher',async()=>{await denied(tdb.ref('siswa/s9b/grade9VrGrades/q2_f1').set({score:120,base:100,daysLate:0,reviewed:true,reviewedAt:firebase.database.ServerValue.TIMESTAMP,reviewedBy:teacherUid}),'score>100');await denied(tdb.ref('siswa/s9b/grade9VrGrades/q2_f1').set({score:90,base:100,daysLate:0,reviewed:false,reviewedAt:firebase.database.ServerValue.TIMESTAMP,reviewedBy:teacherUid}),'unreviewed');});
 
   section='[password] ';console.log('\nPassword protections');
