@@ -222,6 +222,16 @@ function dcSetCriterionScore(assessmentId, criterionId, maximum, value, render =
   }
 }
 
+/** Give every criterion of one rubric group full points (checked) or 0 (unchecked). */
+function dcCompleteGroup(assessmentId, groupId, checked) {
+  const course = dcGetCourseConfig(dcTeacherState.quarter, dcTeacherState.grade);
+  const assessment = course?.assessments?.find((a) => a.id === assessmentId);
+  if (!assessment) return;
+  assessment.criteria.filter((c) => c.group === groupId).forEach((c) => dcSetCriterionScore(assessmentId, c.id, c.max, checked ? c.max : 0, false));
+  renderDcAssessmentPanel();
+  if (typeof updateDcSaveState === "function") updateDcSaveState();
+}
+
 function dcToggleCriterion(assessmentId, criterionId, maximum, checked) {
   dcSetCriterionScore(assessmentId, criterionId, maximum, checked ? maximum : 0);
 }
@@ -452,8 +462,7 @@ function renderDcAssessmentPanel() {
     (criterion) => assessmentDraft.criteria[criterion.id] === criterion.max,
   ).length;
 
-  const criteriaHtml = assessment.criteria
-    .map((criterion, index) => {
+  const criterionRowHtml = (criterion, index) => {
       const value = Number(assessmentDraft.criteria[criterion.id] || 0);
       const isComplete = value === criterion.max;
       return `
@@ -474,8 +483,21 @@ function renderDcAssessmentPanel() {
             <span>/ ${criterion.max}</span>
           </label>
         </div>`;
-    })
-    .join("");
+  };
+  /* Optional criterion groups (e.g. grade 9 VR: A. BSD steps 70 + B. challenge 30). A group with
+   * completeAll gets a "sudah lengkap" box that gives every criterion in it full points. */
+  const criteriaHtml = Array.isArray(assessment.groups) && assessment.groups.length
+    ? assessment.groups.map((group) => {
+        const items = assessment.criteria.map((criterion, index) => ({ criterion, index })).filter((x) => x.criterion.group === group.id);
+        const got = items.reduce((n, x) => n + Number(assessmentDraft.criteria[x.criterion.id] || 0), 0);
+        const full = items.length > 0 && items.every((x) => Number(assessmentDraft.criteria[x.criterion.id] || 0) === x.criterion.max);
+        return `<style>.dc-criteria-group{margin:.4rem 0 1rem;border:1px solid rgba(148,163,184,.18);border-radius:12px;padding:.3rem .8rem}.dc-criteria-group-head{display:flex;justify-content:space-between;align-items:center;padding:.6rem .25rem;font-size:.85rem;color:#6ee7b7;border-bottom:1px solid rgba(148,163,184,.15)}.dc-group-complete{padding:.7rem .25rem;font-weight:700;color:#fde68a;border-bottom:1px dashed rgba(148,163,184,.25)}</style><div class="dc-criteria-group" data-group="${escHtml(group.id)}">
+          <div class="dc-criteria-group-head"><b>${escHtml(group.label)}</b><span>${got} / ${group.max}</span></div>
+          ${group.completeAll ? `<label class="dc-criterion-check dc-group-complete"><input type="checkbox" ${full ? "checked" : ""} onchange="dcCompleteGroup('${assessment.id}','${group.id}',this.checked)" /><span class="dc-custom-check"><i class="fas fa-check"></i></span><span>Semua steps sudah lengkap → semua kriteria ${escHtml(group.label.replace(/^[A-Z]\.\s*/, ""))} dicentang (${group.max} poin)</span></label>` : ""}
+          ${items.map((x) => criterionRowHtml(x.criterion, x.index)).join("")}
+        </div>`;
+      }).join("")
+    : assessment.criteria.map(criterionRowHtml).join("");
   const briefHtml = assessment.brief
     ? `<div class="dc-assessment-brief"><span><i class="fas fa-clipboard-list"></i> Ketentuan tugas</span><p>${escHtml(assessment.brief)}</p></div>`
     : "";
@@ -586,3 +608,4 @@ window.saveDcAssessment = saveDcAssessment;
 
 function dcSetAssessmentReviewed(id,checked){if(dcTeacherState.saving)return;if(!dcTeacherState.draft.reviewed||!(id in dcTeacherState.draft.reviewed))return;dcTeacherState.draft.reviewed[id]=checked===true;if(checked===true&&isAiFormativeWorkspace()&&typeof G11Monitor!=="undefined"){dcTeacherState.draft.evidenceVersions??={};dcTeacherState.draft.evidenceVersions[id]=G11Monitor.version(dcTeacherState.studentId,id);}if(checked===true&&getCurrentDcCourse()?.reviewedFormativeOnly&&typeof G8Submissions!=="undefined"){dcTeacherState.draft.evidenceVersions??={};dcTeacherState.draft.evidenceSnapshots??={};dcTeacherState.draft.evidenceVersions[id]=G8Submissions.version(dcTeacherState.studentId,id);dcTeacherState.draft.evidenceSnapshots[id]=G8Submissions.snapshot(dcTeacherState.studentId,id);}dcTeacherState.dirty=true;renderDcAssessmentPanel();}
 window.dcSetAssessmentReviewed=dcSetAssessmentReviewed;
+if (typeof window !== "undefined") window.dcCompleteGroup = dcCompleteGroup;

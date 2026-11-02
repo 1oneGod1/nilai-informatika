@@ -74,9 +74,9 @@ The emulators need Java 11+. `firebase.json` contains an `emulators` block (auth
 2. Deploy the database rules **first**: `firebase deploy --only database --project nilai-informatika`. Without the new rules, grade 9 enrollment fails and VR Studio stays local-only.
 3. Merge to `main`. Render auto-deploys. Then run `firebase deploy --only hosting --project nilai-informatika`.
 
-## Project grades F1–F3 (70/30)
+## Project grades F1–F3 (rubric: steps 70 + challenge 30)
 
-Teacher rule since Nov 2026: each VR project P1–P3 is graded as F1–F3 (`G9_VR_GRADING` in `js/grade9-vr-submissions.js`):
+Teacher rule since Nov 2026: each VR project P1–P3 is graded as F1–F3 in the main rubric workspace (Kelas 9 → Q2 → student → component 01/02/03):
 
 | Project | Meeting | Rubric component | Field | Due (end of day WIB) |
 | --- | --- | --- | --- | --- |
@@ -84,7 +84,8 @@ Teacher rule since Nov 2026: each VR project P1–P3 is graded as F1–F3 (`G9_V
 | P2 | 2 | 02 `modelsAnimation` | `q2_f2` | Sun 1 Nov 2026 |
 | P3 | 3 | 03 `interactiveVr` | `q2_f3` | Sun 8 Nov 2026 |
 
-`base = 0.7 × BSD course completion % + 0.3 × challenge score (0–100)`; `score = max(KKM, base − 5 × daysLate)`.
-- Course: tick **Semua step course BSD selesai** → 100% (70 points) automatically; otherwise the teacher enters the completion % manually.
-- Challenge: scored with the project's own rubric `G9_VR_CHALLENGE_RUBRIC` (5 criteria, total 100: P1 second coloured object / layout / colour code / position code / reflection; P2 composite model / parent entity / transform via parent / explanation / reflection; P3 two moods / visible difference / A-vs-B comparison / reason / reflection). Scores are stored in `fNLate.challengeScores`.
-In the rubric workspace (Kelas 9 → Q2 → student → component 01/02/03) the evidence panel asks for course % and challenge score, then **Terapkan ke rubrik** fills that component's criteria proportionally, writes the audit note (`F2 VR: course 80% × 0.7 + challenge 90 × 0.3 = 83; …`) and marks it reviewed. Metadata is stored in `digitalCitizenshipAssessment/q2/f1Late|f2Late|f3Late` only for reviewed components. A legacy single base (records without `course`) still works.
+Each component has two criterion groups (`groups` in `js/assessment-config.js`):
+- **A. Ketuntasan steps course BSD (70)**: one criterion per BSD project of that meeting. The box **Semua steps sudah lengkap** gives every step criterion full points; otherwise the teacher enters partial points.
+- **B. Challenge (30)**: a project-specific rubric from the meeting's challenge and required evidence (5 criteria: 9/6/6/6/3).
+
+Lateness: in the evidence panel, **Terapkan keterlambatan & tandai diperiksa** stores `digitalCitizenshipAssessment/q2/f1Late|f2Late|f3Late` (completion date and source, days late, KKM, penalty) and marks the component reviewed. When the gradebook field is built, `score = max(KKM, rubric total − 5 × daysLate)`; without lateness metadata the field is the plain rubric total. The planning-consistency criterion no longer applies to these three components.
