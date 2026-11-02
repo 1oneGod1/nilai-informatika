@@ -73,3 +73,16 @@ The emulators need Java 11+. `firebase.json` contains an `emulators` block (auth
    - `node scripts/prepare-grade9-submission-assets.mjs`
 2. Deploy the database rules **first**: `firebase deploy --only database --project nilai-informatika`. Without the new rules, grade 9 enrollment fails and VR Studio stays local-only.
 3. Merge to `main`. Render auto-deploys. Then run `firebase deploy --only hosting --project nilai-informatika`.
+
+## Project grades F1–F3 (70/30)
+
+Teacher rule since Nov 2026: each VR project P1–P3 is graded as F1–F3 (`G9_VR_GRADING` in `js/grade9-vr-submissions.js`):
+
+| Project | Meeting | Rubric component | Field | Due (end of day WIB) |
+| --- | --- | --- | --- | --- |
+| P1 | 1 | 01 `vrFundamentals` | `q2_f1` | Mon 26 Oct 2026 |
+| P2 | 2 | 02 `modelsAnimation` | `q2_f2` | Sun 1 Nov 2026 |
+| P3 | 3 | 03 `interactiveVr` | `q2_f3` | Sun 8 Nov 2026 |
+
+`base = 0.7 × BSD course completion % + 0.3 × challenge score (0–100)`; `score = max(KKM, base − 5 × daysLate)`.
+In the rubric workspace (Kelas 9 → Q2 → student → component 01/02/03) the evidence panel asks for course % and challenge score, then **Terapkan ke rubrik** fills that component's criteria proportionally, writes the audit note (`F2 VR: course 80% × 0.7 + challenge 90 × 0.3 = 83; …`) and marks it reviewed. Metadata is stored in `digitalCitizenshipAssessment/q2/f1Late|f2Late|f3Late` only for reviewed components. A legacy single base (records without `course`) still works.

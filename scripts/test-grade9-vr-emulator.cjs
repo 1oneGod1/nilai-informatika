@@ -159,18 +159,29 @@ const SEED={
     await tdb.ref('siswa/'+id).update({'digitalCitizenshipAssessment/q2':d.rec,...d.fields});return d;}
   await test('teacher applies F1 from submission to rubric and saves → q2_f1 only',async()=>{
     const s=(await tdb.ref('siswa/s9a').once('value')).val();ctx.allSiswa=[{id:'s9a',...s}];C(`G9VrMonitor.onProgress(${JSON.stringify((await tdb.ref('learningProgress').once('value')).val())})`);
-    const plan=C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit9)})`);assert.equal(plan.meta.sourceVersion,2);assert.equal(plan.meta.dateSource,'submission');assert.match(plan.note,/^F1 VR: /);
+    C(`G9VrMonitor._setForm('s9a',{course:'100',challenge:'100'})`);const plan=C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit9)})`);assert.equal(plan.meta.sourceVersion,2);assert.equal(plan.meta.base,100);assert.equal(plan.meta.dateSource,'submission');assert.match(plan.note,/^F1 VR: /);
     const sum=Math.round(Object.values(plan.criteria).reduce((n,x)=>n+x,0)*100)/100;assert.equal(sum,plan.meta.score);
     const d=await rubricSave('s9a',plan);assert.deepEqual(Object.keys(d.fields),['q2_f1']);
     const after=(await tdb.ref('siswa/s9a').once('value')).val();assert.equal(after.q2_f1,plan.meta.score);assert.equal(after.digitalCitizenshipAssessment.q2.reviewed.vrFundamentals,true);assert.equal(after.digitalCitizenshipAssessment.q2.f1Late.sourceVersion,2);
     for(const k of ['q1_f1','q2_f2','q2_f3','q2_sumatif','password','nama','kelas'])assert.deepEqual(after[k],s[k],'unchanged '+k);});
-  await test('teacher manual F1 (no submission) for s9b: 6 days late → 74 via rubric',async()=>{
+  await test('teacher manual F1 (no submission) for s9b: 6 days after 26 Oct → 74 via rubric',async()=>{
     const s=(await tdb.ref('siswa/s9b').once('value')).val();ctx.allSiswa=[{id:'s9b',...s}];C(`G9VrMonitor.onProgress({})`);
-    C(`G9VrMonitor._setForm('s9b',{manualDate:'2026-10-26'})`);const plan=C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit9)})`);
+    C(`G9VrMonitor._setForm('s9b',{course:'100',challenge:'100',manualDate:'2026-11-01'})`);const plan=C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit9)})`);
     assert.equal(plan.meta.daysLate,6);assert.equal(plan.meta.score,74);assert.equal(plan.meta.dateSource,'manual');assert.equal(plan.meta.sourceVersion,0);assert.match(plan.note,/minimal KKM 74/);
     await rubricSave('s9b',plan);assert.equal((await tdb.ref('siswa/s9b/q2_f1').once('value')).val(),74);});
-  await test('low quality base still floors at KKM; no date gives a clear error',async()=>{C(`G9VrMonitor._setForm('s9b',{base:'60',manualDate:'2026-10-19'})`);assert.equal(C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit9)})`).meta.score,74);
+  await test('low quality base still floors at KKM; no date gives a clear error',async()=>{C(`G9VrMonitor._setForm('s9b',{course:'',challenge:'',base:'60',manualDate:'2026-10-19'})`);assert.equal(C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit9)})`).meta.score,74);
     C(`G9VrMonitor._setForm('s9b',{base:'100',manualDate:''})`);assert.throws(()=>C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit9)})`),/tanggal selesai/);});
+  await test('70/30 base: 80% course + challenge 90 = 83; incomplete input is rejected',()=>{assert.equal(G.weightedBase(80,90),83);assert.equal(G.weightedBase(100,0),70);assert.equal(G.weightedBase('',90),null);assert.equal(G.weightedBase(120,90),null);
+    assert.equal(G.compute(F1,{course:80,challenge:90,kkm:74,manualDate:'2026-10-26'}).suggested,83);assert.equal(G.compute(F1,{course:80,challenge:90,kkm:74,manualDate:'2026-10-28'}).suggested,74);assert.equal(G.compute(F1,{course:'',challenge:90,kkm:74,manualDate:'2026-10-20'}).suggested,null);});
+  await test('config: F2 = project 2 (modelsAnimation, due 1 Nov), F3 = project 3 (interactiveVr, due 8 Nov)',()=>{const g=C('G9_VR_GRADING');assert.equal(g.q2_f2.lessonId,2);assert.equal(g.q2_f2.assessmentId,'modelsAnimation');assert.equal(g.q2_f2.dueDate,'2026-11-01');assert.equal(g.q2_f3.lessonId,3);assert.equal(g.q2_f3.assessmentId,'interactiveVr');assert.equal(g.q2_f3.dueDate,'2026-11-08');assert.deepEqual(JSON.parse(JSON.stringify(C('G9_VR_LESSON_DUE'))),{1:'2026-10-26',2:'2026-11-01',3:'2026-11-08'});});
+  await test('F2 plan uses 70/30 and the F2 due date; saving writes q2_f2 only and keeps f2Late',async()=>{
+    const crit2=C(`dcGetCourseConfig(2,9).assessments.find(a=>a.id==='modelsAnimation').criteria`);
+    C(`G9VrMonitor._setForm('s9b',{course:'80',challenge:'90',manualDate:'2026-11-02'},'q2_f2')`);const plan=C(`G9VrMonitor.applyPlan(allSiswa[0],${JSON.stringify(crit2)},'q2_f2')`);
+    assert.equal(plan.meta.base,83);assert.equal(plan.meta.daysLate,1);assert.equal(plan.meta.score,78);assert.equal(plan.meta.label,'F2');assert.equal(plan.meta.course,80);assert.equal(plan.meta.challenge,90);assert.match(plan.note,/^F2 VR: course 80% × 0.7 \+ challenge 90 × 0.3 = 83; /);
+    const sum=Math.round(Object.values(plan.criteria).reduce((n,v)=>n+v,0)*100)/100;assert.equal(sum,78);
+    const d=C(`(()=>{const d=dcCreateEmptyDraft(2,9);d.rubricScores.modelsAnimation.criteria=${JSON.stringify(plan.criteria)};d.reviewed.modelsAnimation=true;d.f2Late=${JSON.stringify(plan.meta)};d.f1Late={score:1};const rec=dcBuildStoredRecord(d,2,'t',9);return {rec,fields:dcBuildGradebookFields(rec,2,9)};})()`);
+    assert.deepEqual(Object.keys(d.fields),['q2_f2']);assert.equal(d.fields.q2_f2,78);assert.equal(d.rec.f2Late.score,78);assert.equal(d.rec.f1Late,undefined,'f1Late dropped when F1 not reviewed');
+    const back=C(`dcDraftFromStored(${JSON.stringify(d.rec)},2,9).f2Late.score`);assert.equal(back,78);});
   await test('grade metadata validation rejects bad records even for teacher',async()=>{await denied(tdb.ref('siswa/s9b/grade9VrGrades/q2_f1').set({score:120,base:100,daysLate:0,reviewed:true,reviewedAt:firebase.database.ServerValue.TIMESTAMP,reviewedBy:teacherUid}),'score>100');await denied(tdb.ref('siswa/s9b/grade9VrGrades/q2_f1').set({score:90,base:100,daysLate:0,reviewed:false,reviewedAt:firebase.database.ServerValue.TIMESTAMP,reviewedBy:teacherUid}),'unreviewed');});
 
   section='[password] ';console.log('\nPassword protections');

@@ -495,7 +495,7 @@ function renderDcAssessmentPanel() {
       ${course.gradingVersion && !isAiFormativeWorkspace() ? '<p class="dc-assessment-brief">Course 20% · F1–F3 30% · Sumatif 50%.</p>' : ''}
       ${course.gradingVersion ? dcAiArchiveHtml(dcTeacherState.draft) : ''}
       ${course.gradingVersion ? '<div id="g11EvidencePanel"></div>' : ''}
-      ${typeof G9VrRubric !== "undefined" && G9VrRubric.isWorkspace() && assessment.id === "vrFundamentals" ? '<div id="g9EvidencePanel"></div>' : ''}
+      ${typeof G9VrRubric !== "undefined" && G9VrRubric.isWorkspace() && ["vrFundamentals","modelsAnimation","interactiveVr"].includes(assessment.id) ? '<div id="g9EvidencePanel"></div>' : ''}
       ${briefHtml}
       ${course.reviewedFormativeOnly ? g8EvidenceFieldHTML(assessment,assessmentDraft) : ""}
       ${starterCodeHtml}
