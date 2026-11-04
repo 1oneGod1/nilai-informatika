@@ -314,7 +314,7 @@ async function saveDcAssessment() {
     return;
   }
 
-  dcConfirmUnreviewedAiScores(student);
+  const autoReviewed=dcConfirmUnreviewedAiScores(student);
 
   const button = document.getElementById("dcSaveButton");
   const originalHtml = button?.innerHTML || "";
@@ -375,6 +375,7 @@ async function saveDcAssessment() {
     Object.assign(student, gradebookFields);
     if(dcTeacherState.studentId===saveContext.studentId&&dcTeacherState.grade===saveContext.grade&&dcTeacherState.quarter===saveContext.quarter)dcTeacherState.dirty = Boolean(course.gradingVersion&&typeof G11Monitor!=="undefined"&&Object.entries(record.evidenceVersions||{}).some(([id,v])=>record.reviewed?.[id]&&v!==G11Monitor.version(student.id,id)) || (course.reviewedFormativeOnly&&typeof G8Submissions!=="undefined"&&G8Submissions.isStaleRecord(record,student.id)));
     updateDcSaveState();
+    if(autoReviewed.length&&dcTeacherState.studentId===saveContext.studentId)renderDcAssessmentPanel();
     renderTableBody(allSiswa);
     if (typeof ensureFormativeColumnCountForGrade === "function") {
       ensureFormativeColumnCountForGrade(
@@ -627,20 +628,20 @@ function dcUnreviewedAiScores(student){
     const n=(a.id.match(/(\d)$/)||[])[1];
     const field=n?`q${dcTeacherState.quarter}_f${n}`:"";
     return changed||(field&&student?.[field]!==raw);
-  }).map(a=>{const crit=dcTeacherState.draft.rubricScores[a.id].criteria||{};return {a,raw:a.criteria.reduce((n,c)=>n+dcClampScore(crit[c.id],c.max),0)};});
+  }).map(a=>{const crit=dcTeacherState.draft.rubricScores[a.id].criteria||{},old=stored[a.id]?.criteria||{};return {a,raw:a.criteria.reduce((n,c)=>n+dcClampScore(crit[c.id],c.max),0),changed:a.criteria.some(c=>(Number(crit[c.id])||0)!==(Number(old[c.id])||0))};});
 }
 function dcConfirmUnreviewedAiScores(student){
-  const items=dcUnreviewedAiScores(student);
-  if(!items.length||typeof window.confirm!=="function")return false;
-  const list=items.map(({a,raw})=>`• ${a.number||a.title}: ${raw}`).join("\n");
-  const ok=window.confirm(`Nilai berikut BELUM ditandai "sudah diperiksa", jadi buku nilai TIDAK akan berubah:\n${list}\n\nOK = tandai sudah diperiksa & perbarui buku nilai\nBatal = simpan rubrik/feedback saja`);
-  if(!ok)return false;
+  // Saving a scored F1–F3 means the teacher has checked it: mark it reviewed automatically so the
+  // gradebook updates. Only the component being viewed, or one whose score was changed now, is marked;
+  // other untouched components (e.g. a fresh student resubmission) are left for the teacher.
+  const items=dcUnreviewedAiScores(student).filter(({a,changed})=>changed||a.id===dcTeacherState.selectedAssessmentId);
+  if(!items.length)return [];
   for(const {a} of items){
     dcTeacherState.draft.reviewed[a.id]=true;
     if(typeof G11Monitor!=="undefined"){dcTeacherState.draft.evidenceVersions??={};dcTeacherState.draft.evidenceVersions[a.id]=G11Monitor.version(dcTeacherState.studentId,a.id);}
   }
   dcTeacherState.dirty=true;
-  return true;
+  return items.map(({a,raw})=>`${a.number||a.title} ${raw}`);
 }
 window.dcUnreviewedAiScores=dcUnreviewedAiScores;
 if (typeof window !== "undefined") window.dcCompleteGroup = dcCompleteGroup;
