@@ -1569,8 +1569,8 @@ const LESSONS=[
       "Change ONE thing in the AI Find the Finish Line car program, predict the effect first, then prove it with 3 tests: reaching the finish, hitting a dead end, and trying again (retry)."
     ],
     "learn": [
-      "Kode penting: moves.push(lastMove) mencatat setiap gerakan mobil ke daftar moves (jejak gerak). resetCar() mengembalikan mobil ke posisi awal. tryAgain() membuat mobil mencoba lagi setelah gagal. Variabel fastest hanya menyimpan jalur tercepat dari yang sudah dicoba, belum tentu jalur terpendek dari semua kemungkinan.",
-      "Key code: moves.push(lastMove) records every car movement in the moves list (the movement trace). resetCar() returns the car to the start. tryAgain() makes the car try again after failing. The variable fastest only stores the fastest route among those tried, not necessarily the shortest of all possible routes."
+      "Kode penting: moves.push(...) mencatat setiap gerakan mobil (jejak gerak). resetCar() mengembalikan mobil ke posisi awal. tryAgain() membuat mobil mencoba lagi. Jalan buntu = jalan yang tidak punya lanjutan. Mobil tidak bisa putar balik, jadi saat masuk jalan buntu percobaan itu GAGAL: muncul pesan gagal, mobil di-reset ke start, jejak gerak dikosongkan, lalu mobil mencoba lagi dengan pilihan belokan acak. Variabel fastest/shortestPath hanya menyimpan jalur ke finish yang sudah ditemukan, belum tentu yang terpendek dari semua kemungkinan.",
+      "Key code: moves.push(...) records every car movement (the movement trace). resetCar() returns the car to the start. tryAgain() makes the car try again. A dead end is a road with no way forward. The car cannot turn around, so entering a dead end makes that attempt FAIL: a failure message appears, the car is reset to the start, the trace is cleared, and the car tries again with random turn choices. The variable fastest/shortestPath only stores a route to the finish that has been found, not necessarily the shortest possible."
     ],
     "sources": [
       "tn-ai-find-the-finish-line"
@@ -1582,12 +1582,12 @@ const LESSONS=[
         "Do steps 3–16 in BSD. Find these three pieces of code and understand what they do: moves.push (records moves), resetCar (back to the start), tryAgain (tries again)."
       ],
       [
-        "Salin proyekmu, lalu ubah SATU hal saja. Contoh: tambah tembok atau jalan buntu di peta, pindahkan garis finish, ubah posisi awal mobil saat reset, atau tampilkan jumlah gerakan. Sebelum menekan Run, tulis tebakanmu: apa yang akan terjadi?",
-        "Copy your project, then change ONE thing only. Examples: add a wall or dead end to the map, move the finish line, change the car's start position on reset, or display the move count. Before pressing Run, write your prediction: what will happen?"
+        "Salin proyekmu, lalu ubah SATU hal saja. Contoh: ubah nilai deadends (misalnya 0.3 → 0.6) agar jalan buntu lebih banyak, ubah ukuran peta (nColumn/nRow), atau tampilkan jumlah gerakan/percobaan di chat. Sebelum menekan Run, tulis tebakanmu: apa yang akan terjadi?",
+        "Copy your project, then change ONE thing only. Examples: change the deadends value (e.g. 0.3 → 0.6) to get more dead ends, change the map size (nColumn/nRow), or show the move/attempt count in the chat. Before pressing Run, write your prediction: what will happen?"
       ],
       [
-        "Jalankan dan uji 3 kasus, lalu catat hasilnya: (1) Finish: apakah mobil sampai, dan berapa gerakan? (2) Jalan buntu: apa yang dilakukan mobil saat terhalang? (3) Retry: setelah mencoba lagi, apakah mobil kembali ke awal dan moves mulai dari kosong?",
-        "Run it and test 3 cases, then record the results: (1) Finish: does the car arrive, and in how many moves? (2) Dead end: what does the car do when blocked? (3) Retry: after trying again, does the car return to the start and does moves start empty?"
+        "Jalankan dan uji 3 kasus, lalu catat hasilnya: (1) Finish: pada percobaan ke berapa mobil sampai, dan berapa gerakan? (2) Jalan buntu: pesan apa yang muncul dan ke mana mobil kembali? (3) Retry: setelah reset, apakah mobil mulai lagi dari start dengan jejak gerak kosong, dan apakah jalurnya berbeda?",
+        "Run it and test 3 cases, then record the results: (1) Finish: on which attempt does the car arrive, and in how many moves? (2) Dead end: what message appears and where does the car go back to? (3) Retry: after the reset, does the car start again from the start with an empty trace, and is the route different?"
       ],
       [
         "Ambil 2 screenshot: satu menunjukkan kode atau peta yang kamu ubah, satu menunjukkan hasil uji (finish, jalan buntu, atau retry).",
@@ -1599,8 +1599,8 @@ const LESSONS=[
       "(Optional) If the car finds two routes that both reach the finish on the same map, compare their move counts. Which route is shorter according to your tests?"
     ],
     "check": [
-      "Hati-hati: jalur “tercepat” yang ditemukan program belum tentu yang terpendek dari semua kemungkinan, jadi jangan klaim “paling pendek” tanpa bukti. Saat retry, pastikan mobil tidak membawa gerakan lama dari percobaan sebelumnya.",
-      "Careful: the “fastest” route the program finds is not necessarily the shortest possible, so do not claim “shortest” without evidence. On retry, check that the car does not carry old moves from the previous attempt."
+      "Kesimpulan jalan buntu yang tepat: jalan buntu bukan error program, melainkan percobaan yang gagal. Program belajar dengan coba-coba (trial and error): gagal → reset → coba lagi. Mobil tidak mengingat jalan buntu, jadi bisa masuk jalan buntu yang sama lagi. Jalur ke finish yang ditemukan belum tentu yang terpendek, jadi jangan klaim “paling pendek” tanpa bukti.",
+      "Correct dead-end conclusion: a dead end is not a program error but a failed attempt. The program learns by trial and error: fail → reset → try again. The car does not remember dead ends, so it can enter the same dead end again. The route it finds to the finish is not necessarily the shortest, so do not claim “shortest” without evidence."
     ],
     "result": [
       "2 screenshot (perubahan + hasil), tebakanmu sebelum Run, catatan 3 uji (finish, jalan buntu, retry), dan satu keterbatasan.",
