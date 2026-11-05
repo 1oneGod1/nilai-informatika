@@ -1582,8 +1582,8 @@ const LESSONS=[
         "Do steps 3–16 in BSD. Find these three pieces of code and understand what they do: moves.push (records moves), resetCar (back to the start), tryAgain (tries again)."
       ],
       [
-        "Salin proyekmu, lalu ubah SATU hal saja. Contoh: ubah nilai deadends (misalnya 0.3 → 0.6) agar jalan buntu lebih banyak, ubah ukuran peta (nColumn/nRow), atau tampilkan jumlah gerakan/percobaan di chat. Sebelum menekan Run, tulis tebakanmu: apa yang akan terjadi?",
-        "Copy your project, then change ONE thing only. Examples: change the deadends value (e.g. 0.3 → 0.6) to get more dead ends, change the map size (nColumn/nRow), or show the move/attempt count in the chat. Before pressing Run, write your prediction: what will happen?"
+        "Salin proyekmu, lalu ubah SATU hal saja. Contoh: TURUNKAN nilai deadends (misalnya 0.3 → 0.1) agar jalan buntu lebih banyak, atau NAIKKAN (0.3 → 0.8) agar lebih sedikit; perbesar peta (nColumn/nRow); atau tampilkan jumlah gerakan/percobaan di chat. Sebelum menekan Run, tulis tebakanmu: apa yang akan terjadi?",
+        "Copy your project, then change ONE thing only. Examples: LOWER the deadends value (e.g. 0.3 → 0.1) to get more dead ends, or RAISE it (0.3 → 0.8) to get fewer; make the map bigger (nColumn/nRow); or show the move/attempt count in the chat. Before pressing Run, write your prediction: what will happen?"
       ],
       [
         "Jalankan dan uji 3 kasus, lalu catat hasilnya: (1) Finish: pada percobaan ke berapa mobil sampai, dan berapa gerakan? (2) Jalan buntu: pesan apa yang muncul dan ke mana mobil kembali? (3) Retry: setelah reset, apakah mobil mulai lagi dari start dengan jejak gerak kosong, dan apakah jalurnya berbeda?",
