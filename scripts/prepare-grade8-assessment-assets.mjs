@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';import {createHash} from 'node:crypto';
 const root=new URL('../',import.meta.url);
-for(const path of ['js/grade8-cloud-identity.js','js/grade8-submissions.js','js/grade8-game-assessment.js','js/student.js','js/teacher.js','js/teacher-assessment.js']){
+for(const path of ['js/grade8-cloud-identity.js','js/grade8-submissions.js','js/grade8-game-assessment.js','js/student.js','js/teacher.js','js/teacher-assessment.js','js/grade8-project-monitor.js']){
  const bytes=await fs.readFile(new URL(path,root)),file=path.replace('.js','.'+createHash('sha256').update(bytes).digest('hex').slice(0,12)+'.js');await fs.writeFile(new URL(file,root),bytes);
  const name=path.slice(0,-3);
  for(const page of ['index.html','dashboard.html','grade8-games/index.html']){let html=await fs.readFile(new URL(page,root),'utf8'),prefix=page.includes('/')?'../':'';

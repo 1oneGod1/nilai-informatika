@@ -528,7 +528,7 @@
         </div>
         </div>
         <div id="dashPanel-penilaian" class="dash-panel flex flex-col gap-6" role="tabpanel" aria-labelledby="dashTab-penilaian" data-dash-panel="penilaian">
-        <div class="flex flex-wrap items-center gap-3 -mb-2"><a href="#g9VrMonitorPanel" class="inline-flex items-center gap-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 px-5 py-3 text-sm font-black text-slate-950 shadow-lg" style="text-decoration:none" onclick="event.preventDefault();document.getElementById('g9VrMonitorPanel').scrollIntoView({behavior:'smooth',block:'start'})"><i class="fas fa-inbox"></i> Cek form kiriman &amp; nilai project kelas 9 ↓</a><span class="text-xs text-slate-400">Tanggal &amp; jam kirim, isi form, dan nilai F1 · tidak bergantung pada pilihan kuartal di atas</span></div>
+        <div class="flex flex-wrap items-center gap-3 -mb-2"><a href="#g9VrMonitorPanel" class="inline-flex items-center gap-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 px-5 py-3 text-sm font-black text-slate-950 shadow-lg" style="text-decoration:none" onclick="event.preventDefault();document.getElementById('g9VrMonitorPanel').scrollIntoView({behavior:'smooth',block:'start'})"><i class="fas fa-inbox"></i> Cek form kiriman &amp; nilai project kelas 9 ↓</a><span class="text-xs text-slate-400">Tanggal &amp; jam kirim, isi form, dan nilai F1 · tidak bergantung pada pilihan kuartal di atas</span><a href="#g8MonitorPanel" class="inline-flex items-center gap-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 px-5 py-3 text-sm font-black text-slate-950 shadow-lg" style="text-decoration:none" onclick="event.preventDefault();document.getElementById('g8MonitorPanel').scrollIntoView({behavior:'smooth',block:'start'})"><i class="fas fa-inbox"></i> Cek form kiriman &amp; nilai project kelas 8 ↓</a></div>
         <section
           id="dcAssessmentPanel"
           class="dc-assessment-shell glass-panel-teacher rounded-2xl"
@@ -604,6 +604,15 @@
           <div id="g9VrMonitorSummary" class="g9vr-summary" aria-live="polite"></div>
           <div id="g9VrMonitorList" aria-live="polite">Memuat progres Firebase…</div>
         </section>
+        <section id="g8MonitorPanel" class="dc-assessment-shell glass-panel-teacher rounded-2xl">
+          <style>#g8MonitorPanel .g9vr-detail input[type=number],#g8MonitorPanel .g9vr-detail input[type=date],#g8MonitorPanel .g9vr-detail input[type=text]{width:100%;color:#e2e8f0;background:#111827;border:1px solid #475569;border-radius:8px;padding:10px;color-scheme:dark}#g8MonitorPanel .g9vr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#g8MonitorPanel .g9vr-check{display:flex;align-items:center;gap:10px;margin:12px 0;font-weight:700}#g8MonitorPanel .g9vr-check input{width:18px;height:18px}#g8MonitorPanel .g9vr-calc{padding:10px;border:1px dashed #475569;border-radius:8px;color:#cbd5e1}#g8MonitorPanel .g9vr-save:disabled{opacity:.5;cursor:default}#g8MonitorPanel h5{margin:16px 0 8px;font-weight:700;color:#e2e8f0}@media(max-width:640px){#g8MonitorPanel .g9vr-grid{grid-template-columns:1fr}}#g8MonitorPanel .g9vr-summary{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 12px;padding:10px 12px;border-radius:10px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.25)}#g8MonitorPanel .g9vr-summary small{color:#94a3b8}#g8MonitorPanel .g9vr-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(148,163,184,.15);color:#cbd5e1;border:1px solid rgba(148,163,184,.3)}#g8MonitorPanel .g9vr-badge-ok{background:rgba(52,211,153,.15);color:#6ee7b7;border-color:rgba(52,211,153,.4)}#g8MonitorPanel .g9vr-badge-draft{background:rgba(251,191,36,.12);color:#fcd34d;border-color:rgba(251,191,36,.4)}#g8MonitorPanel .g9vr-badge-none{background:rgba(100,116,139,.15);color:#94a3b8}#g8MonitorPanel .g9vr-badge-late{background:rgba(248,113,113,.12);color:#fca5a5;border-color:rgba(248,113,113,.4)}#g8MonitorPanel .g9vr-row{display:block}#g8MonitorPanel .g9vr-row-main{display:grid;grid-template-columns:minmax(160px,1.1fr) minmax(220px,2fr) auto;gap:12px;align-items:center}#g8MonitorPanel .g9vr-row-main small{display:block;color:#94a3b8}#g8MonitorPanel .g9vr-state{display:flex;flex-wrap:wrap;gap:6px;align-items:center}#g8MonitorPanel .g9vr-when{font-size:12px;color:#e2e8f0;white-space:nowrap}#g8MonitorPanel .g9vr-when i{color:#34d399;margin-right:3px}#g8MonitorPanel .g9vr-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}#g8MonitorPanel .g9vr-inline{margin-top:10px;padding:12px;border-radius:10px;background:rgba(15,23,42,.6);border:1px solid #334155}#g8MonitorPanel .g9vr-inline textarea{width:100%;color:#e2e8f0;background:#111827;border:1px solid #475569;border-radius:8px;padding:8px}#g8MonitorPanel .g9vr-inline label{display:block;margin-top:8px;font-size:12px;color:#94a3b8}@media(max-width:800px){#g8MonitorPanel .g9vr-row-main{grid-template-columns:1fr}#g8MonitorPanel .g9vr-actions{justify-content:flex-start}}</style>
+          <h2>Kelas 8 · Game Studio · Form kiriman siswa &amp; nilai F1–F5</h2>
+          <p>Pilih <b>Materi</b> untuk melihat siapa yang sudah mengirim form pertemuan itu, beserta tanggal dan jam kirim (WIB). <b>Lihat form</b> menampilkan link BSD, perubahan, dan hasil uji/refleksi siswa; <b>Buka di rubrik</b> membuka siswa di rubrik project yang sama.</p>
+          <p><b>Nilai project</b> (P1 Platformer→F1, P2 Traffic Looper→F2, P3 Nonogram→F3, P4 Dungeon Battle→F4, P5 Wall Jumper→F5) = <b>A. steps BSD 70 + B. challenge 30</b>, lalu −5 per hari terlambat, tidak di bawah KKM. Centang “Semua steps sudah lengkap” (otomatis 70) atau isi poin step, nilai challenge, tekan <b>Terapkan keterlambatan &amp; tandai diperiksa</b>, lalu <b>Simpan penilaian</b>.</p>
+          <div class="g11-monitor-controls"><label>Materi<select id="g8MonitorLesson"></select></label><label>Kelas<select id="g8MonitorClass"><option value="">Semua kelas 8</option></select></label><label>Cari siswa<input id="g8MonitorSearch" type="search" placeholder="Nama siswa"></label><label>Tampilkan<select id="g8MonitorFilter"><option value="all">Semua siswa</option><option value="submitted">Sudah mengirim form</option><option value="none">Belum mengirim form</option><option value="draft">Masih draft</option><option value="pending">Project ini: kiriman perlu diperiksa</option><option value="ungraded">Project ini: belum dinilai</option></select></label><label>Urutkan<select id="g8MonitorSort"><option value="name">Nama</option><option value="newest">Waktu kirim terbaru</option><option value="oldest">Waktu kirim terlama</option></select></label></div>
+          <div id="g8MonitorSummary" class="g9vr-summary" aria-live="polite"></div>
+          <div id="g8MonitorList" aria-live="polite">Memuat progres Firebase…</div>
+        </section>
         <section id="g11MonitorPanel" class="dc-assessment-shell glass-panel-teacher rounded-2xl">
           <h2>Formatif kelas 11 · Bukti & feedback</h2>
           <p>Cari siswa, buka F1/F2/F3, lalu beri feedback dan nilai.</p>
@@ -620,7 +629,7 @@
             <div class="flex-1 min-w-0">
               <p class="text-[10px] font-mono-tech tracking-[0.2em] text-emerald-300 font-bold uppercase mb-1.5">Kelas 8 · Review Guru</p>
               <h2 id="grade8ReviewTitle" class="text-lg font-black text-white">Game Studio: Mobile Game Developer</h2>
-              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">Q2 · Rubrik lima game BSD, masing-masing /100. Nilai dari karya yang sudah selesai atau demo siswa, lalu simpan ke F1–F5.</p>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed max-w-3xl">Q2 · Lima project BSD → F1–F5. Tiap project: steps BSD 70 + challenge 30, −5/hari terlambat (minimal KKM). Cek kiriman di tab Penilaian.</p>
             </div>
             <div class="flex flex-wrap gap-2"><button type="button" onclick="openGrade8Assessment()" class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 hover:bg-emerald-300 px-5 py-2.5 text-xs font-black text-slate-950 transition-colors whitespace-nowrap"><i class="fas fa-clipboard-check"></i> Nilai tugas BSD</button><button type="button" onclick="openGrade8TeacherPreview()" class="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-400/40 px-4 py-2.5 text-xs font-black text-emerald-300 transition-colors whitespace-nowrap"><i class="fas fa-eye"></i> Review Game Studio</button></div>
           </div>
@@ -932,14 +941,15 @@
     <script src="js/auth.js?v=20260329b"></script>
     <script src="js/assessment-config.7caf303ed129.js"></script>
     <script src="js/grade11-ai-assessment.0654a2a78b16.js"></script>
-    <script src="js/grade8-game-assessment.dfbf30baa6b7.js"></script>
+    <script src="js/grade8-game-assessment.5de5d8d8b35f.js"></script>
     <script src="js/grade8-submissions.866b0f2484cc.js"></script>
+<script src="js/grade8-project-monitor.57677310a9f0.js"></script>
     <script src="js/grade9-cloud-identity.5636913a8844.js"></script>
     <script src="js/grade9-vr-submissions.12650f54bd58.js"></script>
     <!-- teacher.js contains only the logic needed for the dashboard page (auth check, CRUD, admins) -->
-    <script src="js/teacher.e075f647d34e.js"></script>
+    <script src="js/teacher.2d23e3920adf.js"></script>
     <script src="js/grade11-ai-monitor.50f0afa2516b.js"></script>
-    <script src="js/teacher-assessment.6c356dbddbe8.js"></script>
+    <script src="js/teacher-assessment.91da70cc1861.js"></script>
     <script src="js/dashboard-tabs.8d97bb0ce0f0.js"></script>
   </body>
 </html>

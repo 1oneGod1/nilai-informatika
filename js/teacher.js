@@ -507,6 +507,7 @@ function listenToLearningProgressData() {
   learningProgressListenerAttached = true;
   if(typeof G11Monitor!=="undefined")G11Monitor.start();
   if(typeof G9VrMonitor!=="undefined")G9VrMonitor.start();
+  if(typeof G8ProjectMonitor!=="undefined")G8ProjectMonitor.start();
 
   db.ref("learningProgress").on(
     "value",
@@ -515,6 +516,7 @@ function listenToLearningProgressData() {
       if(typeof G11Monitor!=="undefined")G11Monitor.onProgress(data);
       if(typeof G8Submissions!=="undefined")G8Submissions.onProgress(data);
       if(typeof G9VrMonitor!=="undefined")G9VrMonitor.onProgress(data);
+      if(typeof G8ProjectMonitor!=="undefined")G8ProjectMonitor.onProgress(data);
       grade10UiUxProgressByStudent = {};
       Object.entries(data).forEach(([studentId, progress]) => {
         if (progress?.grade10UiUx) {
@@ -539,6 +541,7 @@ function listenToLearningProgressData() {
       console.warn("Gagal memuat learning progress:", error);
       if(typeof G11Monitor!=="undefined")G11Monitor.onProgressError(error);
       if(typeof G9VrMonitor!=="undefined")G9VrMonitor.onProgressError(error);
+      if(typeof G8ProjectMonitor!=="undefined")G8ProjectMonitor.onProgressError(error);
     },
   );
 }
@@ -1934,6 +1937,7 @@ function listenToSiswaData() {
       renderTableBody(allSiswa);
       if(typeof G11Monitor!=="undefined")G11Monitor.render();
       if(typeof G9VrMonitor!=="undefined")G9VrMonitor.render();
+      if(typeof G8ProjectMonitor!=="undefined")G8ProjectMonitor.render();
       if (typeof refreshAssessmentStudentOptions === "function") {
         refreshAssessmentStudentOptions();
       }

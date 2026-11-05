@@ -531,6 +531,7 @@ function renderDcAssessmentPanel() {
     </section>`;
   if(course.gradingVersion&&typeof G11Monitor!=="undefined")G11Monitor.renderEvidence();
   if(course.reviewedFormativeOnly&&typeof G8Submissions!=="undefined")G8Submissions.render();
+  if(course.reviewedFormativeOnly&&typeof G8ProjectMonitor!=="undefined")G8ProjectMonitor.renderCalc(true);
   if(typeof G9VrMonitor!=="undefined")G9VrMonitor.renderEvidence();
 }
 
