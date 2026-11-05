@@ -1561,50 +1561,50 @@ const LESSONS=[
   {
     "id": 13,
     "title": [
-      "F3 · Jalur, jalan buntu, dan retry",
-      "F3 · Routes, dead ends, and retry"
+      "F3 · Ubah peta mobil, lalu uji 3 kasus",
+      "F3 · Change the car's map, then test 3 cases"
     ],
     "goal": [
-      "Modifikasi navigasi dan buktikan hasil pada tiga kasus.",
-      "Modify navigation and demonstrate three test cases."
+      "Ubah SATU hal pada program mobil di AI Find the Finish Line, tebak dulu akibatnya, lalu buktikan dengan 3 uji: sampai finish, masuk jalan buntu, dan coba lagi (retry).",
+      "Change ONE thing in the AI Find the Finish Line car program, predict the effect first, then prove it with 3 tests: reaching the finish, hitting a dead end, and trying again (retry)."
     ],
     "learn": [
-      "moves menyimpan perpindahan; resetCar mengembalikan mobil ke awal. Variabel bernama fastest tidak membuktikan jalur terpendek global.",
-      "moves stores movements; resetCar returns the car to the start. A variable named fastest does not prove a globally shortest route."
+      "Kode penting: moves.push(lastMove) mencatat setiap gerakan mobil ke daftar moves (jejak gerak). resetCar() mengembalikan mobil ke posisi awal. tryAgain() membuat mobil mencoba lagi setelah gagal. Variabel fastest hanya menyimpan jalur tercepat dari yang sudah dicoba, belum tentu jalur terpendek dari semua kemungkinan.",
+      "Key code: moves.push(lastMove) records every car movement in the moves list (the movement trace). resetCar() returns the car to the start. tryAgain() makes the car try again after failing. The variable fastest only stores the fastest route among those tried, not necessarily the shortest of all possible routes."
     ],
     "sources": [
       "tn-ai-find-the-finish-line"
     ],
-    "range": "AI Find the Finish Line · steps 3–17, focus 3–16",
+    "range": "BSD AI Find the Finish Line · kerjakan step 3–16 dulu (step 17 boleh)",
     "tasks": [
       [
-        "Ikuti resetCar, tryAgain, moves.push, serta penyimpanan jalur berhasil.",
-        "Follow resetCar, tryAgain, moves.push, and storing successful routes."
+        "Kerjakan step 3–16 di BSD. Cari tiga kode ini dan pahami gunanya: moves.push (mencatat gerakan), resetCar (kembali ke awal), tryAgain (mencoba lagi).",
+        "Do steps 3–16 in BSD. Find these three pieces of code and understand what they do: moves.push (records moves), resetCar (back to the start), tryAgain (tries again)."
       ],
       [
-        "Salin proyek; ubah satu aspek peta, reset, atau pencatatan gerak. Prediksi dampaknya.",
-        "Copy the project; change one map, reset, or move-recording aspect. Predict its effect."
+        "Salin proyekmu, lalu ubah SATU hal saja. Contoh: tambah tembok atau jalan buntu di peta, pindahkan garis finish, ubah posisi awal mobil saat reset, atau tampilkan jumlah gerakan. Sebelum menekan Run, tulis tebakanmu: apa yang akan terjadi?",
+        "Copy your project, then change ONE thing only. Examples: add a wall or dead end to the map, move the finish line, change the car's start position on reset, or display the move count. Before pressing Run, write your prediction: what will happen?"
       ],
       [
-        "Uji sampai finish, jalan buntu, dan retry. Catat jejak/jumlah gerak serta posisi setelah reset.",
-        "Test reaching the finish, a dead end, and retry. Record the trace/move count and position after reset."
+        "Jalankan dan uji 3 kasus, lalu catat hasilnya: (1) Finish: apakah mobil sampai, dan berapa gerakan? (2) Jalan buntu: apa yang dilakukan mobil saat terhalang? (3) Retry: setelah mencoba lagi, apakah mobil kembali ke awal dan moves mulai dari kosong?",
+        "Run it and test 3 cases, then record the results: (1) Finish: does the car arrive, and in how many moves? (2) Dead end: what does the car do when blocked? (3) Retry: after trying again, does the car return to the start and does moves start empty?"
       ],
       [
-        "Ambil screenshot perubahan kode/peta dan hasil finish, jalan buntu, atau retry. Pilih screenshot yang paling jelas menunjukkan perubahan dan hasil uji.",
-        "Take screenshots of the code/map change and the finish, dead-end, or retry result. Choose the clearest screenshots showing the change and test outcome."
+        "Ambil 2 screenshot: satu menunjukkan kode atau peta yang kamu ubah, satu menunjukkan hasil uji (finish, jalan buntu, atau retry).",
+        "Take 2 screenshots: one showing the code or map you changed, one showing a test result (finish, dead end, or retry)."
       ]
     ],
     "challenge": [
-      "Bandingkan dua jalur berhasil pada peta yang sama jika tersedia. Jelaskan jalur lebih pendek dari hasil yang diuji.",
-      "Compare two successful routes on the same map if available. Explain which tested route is shorter."
+      "(Pilihan) Kalau mobil menemukan dua jalur yang sama-sama sampai finish di peta yang sama, bandingkan jumlah gerakannya. Jalur mana yang lebih pendek menurut hasil ujimu?",
+      "(Optional) If the car finds two routes that both reach the finish on the same map, compare their move counts. Which route is shorter according to your tests?"
     ],
     "check": [
-      "Jalur tercepat yang ditemukan belum tentu terbaik dari semua kemungkinan. Periksa retry tidak memakai state lama yang keliru.",
-      "The fastest found route may not be best among all possibilities. Check that retry does not use incorrect old state."
+      "Hati-hati: jalur “tercepat” yang ditemukan program belum tentu yang terpendek dari semua kemungkinan, jadi jangan klaim “paling pendek” tanpa bukti. Saat retry, pastikan mobil tidak membawa gerakan lama dari percobaan sebelumnya.",
+      "Careful: the “fastest” route the program finds is not necessarily the shortest possible, so do not claim “shortest” without evidence. On retry, check that the car does not carry old moves from the previous attempt."
     ],
     "result": [
-      "Screenshot perubahan dan hasil, satu prediksi, serta catatan tiga kasus uji: finish, jalan buntu, dan retry.",
-      "Change/result screenshots, one prediction, and notes for three test cases: finish, dead end, and retry."
+      "2 screenshot (perubahan + hasil), tebakanmu sebelum Run, catatan 3 uji (finish, jalan buntu, retry), dan satu keterbatasan.",
+      "2 screenshots (change + result), your prediction before Run, notes for 3 tests (finish, dead end, retry), and one limitation."
     ],
     "prep": [
       "Sediakan checkpoint Auto Navigation. Mulai pemeriksaan individual di sini untuk meringankan demo terakhir.",
