@@ -34,7 +34,7 @@ const G9_VR_SUMMATIVE=Object.freeze(['vrDiorama','vrWalkthrough']);
 const G9_VR_LESSON_EVIDENCE=Object.freeze({1:Object.freeze({title:"Halo, dunia virtual!",evidence:"Tautan BSD scene berisi dua objek + penjelasan fungsi scene dan satu atribut."}),
   2:Object.freeze({title:"Bentuk jadi sebuah cerita",evidence:"Tautan BSD objek gabungan + penjelasan satu perubahan posisi atau rotasi melalui objek induk."}),
   3:Object.freeze({title:"Ciptakan suasananya",evidence:"Tautan BSD yang menampilkan dua suasana (jelaskan perbedaan versi A dan B) + alasan memilih salah satu."}),
-  4:Object.freeze({title:"Bawa aset ke duniamu",evidence:"Tautan BSD model dengan ukuran yang sesuai + catatan sumber + penjelasan kendala dan pemeriksaannya."}),
+  4:Object.freeze({title:"Bawa aset ke duniamu",evidence:"Tautan BSD model Poly Pizza dengan ukuran yang sesuai + catatan sumber + penjelasan kendala dan pemeriksaannya."}),
   5:Object.freeze({title:"Dunia yang merespons",evidence:"Tautan BSD interaksi yang berjalan + satu temuan dari teman + satu perbaikan."}),
   6:Object.freeze({title:"Rancang diorama milikmu",evidence:"Tautan BSD scene awal di Sandbox + uraian sketsamu (tema dan tata letak) + daftar fitur minimum."}),
   7:Object.freeze({title:"Bangun, uji, pecahkan",evidence:"Tautan BSD prototipe diorama + satu catatan debugging (dugaan → perubahan → hasil) + penjelasan kode."}),

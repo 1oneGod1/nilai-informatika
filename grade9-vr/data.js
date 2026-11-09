@@ -575,7 +575,7 @@ const LESSONS = [
     "bsd": [
       "Import Third-Party Models into A-Frame"
     ],
-    "scope": "Gunakan satu model contoh yang disiapkan guru. Hindari menghabiskan waktu mencari aset.",
+    "scope": "Pilih satu model dari Poly Pizza (poly.pizza). Tidak perlu login, tidak perlu mengunduh, dan tidak perlu upload; cukup salin link file .glb.",
     "goals": [
       "Memasukkan satu model pihak ketiga.",
       "Menyesuaikan ukuran dan posisi model.",
@@ -584,7 +584,7 @@ const LESSONS = [
     "concepts": [
       [
         "Model merupakan aset",
-        "Model 3D perlu tersedia pada alamat yang bisa diakses. Ikuti format dan metode impor yang digunakan pada latihan BSD."
+        "Model 3D perlu tersedia pada alamat yang bisa diakses. Di Poly Pizza, link file model ada di kode halaman: tekan Ctrl + U, cari .glb dengan Ctrl + F, lalu salin link https://static.poly.pizza/....glb (bukan yang berakhiran .glb.br). Link halaman Sketchfab atau Google Drive tidak bisa dipakai sebagai src."
       ],
       [
         "Ukuran dan posisi berbeda",
@@ -595,11 +595,11 @@ const LESSONS = [
         "Simpan judul, pembuat jika tersedia, tautan sumber, dan ketentuan izin. Menggunakan model pihak ketiga tetap membutuhkan keputusan desainmu sendiri."
       ]
     ],
-    "code": "<a-scene renderer=\"colorManagement: true;\">\n  <a-assets>\n    <a-asset-item id=\"room\"\n      src=\"/resources/projects/importing-models/scene.gltf\">\n    </a-asset-item>\n  </a-assets>\n  <a-gltf-model src=\"#room\"></a-gltf-model>\n</a-scene>",
-    "challenge": "Masukkan satu model, sesuaikan agar proporsinya masuk akal, lalu tambahkan catatan sumbernya. Jelaskan satu masalah yang muncul dan pemeriksaan yang kamu lakukan.",
-    "evidence": "Model tampil dengan ukuran sesuai + catatan sumber + penjelasan kendala.",
-    "submitEvidence": "Tautan BSD model dengan ukuran yang sesuai + catatan sumber + penjelasan kendala dan pemeriksaannya.",
-    "submitExample": "Contoh: Saya mengimpor model kursi (sumber: nama situs + lisensi). Awalnya terlalu besar, jadi scale saya ubah ke 0.3 0.3 0.3. Model sempat tidak tampil; saya memeriksa alamat src dan posisinya.",
+    "code": "<a-scene>\n  <a-assets>\n    <!-- link .glb dari Poly Pizza -->\n    <a-asset-item id=\"model1\"\n      src=\"https://static.poly.pizza/412f5303-86bc-48b2-aaeb-99393c0a4004.glb\">\n    </a-asset-item>\n  </a-assets>\n  <a-gltf-model src=\"#model1\" position=\"0 0 -4\" scale=\"1 1 1\"></a-gltf-model>\n  <!-- kubus pembanding 1 meter -->\n  <a-box position=\"-2 0.5 -4\" color=\"orange\"></a-box>\n</a-scene>",
+    "challenge": "Tampilkan satu model dari Poly Pizza dengan ukuran yang masuk akal dibanding kubus 1 meter. Tulis catatan sumbernya (judul, pembuat, link halaman, lisensi), lalu jelaskan satu kendala dan pemeriksaan yang kamu lakukan.",
+    "evidence": "Model Poly Pizza tampil dengan ukuran sesuai + catatan sumber + penjelasan kendala.",
+    "submitEvidence": "Tautan BSD model Poly Pizza dengan ukuran yang sesuai + catatan sumber + penjelasan kendala dan pemeriksaannya.",
+    "submitExample": "Contoh: Saya memakai model Chair oleh Quaternius (poly.pizza/m/iMNqRzPwwe, lisensi CC0). Setelah Run kursinya tidak terlihat. Saya cek link berakhiran .glb dan id sama dengan src. Ternyata kursinya sangat kecil, jadi scale saya ubah ke 100 100 100 sampai tingginya mirip kubus 1 meter.",
     "summary": [
       "Alamat aset perlu bisa diakses.",
       "scale mengubah ukuran; position mengubah lokasi.",
@@ -628,7 +628,7 @@ const LESSONS = [
         10
       ]
     ],
-    "teacher": "Siapkan model yang bisa dimuat dan izin yang jelas. Jika akses aset bermasalah, gunakan aset guru. Jangan menilai siswa berdasarkan kerumitan model unduhan.",
+    "teacher": "Demokan cara mengambil link .glb dari Poly Pizza (Ctrl + U, cari .glb). Siapkan daftar link cadangan bila Ctrl + U diblokir. Jangan menilai siswa berdasarkan kerumitan model.",
     "questions": [
       [
         "Model terlalu besar tetapi sudah berada di tempat yang benar. Atribut yang diubah terlebih dahulu?",
@@ -697,9 +697,9 @@ const LESSONS = [
       "Import Third-Party Models into A-Frame: a-assets, a-asset-item dan id (langkah 2–4), lalu a-gltf-model untuk menampilkan room (langkah 5).",
       "Lanjutkan satu modifikasi skala/posisi; tanaman, spotlight, dan seluruh pengaturan shadow adalah pengayaan."
     ],
-    "preparation": "Uji model room BSD dan siapkan alternatif berizin jelas. Sediakan catatan sumber; kegiatan mencari model dibatasi di luar kelas.",
-    "minimumTarget": "Satu model tampil, proporsinya sesuai scene, sumber dan ketentuannya dicatat.",
-    "support": "Jika aset gagal, pakai model guru yang sudah diuji. Periksa src/id dahulu, kemudian posisi, skala, dan kamera.",
+    "preparation": "Uji beberapa link .glb Poly Pizza di sandbox BSD dan siapkan daftar cadangan berizin jelas (CC0/CC BY).",
+    "minimumTarget": "Satu model Poly Pizza tampil, proporsinya sesuai dibanding kubus 1 meter, sumber dan lisensinya dicatat.",
+    "support": "Jika model tidak tampil: cek link berakhiran .glb (bukan .glb.br), cek id sama dengan src, lalu coba scale 10 10 10 atau 0.1 0.1 0.1 dan periksa position. Bila Ctrl + U tidak bisa, pakai link dari daftar guru.",
     "exitQuestion": "Aset room sudah dimuat tetapi tidak terlihat. Tuliskan elemen untuk menampilkannya dan dua pemeriksaan berikutnya.",
     "exitExpected": "Menggunakan a-gltf-model src=\"#room\"; memeriksa kecocokan id/alamat, posisi, skala atau kamera dengan alasan.",
     "brief": {
@@ -1702,12 +1702,14 @@ const CLASSROOM_TASKS = [
   },
   {
     "steps": [
-      "Buka Import Third-Party Models into A-Frame. Gunakan model BSD atau aset dari guru.",
-      "Muat aset dan tampilkan model dalam scene.",
-      "Sesuaikan posisi dan ukuran. Catat sumber asetnya."
+      "Buka Import Third-Party Models into A-Frame di BSD. Pelajari a-assets, a-asset-item, dan a-gltf-model.",
+      "Buka poly.pizza, cari satu model (misalnya bed, chair, tree), lalu klik modelnya. Catat judul, pembuat, lisensi, dan link halaman model.",
+      "Ambil link file model: tekan Ctrl + U, tekan Ctrl + F dan ketik .glb, lalu salin link https://static.poly.pizza/....glb (jangan yang berakhiran .glb.br). Tidak perlu login atau klik Download.",
+      "Di sandbox BSD, tempel link pada <a-asset-item id=\"model1\" src=\"...\">, tampilkan dengan <a-gltf-model src=\"#model1\">, dan tambahkan <a-box> 1 meter sebagai pembanding.",
+      "Ubah scale dan position sampai ukuran model masuk akal dan berdiri di lantai."
     ],
-    "challenge": "Sesuaikan proporsi model dengan objek di sekitarnya. Jelaskan satu pemeriksaan jika model tidak tampil.",
-    "result": "Model tampil + sumber aset + penjelasan satu pemeriksaan."
+    "challenge": "Tampilkan satu model Poly Pizza dengan ukuran yang masuk akal dibanding kubus 1 meter. Tulis sumbernya dan jelaskan satu kendala serta pemeriksaanmu.",
+    "result": "Model Poly Pizza tampil + catatan sumber + penjelasan satu kendala."
   },
   {
     "steps": [

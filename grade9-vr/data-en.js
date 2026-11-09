@@ -575,7 +575,7 @@ const LESSONS = [
     "bsd": [
       "Import Third-Party Models into A-Frame"
     ],
-    "scope": "Use one sample model prepared by the teacher. Avoid spending the lesson searching for assets.",
+    "scope": "Choose one model from Poly Pizza (poly.pizza). No login, download, or upload is needed; just copy the .glb file link.",
     "goals": [
       "Import a third-party model.",
       "Adjust its size and position.",
@@ -584,7 +584,7 @@ const LESSONS = [
     "concepts": [
       [
         "A model is an asset",
-        "A 3D model needs an accessible address. Follow the formats and import method used in the BSD activity."
+        "A 3D model needs an accessible address. On Poly Pizza the model file link is in the page source: press Ctrl + U, search .glb with Ctrl + F, and copy the https://static.poly.pizza/....glb link (not the one ending in .glb.br). Sketchfab or Google Drive page links cannot be used as src."
       ],
       [
         "Size differs from position",
@@ -595,11 +595,11 @@ const LESSONS = [
         "Record its title, creator if available, source link, and usage terms. Using someone else’s model still requires your own design decisions."
       ]
     ],
-    "code": "<a-scene renderer=\"colorManagement: true;\">\n  <a-assets>\n    <a-asset-item id=\"room\"\n      src=\"/resources/projects/importing-models/scene.gltf\">\n    </a-asset-item>\n  </a-assets>\n  <a-gltf-model src=\"#room\"></a-gltf-model>\n</a-scene>",
-    "challenge": "Import a model, adjust its proportions, and record its source. Explain one problem and the checks you performed.",
-    "evidence": "A visible, appropriately sized model, source information, and an explanation of a problem.",
-    "submitEvidence": "BSD link to an appropriately sized model + source information + an explanation of a problem and your checks.",
-    "submitExample": "Example: I imported a chair model (source: site name + licence). It was too big at first, so I changed scale to 0.3 0.3 0.3. When it did not appear, I checked the src address and its position.",
+    "code": "<a-scene>\n  <a-assets>\n    <!-- .glb link from Poly Pizza -->\n    <a-asset-item id=\"model1\"\n      src=\"https://static.poly.pizza/412f5303-86bc-48b2-aaeb-99393c0a4004.glb\">\n    </a-asset-item>\n  </a-assets>\n  <a-gltf-model src=\"#model1\" position=\"0 0 -4\" scale=\"1 1 1\"></a-gltf-model>\n  <!-- 1-metre comparison cube -->\n  <a-box position=\"-2 0.5 -4\" color=\"orange\"></a-box>\n</a-scene>",
+    "challenge": "Display one Poly Pizza model at a sensible size compared with a 1-metre cube. Record its source (title, creator, page link, licence), then explain one problem and the checks you performed.",
+    "evidence": "A visible, appropriately sized Poly Pizza model, source information, and an explanation of a problem.",
+    "submitEvidence": "BSD link to an appropriately sized Poly Pizza model + source information + an explanation of a problem and your checks.",
+    "submitExample": "Example: I used Chair by Quaternius (poly.pizza/m/iMNqRzPwwe, CC0 licence). After Run the chair was not visible. I checked that the link ends in .glb and that the id matches src. The chair was tiny, so I changed scale to 100 100 100 until it was about as tall as the 1-metre cube.",
     "summary": [
       "Asset addresses must be accessible.",
       "scale changes size; position changes location.",
@@ -628,7 +628,7 @@ const LESSONS = [
         10
       ]
     ],
-    "teacher": "Prepare working models with clear permissions. If assets are inaccessible, use a teacher-provided asset. Do not assess students by the complexity of downloaded models.",
+    "teacher": "Demonstrate how to get a .glb link from Poly Pizza (Ctrl + U, search .glb). Prepare a backup link list in case Ctrl + U is blocked. Do not assess students by model complexity.",
     "questions": [
       [
         "A model is too large but correctly positioned. Which attribute should change first?",
@@ -697,9 +697,9 @@ const LESSONS = [
       "Import Third-Party Models into A-Frame: a-assets, a-asset-item, and id (steps 2–4), then a-gltf-model to display room (step 5).",
       "Make one scale/position modification. The plant, spotlight, and full shadow setup are extensions."
     ],
-    "preparation": "Test the BSD room model and prepare an alternative with clear permissions. Provide source information; asset searches should happen outside class.",
-    "minimumTarget": "A model is visible with appropriate proportions; its source and usage terms are recorded.",
-    "support": "If loading fails, use a tested teacher asset. Check src/id first, then position, scale, and camera.",
+    "preparation": "Test several Poly Pizza .glb links in the BSD sandbox and prepare a backup list with clear licences (CC0/CC BY).",
+    "minimumTarget": "One Poly Pizza model is visible with sensible proportions compared with a 1-metre cube; its source and licence are recorded.",
+    "support": "If the model does not appear: check the link ends in .glb (not .glb.br), check the id matches src, then try scale 10 10 10 or 0.1 0.1 0.1 and check position. If Ctrl + U is blocked, use a link from the teacher list.",
     "exitQuestion": "The room asset is loaded but invisible. Write the element that displays it and name two further checks.",
     "exitExpected": "Use a-gltf-model src=\"#room\"; explain checks for matching id/address, position, scale, or camera.",
     "brief": {
@@ -1702,12 +1702,14 @@ const CLASSROOM_TASKS = [
   },
   {
     "steps": [
-      "Open Import Third-Party Models into A-Frame. Use a BSD model or a teacher-provided asset.",
-      "Load the asset and display the model in the scene.",
-      "Adjust its position and size. Record the asset source."
+      "Open Import Third-Party Models into A-Frame in BSD. Learn a-assets, a-asset-item, and a-gltf-model.",
+      "Open poly.pizza, search for one model (for example bed, chair, tree), and click it. Note its title, creator, licence, and page link.",
+      "Get the model file link: press Ctrl + U, press Ctrl + F and type .glb, then copy the https://static.poly.pizza/....glb link (not the one ending in .glb.br). No login or Download click is needed.",
+      "In the BSD sandbox, paste the link into <a-asset-item id=\"model1\" src=\"...\">, display it with <a-gltf-model src=\"#model1\">, and add a 1-metre <a-box> for comparison.",
+      "Change scale and position until the model has a sensible size and stands on the floor."
     ],
-    "challenge": "Match the model’s proportions to nearby objects. Explain one check if it does not appear.",
-    "result": "A visible model + asset source + explain one check."
+    "challenge": "Display one Poly Pizza model at a sensible size compared with a 1-metre cube. Record its source and explain one problem and your checks.",
+    "result": "A visible Poly Pizza model + source information + one explained problem."
   },
   {
     "steps": [
