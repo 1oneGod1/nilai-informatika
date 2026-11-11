@@ -1814,6 +1814,130 @@ const G8_COURSES = {
   },
 };
 
+const G10_Q2_ASSESSMENTS = [
+  {
+    id: "techFuture",
+    number: "01",
+    title: "Technology of the Future",
+    subtitle: "Explore Build Your Tech Startup + proyek Technology of the Future",
+    type: "Formatif",
+    weight: 20,
+    color: "#73d31d",
+    groups: [
+      { id: "steps", label: "A. Ketuntasan steps BSD", max: 40, completeAll: true },
+      { id: "product", label: "B. Hasil proyek", max: 60 },
+    ],
+    criteria: [
+      { id: "stepsExplore", group: "steps", label: "Steps BSD Explore Build Your Tech Startup selesai (7 steps)", max: 10 },
+      { id: "stepsProject", group: "steps", label: "Steps BSD Technology of the Future selesai (16 steps)", max: 30 },
+      { id: "titleImage", group: "product", label: "Judul teknologi dan gambar pendukung", max: 15 },
+      { id: "description", group: "product", label: "Deskripsi teknologi ditulis dengan kalimat sendiri", max: 15 },
+      { id: "uses", group: "product", label: "Kegunaan teknologi di masa depan dijelaskan", max: 15 },
+      { id: "links", group: "product", label: "Tiga link contoh nyata yang berfungsi", max: 15 },
+    ],
+  },
+  {
+    id: "businessBrainstorm",
+    number: "02",
+    title: "Business Brainstorm",
+    subtitle: "Ide startup: masalah, keunikan, prototipe, dan pengujian",
+    type: "Formatif",
+    weight: 20,
+    color: "#11bfb6",
+    groups: [
+      { id: "steps", label: "A. Ketuntasan steps BSD", max: 40, completeAll: true },
+      { id: "product", label: "B. Hasil proyek", max: 60 },
+    ],
+    criteria: [
+      { id: "stepsProject", group: "steps", label: "Steps BSD Business Brainstorm selesai (10 steps)", max: 40 },
+      { id: "titleImage", group: "product", label: "Nama startup dan gambar", max: 10 },
+      { id: "problem", group: "product", label: "Masalah yang diselesaikan startup jelas", max: 15 },
+      { id: "ideas", group: "product", label: "Ide solusi dan keunikan startup", max: 15 },
+      { id: "prototype", group: "product", label: "Rencana prototipe", max: 10 },
+      { id: "testing", group: "product", label: "Cara menguji ide startup", max: 10 },
+    ],
+  },
+  {
+    id: "businessBranding",
+    number: "03",
+    title: "Business Branding",
+    subtitle: "Misi/slogan, logo, dan tema warna brand",
+    type: "Formatif",
+    weight: 20,
+    color: "#f0b81b",
+    groups: [
+      { id: "steps", label: "A. Ketuntasan steps BSD", max: 40, completeAll: true },
+      { id: "product", label: "B. Hasil proyek", max: 60 },
+    ],
+    criteria: [
+      { id: "stepsProject", group: "steps", label: "Steps BSD Business Branding selesai (10 steps)", max: 40 },
+      { id: "mission", group: "product", label: "Misi brand atau slogan sesuai startup", max: 20 },
+      { id: "logo", group: "product", label: "Logo startup buatan sendiri", max: 20 },
+      { id: "colorTheme", group: "product", label: "Tema warna brand dipilih dan diterapkan", max: 20 },
+    ],
+  },
+  {
+    id: "businessWebsite",
+    number: "04",
+    title: "Business Website",
+    subtitle: "Planning Document + Multi-Page Website (Home, About Us, What We Do, Contact)",
+    type: "Formatif",
+    weight: 20,
+    color: "#4cc9f0",
+    groups: [
+      { id: "planning", label: "A. Kelengkapan Planning Document", max: 30, completeAll: true },
+      { id: "steps", label: "B. Ketuntasan steps BSD", max: 30, completeAll: true },
+      { id: "product", label: "C. Hasil website", max: 40 },
+    ],
+    criteria: [
+      { id: "planHome", group: "planning", label: "Planning HOME lengkap: nama organisasi, deskripsi banner, slogan, body text 3-4 kalimat, gambar", max: 8 },
+      { id: "planAbout", group: "planning", label: "Planning ABOUT US lengkap: banner, slogan, misi dan nilai, masalah yang diselesaikan", max: 8 },
+      { id: "planWhatWeDo", group: "planning", label: "Planning WHAT WE DO lengkap: banner, slogan, dua paragraf layanan, dua gambar", max: 8 },
+      { id: "planContact", group: "planning", label: "Planning CONTACT US lengkap: banner, slogan, email, telepon, alamat", max: 6 },
+      { id: "stepsProject", group: "steps", label: "Steps BSD Multi-Page Website selesai (31 steps)", max: 30 },
+      { id: "pages", group: "product", label: "Empat halaman (Home, About Us, What We Do, Contact) terhubung lewat navigasi", max: 15 },
+      { id: "content", group: "product", label: "Isi website sesuai planning dan menggambarkan startup", max: 15 },
+      { id: "branding", group: "product", label: "Logo, slogan, dan tema warna brand dipakai konsisten", max: 10 },
+    ],
+  },
+  {
+    id: "businessAdvertising",
+    number: "05",
+    title: "Business Advertising",
+    subtitle: "Blog Planning Document + Blog promosi startup",
+    type: "Formatif",
+    weight: 20,
+    color: "#c77dff",
+    groups: [
+      { id: "planning", label: "A. Kelengkapan Planning Document", max: 30, completeAll: true },
+      { id: "steps", label: "B. Ketuntasan steps BSD", max: 30, completeAll: true },
+      { id: "product", label: "C. Hasil blog", max: 40 },
+    ],
+    criteria: [
+      { id: "planName", group: "planning", label: "Planning: nama blog", max: 6 },
+      { id: "planPost1", group: "planning", label: "Planning post terbaru lengkap: judul, tanggal, dua paragraf 3-4 kalimat, deskripsi dua gambar", max: 12 },
+      { id: "planPost2", group: "planning", label: "Planning post kedua lengkap: judul, tanggal, dua paragraf 3-4 kalimat, deskripsi dua gambar", max: 12 },
+      { id: "stepsProject", group: "steps", label: "Steps BSD Blog selesai (21 steps)", max: 30 },
+      { id: "posts", group: "product", label: "Dua post blog, masing-masing dua paragraf serta dua gambar dan caption", max: 20 },
+      { id: "structure", group: "product", label: "Nama blog dan logo bisnis tampil; post terbaru di atas; link Back to top berfungsi", max: 10 },
+      { id: "promotion", group: "product", label: "Isi blog mempromosikan startup dan sesuai brand", max: 10 },
+    ],
+  },
+];
+
+const G10_COURSES = {
+  2: {
+    id: "buildTechStartup",
+    grade: 10,
+    quarter: 2,
+    title: "Assessment Build Your Tech Startup",
+    shortTitle: "Build Your Tech Startup",
+    description: "Kelas 10 | Q2 | Lima proyek BSD sampai Business Advertising, masing-masing 20% (F1-F5): steps BSD + hasil proyek; Website dan Blog juga menilai kelengkapan Planning Document.",
+    assessments: G10_Q2_ASSESSMENTS,
+    finalQuiz: null,
+  },
+};
+
 const G11_COURSES = {
   1: {
     id: "codePythonAiQ1",
@@ -1890,6 +2014,7 @@ const DC_COURSES_BY_GRADE = {
   7: G7_COURSES,
   8: G8_COURSES,
   9: DC_COURSES,
+  10: G10_COURSES,
   11: G11_COURSES,
   12: G12_COURSES,
 };
@@ -2528,6 +2653,7 @@ window.G12_Q3_ASSESSMENTS = G12_Q3_ASSESSMENTS;
 window.G12_Q4_ASSESSMENTS = G12_Q4_ASSESSMENTS;
 window.G12_COURSES = G12_COURSES;
 window.DC_COURSES_BY_GRADE = DC_COURSES_BY_GRADE;
+window.G10_Q2_ASSESSMENTS = G10_Q2_ASSESSMENTS;
 window.dcGetCourseConfig = dcGetCourseConfig;
 window.dcGetAssessmentItems = dcGetAssessmentItems;
 window.dcGetCourseWeightTotals = dcGetCourseWeightTotals;
