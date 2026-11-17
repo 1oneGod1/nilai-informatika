@@ -35,11 +35,8 @@ const G9_VR_LESSON_EVIDENCE=Object.freeze({1:Object.freeze({title:"Halo, dunia v
   2:Object.freeze({title:"Bentuk jadi sebuah cerita",evidence:"Tautan BSD objek gabungan + penjelasan satu perubahan posisi atau rotasi melalui objek induk."}),
   3:Object.freeze({title:"Ciptakan suasananya",evidence:"Tautan BSD yang menampilkan dua suasana (jelaskan perbedaan versi A dan B) + alasan memilih salah satu."}),
   4:Object.freeze({title:"Bawa aset ke duniamu",evidence:"Tautan BSD model Poly Pizza dengan ukuran yang sesuai + catatan sumber + penjelasan kendala dan pemeriksaannya."}),
-  5:Object.freeze({title:"Dunia yang merespons",evidence:"Tautan BSD interaksi yang berjalan + satu temuan dari teman + satu perbaikan."}),
-  6:Object.freeze({title:"Rancang diorama milikmu",evidence:"Tautan BSD scene awal di Sandbox + uraian sketsamu (tema dan tata letak) + daftar fitur minimum."}),
-  7:Object.freeze({title:"Bangun, uji, pecahkan",evidence:"Tautan BSD prototipe diorama + satu catatan debugging (dugaan → perubahan → hasil) + penjelasan kode."}),
-  8:Object.freeze({title:"Lihat dari mata pengguna",evidence:"Tautan BSD versi final + uraian keadaan sebelum dan sesudah revisi + alasan revisi."}),
-  9:Object.freeze({title:"Saatnya menunjukkan karyamu",evidence:"Tautan BSD diorama final + ringkasan dokumentasi proses + bagian kode yang kamu jelaskan. Demonstrasi dan tes konsep dilakukan di kelas."})});
+  5:Object.freeze({title:"Dunia yang merespons",evidence:"Tautan BSD interaksi gaze yang berjalan + penjelasan pemicu, listener, dan respons."}),
+  6:Object.freeze({title:"Project akhir: diorama VR milikmu",evidence:"Tautan BSD diorama final + tema dan apa yang dilakukan pengunjung + daftar fitur + sumber aset pihak ketiga (jika ada)."})});
 
 const G9VrGrades=(()=>{
   const DAY=86400000;

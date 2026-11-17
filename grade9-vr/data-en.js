@@ -13,7 +13,7 @@ const CONFIG = {
       "Create one simple interaction and test the visitor experience.",
       "Explain your code, credit asset sources, and document revisions."
     ],
-    "finalTask": "Create one diorama with a clear theme. Include your plan, sources for any third-party assets, test results, and evidence of revision. Each student explains code and makes a small modification, including when the project is made in a group.",
+    "finalTask": "One clearly themed diorama in the BSD Sandbox that uses shapes, textures, lighting, a third-party model, and one interaction, submitted with its theme, feature list, and asset source notes.",
     "stages": [
       [
         "1–2",
@@ -26,9 +26,9 @@ const CONFIG = {
         "Textures, lighting, imported models, and gaze responses."
       ],
       [
-        "6–9",
-        "Your own creation",
-        "Plan, build, test, revise, and demonstrate your diorama."
+        "6",
+        "Final project",
+        "Plan, build, and submit a VR diorama."
       ]
     ],
     "wka": {
@@ -732,7 +732,7 @@ const LESSONS = [
   {
     "id": 5,
     "title": "A world that responds",
-    "subtitle": "Build gaze interaction and test it with a partner.",
+    "subtitle": "Build a gaze interaction and explain how it works.",
     "tag": "Interaction",
     "label": "Gaze interaction",
     "lab": "gaze",
@@ -744,7 +744,7 @@ const LESSONS = [
     "goals": [
       "Explain an interaction’s trigger and response.",
       "Create a simple gaze interaction following BSD.",
-      "Test whether a partner understands how to use it."
+      "Explain the flow trigger → listener → function → response."
     ],
     "concepts": [
       [
@@ -756,25 +756,21 @@ const LESSONS = [
         "The target should be visible. Give instructions and feedback that help users recognize a successful action."
       ],
       [
-        "Test without giving the answer",
-        "Let a partner try independently first. Observe confusion, then improve the target, instructions, or response."
-      ],
-      [
         "Cursor and listener work together",
         "The camera contains a fuse cursor. A component on the target registers a click listener; its callback determines the response. Learn this structure with teacher-provided starter code."
       ]
     ],
     "code": "<!-- A simple adaptation, not the complete BSD project. -->\n<!-- Load A-Frame, then register this component before the scene. -->\n<script>\nAFRAME.registerComponent(\"ubah-warna\", {\n  init: function () {\n    const target = this.el;\n    target.addEventListener(\"click\", function () {\n      target.setAttribute(\"color\", \"green\");\n    });\n  }\n});\n</script>\n<a-scene>\n  <a-camera><a-cursor fuse=\"true\" fuse-timeout=\"1500\"></a-cursor></a-camera>\n  <a-box ubah-warna position=\"0 1.6 -3\" color=\"yellow\"></a-box>\n</a-scene>",
-    "challenge": "Create an interactive target. Let a partner try without verbal instructions, then improve one part based on the test.",
-    "evidence": "A working interaction, one user finding, and one improvement.",
-    "submitEvidence": "BSD link to a working interaction + one finding from your partner + one improvement.",
-    "submitExample": "Example: The box changes colour after it is gazed at for 1 second. My partner did not know the box could be gazed at, so I added a hint text and made the box bigger.",
+    "challenge": "",
+    "evidence": "A working gaze interaction + an explanation of its trigger and response.",
+    "submitEvidence": "BSD link to a working gaze interaction + an explanation of the trigger, listener, and response.",
+    "submitExample": "Example: The box changes colour after it is gazed at for 1 second. The trigger is the fuse cursor’s gaze, the click listener calls the changeColour function, and the response turns the box red.",
     "summary": [
       "An interaction has a trigger and a response.",
-      "Targets and instructions should be understandable.",
-      "Testing with another person reveals problems."
+      "An event listener connects an event to a response function.",
+      "Targets and responses should be easy for users to see."
     ],
-    "reflection": "What did your partner do differently from what you expected during the interaction test?",
+    "reflection": "Which part of the trigger → listener → response flow was hardest to understand, and how did you test it?",
     "times": [
       [
         "Opening quiz",
@@ -869,10 +865,10 @@ const LESSONS = [
     "preparation": "Prepare working camera/cursor/target HTML and component JavaScript. Load A-Frame first, register the component next, then create the scene. Test on student devices.",
     "minimumTarget": "Gaze causes one visible change; the student explains the listener and modifies the response.",
     "support": "Do not require beginners to write all 14 steps from scratch. If events/variables need support, read the code together and have students change and explain the response color.",
-    "exitQuestion": "Name the trigger, the function called, the response, and how your partner demonstrated that the interaction works.",
+    "exitQuestion": "For your interaction, name the trigger, the function called, and the visible response.",
     "exitExpected": "Connect gaze/fuse → click listener → response function → an observable visual change.",
     "brief": {
-      "mainGoal": "Create a gaze interaction with a visible response and test it with another user.",
+      "mainGoal": "Create a gaze interaction with a visible response and explain how it works.",
       "material": [
         "An interaction has a trigger and a response. A fuse cursor inside the camera can activate a target after the gaze stays on it for a set duration.",
         "A JavaScript component registers an event listener on the target. The listener connects an event to a response function, such as a color change. Use the teacher’s starter code, understand the flow, and modify the response."
@@ -886,7 +882,7 @@ const LESSONS = [
       "success": [
         "Gazing at the target triggers a visible change.",
         "You can explain trigger → listener → function → response.",
-        "A partner can find/use the target; a finding and improvement are documented."
+        "The response you changed works when tested."
       ],
       "wka": {
         "principle": "Care for others includes considering their experience of our creations.",
@@ -895,26 +891,26 @@ const LESSONS = [
         "practice": "Improve targets and instructions using your partner’s testing difficulties.",
         "question": "What could you change to make the interaction easier for someone else?"
       },
-      "teacherScript": "Today our scene will begin responding to users. We will learn about gaze triggers, event listeners, and response functions through starter code. Change one response and ask a partner to try without verbal help. Be ready to show the interaction flow and one improvement. Care for others becomes visible in targets and instructions that are easy to use."
+      "teacherScript": "Today our scene will begin responding to users. We will learn about gaze triggers, event listeners, and response functions through starter code. Change one response, test it, and explain the flow to me. Care for others becomes visible in targets and responses that other people can understand."
     }
   },
   {
     "id": 6,
-    "title": "Plan your own diorama",
-    "subtitle": "Choose a theme, set a manageable scope, and start building.",
-    "tag": "Project",
-    "label": "Diorama planning",
+    "title": "Final project: your own VR diorama",
+    "subtitle": "Plan, build, and submit your VR diorama in the BSD Sandbox.",
+    "tag": "Final project",
+    "label": "Final project: Diorama",
     "lab": "plan",
-    "prompt": "What one experience do you want to give visitors to your diorama?",
+    "prompt": "What is one experience you want to give visitors to your diorama?",
     "bsd": [
       "Final Project: Diorama",
-      "Referencing previous projects"
+      "Sandbox"
     ],
-    "scope": "The class project is adapted for nine lessons. Agree on a theme and minimum features with the teacher.",
+    "scope": "One independent diorama that uses lessons 1–5. Work on it until your teacher’s deadline.",
     "goals": [
-      "Choose a theme and intended experience.",
-      "Sketch a layout and select realistic features.",
-      "Start an independent scene in Sandbox."
+      "Decide on a theme and what visitors will do.",
+      "Build the diorama in Sandbox using shapes, textures, lighting, models, and interaction.",
+      "Check that every feature works, then submit the final version."
     ],
     "concepts": [
       [
@@ -928,19 +924,23 @@ const LESSONS = [
       [
         "Plans can develop",
         "A sketch need not be perfect. Use it as a guide and record changes and reasons while building."
+      ],
+      [
+        "Save and test every step",
+        "Add one feature, run it, and check the result before adding the next. Problems are easier to find when changes are small."
       ]
     ],
     "code": "Short plan:\nTheme: ____________________\nVisitors will: ____________________\nMy own model: ____________________\nMain interaction: ____________________\nAssets and sources: ____________________",
-    "challenge": "Create a sketch and a minimum-feature list. Review the scope with the teacher before building in Sandbox.",
-    "evidence": "A sketch, feature list, and starter scene in Sandbox.",
-    "submitEvidence": "BSD link to the starter scene in Sandbox + a description of your sketch (theme and layout) + a minimum-feature list.",
-    "submitExample": "Example: Theme: school garden. Visitors gaze at a plant to see its name. Minimum features: 3 plants, a path, 1 gaze interaction. The starter scene in Sandbox already has the ground and the path.",
+    "challenge": "",
+    "evidence": "Final diorama in Sandbox + theme and feature list + asset source notes.",
+    "submitEvidence": "BSD link to the final diorama + theme and what visitors do + feature list + third-party asset sources (if any).",
+    "submitExample": "Example: Theme: school garden. Visitors gaze at plants to see their names. Features: plants made of boxes and spheres, a textured path, evening light, a Poly Pizza tree model (Tree by Kenney, CC0), and a gaze interaction.",
     "summary": [
-      "The theme guides feature choices.",
-      "A finished small scope is more useful than a large unfinished plan.",
-      "Planning and revision provide process evidence."
+      "A diorama starts from a theme and a visitor action.",
+      "Finish the minimum features first, extras later.",
+      "Test every change and record asset sources."
     ],
-    "reflection": "Which feature will you postpone so that the main experience can be completed?",
+    "reflection": "Which part of your diorama are you most proud of, and what would you improve with more time?",
     "times": [
       [
         "Opening quiz",
@@ -967,7 +967,7 @@ const LESSONS = [
         10
       ]
     ],
-    "teacher": "Check scope before students build. Share the rubric and examples of process evidence. BSD references are allowed, but students must explain their adaptations.",
+    "teacher": "Check that the theme and features are realistic before students build. Share the final-project rubric. Students may use BSD references but must explain how they adapted them.",
     "questions": [
       [
         "Visitors should find a plant and activate an information button. Which features come first?",
@@ -1033,30 +1033,30 @@ const LESSONS = [
       ]
     ],
     "bsdFocus": [
-      "Use Final Project: Diorama and Referencing previous projects as a basis. Choose a realistic minimum version for the class.",
-      "Start in Sandbox, refer to previous projects, and adapt the work to an original theme."
+      "Final Project: Diorama is the reference; students build their own version in Sandbox.",
+      "Lesson 1–5 projects may be used as references, then adapted to the student’s theme."
     ],
-    "preparation": "Share the brief/rubric early and a source-record example. Decide whether work is individual or grouped; evidence of mastery remains individual.",
-    "minimumTarget": "A sketch, visitor purpose, minimum-feature list, and saved starter scene.",
-    "support": "Reduce features that do not support the purpose. In group work, record each student’s contribution and understanding.",
-    "exitQuestion": "Name one visitor action, a minimum feature that supports it, and an extra feature you will postpone.",
-    "exitExpected": "Connect the purpose and minimum features; explain why extras are postponed for time or feasibility.",
+    "preparation": "Share the final-project rubric early, with an example of asset source notes. Decide whether work is individual or in groups; understanding is still checked per student.",
+    "minimumTarget": "A clearly themed diorama with a composite object, texture, lighting, one third-party model, and one working interaction.",
+    "support": "Cut features that do not support the theme. For group work, record each student’s contribution.",
+    "exitQuestion": "Name one visitor action in your diorama and the feature that supports it.",
+    "exitExpected": "Theme, visitor action, and features are connected; asset sources are recorded.",
     "brief": {
-      "mainGoal": "Plan a diorama with a clear theme and realistic minimum features, then start a scene in Sandbox.",
+      "mainGoal": "Create one clearly themed VR diorama in the BSD Sandbox using lessons 1–5, then submit the final version.",
       "material": [
-        "A diorama is a small world that communicates a theme or experience. Begin with the visitor: what will they see or do?",
-        "A sketch guides objects, layout, and interaction. The minimum version includes your own combined model, a texture, lighting, and one interaction. Add extras once the main experience works."
+        "A diorama is a small world that communicates a theme or experience. Start from the visitor: what will they see or do?",
+        "The minimum version includes your own composite object, texture, lighting, one third-party model with its source recorded, and one interaction. Extra features come after everything works."
       ],
-      "why": "A focused plan helps you finish within the available class time.",
+      "why": "The final project shows that you can use everything you learned to create your own work.",
       "tasks": [
         "Write your theme, intended visitors, and one main experience.",
         "Sketch the layout, list minimum features and asset sources, and review feasibility with the teacher.",
         "Start a Sandbox scene and set your next building target."
       ],
       "success": [
-        "Your theme and visitor action are clear.",
-        "The sketch and feature list support the purpose and fit the available time.",
-        "The starter scene is saved; postponed extras and the next target are identified."
+        "The theme and visitor action are clear.",
+        "The minimum features run without errors in Sandbox.",
+        "Third-party asset sources are recorded and the final link is submitted."
       ],
       "wka": {
         "principle": "Cultivating and caring for creation guides responsible use of resources.",
@@ -1065,566 +1065,7 @@ const LESSONS = [
         "practice": "Choose a theme that values creation and plan responsible use of time and assets.",
         "question": "What would your diorama help visitors understand or care about?"
       },
-      "teacherScript": "Today you will plan your own diorama. Choose a theme, identify your visitors and their actions, then select features that support that experience. Sketch your plan, agree on the minimum features with me, and start a Sandbox scene. Aim for a plan you can complete. Care for creation can guide your theme and responsible use of time and assets."
-    }
-  },
-  {
-    "id": 7,
-    "title": "Build, test, solve",
-    "subtitle": "Develop your creation and trace problems one at a time.",
-    "tag": "Project",
-    "label": "Development",
-    "lab": "debug",
-    "prompt": "How is testing a hypothesis different from trying random numbers?",
-    "bsd": [
-      "Sandbox",
-      "Previous projects as references"
-    ],
-    "scope": "Build the minimum features. Use tutorials as references and adapt them to your plan.",
-    "goals": [
-      "Develop objects, visuals, and the main interaction.",
-      "Trace problems by testing one change at a time.",
-      "Explain code and record fixes."
-    ],
-    "concepts": [
-      [
-        "State the problem",
-        "Distinguish the expected result from what happened. Identify the relevant scene or code."
-      ],
-      [
-        "Test one hypothesis",
-        "Review the most recent change and try one fix. Changing many things together makes the cause harder to identify."
-      ],
-      [
-        "Keep a process record",
-        "Record the problem, action, and result. Before-and-after screenshots can provide revision evidence."
-      ]
-    ],
-    "code": "Debugging log:\nExpected: ____________________\nActual: ____________________\nSuspected cause: ____________________\nOne change tested: ____________________\nResult: ____________________",
-    "challenge": "Choose a problem in your diorama. Record a hypothesis, test one change, and explain the result to the teacher.",
-    "evidence": "A diorama prototype, one debugging log, and a code explanation.",
-    "submitEvidence": "BSD link to your diorama prototype + one debugging log (hypothesis → change → result) + a code explanation.",
-    "submitExample": "Example: Problem: the door was not visible. Hypothesis: the door was inside the wall. I changed position z from -5 to -4.5 and tested again; the door appeared. The position attribute sets where an object is.",
-    "summary": [
-      "Describe the problem specifically.",
-      "Test one change so the cause is easier to trace.",
-      "Explaining code provides evidence of individual mastery."
-    ],
-    "reflection": "Which hypothesis changed after you saw the test result?",
-    "times": [
-      [
-        "Opening quiz & target",
-        5
-      ],
-      [
-        "Develop the diorama",
-        50
-      ],
-      [
-        "Code check & individual demonstration",
-        15
-      ],
-      [
-        "Formative quiz & process log",
-        10
-      ]
-    ],
-    "teacher": "Begin individual demonstrations for summative assessment. Ask for code reasoning and one small modification. Record individual evidence separately from group assessment.",
-    "questions": [
-      [
-        "An interaction stops after the response code changes. What is a good debugging step?",
-        [
-          "Change all HTML and JavaScript together",
-          "Review the latest response change and test one hypothesis",
-          "Hide the button to avoid testing"
-        ],
-        1,
-        "The latest change is a clue to test systematically."
-      ],
-      [
-        "A feature works again after one value is changed. How can you strengthen the conclusion?",
-        [
-          "Retest and record the connection between the change and result",
-          "Assume every other bug is fixed",
-          "Delete the hypothesis notes"
-        ],
-        0,
-        "Retesting checks whether the fix is consistent."
-      ],
-      [
-        "Which note is most useful for teacher discussion?",
-        [
-          "The project is difficult",
-          "I changed some numbers",
-          "Box invisible; hypothesis: incorrect Z; changed Z to -3; box now visible"
-        ],
-        2,
-        "The note specifies the problem, hypothesis, action, and result."
-      ]
-    ],
-    "openingQuestions": [
-      [
-        "A visitor goal should…",
-        [
-          "Include as many effects as possible",
-          "Match the file name",
-          "State what visitors will see or do"
-        ],
-        2,
-        "A clear purpose guides supporting features."
-      ],
-      [
-        "What evidence should accompany a third-party model?",
-        [
-          "Source and usage terms",
-          "Only its color",
-          "Only the object count"
-        ],
-        0,
-        "Record sources and permissions with the creation."
-      ],
-      [
-        "The minimum features do not work yet. What is the building priority?",
-        [
-          "Adding another feature",
-          "Building and testing the minimum features",
-          "Changing the theme repeatedly"
-        ],
-        1,
-        "Prioritize the features needed for the core experience."
-      ]
-    ],
-    "bsdFocus": [
-      "Diorama in Sandbox: build the approved minimum version rather than starting a new tutorial project.",
-      "Refer to relevant BSD sections while debugging and document your own modifications."
-    ],
-    "preparation": "Prepare a feature checklist and an individual-check schedule. Check sources, code, and results; help trace one problem.",
-    "minimumTarget": "A testable prototype, one debugging log, and an explanation of a code section.",
-    "support": "Address obstacles to the core experience first. Begin collecting individual demonstration evidence so it does not all fall in lesson 9.",
-    "exitQuestion": "Record one problem: expected result, actual result, hypothesis, one change, and test result.",
-    "exitExpected": "Describe a specific problem, testable hypothesis, change, and related result.",
-    "brief": {
-      "mainGoal": "Develop a diorama prototype and address a problem through focused testing.",
-      "material": [
-        "Debugging begins by comparing what you expected with what happened. Recent changes and error messages help you form a hypothesis.",
-        "Test one change, observe its result, and record the process. Individual checks also begin: explain your code and make a small modification."
-      ],
-      "why": "Testing improves the creation, and process notes help explain your decisions.",
-      "tasks": [
-        "Build the approved minimum features.",
-        "Choose a problem, write a hypothesis, test one change, and record its result.",
-        "Show your prototype and a code section to the teacher; make a small modification when asked."
-      ],
-      "success": [
-        "The prototype is saved and its core features can be tested.",
-        "A log includes the problem, hypothesis, one change, and result.",
-        "You can explain your code and the effect of a modification."
-      ],
-      "wka": {
-        "principle": "Wholehearted work includes perseverance in our responsibilities.",
-        "reference": "Colossians 3:23",
-        "url": "https://www.bible.com/bible/111/COL.3.23.NIV",
-        "practice": "Trace a problem carefully and record the help you use.",
-        "question": "What action demonstrates perseverance when your code does not work yet?"
-      },
-      "teacherScript": "Today we will develop the main features and trace problems. Choose one problem, test one hypothesis, and record what changed. I will also ask some students to explain their code and make a small modification. Aim for a testable prototype and specific notes. Perseverance means examining problems carefully and taking responsibility for the process."
-    }
-  },
-  {
-    "id": 8,
-    "title": "See through your users’ eyes",
-    "subtitle": "Listen to feedback. Revise with a purpose.",
-    "tag": "Project",
-    "label": "Testing & revision",
-    "lab": "test",
-    "prompt": "Is a scene successful if its creator can use it but visitors are confused?",
-    "bsd": [
-      "Diorama in Sandbox"
-    ],
-    "scope": "Test a partner’s work, fix the main problem, and save the final version.",
-    "goals": [
-      "Collect specific feedback.",
-      "Prioritize functional and visibility problems.",
-      "Show a revision and explain its purpose."
-    ],
-    "concepts": [
-      [
-        "Give users a clear task",
-        "For example: find the target, activate the interaction, and explain the scene’s theme. Observe without immediately directing them."
-      ],
-      [
-        "Make feedback specific",
-        "Describe what happened, its impact, and one suggestion. For example: the target is dark and hard to find; try adding light."
-      ],
-      [
-        "Prioritize improvements",
-        "Fix a failed or confusing core feature first. Refine visual details if time remains."
-      ]
-    ],
-    "code": "User testing notes:\nUser task: ____________________\nObservation: ____________________\nImpact: ____________________\nChosen revision: ____________________\nResult after retesting: ____________________",
-    "challenge": "Ask a partner to test your diorama. Record an important problem, fix it, and repeat the test with that partner.",
-    "evidence": "A final version, before-and-after evidence, and a reason for the revision.",
-    "submitEvidence": "BSD link to the final version + a description of before and after the revision + the reason for the revision.",
-    "submitExample": "Example: My partner was confused about which objects could be gazed at. Before: no sign. After: interactive objects are yellow and have a hint text. In the retest, my partner found them straight away.",
-    "summary": [
-      "Testing needs a task and observation.",
-      "Specific feedback is easier to act on.",
-      "Retest revisions to check whether the problem is resolved."
-    ],
-    "reflection": "Which feedback did you use, and why did you choose it?",
-    "times": [
-      [
-        "Opening quiz",
-        5
-      ],
-      [
-        "Partner testing",
-        15
-      ],
-      [
-        "Revise function & design",
-        35
-      ],
-      [
-        "Individual demonstration",
-        15
-      ],
-      [
-        "Formative quiz, exit & save",
-        10
-      ]
-    ],
-    "teacher": "Continue individual demonstrations. Assess the response to feedback, not the number of comments received. Ensure work is saved before class ends.",
-    "questions": [
-      [
-        "A partner needs 20 seconds to find a dark target. Which revision addresses it directly?",
-        [
-          "Improve target visibility and retest the time needed",
-          "Rename the file",
-          "Add music without changing the target"
-        ],
-        0,
-        "The improvement targets an observed problem."
-      ],
-      [
-        "The button fails and a decoration color looks unsuitable. What comes first?",
-        [
-          "Decoration color",
-          "The button needed for the main experience",
-          "Adding a third feature"
-        ],
-        1,
-        "A failed core feature affects the purpose more than a decorative detail."
-      ],
-      [
-        "Which evidence shows that a revision worked?",
-        [
-          "The creator feels it looks good",
-          "There are more lines of code",
-          "A partner completes the task after revision, with retest notes"
-        ],
-        2,
-        "Use the same user task to check the revision’s effect."
-      ]
-    ],
-    "openingQuestions": [
-      [
-        "Why change one thing first when debugging?",
-        [
-          "To guarantee short code",
-          "To trace the effect of the change",
-          "To avoid further testing"
-        ],
-        1,
-        "One change helps test a suspected cause."
-      ],
-      [
-        "Which process evidence is useful?",
-        [
-          "Only the final result",
-          "Only the title",
-          "The problem, change, and test result"
-        ],
-        2,
-        "Process evidence shows actions and results."
-      ],
-      [
-        "What should you prepare for a partner’s interaction test?",
-        [
-          "A clear task and observation notes",
-          "Verbal directions for every step",
-          "A list of every color"
-        ],
-        0,
-        "Clear tasks make the outcome observable."
-      ]
-    ],
-    "bsdFocus": [
-      "Diorama in Sandbox: a partner completes user tasks while the creator observes and revises.",
-      "Do not add a new tutorial project. Save the final version and before-and-after evidence."
-    ],
-    "preparation": "Assign test partners and tasks: find the target, activate it, and describe the theme. Provide observation notes and schedule the next individual demonstrations.",
-    "minimumTarget": "A final version, one user finding, a revision, and documented retesting.",
-    "support": "Focus revision on the main problem. If individual slots are full, collect a short recorded code explanation and verify a modification live.",
-    "exitQuestion": "What did the tester find, what did you change, and what happened when the same task was tested again?",
-    "exitExpected": "Connect an observed problem, a targeted revision, and the retest outcome.",
-    "brief": {
-      "mainGoal": "Improve the diorama using user observations and demonstrate the effect through retesting.",
-      "material": [
-        "Give the tester a clear task, such as finding a target and activating an interaction. Observe their attempt before helping.",
-        "Useful feedback identifies what happened, its impact, and a suggestion. Prioritize the core experience, revise it, and retest the same task."
-      ],
-      "why": "Other users can reveal problems that the creator has overlooked.",
-      "tasks": [
-        "Ask a partner to complete a user task and record what actually happens.",
-        "Choose an important problem, revise it, and save before-and-after evidence.",
-        "Retest the same task, save the final version, and continue individual demonstrations."
-      ],
-      "success": [
-        "The notes contain a specific user finding.",
-        "The revision addresses the chosen problem.",
-        "Retesting shows the effect of the change; the final version and evidence are saved."
-      ],
-      "wka": {
-        "principle": "Listening carefully and responding patiently helps us receive others well.",
-        "reference": "James 1:19",
-        "url": "https://www.bible.com/bible/111/JAS.1.19.NIV",
-        "practice": "Hear feedback fully, ask about the evidence, and choose a helpful revision.",
-        "question": "How will you respond to feedback that differs from your opinion?"
-      },
-      "teacherScript": "Today we will view the diorama through a user’s eyes. Give a partner a clear task, observe difficulties, and choose the most helpful improvement. Save before-and-after evidence and retest. Be ready to explain the revision and show its effect. We will practice listening calmly and responding respectfully to feedback."
-    }
-  },
-  {
-    "id": 9,
-    "title": "Show what you have created",
-    "subtitle": "Demonstrate, explain, and reflect.",
-    "tag": "Showcase",
-    "label": "Final demonstration",
-    "lab": "showcase",
-    "prompt": "Which part of your work best shows that you can make decisions independently?",
-    "bsd": [
-      "Final diorama",
-      "Teacher-set concept test on core content"
-    ],
-    "scope": "Assessment covers taught content only. The website quiz is practice, not an automatically recorded exam.",
-    "goals": [
-      "Demonstrate a working core feature.",
-      "Explain code and design decisions individually.",
-      "Reflect on development throughout the course."
-    ],
-    "concepts": [
-      [
-        "Show the result and reasoning",
-        "Explain the theme, important code, a core feature, and one revision. Keep the demonstration focused on evidence."
-      ],
-      [
-        "Mastery is individual",
-        "Even in a group project, each student explains what they understand and makes a small modification."
-      ],
-      [
-        "Use criteria for assessment",
-        "Diorama and process: 70%; individual demonstration: 20%; concept test: 10%. Details are on the final-project page."
-      ]
-    ],
-    "code": "Demonstration sequence:\n1. Theme and main experience.\n2. A working feature.\n3. A code section you understand.\n4. One revision and its reason.\n5. A small modification requested by the teacher.",
-    "challenge": "Prepare a short demonstration and process evidence. Practice explaining one code section without reading the tutorial.",
-    "evidence": "A final diorama, documentation, individual demonstration, and teacher-set concept test.",
-    "submitEvidence": "BSD link to the final diorama + a summary of your process documentation + the code section you explain. The demonstration and concept test happen in class.",
-    "submitExample": "Example: Final diorama: a mini museum with 3 artworks and one gaze interaction. I explained the gallery’s parent a-entity, then tried the teacher’s change (light colour); the result matched my prediction.",
-    "summary": [
-      "A working creation also needs demonstrated understanding.",
-      "Extra features do not automatically earn a higher score.",
-      "Practice progress supports preparation; the teacher’s rubric determines official grades."
-    ],
-    "reflection": "What can you now do independently, and what would you like to learn next?",
-    "times": [
-      [
-        "Opening quiz & readiness",
-        5
-      ],
-      [
-        "Official teacher-set concept test",
-        15
-      ],
-      [
-        "Remaining demonstrations & submission",
-        50
-      ],
-      [
-        "Exit ticket & final reflection",
-        10
-      ]
-    ],
-    "teacher": "Use demonstration evidence from lessons 7–9. Adjust test length and timing to class size. Website practice is open for discussion; use different questions for the official test.",
-    "questions": [
-      [
-        "A-Frame objects should be placed inside…",
-        [
-          "<a-scene>",
-          "Only <a-assets>",
-          "Only <script>"
-        ],
-        0,
-        "The scene contains world elements; assets preload resources and scripts contain programs."
-      ],
-      [
-        "position changes from \"-2 1 -4\" to \"2 1 -4\". What changes?",
-        [
-          "Height increases",
-          "The X position moves to the right",
-          "Size increases"
-        ],
-        1,
-        "Only X changes from -2 to 2; Y and Z are unchanged."
-      ],
-      [
-        "A box should rotate without moving. Which attribute changes?",
-        [
-          "position",
-          "scale",
-          "rotation"
-        ],
-        2,
-        "rotation changes orientation, not location."
-      ],
-      [
-        "A parent containing child objects moves. What happens?",
-        [
-          "The children follow the parent’s transformation",
-          "The children always stay at their original world positions",
-          "The children automatically get bigger"
-        ],
-        0,
-        "A parent transformation affects its children."
-      ],
-      [
-        "A model loads but is too small. What is the direct adjustment?",
-        [
-          "Only change position",
-          "Increase scale and compare proportions",
-          "Remove the asset address"
-        ],
-        1,
-        "scale controls size; check its proportions in the scene."
-      ],
-      [
-        "A texture fails to load. What should you check first?",
-        [
-          "The image src address and accessibility",
-          "The creator’s name",
-          "The lesson count"
-        ],
-        0,
-        "An incorrect or inaccessible image address prevents texture loading."
-      ],
-      [
-        "In gaze interaction, an event listener connects…",
-        [
-          "The title to the date",
-          "The model to its download source",
-          "An event on the target to a response function"
-        ],
-        2,
-        "The listener calls a function when its registered event occurs."
-      ],
-      [
-        "A third-party model has unclear permissions. What should you do?",
-        [
-          "Check the source or choose an asset with clear terms",
-          "Delete the source record",
-          "Assume every download is unrestricted"
-        ],
-        0,
-        "Check usage terms before using the asset."
-      ],
-      [
-        "A scene breaks after several changes. How can you trace the cause?",
-        [
-          "Add features until it looks different",
-          "State the problem, review changes, and test one hypothesis",
-          "Change all the code without notes"
-        ],
-        1,
-        "Testing one hypothesis connects changes with results."
-      ],
-      [
-        "Which revision record demonstrates learning?",
-        [
-          "Only the final result",
-          "Only the number of comments",
-          "User findings, the chosen change, and the retest result"
-        ],
-        2,
-        "Evidence explains the revision’s purpose and effect."
-      ]
-    ],
-    "openingQuestions": [
-      [
-        "After improving a hard-to-find target, you should…",
-        [
-          "Retest with a user",
-          "Assume it definitely works",
-          "Delete earlier evidence"
-        ],
-        0,
-        "Retesting checks whether the problem is resolved."
-      ],
-      [
-        "Which demonstrates individual mastery?",
-        [
-          "Only opening the final result",
-          "Explaining code and making a small modification",
-          "Only saying BSD marked it Passed"
-        ],
-        1,
-        "Explanation and modification provide observable evidence of understanding."
-      ],
-      [
-        "The website’s open practice quizzes are for…",
-        [
-          "Automatically assigning the whole final grade",
-          "Replacing all project evidence",
-          "Preparation and understanding checks"
-        ],
-        2,
-        "The teacher uses project evidence, demonstration, and a concept test for official grades."
-      ]
-    ],
-    "bsdFocus": [
-      "Final diorama and a teacher-selected/written concept test covering only the core content actually taught.",
-      "The 10 questions on the Quiz tab are open practice before lesson 9, not the official test in this lesson’s schedule."
-    ],
-    "preparation": "Prepare a different test from the open practice, remaining demonstration slots, the rubric, and a submission location. Collect individual evidence in lessons 7–8.",
-    "minimumTarget": "Work and process evidence are submitted; each student explains/modifies code; the teacher administers a concept test.",
-    "support": "Lessons 7–9 have 80 minutes of demonstration slots in total: about 26 students at 3 minutes each. For larger classes, collect explanations in advance and verify a short modification live rather than scheduling all presentations in lesson 9.",
-    "exitQuestion": "Choose a design decision and identify the A-Frame concept you used. What evidence shows the decision worked?",
-    "exitExpected": "Connect a decision, correct code/concept, and testing or project evidence; do more than say it is finished.",
-    "brief": {
-      "mainGoal": "Demonstrate mastery through a final diorama, individual explanation and modification, and a teacher-set concept test.",
-      "material": [
-        "Explain the theme, a working feature, important code, and a revision with its reason. Every student demonstrates individual understanding, including in group projects.",
-        "Assessment: diorama and process 70%, individual demonstration 20%, concept test 10%. The website quiz is preparation before this lesson; the teacher uses different questions for the official test."
-      ],
-      "why": "The result and the process explanation together show your learning throughout the course.",
-      "tasks": [
-        "Submit the final diorama, plan, source records, test results, and revision evidence.",
-        "Demonstrate at your scheduled time, explain a code section, and modify it when asked.",
-        "Complete the official concept test and reflect on your abilities and next learning steps."
-      ],
-      "success": [
-        "Core features work and process documentation can be checked.",
-        "You can explain code/decisions and modify code individually.",
-        "Sources and contributions are explained honestly; the concept test and reflection are complete."
-      ],
-      "wka": {
-        "principle": "Truthfulness shapes how we account for our learning and results.",
-        "reference": "Ephesians 4:25",
-        "url": "https://www.bible.com/bible/111/EPH.4.25.NIV",
-        "practice": "Explain your contribution, the help you used, and your asset sources honestly.",
-        "question": "What do you understand independently, and what help should you acknowledge?"
-      },
-      "teacherScript": "Today you will show the results and understanding from our learning journey. Submit your diorama and process evidence, demonstrate at your scheduled time, and complete my concept test. Be ready to explain code, design reasoning, and a revision, then make a small modification. Acknowledge contributions, sources, and help honestly. Finish by reflecting on your progress."
+      "teacherScript": "From today you will work on the final project: your own VR diorama. Decide on a theme and what visitors will do, then build it in Sandbox using the shapes, textures, lighting, models, and interaction we have learned. Submit the link to your final version with the form before the deadline. Caring for creation helps us use time and assets responsibly."
     }
   }
 ];
@@ -1717,46 +1158,21 @@ const CLASSROOM_TASKS = [
       "Run the camera, cursor, and target.",
       "Change the colour response. Test it by gazing at the target."
     ],
-    "challenge": "Ask a classmate to try it without instructions. Improve one confusing part.",
-    "result": "A working interaction + one user finding + one improvement."
+    "challenge": "",
+    "result": "A working gaze interaction + an explanation of its trigger and response."
   },
   {
     "steps": [
-      "Open Final Project: Diorama. Use previous projects as references.",
-      "Choose a theme. Sketch it and list the minimum features.",
-      "Check your plan with your teacher, then start a scene in Sandbox."
+      "Open Final Project: Diorama in BSD. Choose a theme and decide one thing visitors will do.",
+      "List the minimum features: composite shapes, texture & lighting, one third-party model, and one interaction.",
+      "Build your diorama in the BSD Sandbox. Run it every time you add a feature.",
+      "Make sure every feature works, record your asset sources, then save the final version.",
+      "Submit the link to your final diorama with the form below."
     ],
-    "challenge": "Choose one action for your visitor. Make the starter scene support that action.",
-    "result": "Sketch + feature list + starter scene."
-  },
-  {
-    "steps": [
-      "Open your diorama in Sandbox. Build the minimum features in your plan.",
-      "Test the scene. Choose one problem to fix.",
-      "Show your prototype and one piece of code to your teacher."
-    ],
-    "challenge": "Write a prediction → change one thing → retest. Explain whether the problem is solved.",
-    "result": "Prototype + one debugging note + explain your code."
-  },
-  {
-    "steps": [
-      "Open your diorama in Sandbox. Ask a classmate to try one task.",
-      "Record one problem. Improve the function or design.",
-      "Retest the same task. Save the final version."
-    ],
-    "challenge": "Compare before and after. Show how your change helps the user.",
-    "result": "Final version + before/after evidence + a reason for the revision."
-  },
-  {
-    "steps": [
-      "Prepare your final diorama and process evidence for submission.",
-      "Demonstrate your work and explain one piece of code on your teacher’s schedule.",
-      "Take the official concept test provided by your teacher."
-    ],
-    "challenge": "Make one small change requested by your teacher. Predict the result, then test it.",
-    "result": "Final work + documentation + individual demo + concept test."
+    "challenge": "",
+    "result": "Final diorama + theme & feature list + asset source notes."
   }
 ];
-const CLASSROOM_TIMES = [[["Quick demo & goal",5],["Explore a VR example",10],["First scene & challenge",55],["Show results & reflect",10]],[["Quick demo & target",5],["Guided modeling",30],["Modify your model",35],["Show results & reflect",10]],[["Quick demo & target",5],["Texture the starter scene",25],["Basic lighting",25],["Compare two versions",15],["Show results & reflect",10]],[["Import demo & sources",10],["Guided model import",35],["Scale, position & test",25],["Show results & reflect",10]],[["Trigger & response demo",10],["Gaze with starter code",35],["Peer test & improve",25],["Show results & reflect",10]],[["Brief & rubric",5],["Theme, sketch & minimum features",20],["Check your plan with your teacher",10],["Start your diorama in Sandbox",35],["Show results & next target",10]],[["Today’s target",5],["Develop your diorama",50],["Code check & individual demos",15],["Show results & process log",10]],[["Today’s target",5],["Peer testing",15],["Revise function & design",35],["Individual demos",15],["Save results & reflect",10]],[["Prepare your work",5],["Official teacher-provided concept test",15],["Remaining demos & submission",50],["Final reflection",10]]];
+const CLASSROOM_TIMES = [[["Quick demo & goal",5],["Explore a VR example",10],["First scene & challenge",55],["Show results & reflect",10]],[["Quick demo & target",5],["Guided modeling",30],["Modify your model",35],["Show results & reflect",10]],[["Quick demo & target",5],["Texture the starter scene",25],["Basic lighting",25],["Compare two versions",15],["Show results & reflect",10]],[["Import demo & sources",10],["Guided model import",35],["Scale, position & test",25],["Show results & reflect",10]],[["Trigger & response demo",10],["Gaze with starter code",40],["Change the response & test",20],["Show results & reflect",10]],[["Brief & rubric",10],["Theme & feature list",15],["Build in Sandbox",45],["Save & show progress",10]]];
 LESSONS.forEach((lesson,index)=>{lesson.classroom=CLASSROOM_TASKS[index];lesson.times=CLASSROOM_TIMES[index];lesson.brief.tasks=lesson.classroom.steps;});
 LESSONS[0].brief.teacherScript="Today we will build our first VR scene. Open the two listed BSD sections, run one object, then change its colour. Your challenge is to add a second object in a different colour. Show me the result and the code for one attribute.";

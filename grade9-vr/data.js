@@ -13,7 +13,7 @@ const CONFIG = {
       "Membuat satu interaksi sederhana dan menguji pengalaman pengunjung.",
       "Menjelaskan kode, mencatat sumber aset, dan menunjukkan bukti revisi."
     ],
-    "finalTask": "Satu diorama bertema jelas, disertai rancangan, catatan sumber jika memakai aset pihak ketiga, hasil pengujian, dan bukti revisi. Setiap siswa menjelaskan kode dan melakukan modifikasi kecil, termasuk jika karya dibuat berkelompok.",
+    "finalTask": "Satu diorama bertema jelas di Sandbox BSD yang memakai bentuk, tekstur, cahaya, model pihak ketiga, dan satu interaksi, dikumpulkan bersama tema, daftar fitur, dan catatan sumber aset.",
     "stages": [
       [
         "1–2",
@@ -26,9 +26,9 @@ const CONFIG = {
         "Tekstur, cahaya, model impor, dan respons gaze."
       ],
       [
-        "6–9",
-        "Karya mandiri",
-        "Rancang, bangun, uji, revisi, lalu demonstrasikan diorama."
+        "6",
+        "Project akhir",
+        "Rancang, bangun, dan kumpulkan diorama VR."
       ]
     ],
     "wka": {
@@ -732,7 +732,7 @@ const LESSONS = [
   {
     "id": 5,
     "title": "Dunia yang merespons",
-    "subtitle": "Bangun interaksi gaze dan uji bersama teman.",
+    "subtitle": "Bangun interaksi gaze dan jelaskan alurnya.",
     "tag": "Interaksi",
     "label": "Gaze interaction",
     "lab": "gaze",
@@ -744,7 +744,7 @@ const LESSONS = [
     "goals": [
       "Menjelaskan pemicu dan respons interaksi.",
       "Membuat satu interaksi gaze sederhana mengikuti BSD.",
-      "Menguji apakah teman memahami cara menggunakannya."
+      "Menjelaskan alur pemicu → listener → fungsi → respons."
     ],
     "concepts": [
       [
@@ -756,25 +756,21 @@ const LESSONS = [
         "Target sebaiknya mudah terlihat. Beri petunjuk dan respons yang membantu pengguna mengetahui bahwa tindakannya berhasil."
       ],
       [
-        "Uji tanpa memberi jawaban",
-        "Minta teman mencoba sendiri terlebih dahulu. Amati bagian yang membingungkan, lalu perbaiki target, petunjuk, atau respons."
-      ],
-      [
         "Cursor dan listener saling terhubung",
         "Camera memuat cursor fuse. Komponen pada target memasang click listener; fungsi yang dipanggil menentukan respons. Pelajari struktur dasar ini memakai kode awal guru."
       ]
     ],
     "code": "<!-- Contoh adaptasi sederhana; bukan seluruh proyek BSD. -->\n<!-- Muat library A-Frame, daftarkan komponen berikut sebelum scene. -->\n<script>\nAFRAME.registerComponent(\"ubah-warna\", {\n  init: function () {\n    const target = this.el;\n    target.addEventListener(\"click\", function () {\n      target.setAttribute(\"color\", \"green\");\n    });\n  }\n});\n</script>\n<a-scene>\n  <a-camera><a-cursor fuse=\"true\" fuse-timeout=\"1500\"></a-cursor></a-camera>\n  <a-box ubah-warna position=\"0 1.6 -3\" color=\"yellow\"></a-box>\n</a-scene>",
-    "challenge": "Buat satu target interaktif. Minta teman mencoba tanpa penjelasan lisan, kemudian perbaiki satu bagian berdasarkan hasil pengujian.",
-    "evidence": "Interaksi yang berjalan + satu temuan pengguna + satu perbaikan.",
-    "submitEvidence": "Tautan BSD interaksi yang berjalan + satu temuan dari teman + satu perbaikan.",
-    "submitExample": "Contoh: Kotak berubah warna setelah ditatap 1 detik. Teman saya tidak tahu kotak itu bisa ditatap, jadi saya menambah teks petunjuk dan memperbesar kotaknya.",
+    "challenge": "",
+    "evidence": "Interaksi gaze yang berjalan + penjelasan pemicu dan respons.",
+    "submitEvidence": "Tautan BSD interaksi gaze yang berjalan + penjelasan pemicu, listener, dan respons.",
+    "submitExample": "Contoh: Kotak berubah warna setelah ditatap 1 detik. Pemicunya tatapan cursor fuse, listener click memanggil fungsi ubahWarna, dan responsnya kotak menjadi merah.",
     "summary": [
       "Interaksi memiliki pemicu dan respons.",
-      "Target serta petunjuk harus mudah dipahami.",
-      "Pengujian oleh orang lain membantu menemukan masalah."
+      "Event listener menghubungkan kejadian dengan fungsi respons.",
+      "Target dan respons harus mudah terlihat oleh pengguna."
     ],
-    "reflection": "Apa yang dilakukan temanmu berbeda dari perkiraanmu saat menguji interaksi?",
+    "reflection": "Bagian mana dari alur pemicu → listener → respons yang paling sulit kamu pahami, dan bagaimana kamu mengujinya?",
     "times": [
       [
         "Kuis pembuka",
@@ -869,10 +865,10 @@ const LESSONS = [
     "preparation": "Siapkan HTML kamera/cursor/target dan JavaScript komponen yang sudah bekerja. Muat library A-Frame dahulu, komponen berikutnya, lalu scene. Uji pada perangkat siswa.",
     "minimumTarget": "Tatapan memicu satu perubahan yang terlihat; siswa menjelaskan listener dan mengubah respons sendiri.",
     "support": "Jangan meminta pemula menulis seluruh 14 langkah dari nol. Jika event/variabel belum siap, baca kode bersama dan siswa mengganti warna respons dengan penjelasan.",
-    "exitQuestion": "Pada interaksimu, sebut pemicu, fungsi yang dipanggil, respons, dan cara teman membuktikan respons itu berjalan.",
+    "exitQuestion": "Pada interaksimu, sebut pemicu, fungsi yang dipanggil, dan respons yang terlihat.",
     "exitExpected": "Menghubungkan gaze/fuse → click listener → fungsi respons → perubahan tampilan yang dapat diamati.",
     "brief": {
-      "mainGoal": "Membuat satu interaksi gaze dengan respons yang terlihat dan mengujinya bersama pengguna lain.",
+      "mainGoal": "Membuat satu interaksi gaze dengan respons yang terlihat dan menjelaskan alurnya.",
       "material": [
         "Interaksi mempunyai pemicu dan respons. Pada gaze, cursor di dalam kamera dapat mengaktifkan target setelah tatapan bertahan selama durasi fuse.",
         "Komponen JavaScript pada target memasang event listener. Listener menghubungkan kejadian dengan fungsi respons, misalnya perubahan warna. Guru menyediakan kode awal; kamu mempelajari alurnya lalu memodifikasi respons."
@@ -886,7 +882,7 @@ const LESSONS = [
       "success": [
         "Tatapan pada target memicu perubahan tampilan yang terlihat.",
         "Kamu dapat menjelaskan alur pemicu → listener → fungsi → respons.",
-        "Teman dapat menemukan/menggunakan target; ada catatan temuan dan perbaikan."
+        "Respons yang kamu ubah sendiri berjalan saat diuji."
       ],
       "wka": {
         "principle": "Kepedulian kepada sesama mengajak kita memperhatikan pengalaman orang yang memakai karya kita.",
@@ -895,26 +891,26 @@ const LESSONS = [
         "practice": "Perjelas target dan petunjuk berdasarkan kesulitan teman saat menguji.",
         "question": "Apa yang perlu kamu ubah agar interaksi lebih mudah digunakan orang lain?"
       },
-      "teacherScript": "Hari ini scene kita mulai merespons pengguna. Kita akan mempelajari pemicu gaze, event listener, dan fungsi respons melalui kode awal. Tugas kalian mengubah satu respons, lalu meminta teman mencoba tanpa bantuan lisan. Saya mengharapkan kalian dapat menunjukkan alur interaksi dan satu perbaikan. Kepedulian kepada sesama terlihat ketika kita membuat target serta petunjuk yang mudah digunakan."
+      "teacherScript": "Hari ini scene kita mulai merespons pengguna. Kita akan mempelajari pemicu gaze, event listener, dan fungsi respons melalui kode awal. Tugas kalian mengubah satu respons, mengujinya, lalu menjelaskan alurnya kepada saya. Kepedulian kepada sesama terlihat dari target dan respons yang mudah dipahami orang lain."
     }
   },
   {
     "id": 6,
-    "title": "Rancang diorama milikmu",
-    "subtitle": "Pilih tema, batasi cakupan, lalu mulai membangun.",
-    "tag": "Proyek",
-    "label": "Rancangan diorama",
+    "title": "Project akhir: diorama VR milikmu",
+    "subtitle": "Rancang, bangun, dan kumpulkan diorama VR-mu di Sandbox BSD.",
+    "tag": "Project akhir",
+    "label": "Project akhir: Diorama",
     "lab": "plan",
     "prompt": "Apa satu pengalaman yang ingin kamu berikan kepada pengunjung dioramamu?",
     "bsd": [
       "Final Project: Diorama",
-      "Referencing previous projects"
+      "Sandbox"
     ],
-    "scope": "Proyek kelas disederhanakan untuk 9 pertemuan. Sepakati tema dan fitur minimum bersama guru.",
+    "scope": "Satu diorama mandiri yang memakai materi pertemuan 1–5. Dikerjakan sampai batas waktu dari guru.",
     "goals": [
-      "Menentukan tema dan pengalaman yang ingin dibuat.",
-      "Menggambar tata letak dan memilih fitur yang realistis.",
-      "Memulai scene mandiri di Sandbox."
+      "Menentukan tema dan apa yang dilakukan pengunjung.",
+      "Membangun diorama di Sandbox memakai bentuk, tekstur, cahaya, model, dan interaksi.",
+      "Memeriksa semua fitur berjalan, lalu mengumpulkan versi final."
     ],
     "concepts": [
       [
@@ -928,19 +924,23 @@ const LESSONS = [
       [
         "Rancangan boleh berkembang",
         "Sketsa tidak harus sempurna. Gunakan sebagai arah, lalu catat perubahan dan alasannya selama membuat karya."
+      ],
+      [
+        "Simpan dan uji setiap langkah",
+        "Tambahkan satu fitur, jalankan, lalu periksa hasilnya sebelum menambah fitur berikutnya. Masalah lebih mudah ditemukan bila perubahannya kecil."
       ]
     ],
     "code": "Rencana singkat:\nTema: ____________________\nPengunjung akan: ____________________\nObjek buatan sendiri: ____________________\nInteraksi utama: ____________________\nAset dan sumber: ____________________",
-    "challenge": "Buat sketsa dan daftar fitur minimum. Periksa cakupannya bersama guru sebelum mulai membangun di Sandbox.",
-    "evidence": "Sketsa + daftar fitur + scene awal di Sandbox.",
-    "submitEvidence": "Tautan BSD scene awal di Sandbox + uraian sketsamu (tema dan tata letak) + daftar fitur minimum.",
-    "submitExample": "Contoh: Tema: kebun sekolah. Pengunjung menatap tanaman untuk melihat namanya. Fitur minimum: 3 tanaman, jalan setapak, 1 interaksi gaze. Scene awal di Sandbox sudah berisi tanah dan jalan.",
+    "challenge": "",
+    "evidence": "Diorama final di Sandbox + tema dan daftar fitur + catatan sumber aset.",
+    "submitEvidence": "Tautan BSD diorama final + tema dan apa yang dilakukan pengunjung + daftar fitur + sumber aset pihak ketiga (jika ada).",
+    "submitExample": "Contoh: Tema: kebun sekolah. Pengunjung menatap tanaman untuk melihat namanya. Fitur: tanaman dari kotak dan bola, jalan bertekstur, cahaya sore, model pohon Poly Pizza (Tree oleh Kenney, CC0), dan interaksi gaze.",
     "summary": [
-      "Tema membantu memilih fitur.",
-      "Cakupan kecil yang selesai lebih berguna daripada rancangan besar yang belum berfungsi.",
-      "Rancangan dan revisi merupakan bagian dari bukti proses."
+      "Diorama dimulai dari tema dan tindakan pengunjung.",
+      "Selesaikan fitur minimum dulu, tambahan belakangan.",
+      "Uji setiap perubahan dan catat sumber aset."
     ],
-    "reflection": "Fitur apa yang akan kamu tunda agar pengalaman utamanya bisa selesai?",
+    "reflection": "Bagian mana dari dioramamu yang paling kamu banggakan, dan apa yang ingin kamu perbaiki jika punya waktu lagi?",
     "times": [
       [
         "Kuis pembuka",
@@ -967,7 +967,7 @@ const LESSONS = [
         10
       ]
     ],
-    "teacher": "Periksa kelayakan cakupan sebelum siswa membangun. Bagikan rubrik dan contoh bukti proses. Proyek boleh memakai referensi BSD; siswa harus menjelaskan adaptasinya.",
+    "teacher": "Periksa kelayakan tema dan fitur sebelum siswa membangun. Bagikan rubrik project akhir. Siswa boleh memakai referensi BSD, tetapi harus menjelaskan adaptasinya.",
     "questions": [
       [
         "Tujuan diorama: pengunjung menemukan tanaman dan mengaktifkan tombol informasi. Fitur mana yang diprioritaskan?",
@@ -1033,30 +1033,30 @@ const LESSONS = [
       ]
     ],
     "bsdFocus": [
-      "Final Project: Diorama dan Referencing previous projects menjadi dasar; kelas memilih versi minimum yang realistis.",
-      "Mulai di Sandbox dan pakai proyek sebelumnya sebagai referensi, lalu adaptasi terhadap tema sendiri."
+      "Final Project: Diorama menjadi acuan; siswa membangun versi sendiri di Sandbox.",
+      "Proyek pertemuan 1–5 boleh dipakai sebagai referensi, lalu diadaptasi ke tema sendiri."
     ],
-    "preparation": "Bagikan brief/rubrik sejak awal dan contoh catatan sumber. Tentukan apakah karya individu/kelompok; bukti penguasaan tetap individu.",
-    "minimumTarget": "Sketsa, tujuan pengunjung, daftar fitur minimum, dan scene awal tersimpan.",
-    "support": "Kurangi fitur yang tidak mendukung tujuan. Jika bekerja berkelompok, catat kontribusi dan pemahaman tiap siswa.",
-    "exitQuestion": "Sebut satu tindakan pengunjung, fitur minimum yang mendukungnya, dan fitur tambahan yang kamu tunda.",
-    "exitExpected": "Tujuan dan fitur minimum saling terkait; tambahan ditunda dengan alasan waktu/kelayakan.",
+    "preparation": "Bagikan rubrik project akhir sejak awal dan contoh catatan sumber aset. Tentukan apakah karya individu atau kelompok; pemahaman tetap diperiksa per siswa.",
+    "minimumTarget": "Diorama bertema jelas dengan objek gabungan, tekstur, cahaya, satu model pihak ketiga, dan satu interaksi yang berjalan.",
+    "support": "Kurangi fitur yang tidak mendukung tema. Jika bekerja berkelompok, catat kontribusi tiap siswa.",
+    "exitQuestion": "Sebut satu tindakan pengunjung di dioramamu dan fitur yang mendukungnya.",
+    "exitExpected": "Tema, tindakan pengunjung, dan fitur saling terkait; sumber aset tercatat.",
     "brief": {
-      "mainGoal": "Merancang diorama bertema jelas dengan fitur minimum yang realistis dan memulai scene di Sandbox.",
+      "mainGoal": "Membuat satu diorama VR bertema jelas di Sandbox BSD dengan materi pertemuan 1–5, lalu mengumpulkan versi final.",
       "material": [
-        "Diorama adalah dunia kecil yang menyampaikan tema atau pengalaman tertentu. Rancangan dimulai dari pengunjung: apa yang akan mereka lihat atau lakukan?",
-        "Sketsa membantu memilih objek, tata letak, dan interaksi. Versi minimum memuat objek gabungan buatan sendiri, tekstur, cahaya, dan satu interaksi; tambahan dikerjakan setelah fungsi utama berjalan."
+        "Diorama adalah dunia kecil yang menyampaikan tema atau pengalaman tertentu. Mulailah dari pengunjung: apa yang akan mereka lihat atau lakukan?",
+        "Versi minimum memuat objek gabungan buatan sendiri, tekstur, cahaya, satu model pihak ketiga dengan sumber yang dicatat, dan satu interaksi. Fitur tambahan dikerjakan setelah semuanya berjalan."
       ],
-      "why": "Rancangan yang terarah membantu menyelesaikan karya dalam waktu kelas yang tersedia.",
+      "why": "Project akhir menunjukkan bahwa kamu bisa memakai seluruh materi untuk membuat karya sendiri.",
       "tasks": [
         "Tuliskan tema, pengunjung, dan satu pengalaman utama yang ingin diberikan.",
         "Buat sketsa, daftar fitur minimum, dan rencana sumber aset; periksa kelayakan dengan guru.",
         "Mulai scene di Sandbox dan tetapkan target pembangunan pertemuan berikutnya."
       ],
       "success": [
-        "Tema dan tindakan pengunjung dituliskan dengan jelas.",
-        "Sketsa serta daftar fitur mendukung tujuan dan dapat dikerjakan dalam waktu yang tersedia.",
-        "Scene awal tersimpan; fitur tambahan yang ditunda dan target berikutnya disebutkan."
+        "Tema dan tindakan pengunjung jelas.",
+        "Fitur minimum berjalan tanpa error di Sandbox.",
+        "Sumber aset pihak ketiga dicatat dan tautan final dikirim."
       ],
       "wka": {
         "principle": "Panggilan mengusahakan dan memelihara ciptaan memberi arah untuk menggunakan sumber daya dengan bertanggung jawab.",
@@ -1065,566 +1065,7 @@ const LESSONS = [
         "practice": "Pilih tema yang menghargai ciptaan dan rencanakan penggunaan waktu serta aset secara bertanggung jawab.",
         "question": "Apa yang ingin kamu ajak pengunjung pahami atau pedulikan lewat tema diorama?"
       },
-      "teacherScript": "Hari ini kalian mulai merancang diorama sendiri. Tentukan tema, siapa pengunjungnya, dan apa yang mereka lakukan, lalu pilih fitur yang mendukung pengalaman itu. Tugas kalian membuat sketsa, menyepakati fitur minimum dengan saya, dan memulai scene di Sandbox. Saya mengharapkan rancangan yang dapat selesai. Prinsip pemeliharaan ciptaan membantu kita memilih tema serta menggunakan waktu dan aset secara bertanggung jawab."
-    }
-  },
-  {
-    "id": 7,
-    "title": "Bangun, uji, pecahkan",
-    "subtitle": "Kembangkan karya dan telusuri kendala satu per satu.",
-    "tag": "Proyek",
-    "label": "Pengembangan",
-    "lab": "debug",
-    "prompt": "Apa perbedaan antara mencoba angka secara acak dan menguji sebuah dugaan?",
-    "bsd": [
-      "Sandbox",
-      "Proyek sebelumnya sebagai referensi"
-    ],
-    "scope": "Bangun fitur minimum. Gunakan tutorial sebagai referensi, lalu sesuaikan dengan rancanganmu.",
-    "goals": [
-      "Mengembangkan objek, tampilan, dan interaksi utama.",
-      "Menelusuri kendala melalui pengujian satu perubahan.",
-      "Menjelaskan kode dan mencatat perbaikan."
-    ],
-    "concepts": [
-      [
-        "Nyatakan masalahnya",
-        "Bedakan hasil yang diharapkan dengan yang terjadi. Sebut bagian scene atau kode yang terkait."
-      ],
-      [
-        "Uji satu dugaan",
-        "Periksa perubahan terakhir dan coba satu perbaikan. Banyak perubahan sekaligus membuat penyebabnya sulit diketahui."
-      ],
-      [
-        "Simpan jejak proses",
-        "Catat masalah, tindakan, dan hasil. Tangkapan layar sebelum-sesudah dapat menjadi bukti revisi."
-      ]
-    ],
-    "code": "Catatan debugging:\nHarapan: ____________________\nYang terjadi: ____________________\nDugaan penyebab: ____________________\nSatu perubahan yang diuji: ____________________\nHasil: ____________________",
-    "challenge": "Pilih satu masalah dalam diorama. Catat dugaan, uji satu perubahan, dan jelaskan hasilnya kepada guru.",
-    "evidence": "Prototipe diorama + satu catatan debugging + penjelasan kode.",
-    "submitEvidence": "Tautan BSD prototipe diorama + satu catatan debugging (dugaan → perubahan → hasil) + penjelasan kode.",
-    "submitExample": "Contoh: Masalah: pintu tidak terlihat. Dugaan: pintu berada di dalam dinding. Saya mengubah position z dari -5 ke -4.5 lalu menguji ulang; pintu terlihat. Atribut position menentukan letak objek.",
-    "summary": [
-      "Masalah perlu dijelaskan secara spesifik.",
-      "Uji satu perubahan agar penyebab lebih mudah ditelusuri.",
-      "Kemampuan menjelaskan kode merupakan bukti penguasaan individual."
-    ],
-    "reflection": "Dugaan apa yang berubah setelah kamu melihat hasil pengujian?",
-    "times": [
-      [
-        "Kuis pembuka & target",
-        5
-      ],
-      [
-        "Pengembangan diorama",
-        50
-      ],
-      [
-        "Cek kode & demonstrasi individual",
-        15
-      ],
-      [
-        "Kuis formatif & log proses",
-        10
-      ]
-    ],
-    "teacher": "Mulai demonstrasi individual untuk penilaian sumatif. Tanyakan alasan kode, lalu minta satu modifikasi kecil. Catat bukti terpisah dari penilaian kelompok.",
-    "questions": [
-      [
-        "Interaksi berhenti setelah kode respons diubah. Langkah debugging yang tepat?",
-        [
-          "Mengubah seluruh HTML dan JS bersamaan",
-          "Memeriksa perubahan respons terakhir dan menguji satu dugaan",
-          "Menyembunyikan tombol supaya tidak perlu diuji"
-        ],
-        1,
-        "Perubahan terakhir memberi petunjuk yang perlu diuji secara terarah."
-      ],
-      [
-        "Setelah mengganti satu nilai, fitur berjalan lagi. Agar kesimpulan lebih kuat, kamu…",
-        [
-          "Menguji ulang dan mencatat hubungan perubahan dengan hasil",
-          "Menganggap semua bug lain ikut selesai",
-          "Menghapus catatan dugaan"
-        ],
-        0,
-        "Uji ulang dan catatan membantu memeriksa apakah perbaikan konsisten."
-      ],
-      [
-        "Catatan mana yang paling berguna untuk dibahas dengan guru?",
-        [
-          "Proyek sulit",
-          "Saya mengganti beberapa angka",
-          "Kotak tak tampak; dugaan Z salah; Z diubah ke -3; kotak kini terlihat"
-        ],
-        2,
-        "Catatan menyebut masalah, dugaan, tindakan spesifik, dan hasil."
-      ]
-    ],
-    "openingQuestions": [
-      [
-        "Tujuan pengunjung dalam rancangan sebaiknya…",
-        [
-          "Memuat sebanyak mungkin efek",
-          "Sama dengan nama file",
-          "Menyebut apa yang akan dilihat atau dilakukan"
-        ],
-        2,
-        "Tujuan yang jelas membantu memilih fitur yang mendukung pengalaman."
-      ],
-      [
-        "Jika memakai model pihak ketiga, bukti apa yang disiapkan?",
-        [
-          "Sumber dan ketentuan penggunaan",
-          "Hanya warna model",
-          "Hanya jumlah objek"
-        ],
-        0,
-        "Sumber dan izin dicatat bersama karya."
-      ],
-      [
-        "Fitur minimum belum bekerja. Apa prioritas sesi membangun?",
-        [
-          "Menambah fitur lain",
-          "Membuat dan menguji fitur minimum",
-          "Mengganti tema setiap kali"
-        ],
-        1,
-        "Utamakan bagian yang dibutuhkan untuk pengalaman utama."
-      ]
-    ],
-    "bsdFocus": [
-      "Diorama di Sandbox: bangun versi minimum dari rancangan yang disetujui, bukan mengikuti proyek baru.",
-      "Gunakan bagian tutorial BSD yang relevan saat debugging; catat modifikasi sendiri."
-    ],
-    "preparation": "Siapkan daftar cek fitur dan jadwal siswa yang diperiksa individual. Periksa bukti sumber, kode dan hasil; bantu menelusuri satu kendala.",
-    "minimumTarget": "Prototipe yang bisa diuji, satu log debugging, dan penjelasan satu bagian kode.",
-    "support": "Tangani kendala yang menghalangi fungsi utama dahulu. Mulai pengambilan bukti demonstrasi agar tidak menumpuk pada pertemuan 9.",
-    "exitQuestion": "Catat satu masalah: harapan, yang terjadi, dugaan, satu perubahan, dan hasil uji.",
-    "exitExpected": "Log menyebut masalah spesifik, dugaan yang dapat diuji, perubahan dan hasil yang berkaitan.",
-    "brief": {
-      "mainGoal": "Mengembangkan prototipe diorama dan menyelesaikan satu kendala dengan pengujian yang terarah.",
-      "material": [
-        "Debugging dimulai dengan membandingkan hasil yang diharapkan dan yang terjadi. Perubahan terakhir dan pesan kesalahan membantu menyusun dugaan penyebab.",
-        "Uji satu perubahan terlebih dahulu, amati hasilnya, dan catat proses. Sesi ini juga memulai pemeriksaan individual: kamu menjelaskan kode serta melakukan modifikasi kecil."
-      ],
-      "why": "Karya berkembang melalui pengujian, dan catatan proses membantu kamu menjelaskan keputusanmu.",
-      "tasks": [
-        "Bangun fitur minimum sesuai rancangan yang disetujui.",
-        "Pilih satu masalah, tulis dugaan, uji satu perubahan, lalu catat hasilnya.",
-        "Tunjukkan prototipe serta satu bagian kode kepada guru; lakukan modifikasi kecil saat diminta."
-      ],
-      "success": [
-        "Prototipe tersimpan dan fitur utamanya dapat diuji.",
-        "Ada catatan masalah, dugaan, satu perubahan, dan hasil pengujian.",
-        "Kamu dapat menjelaskan bagian kode yang dipakai serta dampak modifikasinya."
-      ],
-      "wka": {
-        "principle": "Bekerja dengan sepenuh hati mencakup ketekunan dalam menjalankan tanggung jawab.",
-        "reference": "Kolose 3:23",
-        "url": "https://www.bible.com/id/bible/306/col.3.23-25.tb",
-        "practice": "Telusuri satu kendala dengan teliti dan catat bantuan yang kamu gunakan.",
-        "question": "Tindakan apa yang menunjukkan ketekunan saat kode belum berjalan?"
-      },
-      "teacherScript": "Hari ini kita membangun fitur utama diorama dan menelusuri kendalanya. Tugas kalian memilih satu masalah, menguji satu dugaan, dan mencatat apa yang berubah. Saya juga akan meminta sebagian siswa menjelaskan kode serta melakukan modifikasi kecil. Saya mengharapkan prototipe yang dapat diuji dan catatan yang spesifik. Ketekunan terlihat ketika kita memeriksa masalah dengan teliti dan bertanggung jawab atas prosesnya."
-    }
-  },
-  {
-    "id": 8,
-    "title": "Lihat dari mata pengguna",
-    "subtitle": "Dengarkan umpan balik. Revisi dengan tujuan.",
-    "tag": "Proyek",
-    "label": "Pengujian & revisi",
-    "lab": "test",
-    "prompt": "Apakah sebuah scene sudah berhasil jika pembuatnya bisa memakai, tetapi pengunjungnya bingung?",
-    "bsd": [
-      "Diorama di Sandbox"
-    ],
-    "scope": "Uji karya teman, perbaiki masalah utama, dan simpan versi final.",
-    "goals": [
-      "Mengumpulkan umpan balik yang spesifik.",
-      "Memprioritaskan masalah fungsi dan keterlihatan.",
-      "Menunjukkan revisi dan alasan perbaikannya."
-    ],
-    "concepts": [
-      [
-        "Berikan tugas yang jelas",
-        "Contoh: temukan target, aktifkan interaksi, dan ceritakan tema scene. Amati pengguna tanpa langsung mengarahkan."
-      ],
-      [
-        "Umpan balik harus spesifik",
-        "Sebut apa yang terjadi, dampaknya, dan satu saran. Contoh: target gelap sehingga sulit ditemukan; coba tambah cahaya."
-      ],
-      [
-        "Prioritaskan perbaikan",
-        "Dahulukan fitur utama yang gagal atau membingungkan. Setelah itu, rapikan detail visual jika masih ada waktu."
-      ]
-    ],
-    "code": "Catatan pengujian:\nTugas pengguna: ____________________\nYang diamati: ____________________\nDampaknya: ____________________\nRevisi yang dipilih: ____________________\nHasil setelah diuji ulang: ____________________",
-    "challenge": "Minta teman menguji dioramamu. Catat satu masalah penting, perbaiki, lalu uji ulang bersama teman tersebut.",
-    "evidence": "Versi final + satu bukti sebelum-sesudah + alasan revisi.",
-    "submitEvidence": "Tautan BSD versi final + uraian keadaan sebelum dan sesudah revisi + alasan revisi.",
-    "submitExample": "Contoh: Teman saya bingung objek mana yang bisa ditatap. Sebelum: tidak ada tanda. Sesudah: objek interaktif berwarna kuning dan diberi teks petunjuk. Saat diuji ulang, teman langsung menemukannya.",
-    "summary": [
-      "Pengujian memerlukan tugas dan pengamatan.",
-      "Umpan balik spesifik lebih mudah ditindaklanjuti.",
-      "Revisi perlu diuji ulang untuk mengetahui apakah masalahnya teratasi."
-    ],
-    "reflection": "Umpan balik mana yang kamu gunakan, dan mengapa kamu memilihnya?",
-    "times": [
-      [
-        "Kuis pembuka",
-        5
-      ],
-      [
-        "Uji oleh teman",
-        15
-      ],
-      [
-        "Revisi fungsi & desain",
-        35
-      ],
-      [
-        "Demonstrasi individual",
-        15
-      ],
-      [
-        "Kuis formatif, exit & simpan",
-        10
-      ]
-    ],
-    "teacher": "Lanjutkan demonstrasi individual. Nilai kualitas tanggapan terhadap umpan balik, bukan banyaknya komentar yang diterima. Pastikan karya tersimpan sebelum akhir kelas.",
-    "questions": [
-      [
-        "Komentar teman: target gelap, perlu 20 detik menemukannya. Revisi yang paling langsung?",
-        [
-          "Meningkatkan keterlihatan target dan menguji waktu menemukan lagi",
-          "Mengganti nama file",
-          "Menambahkan musik tanpa mengubah target"
-        ],
-        0,
-        "Perbaikan diarahkan pada masalah yang benar-benar diamati."
-      ],
-      [
-        "Dua masalah ditemukan: tombol gagal dan warna dekorasi kurang cocok. Mana didahulukan?",
-        [
-          "Warna dekorasi",
-          "Tombol yang dibutuhkan pengalaman utama",
-          "Menambah fitur ketiga"
-        ],
-        1,
-        "Kegagalan fungsi inti lebih mengganggu tujuan daripada detail dekorasi."
-      ],
-      [
-        "Bukti bahwa revisi berhasil adalah…",
-        [
-          "Pembuat merasa sudah bagus",
-          "Jumlah kode bertambah",
-          "Teman dapat menyelesaikan tugas setelah revisi, dengan catatan hasil uji ulang"
-        ],
-        2,
-        "Dampak revisi diperiksa melalui tugas pengguna yang sama."
-      ]
-    ],
-    "openingQuestions": [
-      [
-        "Saat debugging, mengapa mengubah satu hal dahulu?",
-        [
-          "Supaya kode selalu pendek",
-          "Supaya dampak perubahan dapat ditelusuri",
-          "Supaya tidak perlu menguji lagi"
-        ],
-        1,
-        "Satu perubahan membantu menguji dugaan penyebab."
-      ],
-      [
-        "Bukti proses yang membantu adalah…",
-        [
-          "Hanya hasil akhir",
-          "Hanya judul",
-          "Masalah, perubahan, dan hasil pengujian"
-        ],
-        2,
-        "Bukti proses menunjukkan tindakan dan hasilnya."
-      ],
-      [
-        "Teman akan menguji target interaksi. Apa yang disiapkan?",
-        [
-          "Tugas yang jelas dan catatan pengamatan",
-          "Petunjuk lisan untuk setiap langkah",
-          "Daftar semua warna"
-        ],
-        0,
-        "Tugas yang jelas membuat hasil pengujian dapat diamati."
-      ]
-    ],
-    "bsdFocus": [
-      "Diorama di Sandbox: teman menjalankan tugas penggunaan, pembuat mengamati dan merevisi.",
-      "Tidak menambah proyek tutorial baru. Simpan versi akhir dan bukti sebelum/sesudah."
-    ],
-    "preparation": "Siapkan pasangan penguji dan tugas: temukan target, aktifkan, ceritakan tema. Sediakan lembar catatan pengamatan dan siswa berikutnya untuk demonstrasi.",
-    "minimumTarget": "Versi final, satu temuan pengguna, perubahan dan uji ulang yang terdokumentasi.",
-    "support": "Batasi revisi pada masalah utama. Jika jadwal individual penuh, kumpulkan penjelasan kode singkat sebagai rekaman lalu verifikasi modifikasi langsung.",
-    "exitQuestion": "Apa temuan penguji, perubahan yang kamu pilih, dan hasil tugas yang sama setelah diuji ulang?",
-    "exitExpected": "Menghubungkan masalah yang diamati, revisi terarah, dan dampak uji ulang.",
-    "brief": {
-      "mainGoal": "Memperbaiki diorama berdasarkan pengamatan pengguna dan membuktikan dampak revisinya melalui uji ulang.",
-      "material": [
-        "Pengujian memerlukan tugas yang jelas, misalnya menemukan target dan mengaktifkan interaksi. Amati teman mencoba sebelum memberi bantuan.",
-        "Umpan balik yang berguna menyebut kejadian, dampak, dan saran. Dahulukan masalah pada fungsi utama, lakukan revisi, lalu uji kembali dengan tugas yang sama."
-      ],
-      "why": "Pengujian oleh orang lain menunjukkan masalah yang mungkin terlewat oleh pembuatnya.",
-      "tasks": [
-        "Minta teman menjalankan tugas penggunaan dan catat apa yang benar-benar terjadi.",
-        "Pilih satu masalah penting, lakukan revisi, dan simpan bukti sebelum/sesudah.",
-        "Uji ulang dengan tugas yang sama, simpan versi akhir, dan lanjutkan demonstrasi individual."
-      ],
-      "success": [
-        "Catatan memuat temuan pengguna yang spesifik.",
-        "Revisi berkaitan langsung dengan masalah yang dipilih.",
-        "Hasil uji ulang menunjukkan dampak perubahan; versi akhir dan bukti tersimpan."
-      ],
-      "wka": {
-        "principle": "Kesediaan mendengar dan menahan reaksi membantu kita menerima orang lain dengan baik.",
-        "reference": "Yakobus 1:19",
-        "url": "https://www.bible.com/id/bible/306/JAS.1.19.TB",
-        "practice": "Dengarkan masukan sampai selesai, tanyakan bukti, lalu pilih revisi yang membantu pengguna.",
-        "question": "Bagaimana kamu menanggapi masukan yang berbeda dari pendapatmu?"
-      },
-      "teacherScript": "Hari ini kita melihat diorama dari sudut pandang pengguna. Berikan teman satu tugas yang jelas, amati kesulitannya, lalu pilih perbaikan yang paling membantu. Tugas kalian menyimpan bukti sebelum-sesudah dan menguji ulang. Saya mengharapkan alasan revisi serta bukti dampaknya. Kita berlatih mendengar masukan dengan tenang dan menanggapi teman dengan hormat."
-    }
-  },
-  {
-    "id": 9,
-    "title": "Saatnya menunjukkan karyamu",
-    "subtitle": "Demonstrasikan, jelaskan, dan refleksikan.",
-    "tag": "Showcase",
-    "label": "Demonstrasi akhir",
-    "lab": "showcase",
-    "prompt": "Bagian mana dari karyamu yang paling menunjukkan bahwa kamu sudah bisa membuat keputusan sendiri?",
-    "bsd": [
-      "Diorama final",
-      "Tes konsep materi inti yang diberikan guru"
-    ],
-    "scope": "Penilaian hanya mencakup materi yang diajarkan. Kuis di website ini adalah latihan, bukan ujian yang otomatis tercatat.",
-    "goals": [
-      "Menunjukkan fitur utama yang bekerja.",
-      "Menjelaskan kode dan keputusan desain secara individual.",
-      "Merefleksikan perkembangan selama course."
-    ],
-    "concepts": [
-      [
-        "Tunjukkan hasil dan alasan",
-        "Jelaskan tema, bagian kode penting, fitur utama, dan satu revisi. Demonstrasi singkat perlu fokus pada bukti."
-      ],
-      [
-        "Penguasaan itu individual",
-        "Walau karya berkelompok, setiap siswa perlu menjelaskan bagian yang dipahami dan melakukan modifikasi kecil."
-      ],
-      [
-        "Nilai memakai kriteria",
-        "Diorama dan proses berbobot 70%, demonstrasi individual 20%, tes konsep 10%. Detailnya ada pada halaman proyek akhir."
-      ]
-    ],
-    "code": "Urutan demonstrasi:\n1. Tema dan pengalaman utama.\n2. Fitur yang berfungsi.\n3. Bagian kode yang kamu pahami.\n4. Satu revisi dan alasannya.\n5. Modifikasi kecil sesuai arahan guru.",
-    "challenge": "Siapkan demonstrasi singkat dan bukti proses. Berlatih menjelaskan satu bagian kode tanpa membaca tutorial.",
-    "evidence": "Diorama final + dokumentasi + demonstrasi individual + tes konsep yang diberikan guru.",
-    "submitEvidence": "Tautan BSD diorama final + ringkasan dokumentasi proses + bagian kode yang kamu jelaskan. Demonstrasi dan tes konsep dilakukan di kelas.",
-    "submitExample": "Contoh: Diorama final: museum mini dengan 3 karya dan satu interaksi gaze. Saya menjelaskan a-entity induk galeri, lalu mencoba modifikasi dari guru (warna lampu); hasilnya sesuai prediksi.",
-    "summary": [
-      "Karya yang berfungsi perlu disertai pemahaman.",
-      "Fitur tambahan tidak otomatis membuat nilai lebih tinggi.",
-      "Progres latihan membantu persiapan; nilai resmi ditetapkan melalui rubrik guru."
-    ],
-    "reflection": "Apa yang kini bisa kamu lakukan secara mandiri, dan apa yang ingin kamu pelajari berikutnya?",
-    "times": [
-      [
-        "Kuis pembuka & kesiapan",
-        5
-      ],
-      [
-        "Tes konsep resmi dari guru",
-        15
-      ],
-      [
-        "Demonstrasi tersisa & pengumpulan",
-        50
-      ],
-      [
-        "Exit ticket & refleksi akhir",
-        10
-      ]
-    ],
-    "teacher": "Gunakan bukti demonstrasi dari pertemuan 7–9. Sesuaikan jumlah soal dan waktu dengan jumlah siswa. Kuis latihan di sini terbuka untuk pembahasan; gunakan soal berbeda untuk tes resmi.",
-    "questions": [
-      [
-        "Objek A-Frame perlu ditempatkan di dalam…",
-        [
-          "<a-scene>",
-          "<a-assets> saja",
-          "<script> saja"
-        ],
-        0,
-        "Scene menampung elemen dunia 3D; assets memuat sumber dan script berisi program."
-      ],
-      [
-        "position=\"-2 1 -4\" diubah menjadi \"2 1 -4\". Apa yang berubah?",
-        [
-          "Tinggi bertambah",
-          "Posisi X bergeser ke kanan",
-          "Ukuran bertambah"
-        ],
-        1,
-        "Hanya X berubah dari -2 ke 2; Y dan Z tetap."
-      ],
-      [
-        "Kotak harus berputar tanpa berpindah tempat. Atribut yang diubah?",
-        [
-          "position",
-          "scale",
-          "rotation"
-        ],
-        2,
-        "rotation mengubah orientasi, bukan lokasi."
-      ],
-      [
-        "Anak objek berada di dalam induk yang dipindahkan. Apa yang terjadi?",
-        [
-          "Anak ikut transformasi induk",
-          "Anak selalu tetap di posisi dunia semula",
-          "Anak otomatis menjadi lebih besar"
-        ],
-        0,
-        "Transformasi induk memengaruhi kelompok anak."
-      ],
-      [
-        "Model sudah termuat, tetapi terlalu kecil. Perbaikan yang paling langsung?",
-        [
-          "Mengubah position saja",
-          "Meningkatkan scale lalu membandingkan proporsi",
-          "Menghapus alamat aset"
-        ],
-        1,
-        "scale mengatur ukuran; tetap uji proporsinya dalam scene."
-      ],
-      [
-        "Tekstur gagal dimuat. Pemeriksaan pertama yang terkait masalahnya?",
-        [
-          "Alamat gambar pada src dan akses aset",
-          "Nama pembuat proyek",
-          "Jumlah pertemuan"
-        ],
-        0,
-        "Sumber gambar yang salah/tidak dapat diakses menghambat pemuatan tekstur."
-      ],
-      [
-        "Pada interaksi gaze, event listener menghubungkan…",
-        [
-          "Judul dengan tanggal",
-          "Model dengan sumber unduhan",
-          "Kejadian pada target dengan fungsi respons"
-        ],
-        2,
-        "Listener memanggil fungsi saat event yang didaftarkan terjadi."
-      ],
-      [
-        "Model pihak ketiga tidak mempunyai izin yang jelas. Kamu sebaiknya…",
-        [
-          "Memeriksa sumber atau memilih aset yang ketentuannya jelas",
-          "Menghapus catatan sumber",
-          "Menganggap semua unduhan bebas digunakan"
-        ],
-        0,
-        "Periksa ketentuan penggunaan sebelum memasukkan aset ke karya."
-      ],
-      [
-        "Scene rusak setelah beberapa perubahan. Cara menelusuri penyebabnya?",
-        [
-          "Menambah fitur sampai terlihat berbeda",
-          "Menyatakan masalah, memeriksa perubahan, dan menguji satu dugaan",
-          "Mengubah seluruh kode tanpa mencatat"
-        ],
-        1,
-        "Pengujian satu dugaan membantu menghubungkan perubahan dan hasil."
-      ],
-      [
-        "Dokumentasi revisi yang menunjukkan belajar adalah…",
-        [
-          "Hasil akhir saja",
-          "Jumlah komentar yang diterima saja",
-          "Temuan pengguna, perubahan yang dipilih, dan hasil uji ulang"
-        ],
-        2,
-        "Bukti menjelaskan alasan serta dampak revisi."
-      ]
-    ],
-    "openingQuestions": [
-      [
-        "Setelah memperbaiki target yang sulit ditemukan, kamu perlu…",
-        [
-          "Menguji ulang dengan pengguna",
-          "Menganggap pasti berhasil",
-          "Menghapus bukti sebelumnya"
-        ],
-        0,
-        "Uji ulang memberi bukti apakah masalah telah teratasi."
-      ],
-      [
-        "Dalam demonstrasi individual, bukti penguasaan adalah…",
-        [
-          "Hanya membuka hasil akhir",
-          "Menjelaskan kode dan melakukan modifikasi kecil",
-          "Hanya menyebut bahwa BSD Passed"
-        ],
-        1,
-        "Penjelasan dan modifikasi menunjukkan pemahaman yang dapat diamati."
-      ],
-      [
-        "Kuis latihan terbuka di website ini digunakan untuk…",
-        [
-          "Menetapkan otomatis seluruh nilai akhir",
-          "Menggantikan semua bukti proyek",
-          "Persiapan dan pemeriksaan pemahaman"
-        ],
-        2,
-        "Nilai resmi ditetapkan guru melalui bukti proyek, demonstrasi, dan tes yang diberikan guru."
-      ]
-    ],
-    "bsdFocus": [
-      "Diorama final dan tes konsep yang dipilih/disusun guru hanya untuk materi inti yang benar-benar diajarkan.",
-      "10 soal pada tab Kuis adalah latihan terbuka sebelum pertemuan 9; bukan soal tes resmi yang menghabiskan waktu agenda ini."
-    ],
-    "preparation": "Siapkan tes berbeda dari latihan terbuka, jadwal demonstrasi tersisa, rubrik dan lokasi pengumpulan. Ambil bukti individual sejak pertemuan 7–8.",
-    "minimumTarget": "Karya dan proses dikumpulkan; setiap siswa memberi penjelasan/modifikasi; tes konsep diberikan guru.",
-    "support": "Total slot demonstrasi pertemuan 7–9 adalah 80 menit: sekitar 26 siswa bila 3 menit/orang. Untuk kelas lebih besar, ambil rekaman penjelasan sebelumnya dan cek modifikasi langsung singkat; jangan memaksakan semua presentasi di pertemuan 9.",
-    "exitQuestion": "Pilih satu keputusan desain dan tunjukkan konsep A-Frame yang kamu gunakan. Bukti apa yang menunjukkan keputusan itu berhasil?",
-    "exitExpected": "Menghubungkan keputusan, bagian kode/konsep yang tepat, dan bukti pengujian/karya; bukan sekadar mengatakan selesai.",
-    "brief": {
-      "mainGoal": "Menunjukkan penguasaan melalui diorama final, penjelasan dan modifikasi individual, serta tes konsep dari guru.",
-      "material": [
-        "Demonstrasi menyampaikan tema, fitur yang bekerja, bagian kode penting, dan satu revisi beserta alasannya. Setiap siswa menunjukkan pemahaman sendiri, termasuk jika karya dibuat bersama.",
-        "Penilaian memakai diorama dan proses 70%, demonstrasi individual 20%, serta tes konsep 10%. Kuis terbuka website merupakan latihan sebelum pertemuan ini; tes resmi diberikan guru dengan soal berbeda."
-      ],
-      "why": "Hasil akhir dan penjelasan proses bersama-sama menunjukkan perkembangan belajar selama course.",
-      "tasks": [
-        "Kumpulkan karya final, rancangan, catatan sumber, hasil uji, dan bukti revisi.",
-        "Lakukan demonstrasi sesuai jadwal, jelaskan satu bagian kode, dan modifikasi saat diminta guru.",
-        "Kerjakan tes konsep resmi serta tuliskan refleksi tentang kemampuan dan langkah belajar berikutnya."
-      ],
-      "success": [
-        "Fitur utama diorama berjalan dan dokumen proses dapat diperiksa.",
-        "Kamu dapat menjelaskan keputusan/kode serta melakukan modifikasi secara individual.",
-        "Sumber dan kontribusi dijelaskan dengan jujur; tes konsep serta refleksi selesai."
-      ],
-      "wka": {
-        "principle": "Berkata benar membentuk cara kita mempertanggungjawabkan hasil dan proses belajar.",
-        "reference": "Efesus 4:25",
-        "url": "https://www.bible.com/id/bible/306/EPH.4.25.TB",
-        "practice": "Jelaskan kontribusi sendiri, bantuan yang dipakai, dan sumber aset secara jujur saat demonstrasi.",
-        "question": "Bagian apa yang kamu pahami sendiri, dan bantuan apa yang perlu kamu akui?"
-      },
-      "teacherScript": "Hari ini kalian menunjukkan hasil dan pemahaman dari seluruh perjalanan belajar. Kumpulkan diorama beserta prosesnya, lalu demonstrasikan sesuai jadwal dan kerjakan tes konsep dari saya. Saya mengharapkan kalian dapat menjelaskan kode, alasan desain, dan satu revisi, kemudian melakukan modifikasi kecil. Saat mempresentasikan karya, sebutkan kontribusi, sumber, dan bantuan dengan jujur. Akhiri dengan refleksi tentang perkembangan kalian."
+      "teacherScript": "Mulai hari ini kalian mengerjakan project akhir: diorama VR milik sendiri. Tentukan tema dan apa yang dilakukan pengunjung, lalu bangun dioramanya di Sandbox memakai bentuk, tekstur, cahaya, model, dan interaksi yang sudah kita pelajari. Kirim tautan versi final lewat form sebelum batas waktu. Prinsip memelihara ciptaan membantu kita menggunakan waktu dan aset secara bertanggung jawab."
     }
   }
 ];
@@ -1717,46 +1158,21 @@ const CLASSROOM_TASKS = [
       "Jalankan kamera, cursor, dan target.",
       "Ubah respons warna. Uji dengan menatap target."
     ],
-    "challenge": "Minta teman mencoba tanpa petunjuk. Perbaiki satu bagian yang membingungkan.",
-    "result": "Interaksi berjalan + satu temuan teman + satu perbaikan."
+    "challenge": "",
+    "result": "Interaksi gaze berjalan + penjelasan pemicu dan respons."
   },
   {
     "steps": [
-      "Buka Final Project: Diorama. Lihat proyek sebelumnya sebagai referensi.",
-      "Pilih tema. Buat sketsa dan daftar fitur minimum.",
-      "Cek rancangan dengan guru, lalu mulai scene di Sandbox."
+      "Buka Final Project: Diorama di BSD. Pilih tema dan tentukan satu hal yang dilakukan pengunjung.",
+      "Tulis daftar fitur minimum: bentuk gabungan, tekstur & cahaya, satu model pihak ketiga, dan satu interaksi.",
+      "Bangun dioramanya di Sandbox BSD. Jalankan setiap kali menambah fitur.",
+      "Pastikan semua fitur berjalan, catat sumber aset, lalu simpan versi final.",
+      "Kirim tautan diorama final lewat form di bawah."
     ],
-    "challenge": "Tentukan satu hal yang akan dilakukan pengunjung. Buat scene awal mendukung hal itu.",
-    "result": "Sketsa + daftar fitur + scene awal."
-  },
-  {
-    "steps": [
-      "Buka diorama di Sandbox. Bangun fitur minimum dari rancanganmu.",
-      "Uji scene. Pilih satu masalah untuk diperbaiki.",
-      "Tunjukkan prototipe dan satu bagian kode kepada guru."
-    ],
-    "challenge": "Tulis dugaan → ubah satu hal → uji ulang. Jelaskan apakah masalahnya selesai.",
-    "result": "Prototipe + satu catatan debugging + penjelasan kode."
-  },
-  {
-    "steps": [
-      "Buka diorama di Sandbox. Minta teman mencoba satu tugas.",
-      "Catat satu masalah. Perbaiki fungsi atau tampilannya.",
-      "Uji ulang tugas yang sama. Simpan versi akhir."
-    ],
-    "challenge": "Bandingkan sebelum dan sesudah revisi. Tunjukkan bahwa perbaikannya membantu pengguna.",
-    "result": "Versi final + bukti sebelum/sesudah + alasan revisi."
-  },
-  {
-    "steps": [
-      "Siapkan diorama final dan bukti proses untuk dikumpulkan.",
-      "Demonstrasikan karya. Jelaskan satu bagian kode sesuai jadwal guru.",
-      "Kerjakan tes konsep resmi dari guru."
-    ],
-    "challenge": "Lakukan satu modifikasi kecil yang diminta guru. Prediksi hasilnya, lalu uji.",
-    "result": "Karya final + dokumentasi + demo individual + tes konsep."
+    "challenge": "",
+    "result": "Diorama final + tema & daftar fitur + catatan sumber aset."
   }
 ];
-const CLASSROOM_TIMES = [[["Demo singkat & tujuan",5],["Eksplorasi contoh VR",10],["Scene pertama & tantangan",55],["Tunjukkan hasil & refleksi",10]],[["Demo singkat & target",5],["Modeling terpandu",30],["Modifikasi objek",35],["Tunjukkan hasil & refleksi",10]],[["Demo singkat & target",5],["Tekstur pada scene awal",25],["Cahaya dasar",25],["Bandingkan dua versi",15],["Tunjukkan hasil & refleksi",10]],[["Demo impor & sumber",10],["Impor model terpandu",35],["Skala, posisi & pengujian",25],["Tunjukkan hasil & refleksi",10]],[["Demo pemicu & respons",10],["Gaze dengan kode awal",35],["Uji teman & perbaikan",25],["Tunjukkan hasil & refleksi",10]],[["Brief & rubrik",5],["Tema, sketsa & fitur minimum",20],["Cek rancangan bersama guru",10],["Mulai diorama di Sandbox",35],["Tunjukkan hasil & target berikutnya",10]],[["Target hari ini",5],["Pengembangan diorama",50],["Cek kode & demonstrasi individual",15],["Tunjukkan hasil & log proses",10]],[["Target hari ini",5],["Uji oleh teman",15],["Revisi fungsi & desain",35],["Demonstrasi individual",15],["Simpan hasil & refleksi",10]],[["Siapkan karya",5],["Tes konsep resmi dari guru",15],["Demonstrasi tersisa & pengumpulan",50],["Refleksi akhir",10]]];
+const CLASSROOM_TIMES = [[["Demo singkat & tujuan",5],["Eksplorasi contoh VR",10],["Scene pertama & tantangan",55],["Tunjukkan hasil & refleksi",10]],[["Demo singkat & target",5],["Modeling terpandu",30],["Modifikasi objek",35],["Tunjukkan hasil & refleksi",10]],[["Demo singkat & target",5],["Tekstur pada scene awal",25],["Cahaya dasar",25],["Bandingkan dua versi",15],["Tunjukkan hasil & refleksi",10]],[["Demo impor & sumber",10],["Impor model terpandu",35],["Skala, posisi & pengujian",25],["Tunjukkan hasil & refleksi",10]],[["Demo pemicu & respons",10],["Gaze dengan kode awal",40],["Ubah respons & uji",20],["Tunjukkan hasil & refleksi",10]],[["Brief & rubrik",10],["Tema & daftar fitur",15],["Membangun di Sandbox",45],["Simpan & tunjukkan progres",10]]];
 LESSONS.forEach((lesson,index)=>{lesson.classroom=CLASSROOM_TASKS[index];lesson.times=CLASSROOM_TIMES[index];lesson.brief.tasks=lesson.classroom.steps;});
 LESSONS[0].brief.teacherScript="Hari ini kita membuat scene VR pertama. Buka dua bagian BSD yang tertulis, jalankan satu objek, lalu ubah warnanya. Tantangannya: tambah objek kedua dengan warna berbeda. Tunjukkan hasil dan kode satu atribut kepada saya.";
